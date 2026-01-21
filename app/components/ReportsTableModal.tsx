@@ -1,0 +1,404 @@
+"use client";
+
+import { useState } from "react";
+import { Report, ReportCategory } from "../types";
+import { getCategoryLabel, getCategoryColor } from "../utils/categoryHelpers";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+
+interface ReportsTableModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  reports: Report[];
+  onReportClick: (report: Report) => void;
+}
+
+type SortField = "createdAt" | "category" | "barrio";
+type SortDirection = "asc" | "desc";
+
+export default function ReportsTableModal({
+  isOpen,
+  onClose,
+  reports,
+  onReportClick,
+}: ReportsTableModalProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<ReportCategory | "all">(
+    "all",
+  );
+  const [dateFilter, setDateFilter] = useState<
+    "all" | "today" | "week" | "month"
+  >("all");
+  const [sortField, setSortField] = useState<SortField>("createdAt");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  if (!isOpen) return null;
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Filtrar reportes
+  const getFilteredReports = () => {
+    const now = new Date();
+    return reports.filter((report) => {
+      // Filtro de búsqueda
+      const matchesSearch =
+        searchTerm === "" ||
+        report.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        report.barrio.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        report.direccion.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Filtro de categoría
+      const matchesCategory =
+        categoryFilter === "all" || report.category === categoryFilter;
+
+      // Filtro de fecha
+      const reportDate = new Date(report.createdAt);
+      let matchesDate = true;
+      switch (dateFilter) {
+        case "today":
+          matchesDate = reportDate.toDateString() === now.toDateString();
+          break;
+        case "week":
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          matchesDate = reportDate >= weekAgo;
+          break;
+        case "month":
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          matchesDate = reportDate >= monthAgo;
+          break;
+      }
+
+      return matchesSearch && matchesCategory && matchesDate;
+    });
+  };
+
+  // Ordenar reportes
+  const getSortedReports = () => {
+    const filtered = getFilteredReports();
+    return [...filtered].sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (sortField) {
+        case "createdAt":
+          aValue = new Date(a.createdAt).getTime();
+          bValue = new Date(b.createdAt).getTime();
+          break;
+        case "category":
+          aValue = a.category;
+          bValue = b.category;
+          break;
+        case "barrio":
+          aValue = a.barrio;
+          bValue = b.barrio;
+          break;
+      }
+
+      if (sortDirection === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+  };
+
+  const sortedReports = getSortedReports();
+
+  // Paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentReports = sortedReports.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedReports.length / itemsPerPage);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+
+  // Exportar a PDF
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Reportes Ciudadanos - Reconquista, Santa Fe", 14, 20);
+    doc.setFontSize(11);
+    doc.text(`Generado: ${new Date().toLocaleString("es-AR")}`, 14, 28);
+    doc.text(`Total de reportes: ${sortedReports.length}`, 14, 35);
+
+    const tableData = sortedReports.map((report) => [
+      formatDate(report.createdAt),
+      getCategoryLabel(report.category).replace(/[^\w\s]/gi, ""),
+      report.barrio,
+      report.direccion,
+      report.description,
+    ]);
+
+    autoTable(doc, {
+      head: [["Fecha", "Categoría", "Barrio", "Dirección", "Descripción"]],
+      body: tableData,
+      startY: 40,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [37, 99, 235] },
+    });
+
+    doc.save(`reportes-${new Date().toISOString().split("T")[0]}.pdf`);
+  };
+
+  // Exportar a Excel
+  const exportToExcel = () => {
+    const wsData = [
+      [
+        "Fecha",
+        "Categoría",
+        "Barrio",
+        "Dirección",
+        "Descripción",
+        "Latitud",
+        "Longitud",
+      ],
+    ];
+
+    sortedReports.forEach((report) => {
+      wsData.push([
+        formatDate(report.createdAt),
+        getCategoryLabel(report.category),
+        report.barrio,
+        report.direccion,
+        report.description,
+        report.lat.toString(),
+        report.lng.toString(),
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Reportes");
+
+    XLSX.writeFile(
+      wb,
+      `reportes-${new Date().toISOString().split("T")[0]}.xlsx`,
+    );
+  };
+
+  return (
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{
+        zIndex: 9999,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        backdropFilter: "blur(4px)",
+      }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-6 border-b flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Todos los Reportes
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {sortedReports.length} reporte(s) encontrado(s)
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-3xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Filtros y Búsqueda */}
+        <div className="p-4 border-b bg-gray-50 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <input
+              type="text"
+              placeholder="Buscar por descripción, barrio o dirección..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            />
+
+            <select
+              value={categoryFilter}
+              onChange={(e) =>
+                setCategoryFilter(e.target.value as ReportCategory | "all")
+              }
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            >
+              <option value="all">Todas las categorías</option>
+              <option value="basura">🗑️ Basura</option>
+              <option value="alumbrado">💡 Alumbrado</option>
+              <option value="baches">🚧 Baches</option>
+              <option value="pastizales">🌿 Pastizales</option>
+            </select>
+
+            <select
+              value={dateFilter}
+              onChange={(e) =>
+                setDateFilter(
+                  e.target.value as "all" | "today" | "week" | "month",
+                )
+              }
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            >
+              <option value="all">Todas las fechas</option>
+              <option value="today">Hoy</option>
+              <option value="week">Última semana</option>
+              <option value="month">Último mes</option>
+            </select>
+
+            <div className="flex gap-2">
+              <button
+                onClick={exportToPDF}
+                className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+              >
+                📄 PDF
+              </button>
+              <button
+                onClick={exportToExcel}
+                className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                📊 Excel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabla */}
+        <div className="flex-1 overflow-auto p-4">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-100 sticky top-0">
+              <tr>
+                <th
+                  className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort("createdAt")}
+                >
+                  Fecha{" "}
+                  {sortField === "createdAt" &&
+                    (sortDirection === "asc" ? "↑" : "↓")}
+                </th>
+                <th
+                  className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort("category")}
+                >
+                  Categoría{" "}
+                  {sortField === "category" &&
+                    (sortDirection === "asc" ? "↑" : "↓")}
+                </th>
+                <th
+                  className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort("barrio")}
+                >
+                  Barrio{" "}
+                  {sortField === "barrio" &&
+                    (sortDirection === "asc" ? "↑" : "↓")}
+                </th>
+                <th className="px-4 py-3 text-left">Dirección</th>
+                <th className="px-4 py-3 text-left">Descripción</th>
+                <th className="px-4 py-3 text-left">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentReports.map((report) => (
+                <tr
+                  key={report.id}
+                  className="border-b hover:bg-gray-50 cursor-pointer"
+                  onClick={() => onReportClick(report)}
+                >
+                  <td className="px-4 py-3 text-gray-700 text-xs">
+                    {formatDate(report.createdAt)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getCategoryColor(report.category)}`}
+                    >
+                      {getCategoryLabel(report.category)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">{report.barrio}</td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {report.direccion}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700">
+                    {report.description.length > 50
+                      ? report.description.substring(0, 50) + "..."
+                      : report.description}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onReportClick(report);
+                      }}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Ver
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {currentReports.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              No se encontraron reportes con los filtros seleccionados
+            </div>
+          )}
+        </div>
+
+        {/* Paginación */}
+        {totalPages > 1 && (
+          <div className="p-4 border-t bg-gray-50 flex justify-between items-center">
+            <div className="text-sm text-gray-600">
+              Mostrando {indexOfFirstItem + 1} -{" "}
+              {Math.min(indexOfLastItem, sortedReports.length)} de{" "}
+              {sortedReports.length}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Anterior
+              </button>
+              <span className="px-3 py-1 text-gray-700">
+                Página {currentPage} de {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
