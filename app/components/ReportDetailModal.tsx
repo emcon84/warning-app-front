@@ -80,7 +80,9 @@ export default function ReportDetailModal({
               <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
                 DESCRIPCIÓN
               </h3>
-              <p className="text-sm sm:text-lg text-gray-900">{report.description}</p>
+              <p className="text-sm sm:text-lg text-gray-900">
+                {report.description}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -88,13 +90,17 @@ export default function ReportDetailModal({
                 <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
                   📍 BARRIO
                 </h3>
-                <p className="text-sm sm:text-base text-gray-900 truncate">{report.barrio}</p>
+                <p className="text-sm sm:text-base text-gray-900 truncate">
+                  {report.barrio}
+                </p>
               </div>
               <div>
                 <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
                   🏠 DIRECCIÓN
                 </h3>
-                <p className="text-sm sm:text-base text-gray-900 truncate">{report.direccion}</p>
+                <p className="text-sm sm:text-base text-gray-900 truncate">
+                  {report.direccion}
+                </p>
               </div>
             </div>
 
@@ -111,7 +117,9 @@ export default function ReportDetailModal({
               <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
                 🕒 FECHA Y HORA
               </h3>
-              <p className="text-sm sm:text-base text-gray-900">{formatDate(report.createdAt)}</p>
+              <p className="text-sm sm:text-base text-gray-900">
+                {formatDate(report.createdAt)}
+              </p>
             </div>
           </div>
 

@@ -21,7 +21,10 @@
       "purpose": "maskable any"
     }
   ],
-  "categories": ["government", "utilities"],
+  "categories": [
+    "government",
+    "utilities"
+  ],
   "screenshots": [],
   "share_target": {
     "action": "/",

@@ -37,7 +37,7 @@ export default function Sidebar({
   };
 
   return (
-    <div 
+    <div
       className={`
         fixed md:relative
         inset-y-0 left-0
@@ -47,7 +47,7 @@ export default function Sidebar({
         h-full
         z-[1000]
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
     >
       {/* Header */}
@@ -57,7 +57,9 @@ export default function Sidebar({
             <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
               Reportes Ciudadanos
             </h1>
-            <p className="text-xs md:text-sm text-gray-600">Reconquista, Santa Fe</p>
+            <p className="text-xs md:text-sm text-gray-600">
+              Reconquista, Santa Fe
+            </p>
             <p className="text-xs text-gray-500 mt-1">
               Haz clic en el mapa para reportar
             </p>
@@ -134,7 +136,9 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto p-3 md:p-4">
         {reports.length === 0 ? (
           <div className="text-center text-gray-500 py-8">
-            <p className="text-xs md:text-sm">No hay reportes en este período</p>
+            <p className="text-xs md:text-sm">
+              No hay reportes en este período
+            </p>
           </div>
         ) : (
           <ul className="space-y-2 md:space-y-3">
