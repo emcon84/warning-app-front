@@ -13,10 +13,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  // Deshabilitar Turbopack para compatibilidad con PWA
-  experimental: {
-    turbo: undefined,
-  },
+  /* config options here */
 };
 
 export default withPWA(nextConfig);
