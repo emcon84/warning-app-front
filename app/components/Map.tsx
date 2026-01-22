@@ -85,7 +85,8 @@ export default function MapComponent({
     <MapContainer
       center={defaultCenter}
       zoom={13}
-      style={{ width: "100%", height: "100vh" }}
+      style={{ width: "100%", height: "100%", minHeight: "100vh" }}
+      className="z-0"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

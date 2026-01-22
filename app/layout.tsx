@@ -13,8 +13,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Reportes de Basura - Mi Localidad",
-  description: "Reporta los lugares donde el basurero no recogió la basura",
+  title: "Reportes Ciudadanos - Reconquista",
+  description: "Sistema de reportes ciudadanos para Reconquista, Santa Fe. Reportá problemas de basura, alumbrado, baches y pastizales.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Reportes RQ",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Reportes Ciudadanos Reconquista",
+    title: "Reportes Ciudadanos - Reconquista",
+    description: "Sistema de reportes ciudadanos para Reconquista, Santa Fe",
+  },
+  twitter: {
+    card: "summary",
+    title: "Reportes Ciudadanos - Reconquista",
+    description: "Sistema de reportes ciudadanos para Reconquista, Santa Fe",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
@@ -23,7 +50,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
+      <head>
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

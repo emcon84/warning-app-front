@@ -34,6 +34,7 @@ export default function Home() {
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Cargar reportes al montar el componente
   useEffect(() => {
@@ -155,7 +156,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Mensaje de error si la API no está disponible */}
       {error && (
         <div className="absolute top-4 right-4 z-[1000] bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-md">
@@ -175,6 +176,44 @@ export default function Home() {
         </div>
       )}
 
+      {/* Botón hamburguesa para mobile */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="fixed top-4 left-4 z-[1001] bg-white p-3 rounded-lg shadow-lg md:hidden hover:bg-gray-50 transition-colors"
+        aria-label="Toggle menu"
+      >
+        <svg
+          className="w-6 h-6 text-gray-700"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          {isSidebarOpen ? (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          )}
+        </svg>
+      </button>
+
+      {/* Overlay para cerrar sidebar en mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <Sidebar
         reports={filteredReports}
@@ -183,12 +222,14 @@ export default function Home() {
         totalReports={reports.length}
         onReportClick={handleReportClick}
         onViewAll={handleViewAll}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       {/* Mapa */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative w-full h-full">
         {/* Indicador de instrucción */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999] bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999] bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-full shadow-lg text-xs md:text-sm max-w-[90%] md:max-w-none text-center">
           📍 Tocá el mapa para crear un reporte
         </div>
 

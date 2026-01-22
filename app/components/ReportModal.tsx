@@ -84,7 +84,7 @@ export default function ReportModal({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center p-4"
+      className="fixed inset-0 flex items-center justify-center p-2 sm:p-4"
       style={{
         zIndex: 9999,
         backgroundColor: "rgba(0, 0, 0, 0.7)",
@@ -93,27 +93,27 @@ export default function ReportModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-lg shadow-xl max-w-lg w-full p-4 sm:p-6 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold mb-4 text-gray-900">
+        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-900">
           Crear Reporte Ciudadano
         </h2>
 
-        <div className="mb-4 text-sm text-gray-600 bg-gray-50 p-3 rounded">
+        <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded">
           <p>
             <strong>📍 Ubicación:</strong>
           </p>
-          <p>
+          <p className="break-all">
             Lat: {lat.toFixed(6)}, Lng: {lng.toFixed(6)}
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4">
             <label
               htmlFor="category"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
               Categoría del reporte: <span className="text-red-500">*</span>
             </label>
@@ -121,7 +121,7 @@ export default function ReportModal({
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value as ReportCategory)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
               required
             >
               <option value="basura">🗑️ Falta de recolección de basura</option>
@@ -133,10 +133,10 @@ export default function ReportModal({
             </select>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4">
             <label
               htmlFor="barrio"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
               Barrio: <span className="text-red-500">*</span>
             </label>
@@ -145,16 +145,16 @@ export default function ReportModal({
               id="barrio"
               value={barrio}
               onChange={(e) => setBarrio(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
               placeholder="Ej: Centro, Villa Ocampo, etc."
               required
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4">
             <label
               htmlFor="direccion"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
               Dirección: <span className="text-red-500">*</span>
             </label>
@@ -163,16 +163,16 @@ export default function ReportModal({
               id="direccion"
               value={direccion}
               onChange={(e) => setDireccion(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
               placeholder="Ej: Calle Falsa 123"
               required
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4">
             <label
               htmlFor="fecha"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
               📅 Fecha (opcional):
             </label>
@@ -181,17 +181,17 @@ export default function ReportModal({
               id="fecha"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
             />
             <p className="text-xs text-gray-500 mt-1">
               Si no seleccionas una fecha, se usará la fecha de hoy
             </p>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-3 sm:mb-4">
             <label
               htmlFor="description"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
               Descripción del problema: <span className="text-red-500">*</span>
             </label>
@@ -199,17 +199,17 @@ export default function ReportModal({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
               rows={3}
               placeholder="Describe qué sucedió (ej: La basura lleva 3 días sin recoger)"
               required
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 sm:mb-6">
             <label
               htmlFor="photo"
-              className="block text-gray-700 font-medium mb-2"
+              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
               📷 Foto (opcional):
             </label>
@@ -218,30 +218,30 @@ export default function ReportModal({
               id="photo"
               accept="image/*"
               onChange={handlePhotoChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-xs sm:text-sm file:mr-2 sm:file:mr-4 file:py-1 sm:file:py-2 file:px-2 sm:file:px-4 file:rounded-full file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
             {photo && (
               <div className="mt-2">
                 <img
                   src={photo}
                   alt="Preview"
-                  className="max-h-40 rounded-lg"
+                  className="max-h-32 sm:max-h-40 rounded-lg w-auto mx-auto"
                 />
               </div>
             )}
           </div>
 
-          <div className="flex gap-3 justify-end">
+          <div className="flex gap-2 sm:gap-3 justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+              className="px-3 sm:px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
             >
               Crear Reporte
             </button>
