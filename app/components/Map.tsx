@@ -10,23 +10,22 @@ import {
 import "leaflet/dist/leaflet.css";
 import { Report, ReportCategory } from "../types";
 import L from "leaflet";
-import { getCategoryLabel } from "../utils/categoryHelpers";
+import {
+  getCategoryLabel,
+  getCategoryIconSvg,
+  getCategoryIcon,
+} from "../utils/categoryHelpers";
 
 // Crear iconos personalizados para cada categoría
 const createCustomIcon = (category: ReportCategory) => {
-  const icons = {
-    basura: "🗑️",
-    alumbrado: "💡",
-    baches: "🚧",
-    pastizales: "🌿",
-  };
-
   const colors = {
     basura: "#f97316", // orange-500
     alumbrado: "#eab308", // yellow-500
     baches: "#ef4444", // red-500
     pastizales: "#22c55e", // green-500
   };
+
+  const iconSvg = getCategoryIconSvg(category);
 
   return L.divIcon({
     html: `
@@ -42,10 +41,13 @@ const createCustomIcon = (category: ReportCategory) => {
         align-items: center;
         justify-content: center;
       ">
-        <span style="
+        <div style="
           transform: rotate(45deg);
-          font-size: 20px;
-        ">${icons[category]}</span>
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">${iconSvg}</div>
       </div>
     `,
     className: "custom-marker",
@@ -109,7 +111,11 @@ export default function MapComponent({
                 />
               )}
               <div className="mb-2">
-                <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-gray-100">
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold bg-gray-100">
+                  {(() => {
+                    const Icon = getCategoryIcon(report.category);
+                    return <Icon className="w-3 h-3" />;
+                  })()}
                   {getCategoryLabel(report.category)}
                 </span>
               </div>
@@ -117,11 +123,39 @@ export default function MapComponent({
                 {report.description}
               </p>
               <div className="text-xs text-gray-600 space-y-1">
-                <p>
-                  <strong>📍 Barrio:</strong> {report.barrio}
+                <p className="flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <strong>Barrio:</strong> {report.barrio}
                 </p>
-                <p>
-                  <strong>🏠 Dirección:</strong> {report.direccion}
+                <p className="flex items-center gap-1">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                  <strong>Dirección:</strong> {report.direccion}
                 </p>
                 <p className="text-gray-500 mt-1">
                   {new Date(report.createdAt).toLocaleString("es-AR")}

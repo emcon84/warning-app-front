@@ -7,7 +7,9 @@ import ReportDetailModal from "./components/ReportDetailModal";
 import ReportsTableModal from "./components/ReportsTableModal";
 import { Report, ReportCategory } from "./types";
 import Sidebar from "./components/Sidebar";
+import Navbar from "./components/Navbar";
 import { getReports, createReport } from "./utils/api";
+import { MapPin, AlertTriangle } from "lucide-react";
 
 // Cargar el mapa dinámicamente para evitar errores de SSR
 const MapComponent = dynamic(() => import("./components/Map"), {
@@ -156,12 +158,12 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden">
       {/* Mensaje de error si la API no está disponible */}
       {error && (
-        <div className="absolute top-4 right-4 z-[1000] bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-md">
+        <div className="absolute top-20 right-4 z-[1000] bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-md">
           <div className="flex items-start">
-            <span className="text-xl mr-2">⚠️</span>
+            <AlertTriangle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold">Error de conexión</p>
               <p className="text-sm">{error}</p>
@@ -176,64 +178,44 @@ export default function Home() {
         </div>
       )}
 
-      {/* Botón hamburguesa para mobile */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="fixed top-4 left-4 z-[1001] bg-white p-3 rounded-lg shadow-lg md:hidden hover:bg-gray-50 transition-colors"
-        aria-label="Toggle menu"
-      >
-        <svg
-          className="w-6 h-6 text-gray-700"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          {isSidebarOpen ? (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          ) : (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          )}
-        </svg>
-      </button>
-
-      {/* Overlay para cerrar sidebar en mobile */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <Sidebar
-        reports={filteredReports}
-        filterPeriod={filterPeriod}
-        onFilterChange={setFilterPeriod}
+      {/* Navbar */}
+      <Navbar
         totalReports={reports.length}
-        onReportClick={handleReportClick}
-        onViewAll={handleViewAll}
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
+        onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
       />
 
-      {/* Mapa */}
-      <div className="flex-1 relative w-full h-full">
-        {/* Indicador de instrucción */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999] bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-full shadow-lg text-xs md:text-sm max-w-[90%] md:max-w-none text-center">
-          📍 Tocá el mapa para crear un reporte
-        </div>
+      {/* Contenedor principal con navbar */}
+      <div className="flex flex-1 overflow-hidden mt-[60px]">
+        {/* Overlay para cerrar sidebar en mobile */}
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
 
-        <MapComponent onMapClick={handleMapClick} reports={filteredReports} />
+        {/* Sidebar */}
+        <Sidebar
+          reports={filteredReports}
+          filterPeriod={filterPeriod}
+          onFilterChange={setFilterPeriod}
+          totalReports={reports.length}
+          onReportClick={handleReportClick}
+          onViewAll={handleViewAll}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+
+        {/* Mapa */}
+        <div className="flex-1 relative w-full h-full">
+          {/* Indicador de instrucción */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999] bg-gray-900 text-white px-3 py-2 md:px-4 md:py-2 rounded-full shadow-lg text-xs md:text-sm max-w-[90%] md:max-w-none text-center flex items-center gap-2 justify-center">
+            <MapPin className="w-4 h-4" />
+            Tocá el mapa para crear un reporte
+          </div>
+
+          <MapComponent onMapClick={handleMapClick} reports={filteredReports} />
+        </div>
       </div>
 
       {/* Modal de reporte - fuera del contenedor del mapa */}

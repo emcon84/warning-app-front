@@ -1,7 +1,12 @@
 "use client";
 
 import { Report } from "../types";
-import { getCategoryLabel, getCategoryColor } from "../utils/categoryHelpers";
+import {
+  getCategoryLabel,
+  getCategoryColor,
+  getCategoryIcon,
+} from "../utils/categoryHelpers";
+import { MapPin, Home, Navigation, Clock } from "lucide-react";
 
 interface ReportDetailModalProps {
   isOpen: boolean;
@@ -70,8 +75,12 @@ export default function ReportDetailModal({
                 CATEGORÍA
               </h3>
               <div
-                className={`inline-block px-2 sm:px-3 py-1 rounded text-xs sm:text-sm font-semibold border ${getCategoryColor(report.category)}`}
+                className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm font-semibold border ${getCategoryColor(report.category)}`}
               >
+                {(() => {
+                  const Icon = getCategoryIcon(report.category);
+                  return <Icon className="w-4 h-4" />;
+                })()}
                 {getCategoryLabel(report.category)}
               </div>
             </div>
@@ -87,16 +96,18 @@ export default function ReportDetailModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                  📍 BARRIO
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4" />
+                  BARRIO
                 </h3>
                 <p className="text-sm sm:text-base text-gray-900 truncate">
                   {report.barrio}
                 </p>
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                  🏠 DIRECCIÓN
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                  <Home className="w-4 h-4" />
+                  DIRECCIÓN
                 </h3>
                 <p className="text-sm sm:text-base text-gray-900 truncate">
                   {report.direccion}
@@ -105,8 +116,9 @@ export default function ReportDetailModal({
             </div>
 
             <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                📐 COORDENADAS
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                <Navigation className="w-4 h-4" />
+                COORDENADAS
               </h3>
               <p className="text-gray-900 font-mono text-xs sm:text-sm break-all">
                 Lat: {report.lat.toFixed(6)}, Lng: {report.lng.toFixed(6)}
@@ -114,8 +126,9 @@ export default function ReportDetailModal({
             </div>
 
             <div>
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                🕒 FECHA Y HORA
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                <Clock className="w-4 h-4" />
+                FECHA Y HORA
               </h3>
               <p className="text-sm sm:text-base text-gray-900">
                 {formatDate(report.createdAt)}
@@ -126,7 +139,7 @@ export default function ReportDetailModal({
           <div className="mt-4 sm:mt-6 flex justify-end">
             <button
               onClick={onClose}
-              className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              className="px-4 sm:px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
             >
               Cerrar
             </button>

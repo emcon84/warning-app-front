@@ -1,7 +1,20 @@
 "use client";
 
 import { Report } from "../types";
-import { getCategoryLabel, getCategoryColor } from "../utils/categoryHelpers";
+import {
+  getCategoryLabel,
+  getCategoryColor,
+  getCategoryIcon,
+} from "../utils/categoryHelpers";
+import {
+  Calendar,
+  CalendarDays,
+  BarChart3,
+  MapPin,
+  Home,
+  Navigation,
+  Clock,
+} from "lucide-react";
 
 type FilterPeriod = "today" | "week";
 
@@ -41,14 +54,13 @@ export default function Sidebar({
       className={`
         fixed md:relative
         inset-y-0 left-0
-        w-80 md:w-80 lg:w-96
+        w-full md:w-80 lg:w-96
         bg-white shadow-lg 
         flex flex-col 
         h-full
         z-[1000]
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-      `}
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}        pt-[60px] md:pt-0      `}
     >
       {/* Header */}
       <div className="p-4 border-b">
@@ -96,31 +108,34 @@ export default function Sidebar({
           <div className="flex gap-2">
             <button
               onClick={() => onFilterChange("today")}
-              className={`flex-1 px-2 md:px-3 py-2 rounded-lg text-xs md:text-sm transition-colors font-medium ${
+              className={`flex-1 px-2 md:px-3 py-2 rounded-lg text-xs md:text-sm transition-colors font-medium flex items-center justify-center gap-1.5 ${
                 filterPeriod === "today"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-gray-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
               }`}
             >
-              📅 Hoy
+              <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              Hoy
             </button>
             <button
               onClick={() => onFilterChange("week")}
-              className={`flex-1 px-2 md:px-3 py-2 rounded-lg text-xs md:text-sm transition-colors font-medium ${
+              className={`flex-1 px-2 md:px-3 py-2 rounded-lg text-xs md:text-sm transition-colors font-medium flex items-center justify-center gap-1.5 ${
                 filterPeriod === "week"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-gray-900 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
               }`}
             >
-              📆 Semana
+              <CalendarDays className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              Semana
             </button>
           </div>
 
           <button
             onClick={onViewAll}
-            className="w-full px-2 md:px-3 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all text-xs md:text-sm font-medium shadow-md"
+            className="w-full px-2 md:px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all text-xs md:text-sm font-medium shadow-md flex items-center justify-center gap-2"
           >
-            📊 Ver Todos los Reportes
+            <BarChart3 className="w-4 h-4" />
+            Ver Todos los Reportes
           </button>
         </div>
         <div className="mt-3 text-xs md:text-sm text-gray-600">
@@ -159,25 +174,33 @@ export default function Sidebar({
                   />
                 )}
                 <div
-                  className={`inline-block px-2 py-1 rounded text-xs font-semibold mb-2 border ${getCategoryColor(report.category)}`}
+                  className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold mb-2 border ${getCategoryColor(report.category)}`}
                 >
+                  {(() => {
+                    const Icon = getCategoryIcon(report.category);
+                    return <Icon className="w-3.5 h-3.5" />;
+                  })()}
                   {getCategoryLabel(report.category)}
                 </div>
                 <p className="text-gray-900 font-medium text-xs md:text-sm mb-2 line-clamp-2">
                   {report.description}
                 </p>
                 <div className="text-xs text-gray-600 space-y-1 bg-white p-2 rounded">
-                  <p className="truncate">
-                    <strong>📍 Barrio:</strong> {report.barrio}
+                  <p className="truncate flex items-center gap-1">
+                    <MapPin className="w-3 h-3 flex-shrink-0" />
+                    <strong>Barrio:</strong> {report.barrio}
                   </p>
-                  <p className="truncate">
-                    <strong>🏠 Dirección:</strong> {report.direccion}
+                  <p className="truncate flex items-center gap-1">
+                    <Home className="w-3 h-3 flex-shrink-0" />
+                    <strong>Dirección:</strong> {report.direccion}
                   </p>
-                  <p className="text-gray-500 text-[10px] md:text-xs truncate">
-                    📐 {report.lat.toFixed(4)}, {report.lng.toFixed(4)}
+                  <p className="text-gray-500 text-[10px] md:text-xs truncate flex items-center gap-1">
+                    <Navigation className="w-3 h-3 flex-shrink-0" />
+                    {report.lat.toFixed(4)}, {report.lng.toFixed(4)}
                   </p>
-                  <p className="text-gray-500 text-[10px] md:text-xs">
-                    🕒 {formatDate(report.createdAt)}
+                  <p className="text-gray-500 text-[10px] md:text-xs flex items-center gap-1">
+                    <Clock className="w-3 h-3 flex-shrink-0" />
+                    {formatDate(report.createdAt)}
                   </p>
                 </div>
               </li>

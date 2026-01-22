@@ -2,10 +2,22 @@
 
 import { useState } from "react";
 import { Report, ReportCategory } from "../types";
-import { getCategoryLabel, getCategoryColor } from "../utils/categoryHelpers";
+import {
+  getCategoryLabel,
+  getCategoryColor,
+  getCategoryIcon,
+} from "../utils/categoryHelpers";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
+import {
+  FileText,
+  Download,
+  Trash2,
+  Lightbulb,
+  Construction,
+  Trees,
+} from "lucide-react";
 
 interface ReportsTableModalProps {
   isOpen: boolean;
@@ -246,10 +258,10 @@ export default function ReportsTableModal({
               className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
             >
               <option value="all">Todas las categorías</option>
-              <option value="basura">🗑️ Basura</option>
-              <option value="alumbrado">💡 Alumbrado</option>
-              <option value="baches">🚧 Baches</option>
-              <option value="pastizales">🌿 Pastizales</option>
+              <option value="basura">Basura</option>
+              <option value="alumbrado">Alumbrado</option>
+              <option value="baches">Baches</option>
+              <option value="pastizales">Pastizales</option>
             </select>
 
             <select
@@ -270,15 +282,17 @@ export default function ReportsTableModal({
             <div className="flex gap-1 sm:gap-2">
               <button
                 onClick={exportToPDF}
-                className="flex-1 px-2 sm:px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm font-medium"
+                className="flex-1 px-2 sm:px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5"
               >
-                📄 PDF
+                <FileText className="w-3.5 h-3.5" />
+                PDF
               </button>
               <button
                 onClick={exportToExcel}
-                className="flex-1 px-2 sm:px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-sm font-medium"
+                className="flex-1 px-2 sm:px-3 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5"
               >
-                📊 Excel
+                <Download className="w-3.5 h-3.5" />
+                Excel
               </button>
             </div>
           </div>
@@ -296,8 +310,12 @@ export default function ReportsTableModal({
               >
                 <div className="flex justify-between items-start mb-2">
                   <span
-                    className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getCategoryColor(report.category)}`}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold border ${getCategoryColor(report.category)}`}
                   >
+                    {(() => {
+                      const Icon = getCategoryIcon(report.category);
+                      return <Icon className="w-3 h-3" />;
+                    })()}
                     {getCategoryLabel(report.category)}
                   </span>
                   <span className="text-xs text-gray-500">
@@ -308,11 +326,39 @@ export default function ReportsTableModal({
                   {report.description}
                 </p>
                 <div className="text-xs text-gray-600 space-y-1">
-                  <p className="truncate">
-                    <strong>📍</strong> {report.barrio}
+                  <p className="truncate flex items-center gap-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <strong>{report.barrio}</strong>
                   </p>
-                  <p className="truncate">
-                    <strong>🏠</strong> {report.direccion}
+                  <p className="truncate flex items-center gap-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    <strong>{report.direccion}</strong>
                   </p>
                 </div>
               </div>
@@ -364,8 +410,12 @@ export default function ReportsTableModal({
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${getCategoryColor(report.category)}`}
+                      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold border ${getCategoryColor(report.category)}`}
                     >
+                      {(() => {
+                        const Icon = getCategoryIcon(report.category);
+                        return <Icon className="w-3.5 h-3.5" />;
+                      })()}
                       {getCategoryLabel(report.category)}
                     </span>
                   </td>

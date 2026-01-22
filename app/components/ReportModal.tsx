@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import { ReportCategory } from "../types";
+import {
+  MapPin,
+  Calendar,
+  Trash2,
+  Lightbulb,
+  Construction,
+  Trees,
+} from "lucide-react";
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -101,8 +109,9 @@ export default function ReportModal({
         </h2>
 
         <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded">
-          <p>
-            <strong>📍 Ubicación:</strong>
+          <p className="flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5" />
+            <strong>Ubicación:</strong>
           </p>
           <p className="break-all">
             Lat: {lat.toFixed(6)}, Lng: {lng.toFixed(6)}
@@ -124,11 +133,11 @@ export default function ReportModal({
               className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
               required
             >
-              <option value="basura">🗑️ Falta de recolección de basura</option>
-              <option value="alumbrado">💡 Falta de alumbrado público</option>
-              <option value="baches">🚧 Baches en vía pública</option>
+              <option value="basura">Falta de recolección de basura</option>
+              <option value="alumbrado">Falta de alumbrado público</option>
+              <option value="baches">Baches en vía pública</option>
               <option value="pastizales">
-                🌿 Falta de limpieza de pastizales
+                Falta de limpieza de pastizales
               </option>
             </select>
           </div>
@@ -172,9 +181,10 @@ export default function ReportModal({
           <div className="mb-3 sm:mb-4">
             <label
               htmlFor="fecha"
-              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
+              className="flex items-center gap-1.5 text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
-              📅 Fecha (opcional):
+              <Calendar className="w-4 h-4" />
+              Fecha (opcional):
             </label>
             <input
               type="date"
@@ -241,7 +251,7 @@ export default function ReportModal({
             </button>
             <button
               type="submit"
-              className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              className="px-3 sm:px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
             >
               Crear Reporte
             </button>
