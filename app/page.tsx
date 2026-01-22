@@ -30,7 +30,7 @@ export default function Home() {
     lat: number;
     lng: number;
   } | null>(null);
-  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>("today");
+  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>("week");
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
