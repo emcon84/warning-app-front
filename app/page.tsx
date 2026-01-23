@@ -72,6 +72,7 @@ export default function Home() {
     direccion: string;
     photo?: File;
     fecha?: string;
+    isUrgent?: boolean;
   }) => {
     console.log("handleSubmitReport llamado con:", data);
     console.log("selectedLocation:", selectedLocation);
@@ -87,6 +88,7 @@ export default function Home() {
           direccion: data.direccion,
           photo: data.photo,
           fecha: data.fecha,
+          isUrgent: data.isUrgent,
         });
 
         console.log("Reporte creado exitosamente:", newReport);

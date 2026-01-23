@@ -11,6 +11,7 @@ export interface CreateReportData {
   direccion: string;
   photo?: File | string;
   fecha?: string;
+  isUrgent?: boolean;
 }
 
 export interface ReportFilters {
@@ -75,6 +76,8 @@ export async function createReport(data: CreateReportData): Promise<Report> {
       formData.append("barrio", data.barrio);
       formData.append("direccion", data.direccion);
       if (data.fecha) formData.append("fecha", data.fecha);
+      if (data.isUrgent !== undefined)
+        formData.append("isUrgent", data.isUrgent.toString());
       formData.append("photo", data.photo);
       body = formData;
     } else {

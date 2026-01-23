@@ -9,6 +9,8 @@ import {
   Lightbulb,
   Construction,
   Trees,
+  Phone,
+  AlertTriangle,
 } from "lucide-react";
 
 interface ReportModalProps {
@@ -21,6 +23,7 @@ interface ReportModalProps {
     direccion: string;
     photo?: File;
     fecha?: string;
+    isUrgent?: boolean;
   }) => void;
   lat: number;
   lng: number;
@@ -42,6 +45,7 @@ export default function ReportModal({
     undefined,
   );
   const [fecha, setFecha] = useState<string>("");
+  const [isUrgent, setIsUrgent] = useState(false);
 
   if (!isOpen) return null;
 
@@ -68,6 +72,7 @@ export default function ReportModal({
       direccion,
       photo,
       fecha,
+      isUrgent,
     });
 
     if (description.trim() && barrio.trim() && direccion.trim()) {
@@ -79,6 +84,7 @@ export default function ReportModal({
         direccion,
         photo,
         fecha: fecha || undefined,
+        isUrgent: category === "robo" ? isUrgent : false,
       });
       setCategory("basura");
       setDescription("");
@@ -87,6 +93,7 @@ export default function ReportModal({
       setPhoto(undefined);
       setPhotoPreview(undefined);
       setFecha("");
+      setIsUrgent(false);
     } else {
       console.log("Validación fallida:", {
         description: description.trim(),
@@ -135,7 +142,10 @@ export default function ReportModal({
             <select
               id="category"
               value={category}
-              onChange={(e) => setCategory(e.target.value as ReportCategory)}
+              onChange={(e) => {
+                setCategory(e.target.value as ReportCategory);
+                setIsUrgent(false); // Reset urgent flag when changing category
+              }}
               className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
               required
             >
@@ -176,6 +186,49 @@ export default function ReportModal({
               </option>
             </select>
           </div>
+
+          {/* Alerta especial para robo */}
+          {category === "robo" && (
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-bold text-red-900 mb-2">
+                    ¿Robo en ejecución?
+                  </h3>
+                  <label className="flex items-center gap-2 mb-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isUrgent}
+                      onChange={(e) => setIsUrgent(e.target.checked)}
+                      className="w-4 h-4 text-red-600 rounded focus:ring-red-500"
+                    />
+                    <span className="text-sm text-red-800">
+                      Este robo está sucediendo ahora
+                    </span>
+                  </label>
+
+                  {isUrgent && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.location.href = "tel:911";
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 animate-pulse"
+                    >
+                      <Phone className="w-5 h-5" />
+                      LLAMAR AL 911 AHORA
+                    </button>
+                  )}
+
+                  <p className="text-xs text-red-700 mt-2">
+                    Si el robo está en curso, llama al 911 primero. El reporte
+                    se guardará de todas formas.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mb-3 sm:mb-4">
             <label

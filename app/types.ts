@@ -31,4 +31,5 @@ export interface Report {
   direccion: string;
   photo?: string;
   createdAt: Date;
+  isUrgent?: boolean;
 }
