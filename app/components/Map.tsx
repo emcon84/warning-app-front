@@ -24,6 +24,22 @@ const createCustomIcon = (category: ReportCategory) => {
     baches: "#ef4444", // red-500
     pastizales: "#22c55e", // green-500
     robo: "#dc2626", // red-600
+    fugas_agua: "#3b82f6", // blue-500
+    drenaje: "#06b6d4", // cyan-500
+    banquetas: "#78716c", // stone-500
+    semaforos: "#f59e0b", // amber-500
+    limpieza: "#0ea5e9", // sky-500
+    graffiti: "#ec4899", // pink-500
+    escombros: "#6b7280", // gray-500
+    arboles: "#10b981", // emerald-500
+    vandalismo: "#f43f5e", // rose-500
+    vehiculos_abandonados: "#64748b", // slate-500
+    iluminacion: "#fbbf24", // yellow-400
+    animales_callejeros: "#fb923c", // orange-400
+    plagas: "#dc2626", // red-600
+    senalizacion: "#6366f1", // indigo-500
+    estacionamiento: "#8b5cf6", // violet-500
+    transporte: "#3b82f6", // blue-500
   };
 
   const iconSvg = getCategoryIconSvg(category);

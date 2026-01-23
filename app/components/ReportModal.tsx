@@ -146,6 +146,34 @@ export default function ReportModal({
                 Falta de limpieza de pastizales
               </option>
               <option value="robo">Robo</option>
+              <option value="fugas_agua">Fugas de agua</option>
+              <option value="drenaje">
+                Problemas de alcantarillado/drenaje
+              </option>
+              <option value="banquetas">Banquetas dañadas/obstruidas</option>
+              <option value="semaforos">Semáforos descompuestos</option>
+              <option value="limpieza">
+                Falta de limpieza en áreas públicas
+              </option>
+              <option value="graffiti">Vandalismo/grafiti</option>
+              <option value="escombros">
+                Escombros o residuos voluminosos
+              </option>
+              <option value="arboles">Árboles caídos/peligrosos</option>
+              <option value="vandalismo">Daños a propiedad pública</option>
+              <option value="vehiculos_abandonados">
+                Vehículos abandonados
+              </option>
+              <option value="iluminacion">Falta de iluminación</option>
+              <option value="animales_callejeros">Animales callejeros</option>
+              <option value="plagas">Plagas urbanas</option>
+              <option value="senalizacion">Señalización dañada</option>
+              <option value="estacionamiento">
+                Problemas de estacionamiento
+              </option>
+              <option value="transporte">
+                Problemas de transporte público
+              </option>
             </select>
           </div>
 

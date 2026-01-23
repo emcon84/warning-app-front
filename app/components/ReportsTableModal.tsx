@@ -262,6 +262,25 @@ export default function ReportsTableModal({
               <option value="alumbrado">Alumbrado</option>
               <option value="baches">Baches</option>
               <option value="pastizales">Pastizales</option>
+              <option value="robo">Robo</option>
+              <option value="fugas_agua">Fugas de agua</option>
+              <option value="drenaje">Drenaje</option>
+              <option value="banquetas">Banquetas</option>
+              <option value="semaforos">Semáforos</option>
+              <option value="limpieza">Limpieza</option>
+              <option value="graffiti">Grafiti</option>
+              <option value="escombros">Escombros</option>
+              <option value="arboles">Árboles</option>
+              <option value="vandalismo">Vandalismo</option>
+              <option value="vehiculos_abandonados">
+                Vehículos abandonados
+              </option>
+              <option value="iluminacion">Iluminación</option>
+              <option value="animales_callejeros">Animales callejeros</option>
+              <option value="plagas">Plagas</option>
+              <option value="senalizacion">Señalización</option>
+              <option value="estacionamiento">Estacionamiento</option>
+              <option value="transporte">Transporte</option>
             </select>
 
             <select

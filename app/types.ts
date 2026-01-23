@@ -3,7 +3,23 @@ export type ReportCategory =
   | "alumbrado"
   | "baches"
   | "pastizales"
-  | "robo";
+  | "robo"
+  | "fugas_agua"
+  | "drenaje"
+  | "banquetas"
+  | "semaforos"
+  | "limpieza"
+  | "graffiti"
+  | "escombros"
+  | "arboles"
+  | "vandalismo"
+  | "vehiculos_abandonados"
+  | "iluminacion"
+  | "animales_callejeros"
+  | "plagas"
+  | "senalizacion"
+  | "estacionamiento"
+  | "transporte";
 
 export interface Report {
   id: string;
