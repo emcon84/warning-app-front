@@ -23,6 +23,7 @@ const createCustomIcon = (category: ReportCategory) => {
     alumbrado: "#eab308", // yellow-500
     baches: "#ef4444", // red-500
     pastizales: "#22c55e", // green-500
+    robo: "#dc2626", // red-600
   };
 
   const iconSvg = getCategoryIconSvg(category);
