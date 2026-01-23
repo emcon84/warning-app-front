@@ -70,7 +70,7 @@ export default function Home() {
     description: string;
     barrio: string;
     direccion: string;
-    photo?: string;
+    photo?: File;
     fecha?: string;
   }) => {
     console.log("handleSubmitReport llamado con:", data);

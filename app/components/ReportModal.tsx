@@ -19,7 +19,7 @@ interface ReportModalProps {
     description: string;
     barrio: string;
     direccion: string;
-    photo?: string;
+    photo?: File;
     fecha?: string;
   }) => void;
   lat: number;
@@ -37,7 +37,10 @@ export default function ReportModal({
   const [description, setDescription] = useState("");
   const [barrio, setBarrio] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [photo, setPhoto] = useState<string | undefined>(undefined);
+  const [photo, setPhoto] = useState<File | undefined>(undefined);
+  const [photoPreview, setPhotoPreview] = useState<string | undefined>(
+    undefined,
+  );
   const [fecha, setFecha] = useState<string>("");
 
   if (!isOpen) return null;
@@ -45,9 +48,11 @@ export default function ReportModal({
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setPhoto(file);
+      // Crear preview
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhoto(reader.result as string);
+        setPhotoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -80,6 +85,7 @@ export default function ReportModal({
       setBarrio("");
       setDireccion("");
       setPhoto(undefined);
+      setPhotoPreview(undefined);
       setFecha("");
     } else {
       console.log("Validación fallida:", {
@@ -230,10 +236,10 @@ export default function ReportModal({
               onChange={handlePhotoChange}
               className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-xs sm:text-sm file:mr-2 sm:file:mr-4 file:py-1 sm:file:py-2 file:px-2 sm:file:px-4 file:rounded-full file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
-            {photo && (
+            {photoPreview && (
               <div className="mt-2">
                 <img
-                  src={photo}
+                  src={photoPreview}
                   alt="Preview"
                   className="max-h-32 sm:max-h-40 rounded-lg w-auto mx-auto"
                 />

@@ -168,7 +168,11 @@ export default function Sidebar({
               >
                 {report.photo && (
                   <img
-                    src={report.photo}
+                    src={
+                      report.photo.startsWith("http")
+                        ? report.photo
+                        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${report.photo}`
+                    }
                     alt="Foto del reporte"
                     className="w-full h-24 md:h-32 object-cover rounded-lg mb-2"
                   />

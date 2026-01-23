@@ -9,7 +9,7 @@ export interface CreateReportData {
   description: string;
   barrio: string;
   direccion: string;
-  photo?: string;
+  photo?: File | string;
   fecha?: string;
 }
 
@@ -62,12 +62,31 @@ export async function getReport(id: string): Promise<Report> {
 // Crear un nuevo reporte
 export async function createReport(data: CreateReportData): Promise<Report> {
   try {
+    let body: FormData | string;
+    let headers: HeadersInit = {};
+
+    // Si hay una foto y es un File, usar FormData
+    if (data.photo instanceof File) {
+      const formData = new FormData();
+      formData.append("lat", data.lat.toString());
+      formData.append("lng", data.lng.toString());
+      formData.append("category", data.category);
+      formData.append("description", data.description);
+      formData.append("barrio", data.barrio);
+      formData.append("direccion", data.direccion);
+      if (data.fecha) formData.append("fecha", data.fecha);
+      formData.append("photo", data.photo);
+      body = formData;
+    } else {
+      // Si no hay archivo o es string (retrocompatibilidad), usar JSON
+      headers = { "Content-Type": "application/json" };
+      body = JSON.stringify(data);
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/reports`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      headers,
+      body,
     });
 
     if (!response.ok) {

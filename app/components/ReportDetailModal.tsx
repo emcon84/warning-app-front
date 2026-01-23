@@ -62,7 +62,11 @@ export default function ReportDetailModal({
             <div className="mb-3 sm:mb-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={report.photo}
+                src={
+                  report.photo.startsWith("http")
+                    ? report.photo
+                    : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${report.photo}`
+                }
                 alt="Foto del reporte"
                 className="w-full max-h-64 sm:max-h-96 object-cover rounded-lg"
               />
