@@ -1,4 +1,9 @@
-export type ReportCategory = "basura" | "alumbrado" | "baches" | "pastizales";
+export type ReportCategory =
+  | "basura"
+  | "alumbrado"
+  | "baches"
+  | "pastizales"
+  | "robo";
 
 export interface Report {
   id: string;

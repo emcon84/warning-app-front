@@ -145,6 +145,7 @@ export default function ReportModal({
               <option value="pastizales">
                 Falta de limpieza de pastizales
               </option>
+              <option value="robo">Robo</option>
             </select>
           </div>
 
