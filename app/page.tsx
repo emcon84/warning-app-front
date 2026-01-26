@@ -111,7 +111,6 @@ export default function Home() {
               body: `${newReport.description}\nBarrio: ${newReport.barrio}`,
               tag: newReport.id,
               requireInteraction: isUrgent,
-              vibrate: isUrgent ? [200, 100, 200, 100, 200] : [200, 100, 200],
               data: {
                 reportId: newReport.id,
                 lat: newReport.lat,
