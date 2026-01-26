@@ -8,7 +8,7 @@ import ReportsTableModal from "./components/ReportsTableModal";
 import { Report, ReportCategory } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
-import { getReports, createReport } from "./utils/api";
+import { getReports, createReport, deleteReport } from "./utils/api";
 import { MapPin, AlertTriangle } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
 import { getCategoryLabel } from "./utils/categoryHelpers";
@@ -149,6 +149,17 @@ export default function Home() {
     setSelectedReport(null);
   };
 
+  const handleDeleteReport = async (reportId: string) => {
+    try {
+      await deleteReport(reportId);
+      // Actualizar la lista local eliminando el reporte
+      setReports(reports.filter((r) => r.id !== reportId));
+    } catch (error) {
+      console.error("Error al eliminar reporte:", error);
+      throw error;
+    }
+  };
+
   const handleViewAll = () => {
     setIsTableModalOpen(true);
   };
@@ -261,6 +272,7 @@ export default function Home() {
           isOpen={isDetailModalOpen}
           onClose={handleCloseDetailModal}
           report={selectedReport}
+          onDelete={handleDeleteReport}
         />
       )}
 
@@ -274,6 +286,7 @@ export default function Home() {
           setSelectedReport(report);
           setIsDetailModalOpen(true);
         }}
+        onDelete={handleDeleteReport}
       />
     </div>
   );

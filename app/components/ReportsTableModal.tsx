@@ -24,6 +24,7 @@ interface ReportsTableModalProps {
   onClose: () => void;
   reports: Report[];
   onReportClick: (report: Report) => void;
+  onDelete?: (reportId: string) => void;
 }
 
 type SortField = "createdAt" | "category" | "barrio";
@@ -34,6 +35,7 @@ export default function ReportsTableModal({
   onClose,
   reports,
   onReportClick,
+  onDelete,
 }: ReportsTableModalProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -324,62 +326,84 @@ export default function ReportsTableModal({
             {currentReports.map((report) => (
               <div
                 key={report.id}
-                className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => onReportClick(report)}
+                className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold border ${getCategoryColor(report.category)}`}
+                <div
+                  className="cursor-pointer"
+                  onClick={() => onReportClick(report)}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold border ${getCategoryColor(report.category)}`}
+                    >
+                      {(() => {
+                        const Icon = getCategoryIcon(report.category);
+                        return <Icon className="w-3 h-3" />;
+                      })()}
+                      {getCategoryLabel(report.category)}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {formatDate(report.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                    {report.description}
+                  </p>
+                  <div className="text-xs text-gray-600 space-y-1">
+                    <p className="truncate flex items-center gap-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      <strong>{report.barrio}</strong>
+                    </p>
+                    <p className="truncate flex items-center gap-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                      </svg>
+                      <strong>{report.direccion}</strong>
+                    </p>
+                  </div>
+                </div>
+                {onDelete && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (
+                        confirm(
+                          "¿Estás seguro de que quieres eliminar este reporte?",
+                        )
+                      ) {
+                        onDelete(report.id);
+                      }
+                    }}
+                    className="mt-2 w-full px-3 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 transition-colors flex items-center justify-center gap-1"
                   >
-                    {(() => {
-                      const Icon = getCategoryIcon(report.category);
-                      return <Icon className="w-3 h-3" />;
-                    })()}
-                    {getCategoryLabel(report.category)}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {formatDate(report.createdAt)}
-                  </span>
-                </div>
-                <p className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
-                  {report.description}
-                </p>
-                <div className="text-xs text-gray-600 space-y-1">
-                  <p className="truncate flex items-center gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
-                    <strong>{report.barrio}</strong>
-                  </p>
-                  <p className="truncate flex items-center gap-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                      <polyline points="9 22 9 12 15 12 15 22" />
-                    </svg>
-                    <strong>{report.direccion}</strong>
-                  </p>
-                </div>
+                    <Trash2 className="w-3 h-3" />
+                    Eliminar
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -448,15 +472,35 @@ export default function ReportsTableModal({
                       : report.description}
                   </td>
                   <td className="px-4 py-3">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onReportClick(report);
-                      }}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                      Ver
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onReportClick(report);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                      >
+                        Ver
+                      </button>
+                      {onDelete && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (
+                              confirm(
+                                "¿Estás seguro de que quieres eliminar este reporte?",
+                              )
+                            ) {
+                              onDelete(report.id);
+                            }
+                          }}
+                          className="text-red-600 hover:text-red-800 font-medium text-sm flex items-center gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Eliminar
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

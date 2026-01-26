@@ -15,20 +15,41 @@ import {
   Share2,
   Phone,
   AlertTriangle,
+  Trash2,
 } from "lucide-react";
 
 interface ReportDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   report: Report;
+  onDelete?: (reportId: string) => void;
 }
 
 export default function ReportDetailModal({
   isOpen,
   onClose,
   report,
+  onDelete,
 }: ReportDetailModalProps) {
   if (!isOpen) return null;
+
+  const handleDelete = async () => {
+    if (
+      confirm(
+        "¿Estás seguro de que quieres eliminar este reporte? Esta acción no se puede deshacer.",
+      )
+    ) {
+      try {
+        if (onDelete) {
+          await onDelete(report.id);
+          onClose();
+        }
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert("Error al eliminar el reporte. Intenta nuevamente.");
+      }
+    }
+  };
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString("es-AR", {
@@ -221,20 +242,29 @@ export default function ReportDetailModal({
             </div>
           )}
 
-          <div className="mt-4 sm:mt-6 flex justify-end gap-2 sm:gap-3">
+          <div className="mt-4 sm:mt-6 flex justify-between gap-2">
             <button
-              onClick={shareOnWhatsApp}
-              className="px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base flex items-center gap-2"
+              onClick={handleDelete}
+              className="px-4 sm:px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base flex items-center gap-2"
             >
-              <Share2 className="w-4 h-4" />
-              Compartir
+              <Trash2 className="w-4 h-4" />
+              Eliminar
             </button>
-            <button
-              onClick={onClose}
-              className="px-4 sm:px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
-            >
-              Cerrar
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={shareOnWhatsApp}
+                className="px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base flex items-center gap-2"
+              >
+                <Share2 className="w-4 h-4" />
+                Compartir
+              </button>
+              <button
+                onClick={onClose}
+                className="px-4 sm:px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       </div>

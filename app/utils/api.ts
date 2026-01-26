@@ -106,6 +106,25 @@ export async function createReport(data: CreateReportData): Promise<Report> {
   }
 }
 
+// Eliminar un reporte
+export async function deleteReport(id: string): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reports/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        error.error || `Error al eliminar reporte: ${response.statusText}`,
+      );
+    }
+  } catch (error) {
+    console.error("Error deleting report:", error);
+    throw error;
+  }
+}
+
 // Actualizar un reporte
 export async function updateReport(
   id: string,
