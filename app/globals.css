@@ -47,6 +47,22 @@ body {
   animation: slide-up 0.3s ease-out;
 }
 
+/* Animación para el modal de confirmación */
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
 .custom-marker:hover {
   z-index: 1000 !important;
 }
