@@ -15,6 +15,7 @@ import {
   getCategoryIconSvg,
   getCategoryIcon,
 } from "../utils/categoryHelpers";
+import { Share2, Phone, AlertTriangle } from "lucide-react";
 
 // Crear iconos personalizados para cada categoría
 const createCustomIcon = (category: ReportCategory) => {
@@ -178,6 +179,102 @@ export default function MapComponent({
                   {new Date(report.createdAt).toLocaleString("es-AR")}
                 </p>
               </div>
+
+              {/* Botones de emergencia para robos urgentes */}
+              {report.category === "robo" && report.isUrgent && (
+                <div className="mt-3 p-2 bg-red-50 border border-red-300 rounded">
+                  <div className="flex items-center gap-1 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-red-600" />
+                    <span className="text-xs font-bold text-red-900">
+                      ROBO EN EJECUCIÓN
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => {
+                        window.location.href = "tel:911";
+                      }}
+                      className="w-full px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 flex items-center justify-center gap-1"
+                    >
+                      <Phone className="w-3 h-3" />
+                      Llamar al 911
+                    </button>
+                    <button
+                      onClick={() => {
+                        const formatDate = (date: Date) => {
+                          return new Date(date).toLocaleString("es-AR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          });
+                        };
+                        const message = `🚨 *ALERTA DE ROBO EN EJECUCIÓN*
+
+⚠️ *URGENTE - Reconquista, Santa Fe*
+
+📝 *Descripción:* ${report.description}
+
+📍 *Ubicación:*
+• Barrio: ${report.barrio}
+• Dirección: ${report.direccion}
+
+🗺️ Ver ubicación exacta: https://www.google.com/maps?q=${report.lat},${report.lng}
+
+📅 *Reportado:* ${formatDate(report.createdAt)}`;
+
+                        const encodedMessage = encodeURIComponent(message);
+                        window.open(
+                          `https://wa.me/5493482730030?text=${encodedMessage}`,
+                          "_blank",
+                        );
+                      }}
+                      className="w-full px-3 py-1.5 bg-orange-600 text-white rounded text-xs font-semibold hover:bg-orange-700 flex items-center justify-center gap-1"
+                    >
+                      <Share2 className="w-3 h-3" />
+                      Avisar a Ojos en Alerta
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Botón de compartir general */}
+              <button
+                onClick={() => {
+                  const formatDate = (date: Date) => {
+                    return new Date(date).toLocaleString("es-AR", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    });
+                  };
+                  const message = `🚨 *Reporte Ciudadano - Reconquista*
+
+📌 *Categoría:* ${getCategoryLabel(report.category)}
+📝 *Descripción:* ${report.description}
+
+📍 *Ubicación:*
+• Barrio: ${report.barrio}
+• Dirección: ${report.direccion}
+
+📅 *Fecha:* ${formatDate(report.createdAt)}
+
+🗺️ Ver en mapa: https://www.google.com/maps?q=${report.lat},${report.lng}`;
+
+                  const encodedMessage = encodeURIComponent(message);
+                  window.open(
+                    `https://wa.me/?text=${encodedMessage}`,
+                    "_blank",
+                  );
+                }}
+                className="w-full mt-2 px-3 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700 flex items-center justify-center gap-1"
+              >
+                <Share2 className="w-3 h-3" />
+                Compartir
+              </button>
             </div>
           </Popup>
         </Marker>

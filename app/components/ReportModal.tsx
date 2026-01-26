@@ -11,6 +11,7 @@ import {
   Trees,
   Phone,
   AlertTriangle,
+  Share2,
 } from "lucide-react";
 
 interface ReportModalProps {
@@ -209,16 +210,45 @@ export default function ReportModal({
                   </label>
 
                   {isUrgent && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.location.href = "tel:911";
-                      }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 animate-pulse"
-                    >
-                      <Phone className="w-5 h-5" />
-                      LLAMAR AL 911 AHORA
-                    </button>
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          window.location.href = "tel:911";
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 animate-pulse"
+                      >
+                        <Phone className="w-5 h-5" />
+                        LLAMAR AL 911 AHORA
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const message = `🚨 *ALERTA DE ROBO EN EJECUCIÓN*
+
+⚠️ *URGENTE - Reconquista, Santa Fe*
+
+📝 *Descripción:* ${description || "Sin descripción aún"}
+
+📍 *Ubicación:*
+• Barrio: ${barrio || "Sin especificar"}
+• Dirección: ${direccion || "Sin especificar"}
+
+🗺️ Ver ubicación exacta: https://www.google.com/maps?q=${lat},${lng}
+
+⏰ *Ahora mismo*`;
+
+                          const encodedMessage = encodeURIComponent(message);
+                          const whatsappUrl = `https://wa.me/5493482730030?text=${encodedMessage}`;
+                          window.open(whatsappUrl, "_blank");
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                      >
+                        <Share2 className="w-5 h-5" />
+                        Avisar a Ojos en Alerta
+                      </button>
+                    </div>
                   )}
 
                   <p className="text-xs text-red-700 mt-2">
