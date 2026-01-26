@@ -150,22 +150,6 @@ export async function updateReport(
   }
 }
 
-// Eliminar un reporte
-export async function deleteReport(id: string): Promise<void> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/reports/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error al eliminar reporte: ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Error deleting report:", error);
-    throw error;
-  }
-}
-
 // Obtener estadísticas
 export async function getStats() {
   try {
