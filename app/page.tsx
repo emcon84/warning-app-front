@@ -10,6 +10,8 @@ import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import { getReports, createReport } from "./utils/api";
 import { MapPin, AlertTriangle } from "lucide-react";
+import { useNotifications } from "./hooks/useNotifications";
+import { getCategoryLabel } from "./utils/categoryHelpers";
 
 // Cargar el mapa dinámicamente para evitar errores de SSR
 const MapComponent = dynamic(() => import("./components/Map"), {
@@ -37,6 +39,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { showNotification, permission } = useNotifications();
 
   // Cargar reportes al montar el componente
   useEffect(() => {
@@ -95,6 +98,28 @@ export default function Home() {
 
         // Actualizar la lista local
         setReports([...reports, newReport]);
+        // Enviar notificación push
+        if (permission === "granted") {
+          const categoryLabel = getCategoryLabel(newReport.category);
+          const isUrgent = newReport.category === "robo" && newReport.isUrgent;
+
+          await showNotification(
+            isUrgent
+              ? "🚨 ALERTA: Robo en ejecución"
+              : `🚨 Nuevo Reporte: ${categoryLabel}`,
+            {
+              body: `${newReport.description}\nBarrio: ${newReport.barrio}`,
+              tag: newReport.id,
+              requireInteraction: isUrgent,
+              vibrate: isUrgent ? [200, 100, 200, 100, 200] : [200, 100, 200],
+              data: {
+                reportId: newReport.id,
+                lat: newReport.lat,
+                lng: newReport.lng,
+              },
+            },
+          );
+        }
 
         console.log("Reporte agregado, cerrando modal...");
         setIsModalOpen(false);

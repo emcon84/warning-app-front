@@ -211,6 +211,18 @@ export default function ReportModal({
 
                   {isUrgent && (
                     <div className="space-y-2">
+                      {/* Advertencia si faltan datos */}
+                      {(!description.trim() ||
+                        !barrio.trim() ||
+                        !direccion.trim()) && (
+                        <div className="bg-yellow-50 border border-yellow-300 rounded p-2 mb-2">
+                          <p className="text-xs text-yellow-800 font-medium">
+                            ⚠️ Completa todos los campos obligatorios antes de
+                            enviar la alerta
+                          </p>
+                        </div>
+                      )}
+
                       <button
                         type="button"
                         onClick={() => {
@@ -225,15 +237,27 @@ export default function ReportModal({
                       <button
                         type="button"
                         onClick={() => {
+                          // Validar que todos los campos estén completos
+                          if (
+                            !description.trim() ||
+                            !barrio.trim() ||
+                            !direccion.trim()
+                          ) {
+                            alert(
+                              "⚠️ Por favor completa todos los campos obligatorios antes de enviar la alerta:\n\n• Descripción del problema\n• Barrio\n• Dirección",
+                            );
+                            return;
+                          }
+
                           const message = `🚨 *ALERTA DE ROBO EN EJECUCIÓN*
 
 ⚠️ *URGENTE - Reconquista, Santa Fe*
 
-📝 *Descripción:* ${description || "Sin descripción aún"}
+📝 *Descripción:* ${description}
 
 📍 *Ubicación:*
-• Barrio: ${barrio || "Sin especificar"}
-• Dirección: ${direccion || "Sin especificar"}
+• Barrio: ${barrio}
+• Dirección: ${direccion}
 
 🗺️ Ver ubicación exacta: https://www.google.com/maps?q=${lat},${lng}
 
@@ -243,7 +267,18 @@ export default function ReportModal({
                           const whatsappUrl = `https://wa.me/5493482730030?text=${encodedMessage}`;
                           window.open(whatsappUrl, "_blank");
                         }}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                        disabled={
+                          !description.trim() ||
+                          !barrio.trim() ||
+                          !direccion.trim()
+                        }
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-all duration-200 shadow-md ${
+                          !description.trim() ||
+                          !barrio.trim() ||
+                          !direccion.trim()
+                            ? "bg-gray-400 cursor-not-allowed opacity-60"
+                            : "bg-orange-600 hover:bg-orange-700 hover:shadow-lg active:scale-95"
+                        }`}
                       >
                         <Share2 className="w-5 h-5" />
                         Avisar a Ojos en Alerta
