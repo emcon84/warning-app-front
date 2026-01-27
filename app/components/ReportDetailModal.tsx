@@ -134,213 +134,232 @@ export default function ReportDetailModal({
   return (
     <>
       <div
-        className="fixed inset-0 flex items-center justify-center p-2 sm:p-4"
+        className="fixed inset-0 flex items-center justify-center p-4"
         style={{
           zIndex: 9999,
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          backdropFilter: "blur(4px)",
+          backgroundColor: "rgba(0, 0, 0, 0.75)",
+          backdropFilter: "blur(6px)",
         }}
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="p-4 sm:p-6">
-            <div className="flex justify-between items-start mb-3 sm:mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Detalle del Reporte
-              </h2>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 text-2xl sm:text-3xl font-bold ml-2"
+          {/* Header */}
+          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Detalle del Reporte
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                ×
-              </button>
-            </div>
-
-            {photos.length > 0 && (
-              <div className="mb-3 sm:mb-4 relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={
-                    photos[currentImageIndex].startsWith("http")
-                      ? photos[currentImageIndex]
-                      : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${photos[currentImageIndex]}`
-                  }
-                  alt={`Foto ${currentImageIndex + 1} del reporte`}
-                  className="w-full max-h-64 sm:max-h-96 object-cover rounded-lg"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
                 />
+              </svg>
+            </button>
+          </div>
 
-                {/* Controles del carrusel */}
-                {hasMultiplePhotos && (
-                  <>
-                    {/* Botones de navegación */}
-                    <button
-                      onClick={prevImage}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={nextImage}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
+          {/* Content - Grid Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+            {/* Left Column - Image and Category */}
+            <div className="space-y-4">
+              {photos.length > 0 && (
+                <div className="relative rounded-xl overflow-hidden bg-gray-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={
+                      photos[currentImageIndex].startsWith("http")
+                        ? photos[currentImageIndex]
+                        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${photos[currentImageIndex]}`
+                    }
+                    alt={`Foto ${currentImageIndex + 1} del reporte`}
+                    className="w-full h-80 object-cover"
+                  />
 
-                    {/* Indicadores */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
-                      {photos.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setCurrentImageIndex(index)}
-                          className={`w-2 h-2 rounded-full transition-all ${
-                            index === currentImageIndex
-                              ? "bg-white w-6"
-                              : "bg-white/50"
-                          }`}
-                        />
-                      ))}
-                    </div>
+                  {/* Controles del carrusel */}
+                  {hasMultiplePhotos && (
+                    <>
+                      <button
+                        onClick={prevImage}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2.5 transition-all backdrop-blur-sm"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={nextImage}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2.5 transition-all backdrop-blur-sm"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
 
-                    {/* Contador */}
-                    <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
-                      {currentImageIndex + 1} / {photos.length}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                        {photos.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={`h-2 rounded-full transition-all ${
+                              index === currentImageIndex
+                                ? "bg-white w-8"
+                                : "bg-white/60 w-2 hover:bg-white/80"
+                            }`}
+                          />
+                        ))}
+                      </div>
 
-            <div className="space-y-3 sm:space-y-4">
+                      <div className="absolute top-3 right-3 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
+                        {currentImageIndex + 1} / {photos.length}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Category Badge */}
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                  CATEGORÍA
-                </h3>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+                  Categoría
+                </label>
                 <div
-                  className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm font-semibold border ${getCategoryColor(report.category)}`}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border-2 ${getCategoryColor(report.category)}`}
                 >
                   {React.createElement(getCategoryIcon(report.category), {
-                    className: "w-4 h-4",
+                    className: "w-5 h-5",
                   })}
                   {getCategoryLabel(report.category)}
                 </div>
               </div>
+            </div>
 
+            {/* Right Column - Details and Actions */}
+            <div className="space-y-4">
+              {/* Description */}
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                  DESCRIPCIÓN
-                </h3>
-                <p className="text-sm sm:text-lg text-gray-900">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+                  Descripción
+                </label>
+                <p className="text-base text-gray-900 leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-200">
                   {report.description}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {/* Location Info */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <MapPin className="w-4 h-4" />
-                    BARRIO
-                  </h3>
-                  <p className="text-sm sm:text-base text-gray-900 truncate">
+                    Barrio
+                  </label>
+                  <p className="text-sm text-gray-900 font-medium">
                     {report.barrio}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <Home className="w-4 h-4" />
-                    DIRECCIÓN
-                  </h3>
-                  <p className="text-sm sm:text-base text-gray-900 truncate">
+                    Dirección
+                  </label>
+                  <p className="text-sm text-gray-900 font-medium">
                     {report.direccion}
                   </p>
                 </div>
               </div>
 
+              {/* Coordinates */}
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <Navigation className="w-4 h-4" />
-                  COORDENADAS
-                </h3>
-                <p className="text-gray-900 font-mono text-xs sm:text-sm break-all">
-                  Lat: {report.lat.toFixed(6)}, Lng: {report.lng.toFixed(6)}
+                  Coordenadas
+                </label>
+                <p className="text-gray-700 font-mono text-xs bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                  {report.lat.toFixed(6)}, {report.lng.toFixed(6)}
                 </p>
               </div>
 
+              {/* Date */}
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1 flex items-center gap-1.5">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
-                  FECHA Y HORA
-                </h3>
-                <p className="text-sm sm:text-base text-gray-900">
+                  Fecha y Hora
+                </label>
+                <p className="text-sm text-gray-900 font-medium">
                   {formatDate(report.createdAt)}
                 </p>
               </div>
-            </div>
 
-            {/* Botones de emergencia para robos en ejecución */}
-            {report.category === "robo" && report.isUrgent && (
-              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-red-50 border-2 border-red-300 rounded-lg">
-                <div className="flex items-center gap-2 mb-3">
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
-                  <h3 className="text-sm sm:text-base font-bold text-red-900">
-                    ROBO EN EJECUCIÓN - ACCIÓN URGENTE
-                  </h3>
+              {/* Emergency Actions */}
+              {report.category === "robo" && report.isUrgent && (
+                <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                    <h3 className="text-sm font-bold text-red-900 uppercase">
+                      Robo en Ejecución - Acción Urgente
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={callPolice}
+                      className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
+                    >
+                      <Phone className="w-4 h-4" />
+                      911
+                    </button>
+                    <button
+                      onClick={alertOjosEnAlerta}
+                      className="px-4 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Ojos en Alerta
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-2">
+              )}
+
+              {/* Public Services */}
+              {[
+                "basura",
+                "alumbrado",
+                "pastizales",
+                "fugas_agua",
+                "drenaje",
+                "limpieza",
+                "escombros",
+                "baches",
+                "banquetas",
+              ].includes(report.category) && (
+                <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Construction className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-sm font-bold text-blue-900 uppercase">
+                      Servicios Públicos
+                    </h3>
+                  </div>
                   <button
-                    onClick={callPolice}
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2"
-                  >
-                    <Phone className="w-5 h-5" />
-                    Llamar a la Policía (911)
-                  </button>
-                  <button
-                    onClick={alertOjosEnAlerta}
-                    className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2"
-                  >
-                    <Share2 className="w-5 h-5" />
-                    Avisar a Ojos en Alerta
-                  </button>
-                </div>
-              </div>
-            )}
+                    onClick={() => {
+                      const categoryLabels: { [key: string]: string } = {
+                        basura: "Basura sin recolectar",
+                        alumbrado: "Problema de alumbrado público",
+                        pastizales: "Pastizales altos",
+                        fugas_agua: "Fuga de agua",
+                        drenaje: "Problema de drenaje",
+                        limpieza: "Falta de limpieza",
+                        escombros: "Escombros",
+                        baches: "Baches",
+                        banquetas: "Banquetas dañadas",
+                      };
 
-            {/* Botón para Servicios Públicos */}
-            {[
-              "basura",
-              "alumbrado",
-              "pastizales",
-              "fugas_agua",
-              "drenaje",
-              "limpieza",
-              "escombros",
-              "baches",
-              "banquetas",
-            ].includes(report.category) && (
-              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
-                <div className="flex items-center gap-2 mb-3">
-                  <Construction className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-sm sm:text-base font-bold text-blue-900">
-                    Contacto Rápido - Servicios Públicos
-                  </h3>
-                </div>
-                <button
-                  onClick={() => {
-                    const categoryLabels: { [key: string]: string } = {
-                      basura: "Basura sin recolectar",
-                      alumbrado: "Problema de alumbrado público",
-                      pastizales: "Pastizales altos",
-                      fugas_agua: "Fuga de agua",
-                      drenaje: "Problema de drenaje",
-                      limpieza: "Falta de limpieza",
-                      escombros: "Escombros",
-                      baches: "Baches",
-                      banquetas: "Banquetas dañadas",
-                    };
-
-                    const message = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*
+                      const message = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*
 
 📋 *Tipo de Reclamo:* ${categoryLabels[report.category] || report.category}
 
@@ -354,41 +373,43 @@ export default function ReportDetailModal({
 
 📅 *Fecha:* ${formatDate(report.createdAt)}`;
 
-                    const encodedMessage = encodeURIComponent(message);
-                    const whatsappUrl = `https://wa.me/5493482519279?text=${encodedMessage}`;
-                    window.open(whatsappUrl, "_blank");
-                  }}
-                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2"
-                >
-                  <Share2 className="w-5 h-5" />
-                  Enviar Reclamo a Servicios Públicos
-                </button>
-              </div>
-            )}
+                      const encodedMessage = encodeURIComponent(message);
+                      const whatsappUrl = `https://wa.me/5493482519279?text=${encodedMessage}`;
+                      window.open(whatsappUrl, "_blank");
+                    }}
+                    className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Enviar Reclamo
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
-            <div className="mt-4 sm:mt-6 flex justify-between gap-2">
+          {/* Footer Actions */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center gap-2 text-sm"
+            >
+              <Trash2 className="w-4 h-4" />
+              Eliminar
+            </button>
+            <div className="flex gap-3">
               <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="px-4 sm:px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base flex items-center gap-2"
+                onClick={shareOnWhatsApp}
+                className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center gap-2 text-sm"
               >
-                <Trash2 className="w-4 h-4" />
-                Eliminar
+                <Share2 className="w-4 h-4" />
+                Compartir
               </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={shareOnWhatsApp}
-                  className="px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base flex items-center gap-2"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Compartir
-                </button>
-                <button
-                  onClick={onClose}
-                  className="px-4 sm:px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
-                >
-                  Cerrar
-                </button>
-              </div>
+              <button
+                onClick={onClose}
+                className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold text-sm"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
