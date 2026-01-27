@@ -98,7 +98,9 @@ export default function ReportDetailModal({
 
 📅 *Fecha:* ${formatDate(report.createdAt)}
 
-🗺️ Ver en mapa: https://www.google.com/maps?q=${report.lat},${report.lng}`;
+🗺️ Ver en mapa: https://www.google.com/maps?q=${report.lat},${report.lng}
+
+🌐 *Reporta incidentes en:* https://reportesreconquista.com`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
@@ -119,7 +121,9 @@ export default function ReportDetailModal({
 
 🗺️ Ver ubicación exacta: https://www.google.com/maps?q=${report.lat},${report.lng}
 
-📅 *Reportado:* ${formatDate(report.createdAt)}`;
+📅 *Reportado:* ${formatDate(report.createdAt)}
+
+🌐 *Reporta incidentes en:* https://reportesreconquista.com`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/5493482730030?text=${encodedMessage}`;
@@ -371,7 +375,9 @@ export default function ReportDetailModal({
 
 🗺️ Ver ubicación: https://www.google.com/maps?q=${report.lat},${report.lng}
 
-📅 *Fecha:* ${formatDate(report.createdAt)}`;
+📅 *Fecha:* ${formatDate(report.createdAt)}
+
+🌐 *Reporta incidentes en:* https://reportesreconquista.com`;
 
                       const encodedMessage = encodeURIComponent(message);
                       const whatsappUrl = `https://wa.me/5493482519279?text=${encodedMessage}`;

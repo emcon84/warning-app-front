@@ -275,7 +275,9 @@ export default function ReportModal({
 
 🗺️ Ver ubicación exacta: https://www.google.com/maps?q=${lat},${lng}
 
-⏰ *Ahora mismo*`;
+⏰ *Ahora mismo*
+
+🌐 *Reporta incidentes en:* https://reportesreconquista.com`;
 
                           const encodedMessage = encodeURIComponent(message);
                           const whatsappUrl = `https://wa.me/5493482730030?text=${encodedMessage}`;
@@ -378,7 +380,9 @@ export default function ReportModal({
 
 🗺️ Ver ubicación: https://www.google.com/maps?q=${lat},${lng}
 
-📅 *Fecha:* ${new Date().toLocaleDateString("es-AR")}`;
+📅 *Fecha:* ${new Date().toLocaleDateString("es-AR")}
+
+🌐 *Reporta incidentes en:* https://reportesreconquista.com`;
 
                   const encodedMessage = encodeURIComponent(message);
                   const whatsappUrl = `https://wa.me/5493482519279?text=${encodedMessage}`;
