@@ -30,6 +30,7 @@ export interface Report {
   barrio: string;
   direccion: string;
   photo?: string;
+  photos?: string[]; // Múltiples fotos
   createdAt: Date;
   isUrgent?: boolean;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Report } from "../types";
 import {
   getCategoryLabel,
@@ -16,6 +16,8 @@ import {
   Phone,
   AlertTriangle,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
 
@@ -33,6 +35,30 @@ export default function ReportDetailModal({
   onDelete,
 }: ReportDetailModalProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Obtener todas las fotos (compatibilidad con photo y photos)
+  const photos = report.photos || (report.photo ? [report.photo] : []);
+  const hasMultiplePhotos = photos.length > 1;
+
+  // Autoplay del carrusel
+  useEffect(() => {
+    if (!hasMultiplePhotos) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % photos.length);
+    }, 3000); // Cambia cada 3 segundos
+
+    return () => clearInterval(interval);
+  }, [hasMultiplePhotos, photos.length]);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % photos.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
 
   if (!isOpen) return null;
 
@@ -132,18 +158,57 @@ export default function ReportDetailModal({
               </button>
             </div>
 
-            {report.photo && (
-              <div className="mb-3 sm:mb-4">
+            {photos.length > 0 && (
+              <div className="mb-3 sm:mb-4 relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={
-                    report.photo.startsWith("http")
-                      ? report.photo
-                      : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${report.photo}`
+                    photos[currentImageIndex].startsWith("http")
+                      ? photos[currentImageIndex]
+                      : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${photos[currentImageIndex]}`
                   }
-                  alt="Foto del reporte"
+                  alt={`Foto ${currentImageIndex + 1} del reporte`}
                   className="w-full max-h-64 sm:max-h-96 object-cover rounded-lg"
                 />
+
+                {/* Controles del carrusel */}
+                {hasMultiplePhotos && (
+                  <>
+                    {/* Botones de navegación */}
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+
+                    {/* Indicadores */}
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
+                      {photos.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`w-2 h-2 rounded-full transition-all ${
+                            index === currentImageIndex
+                              ? "bg-white w-6"
+                              : "bg-white/50"
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Contador */}
+                    <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                      {currentImageIndex + 1} / {photos.length}
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

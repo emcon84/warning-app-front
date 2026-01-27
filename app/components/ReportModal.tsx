@@ -308,6 +308,101 @@ export default function ReportModal({
             </div>
           )}
 
+          {/* Botón para Servicios Públicos */}
+          {[
+            "basura",
+            "alumbrado",
+            "pastizales",
+            "fugas_agua",
+            "drenaje",
+            "limpieza",
+            "escombros",
+            "baches",
+            "banquetas",
+          ].includes(category) && (
+            <div className="mb-3 sm:mb-4 bg-blue-50 border-2 border-blue-300 rounded-lg p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Construction className="w-5 h-5 text-blue-600" />
+                <h3 className="text-sm sm:text-base font-bold text-blue-900">
+                  Contacto Rápido - Servicios Públicos
+                </h3>
+              </div>
+
+              {/* Advertencia si faltan datos */}
+              {(!description.trim() || !barrio.trim() || !direccion.trim()) && (
+                <div className="bg-yellow-50 border border-yellow-300 rounded p-2 mb-2">
+                  <p className="text-xs text-yellow-800 font-medium">
+                    ⚠️ Completa todos los campos obligatorios antes de enviar el
+                    reclamo
+                  </p>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  // Validar que todos los campos estén completos
+                  if (
+                    !description.trim() ||
+                    !barrio.trim() ||
+                    !direccion.trim()
+                  ) {
+                    alert(
+                      "⚠️ Por favor completa todos los campos obligatorios antes de enviar el reclamo:\n\n• Descripción del problema\n• Barrio\n• Dirección",
+                    );
+                    return;
+                  }
+
+                  const categoryLabels: { [key: string]: string } = {
+                    basura: "Basura sin recolectar",
+                    alumbrado: "Problema de alumbrado público",
+                    pastizales: "Pastizales altos",
+                    fugas_agua: "Fuga de agua",
+                    drenaje: "Problema de drenaje",
+                    limpieza: "Falta de limpieza",
+                    escombros: "Escombros",
+                    baches: "Baches",
+                    banquetas: "Banquetas dañadas",
+                  };
+
+                  const message = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*
+
+📋 *Tipo de Reclamo:* ${categoryLabels[category] || category}
+
+📝 *Descripción:* ${description}
+
+📍 *Ubicación:*
+• Barrio: ${barrio}
+• Dirección: ${direccion}
+
+🗺️ Ver ubicación: https://www.google.com/maps?q=${lat},${lng}
+
+📅 *Fecha:* ${new Date().toLocaleDateString("es-AR")}`;
+
+                  const encodedMessage = encodeURIComponent(message);
+                  const whatsappUrl = `https://wa.me/5493482519279?text=${encodedMessage}`;
+                  window.open(whatsappUrl, "_blank");
+                }}
+                disabled={
+                  !description.trim() || !barrio.trim() || !direccion.trim()
+                }
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md ${
+                  !description.trim() || !barrio.trim() || !direccion.trim()
+                    ? "bg-gray-400 cursor-not-allowed opacity-60"
+                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg active:scale-95 text-white"
+                }`}
+              >
+                <Share2 className="w-5 h-5" />
+                Enviar Reclamo a Servicios Públicos
+              </button>
+
+              <p className="text-xs text-blue-700 mt-2">
+                Este botón enviará tu reclamo directamente a la oficina de
+                Servicios Públicos.
+              </p>
+            </div>
+          )}
+
           <div className="mb-3 sm:mb-4">
             <label
               htmlFor="barrio"

@@ -166,17 +166,32 @@ export default function Sidebar({
                   onClose();
                 }}
               >
-                {report.photo && (
-                  <img
-                    src={
-                      report.photo.startsWith("http")
-                        ? report.photo
-                        : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${report.photo}`
-                    }
-                    alt="Foto del reporte"
-                    className="w-full h-24 md:h-32 object-cover rounded-lg mb-2"
-                  />
-                )}
+                {(() => {
+                  const photos =
+                    report.photos || (report.photo ? [report.photo] : []);
+                  if (photos.length > 0) {
+                    const firstPhoto = photos[0];
+                    return (
+                      <div className="relative mb-2">
+                        <img
+                          src={
+                            firstPhoto.startsWith("http")
+                              ? firstPhoto
+                              : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${firstPhoto}`
+                          }
+                          alt="Foto del reporte"
+                          className="w-full h-24 md:h-32 object-cover rounded-lg"
+                        />
+                        {photos.length > 1 && (
+                          <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-semibold">
+                            +{photos.length - 1}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
                 <div
                   className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold mb-2 border ${getCategoryColor(report.category)}`}
                 >

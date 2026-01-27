@@ -121,13 +121,27 @@ export default function MapComponent({
         >
           <Popup>
             <div className="text-sm">
-              {report.photo && (
-                <img
-                  src={report.photo}
-                  alt="Foto"
-                  className="w-full h-24 object-cover rounded mb-2"
-                />
-              )}
+              {(() => {
+                const photos =
+                  report.photos || (report.photo ? [report.photo] : []);
+                if (photos.length > 0) {
+                  return (
+                    <div className="relative mb-2">
+                      <img
+                        src={photos[0]}
+                        alt="Foto"
+                        className="w-full h-24 object-cover rounded"
+                      />
+                      {photos.length > 1 && (
+                        <div className="absolute top-1 right-1 bg-black/60 text-white px-2 py-0.5 rounded text-xs">
+                          +{photos.length - 1}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
               <div className="mb-2">
                 <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold bg-gray-100">
                   {(() => {
