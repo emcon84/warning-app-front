@@ -18,6 +18,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  Construction,
 } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
 
@@ -303,6 +304,65 @@ export default function ReportDetailModal({
                     Avisar a Ojos en Alerta
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Botón para Servicios Públicos */}
+            {[
+              "basura",
+              "alumbrado",
+              "pastizales",
+              "fugas_agua",
+              "drenaje",
+              "limpieza",
+              "escombros",
+              "baches",
+              "banquetas",
+            ].includes(report.category) && (
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                <div className="flex items-center gap-2 mb-3">
+                  <Construction className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-sm sm:text-base font-bold text-blue-900">
+                    Contacto Rápido - Servicios Públicos
+                  </h3>
+                </div>
+                <button
+                  onClick={() => {
+                    const categoryLabels: { [key: string]: string } = {
+                      basura: "Basura sin recolectar",
+                      alumbrado: "Problema de alumbrado público",
+                      pastizales: "Pastizales altos",
+                      fugas_agua: "Fuga de agua",
+                      drenaje: "Problema de drenaje",
+                      limpieza: "Falta de limpieza",
+                      escombros: "Escombros",
+                      baches: "Baches",
+                      banquetas: "Banquetas dañadas",
+                    };
+
+                    const message = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*
+
+📋 *Tipo de Reclamo:* ${categoryLabels[report.category] || report.category}
+
+📝 *Descripción:* ${report.description}
+
+📍 *Ubicación:*
+• Barrio: ${report.barrio}
+• Dirección: ${report.direccion}
+
+🗺️ Ver ubicación: https://www.google.com/maps?q=${report.lat},${report.lng}
+
+📅 *Fecha:* ${formatDate(report.createdAt)}`;
+
+                    const encodedMessage = encodeURIComponent(message);
+                    const whatsappUrl = `https://wa.me/5493482519279?text=${encodedMessage}`;
+                    window.open(whatsappUrl, "_blank");
+                  }}
+                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2"
+                >
+                  <Share2 className="w-5 h-5" />
+                  Enviar Reclamo a Servicios Públicos
+                </button>
               </div>
             )}
 

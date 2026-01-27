@@ -253,6 +253,69 @@ export default function MapComponent({
                 </div>
               )}
 
+              {/* Botón para Servicios Públicos */}
+              {[
+                "basura",
+                "alumbrado",
+                "pastizales",
+                "fugas_agua",
+                "drenaje",
+                "limpieza",
+                "escombros",
+                "baches",
+                "banquetas",
+              ].includes(report.category) && (
+                <button
+                  onClick={() => {
+                    const formatDate = (date: Date) => {
+                      return new Date(date).toLocaleString("es-AR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      });
+                    };
+
+                    const categoryLabels: { [key: string]: string } = {
+                      basura: "Basura sin recolectar",
+                      alumbrado: "Problema de alumbrado público",
+                      pastizales: "Pastizales altos",
+                      fugas_agua: "Fuga de agua",
+                      drenaje: "Problema de drenaje",
+                      limpieza: "Falta de limpieza",
+                      escombros: "Escombros",
+                      baches: "Baches",
+                      banquetas: "Banquetas dañadas",
+                    };
+
+                    const message = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*
+
+📋 *Tipo de Reclamo:* ${categoryLabels[report.category] || report.category}
+
+📝 *Descripción:* ${report.description}
+
+📍 *Ubicación:*
+• Barrio: ${report.barrio}
+• Dirección: ${report.direccion}
+
+🗺️ Ver ubicación: https://www.google.com/maps?q=${report.lat},${report.lng}
+
+📅 *Fecha:* ${formatDate(report.createdAt)}`;
+
+                    const encodedMessage = encodeURIComponent(message);
+                    window.open(
+                      `https://wa.me/5493482519279?text=${encodedMessage}`,
+                      "_blank",
+                    );
+                  }}
+                  className="w-full mt-2 px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 flex items-center justify-center gap-1"
+                >
+                  <Share2 className="w-3 h-3" />
+                  Reclamo a Servicios Públicos
+                </button>
+              )}
+
               {/* Botón de compartir general */}
               <button
                 onClick={() => {
