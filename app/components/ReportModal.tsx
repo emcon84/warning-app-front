@@ -41,26 +41,39 @@ export default function ReportModal({
   const [description, setDescription] = useState("");
   const [barrio, setBarrio] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [photo, setPhoto] = useState<File | undefined>(undefined);
-  const [photoPreview, setPhotoPreview] = useState<string | undefined>(
-    undefined,
-  );
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [fecha, setFecha] = useState<string>("");
   const [isUrgent, setIsUrgent] = useState(false);
 
   if (!isOpen) return null;
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPhoto(file);
-      // Crear preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setPhotos(files);
+
+      // Crear previews para todas las imágenes
+      const previews: string[] = [];
+      let loadedCount = 0;
+
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          previews.push(reader.result as string);
+          loadedCount++;
+          if (loadedCount === files.length) {
+            setPhotoPreviews(previews);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(photos.filter((_, i) => i !== index));
+    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,7 +84,7 @@ export default function ReportModal({
       description,
       barrio,
       direccion,
-      photo,
+      photos,
       fecha,
       isUrgent,
     });
@@ -83,7 +96,7 @@ export default function ReportModal({
         description,
         barrio,
         direccion,
-        photo,
+        photo: photos[0], // Por ahora enviamos solo la primera foto
         fecha: fecha || undefined,
         isUrgent: category === "robo" ? isUrgent : false,
       });
@@ -91,8 +104,8 @@ export default function ReportModal({
       setDescription("");
       setBarrio("");
       setDireccion("");
-      setPhoto(undefined);
-      setPhotoPreview(undefined);
+      setPhotos([]);
+      setPhotoPreviews([]);
       setFecha("");
       setIsUrgent(false);
     } else {
