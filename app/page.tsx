@@ -74,6 +74,7 @@ export default function Home() {
     barrio: string;
     direccion: string;
     photo?: File;
+    photos?: File[];
     fecha?: string;
     isUrgent?: boolean;
   }) => {
@@ -90,6 +91,7 @@ export default function Home() {
           barrio: data.barrio,
           direccion: data.direccion,
           photo: data.photo,
+          photos: data.photos,
           fecha: data.fecha,
           isUrgent: data.isUrgent,
         });

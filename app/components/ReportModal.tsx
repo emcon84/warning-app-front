@@ -23,6 +23,7 @@ interface ReportModalProps {
     barrio: string;
     direccion: string;
     photo?: File;
+    photos?: File[];
     fecha?: string;
     isUrgent?: boolean;
   }) => void;
@@ -96,7 +97,7 @@ export default function ReportModal({
         description,
         barrio,
         direccion,
-        photo: photos[0], // Por ahora enviamos solo la primera foto
+        photos: photos.length > 0 ? photos : undefined,
         fecha: fecha || undefined,
         isUrgent: category === "robo" ? isUrgent : false,
       });

@@ -10,6 +10,7 @@ export interface CreateReportData {
   barrio: string;
   direccion: string;
   photo?: File | string;
+  photos?: File[]; // Múltiples fotos
   fecha?: string;
   isUrgent?: boolean;
 }
@@ -66,8 +67,27 @@ export async function createReport(data: CreateReportData): Promise<Report> {
     let body: FormData | string;
     let headers: HeadersInit = {};
 
-    // Si hay una foto y es un File, usar FormData
-    if (data.photo instanceof File) {
+    // Si hay fotos (múltiples o una sola), usar FormData
+    if (data.photos && data.photos.length > 0) {
+      const formData = new FormData();
+      formData.append("lat", data.lat.toString());
+      formData.append("lng", data.lng.toString());
+      formData.append("category", data.category);
+      formData.append("description", data.description);
+      formData.append("barrio", data.barrio);
+      formData.append("direccion", data.direccion);
+      if (data.fecha) formData.append("fecha", data.fecha);
+      if (data.isUrgent !== undefined)
+        formData.append("isUrgent", data.isUrgent.toString());
+
+      // Agregar todas las fotos
+      data.photos.forEach((photo, index) => {
+        formData.append(`photo${index}`, photo);
+      });
+
+      body = formData;
+    } else if (data.photo instanceof File) {
+      // Compatibilidad: una sola foto
       const formData = new FormData();
       formData.append("lat", data.lat.toString());
       formData.append("lng", data.lng.toString());
