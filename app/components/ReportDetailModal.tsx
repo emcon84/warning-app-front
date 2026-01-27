@@ -138,7 +138,7 @@ export default function ReportDetailModal({
   return (
     <>
       <div
-        className="fixed inset-0 flex items-center justify-center p-4"
+        className="fixed inset-0 flex items-center justify-center p-2 sm:p-4"
         style={{
           zIndex: 9999,
           backgroundColor: "rgba(0, 0, 0, 0.75)",
@@ -147,12 +147,12 @@ export default function ReportDetailModal({
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden"
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
-            <h2 className="text-2xl font-bold text-gray-900">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white flex-shrink-0">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               Detalle del Reporte
             </h2>
             <button
@@ -176,7 +176,7 @@ export default function ReportDetailModal({
           </div>
 
           {/* Content - Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 p-4 sm:p-6 overflow-y-auto flex-1">
             {/* Left Column - Image and Category */}
             <div className="space-y-4">
               {photos.length > 0 && (
@@ -394,7 +394,7 @@ export default function ReportDetailModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-4 py-4 bg-gray-50 border-t border-gray-200">
+          <div className="px-4 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 flex-shrink-0">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(true)}
