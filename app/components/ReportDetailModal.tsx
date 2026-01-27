@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Report } from "../types";
+import { Report, ReportCategory } from "../types";
 import {
   getCategoryLabel,
   getCategoryColor,
@@ -19,14 +19,18 @@ import {
   ChevronLeft,
   ChevronRight,
   Construction,
+  Pencil,
 } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
+import EditReportModal from "./EditReportModal";
+import { updateReport } from "../utils/api";
 
 interface ReportDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   report: Report;
   onDelete?: (reportId: string) => void;
+  onUpdate?: (updatedReport: Report) => void;
 }
 
 export default function ReportDetailModal({
@@ -34,8 +38,10 @@ export default function ReportDetailModal({
   onClose,
   report,
   onDelete,
+  onUpdate,
 }: ReportDetailModalProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Obtener todas las fotos (compatibilidad con photo y photos)
@@ -73,6 +79,26 @@ export default function ReportDetailModal({
     } catch (error) {
       console.error("Error al eliminar:", error);
       alert("Error al eliminar el reporte. Intenta nuevamente.");
+    }
+  };
+
+  const handleUpdate = async (data: {
+    category: ReportCategory;
+    description: string;
+    barrio: string;
+    direccion: string;
+    photos?: File[];
+    isUrgent?: boolean;
+  }) => {
+    try {
+      const updatedReport = await updateReport(report.id, data);
+      setShowEditModal(false);
+      if (onUpdate) {
+        onUpdate(updatedReport);
+      }
+    } catch (error) {
+      console.error("Error al actualizar:", error);
+      alert("Error al actualizar el reporte. Intenta nuevamente.");
     }
   };
 
@@ -151,7 +177,7 @@ export default function ReportDetailModal({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white flex-shrink-0">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center bg-linear-to-r from-gray-50 to-white shrink-0">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               Detalle del Reporte
             </h2>
@@ -394,15 +420,24 @@ export default function ReportDetailModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-4 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 flex-shrink-0">
+          <div className="px-4 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 shrink-0">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="w-full sm:w-auto px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center justify-center gap-2 text-sm"
-              >
-                <Trash2 className="w-4 h-4" />
-                Eliminar
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <button
+                  onClick={() => setShowEditModal(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2 text-sm"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Editar
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center justify-center gap-2 text-sm"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Eliminar
+                </button>
+              </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={shareOnWhatsApp}
@@ -422,6 +457,13 @@ export default function ReportDetailModal({
           </div>
         </div>
       </div>
+
+      <EditReportModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSubmit={handleUpdate}
+        report={report}
+      />
 
       <ConfirmDialog
         isOpen={showDeleteConfirm}

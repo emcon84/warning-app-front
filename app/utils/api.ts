@@ -151,16 +151,42 @@ export async function updateReport(
   data: Partial<CreateReportData>,
 ): Promise<Report> {
   try {
+    let body;
+    let headers: HeadersInit = {};
+
+    // Si hay fotos nuevas, usar FormData
+    if (data.photos && data.photos.length > 0) {
+      const formData = new FormData();
+      if (data.category) formData.append("category", data.category);
+      if (data.description) formData.append("description", data.description);
+      if (data.barrio) formData.append("barrio", data.barrio);
+      if (data.direccion) formData.append("direccion", data.direccion);
+      if (data.isUrgent !== undefined)
+        formData.append("isUrgent", data.isUrgent.toString());
+
+      // Agregar cada foto con índice
+      data.photos.forEach((photo, index) => {
+        formData.append(`photo${index}`, photo);
+      });
+
+      body = formData;
+    } else {
+      // Sin fotos, usar JSON
+      headers = { "Content-Type": "application/json" };
+      body = JSON.stringify(data);
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/reports/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      headers,
+      body,
     });
 
     if (!response.ok) {
-      throw new Error(`Error al actualizar reporte: ${response.statusText}`);
+      const error = await response.json();
+      throw new Error(
+        error.error || `Error al actualizar reporte: ${response.statusText}`,
+      );
     }
 
     return await response.json();

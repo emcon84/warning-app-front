@@ -162,6 +162,17 @@ export default function Home() {
     }
   };
 
+  const handleUpdateReport = (updatedReport: Report) => {
+    // Actualizar la lista local con el reporte actualizado
+    setReports(
+      reports.map((r) => (r.id === updatedReport.id ? updatedReport : r)),
+    );
+    // Actualizar el reporte seleccionado si es el mismo
+    if (selectedReport?.id === updatedReport.id) {
+      setSelectedReport(updatedReport);
+    }
+  };
+
   const handleViewAll = () => {
     setIsTableModalOpen(true);
   };
@@ -275,6 +286,7 @@ export default function Home() {
           onClose={handleCloseDetailModal}
           report={selectedReport}
           onDelete={handleDeleteReport}
+          onUpdate={handleUpdateReport}
         />
       )}
 
