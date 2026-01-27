@@ -394,28 +394,30 @@ export default function ReportDetailModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center gap-2 text-sm"
-            >
-              <Trash2 className="w-4 h-4" />
-              Eliminar
-            </button>
-            <div className="flex gap-3">
+          <div className="px-4 py-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-3">
               <button
-                onClick={shareOnWhatsApp}
-                className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center gap-2 text-sm"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="w-full sm:w-auto px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold flex items-center justify-center gap-2 text-sm"
               >
-                <Share2 className="w-4 h-4" />
-                Compartir
+                <Trash2 className="w-4 h-4" />
+                Eliminar
               </button>
-              <button
-                onClick={onClose}
-                className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold text-sm"
-              >
-                Cerrar
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <button
+                  onClick={shareOnWhatsApp}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center justify-center gap-2 text-sm"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Compartir
+                </button>
+                <button
+                  onClick={onClose}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold text-sm"
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>
