@@ -387,22 +387,34 @@ export default function ReportModal({
               htmlFor="photo"
               className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
             >
-              📷 Foto (opcional):
+              📷 Fotos (opcional):
             </label>
             <input
               type="file"
               id="photo"
               accept="image/*"
+              multiple
               onChange={handlePhotoChange}
               className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-xs sm:text-sm file:mr-2 sm:file:mr-4 file:py-1 sm:file:py-2 file:px-2 sm:file:px-4 file:rounded-full file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
-            {photoPreview && (
-              <div className="mt-2">
-                <img
-                  src={photoPreview}
-                  alt="Preview"
-                  className="max-h-32 sm:max-h-40 rounded-lg w-auto mx-auto"
-                />
+            {photoPreviews.length > 0 && (
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {photoPreviews.map((preview, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(index)}
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
