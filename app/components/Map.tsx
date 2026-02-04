@@ -25,6 +25,7 @@ const createCustomIcon = (category: ReportCategory) => {
     baches: "#ef4444", // red-500
     pastizales: "#22c55e", // green-500
     robo: "#dc2626", // red-600
+    personas_sospechosas: "#dc2626", // red-600
     fugas_agua: "#3b82f6", // blue-500
     drenaje: "#06b6d4", // cyan-500
     banquetas: "#78716c", // stone-500
