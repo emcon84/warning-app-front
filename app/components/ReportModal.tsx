@@ -99,7 +99,10 @@ export default function ReportModal({
         direccion,
         photos: photos.length > 0 ? photos : undefined,
         fecha: fecha || undefined,
-        isUrgent: category === "robo" ? isUrgent : false,
+        isUrgent:
+          category === "robo" || category === "personas_sospechosas"
+            ? isUrgent
+            : false,
       });
       setCategory("basura");
       setDescription("");
@@ -171,6 +174,7 @@ export default function ReportModal({
                 Falta de limpieza de pastizales
               </option>
               <option value="robo">Robo</option>
+              <option value="personas_sospechosas">Personas sospechosas</option>
               <option value="fugas_agua">Fugas de agua</option>
               <option value="drenaje">
                 Problemas de alcantarillado/drenaje
@@ -202,14 +206,16 @@ export default function ReportModal({
             </select>
           </div>
 
-          {/* Alerta especial para robo */}
-          {category === "robo" && (
+          {/* Alerta especial para robo y personas sospechosas */}
+          {(category === "robo" || category === "personas_sospechosas") && (
             <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="font-bold text-red-900 mb-2">
-                    ¿Robo en ejecución?
+                    {category === "robo"
+                      ? "¿Robo en ejecución?"
+                      : "¿Situación en curso?"}
                   </h3>
                   <label className="flex items-center gap-2 mb-3 cursor-pointer">
                     <input
@@ -219,7 +225,9 @@ export default function ReportModal({
                       className="w-4 h-4 text-red-600 rounded focus:ring-red-500"
                     />
                     <span className="text-sm text-red-800">
-                      Este robo está sucediendo ahora
+                      {category === "robo"
+                        ? "Este robo está sucediendo ahora"
+                        : "Esta situación está ocurriendo ahora"}
                     </span>
                   </label>
 
@@ -263,7 +271,11 @@ export default function ReportModal({
                             return;
                           }
 
-                          const message = `🚨 *ALERTA DE ROBO EN EJECUCIÓN*
+                          const alertTitle =
+                            category === "robo"
+                              ? "ALERTA DE ROBO EN EJECUCIÓN"
+                              : "ALERTA DE PERSONAS SOSPECHOSAS";
+                          const message = `🚨 *${alertTitle}*
 
 ⚠️ *URGENTE - Reconquista, Santa Fe*
 
@@ -303,8 +315,9 @@ export default function ReportModal({
                   )}
 
                   <p className="text-xs text-red-700 mt-2">
-                    Si el robo está en curso, llama al 911 primero. El reporte
-                    se guardará de todas formas.
+                    {category === "robo"
+                      ? "Si el robo está en curso, llama al 911 primero. El reporte se guardará de todas formas."
+                      : "Si la situación es peligrosa, llama al 911 primero. El reporte se guardará de todas formas."}
                   </p>
                 </div>
               </div>

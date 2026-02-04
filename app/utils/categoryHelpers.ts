@@ -21,6 +21,7 @@ import {
   SignpostBig,
   ParkingCircle,
   Bus,
+  Users,
 } from "lucide-react";
 
 export const getCategoryLabel = (category: ReportCategory): string => {
@@ -30,6 +31,7 @@ export const getCategoryLabel = (category: ReportCategory): string => {
     baches: "Baches en vía pública",
     pastizales: "Limpieza de pastizales",
     robo: "Robo",
+    personas_sospechosas: "Personas sospechosas",
     fugas_agua: "Fugas de agua",
     drenaje: "Problemas de drenaje",
     banquetas: "Banquetas dañadas",
@@ -57,6 +59,7 @@ export const getCategoryIcon = (category: ReportCategory) => {
     baches: Construction,
     pastizales: Trees,
     robo: ShieldAlert,
+    personas_sospechosas: Users,
     fugas_agua: Droplet,
     drenaje: Droplets,
     banquetas: Footprints,
@@ -84,6 +87,7 @@ export const getCategoryIconSvg = (category: ReportCategory): string => {
     baches: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>`,
     pastizales: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/><path d="M7 16v6"/><path d="M13 19v3"/><path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"/></svg>`,
     robo: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>`,
+    personas_sospechosas: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
     fugas_agua: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
     drenaje: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>`,
     banquetas: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2.5a2 2 0 0 1-2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 1-2 2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/><path d="M3 13h18"/></svg>`,
@@ -111,6 +115,7 @@ export const getCategoryColor = (category: ReportCategory): string => {
     baches: "bg-red-100 text-red-800 border-red-300",
     pastizales: "bg-green-100 text-green-800 border-green-300",
     robo: "bg-purple-100 text-purple-800 border-purple-300",
+    personas_sospechosas: "bg-red-100 text-red-800 border-red-300",
     fugas_agua: "bg-blue-100 text-blue-800 border-blue-300",
     drenaje: "bg-cyan-100 text-cyan-800 border-cyan-300",
     banquetas: "bg-stone-100 text-stone-800 border-stone-300",

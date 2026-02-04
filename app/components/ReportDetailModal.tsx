@@ -135,7 +135,11 @@ export default function ReportDetailModal({
   };
 
   const alertOjosEnAlerta = () => {
-    const message = `🚨 *ALERTA DE ROBO EN EJECUCIÓN*
+    const alertTitle =
+      report.category === "robo"
+        ? "ALERTA DE ROBO EN EJECUCIÓN"
+        : "ALERTA DE PERSONAS SOSPECHOSAS";
+    const message = `🚨 *${alertTitle}*
 
 ⚠️ *URGENTE - Reconquista, Santa Fe*
 
@@ -329,32 +333,36 @@ export default function ReportDetailModal({
               </div>
 
               {/* Emergency Actions */}
-              {report.category === "robo" && report.isUrgent && (
-                <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl">
-                  <div className="flex items-center gap-2 mb-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                    <h3 className="text-sm font-bold text-red-900 uppercase">
-                      Robo en Ejecución - Acción Urgente
-                    </h3>
+              {(report.category === "robo" ||
+                report.category === "personas_sospechosas") &&
+                report.isUrgent && (
+                  <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                      <h3 className="text-sm font-bold text-red-900 uppercase">
+                        {report.category === "robo"
+                          ? "Robo en Ejecución - Acción Urgente"
+                          : "Personas Sospechosas - Acción Urgente"}
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={callPolice}
+                        className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
+                      >
+                        <Phone className="w-4 h-4" />
+                        911
+                      </button>
+                      <button
+                        onClick={alertOjosEnAlerta}
+                        className="px-4 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        Ojos en Alerta
+                      </button>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={callPolice}
-                      className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
-                    >
-                      <Phone className="w-4 h-4" />
-                      911
-                    </button>
-                    <button
-                      onClick={alertOjosEnAlerta}
-                      className="px-4 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      Ojos en Alerta
-                    </button>
-                  </div>
-                </div>
-              )}
+                )}
 
               {/* Public Services */}
               {[
