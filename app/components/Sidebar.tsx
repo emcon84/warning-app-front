@@ -52,15 +52,17 @@ export default function Sidebar({
   return (
     <div
       className={`
-        fixed md:relative
+        fixed
         inset-y-0 left-0
-        w-full md:w-80 lg:w-96
-        bg-white shadow-lg 
-        flex flex-col 
+        w-80 lg:w-96
+        bg-white shadow-lg
+        flex flex-col
         h-full
         z-[1000]
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}        pt-[60px] md:pt-0      `}
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        pt-[60px]
+      `}
     >
       {/* Header */}
       <div className="p-4 border-b">
@@ -76,10 +78,10 @@ export default function Sidebar({
               Haz clic en el mapa para reportar
             </p>
           </div>
-          {/* Botón cerrar solo en mobile */}
+          {/* Botón cerrar */}
           <button
             onClick={onClose}
-            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="Cerrar menú"
           >
             <svg

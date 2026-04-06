@@ -8,13 +8,15 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Report, ReportCategory } from "../types";
+import { Report, ReportCategory, Doctor } from "../types";
 import L from "leaflet";
+import { useState, useEffect } from "react";
 import {
   getCategoryLabel,
   getCategoryIconSvg,
   getCategoryIcon,
 } from "../utils/categoryHelpers";
+import { getDoctorPinColor, getDoctorIconSvg } from "../utils/doctorHelpers";
 import { Share2, Phone, AlertTriangle } from "lucide-react";
 
 // Crear iconos personalizados para cada categoría
@@ -76,12 +78,27 @@ const createCustomIcon = (category: ReportCategory) => {
   });
 };
 
+// Crear icono para doctor
+const createDoctorIcon = (doctor: Doctor) => {
+  return L.divIcon({
+    html: getDoctorIconSvg(doctor),
+    className: "",
+    iconSize: [38, 44],
+    iconAnchor: [19, 44],
+    popupAnchor: [0, -44],
+  });
+};
+
 // Centro en Reconquista, Santa Fe, Argentina
 const defaultCenter: [number, number] = [-29.15, -59.65];
 
 interface MapComponentProps {
   onMapClick: (lat: number, lng: number) => void;
   reports: Report[];
+  doctors?: Doctor[];
+  showDoctors?: boolean;
+  showReports?: boolean;
+  onDoctorClick?: (doctor: Doctor) => void;
 }
 
 function MapClickHandler({
@@ -101,7 +118,16 @@ function MapClickHandler({
 export default function MapComponent({
   onMapClick,
   reports,
+  doctors = [],
+  showDoctors = true,
+  showReports = true,
+  onDoctorClick,
 }: MapComponentProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!mounted) return null;
+
   return (
     <MapContainer
       center={defaultCenter}
@@ -110,11 +136,41 @@ export default function MapComponent({
       className="z-0"
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
       />
       <MapClickHandler onMapClick={onMapClick} />
-      {reports.map((report) => (
+
+      {/* Marcadores de doctores */}
+      {showDoctors && doctors.map((doctor) => (
+        <Marker
+          key={`doctor-${doctor.id}`}
+          position={[doctor.lat, doctor.lng]}
+          icon={createDoctorIcon(doctor)}
+          eventHandlers={{
+            mouseover: (e) => e.target.openPopup(),
+            mouseout: (e) => e.target.closePopup(),
+            click: () => onDoctorClick?.(doctor),
+          }}
+        >
+          <Popup closeButton={false} autoPan={false}>
+            <div className="text-sm min-w-[160px]">
+              <p className="font-bold text-base leading-tight">{doctor.nombre}</p>
+              <p className="text-gray-500 text-xs mt-0.5">{doctor.especialidad}</p>
+              {doctor.direccion && <p className="text-gray-400 text-xs mt-1">{doctor.direccion}</p>}
+              <button
+                onClick={() => onDoctorClick?.(doctor)}
+                className="mt-2 w-full px-3 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700"
+              >
+                Ver detalle
+              </button>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+
+      {/* Marcadores de reportes */}
+      {showReports && reports.map((report) => (
         <Marker
           key={report.id}
           position={[report.lat, report.lng]}

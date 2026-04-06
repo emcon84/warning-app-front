@@ -5,11 +5,13 @@ import dynamic from "next/dynamic";
 import ReportModal from "./components/ReportModal";
 import ReportDetailModal from "./components/ReportDetailModal";
 import ReportsTableModal from "./components/ReportsTableModal";
-import { Report, ReportCategory } from "./types";
+import DoctorDetailModal from "./components/DoctorDetailModal";
+import AddDoctorModal from "./components/AddDoctorModal";
+import { Report, ReportCategory, Doctor } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
-import { getReports, createReport, deleteReport } from "./utils/api";
-import { MapPin, AlertTriangle } from "lucide-react";
+import { getReports, createReport, deleteReport, getDoctors } from "./utils/api";
+import { MapPin, AlertTriangle, Stethoscope } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
 import { getCategoryLabel } from "./utils/categoryHelpers";
 
@@ -24,9 +26,12 @@ const MapComponent = dynamic(() => import("./components/Map"), {
 });
 
 type FilterPeriod = "today" | "week";
+type MapView = "all" | "doctors" | "reports";
+type AddMode = "report" | "doctor" | null;
 
 export default function Home() {
   const [reports, setReports] = useState<Report[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
@@ -39,12 +44,28 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [isDoctorDetailOpen, setIsDoctorDetailOpen] = useState(false);
+  const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
+  const [mapView, setMapView] = useState<MapView>("all");
+  const [addMode, setAddMode] = useState<AddMode>(null);
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const { showNotification, permission } = useNotifications();
 
-  // Cargar reportes al montar el componente
+  // Cargar reportes y médicos al montar el componente
   useEffect(() => {
     loadReports();
+    loadDoctors();
   }, []);
+
+  const loadDoctors = async () => {
+    try {
+      const data = await getDoctors();
+      setDoctors(data);
+    } catch (err) {
+      console.error("Error loading doctors:", err);
+    }
+  };
 
   const loadReports = async () => {
     try {
@@ -63,9 +84,29 @@ export default function Home() {
   };
 
   const handleMapClick = (lat: number, lng: number) => {
-    console.log("Mapa clickeado:", lat, lng);
     setSelectedLocation({ lat, lng });
-    setIsModalOpen(true);
+    if (addMode === "doctor") {
+      setIsAddDoctorOpen(true);
+    } else if (mapView !== "doctors") {
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleDoctorClick = (doctor: Doctor) => {
+    setSelectedDoctor(doctor);
+    setIsDoctorDetailOpen(true);
+  };
+
+  const handleDoctorCreated = (doctor: Doctor) => {
+    setDoctors([...doctors, doctor]);
+    setAddMode(null);
+  };
+
+  const handleDoctorUpdate = (updatedDoctor: Doctor) => {
+    setDoctors(doctors.map((d) => (d.id === updatedDoctor.id ? updatedDoctor : d)));
+    if (selectedDoctor?.id === updatedDoctor.id) {
+      setSelectedDoctor(updatedDoctor);
+    }
   };
 
   const handleSubmitReport = async (data: {
@@ -195,6 +236,19 @@ export default function Home() {
 
   const filteredReports = getFilteredReports();
 
+  const allSpecialties = [...new Set(doctors.map((d) => d.especialidad))].sort();
+
+  const toggleSpecialty = (esp: string) => {
+    setSelectedSpecialties((prev) =>
+      prev.includes(esp) ? prev.filter((s) => s !== esp) : [...prev, esp]
+    );
+  };
+
+  const filteredDoctors =
+    selectedSpecialties.length === 0
+      ? doctors
+      : doctors.filter((d) => selectedSpecialties.includes(d.especialidad));
+
   // Mostrar estado de carga
   if (isLoading) {
     return (
@@ -232,14 +286,16 @@ export default function Home() {
       <Navbar
         totalReports={reports.length}
         onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        mapView={mapView}
+        onMapViewChange={setMapView}
       />
 
       {/* Contenedor principal con navbar */}
       <div className="flex flex-1 overflow-hidden mt-[60px]">
-        {/* Overlay para cerrar sidebar en mobile */}
+        {/* Overlay para cerrar sidebar - solo mobile */}
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-[999] md:hidden"
+            className="fixed inset-0 bg-black bg-opacity-50 z-[999] sm:hidden"
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
@@ -260,11 +316,101 @@ export default function Home() {
         <div className="flex-1 relative w-full h-full">
           {/* Indicador de instrucción */}
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999] bg-gray-900 text-white px-3 py-2 md:px-4 md:py-2 rounded-full shadow-lg text-xs md:text-sm max-w-[90%] md:max-w-none text-center flex items-center gap-2 justify-center">
-            <MapPin className="w-4 h-4" />
-            Tocá el mapa para crear un reporte
+            {addMode === "doctor" ? (
+              <>
+                <Stethoscope className="w-4 h-4 text-green-400" />
+                Tocá el mapa para ubicar el médico
+                <button
+                  onClick={() => setAddMode(null)}
+                  className="ml-1 text-gray-400 hover:text-white"
+                >✕</button>
+              </>
+            ) : mapView === "doctors" ? (
+              <>
+                <Stethoscope className="w-4 h-4 text-green-400" />
+                Vista médicos — usá el botón para agregar uno
+              </>
+            ) : (
+              <>
+                <MapPin className="w-4 h-4" />
+                Tocá el mapa para crear un reporte
+              </>
+            )}
           </div>
 
-          <MapComponent onMapClick={handleMapClick} reports={filteredReports} />
+          {/* Botón agregar médico */}
+          <button
+            onClick={() => setAddMode(addMode === "doctor" ? null : "doctor")}
+            className={`absolute bottom-6 right-4 z-[999] flex items-center gap-2 px-4 py-2 rounded-full shadow-lg text-sm font-semibold transition-colors ${
+              addMode === "doctor"
+                ? "bg-green-600 text-white"
+                : "bg-white text-green-700 border border-green-300 hover:bg-green-50"
+            }`}
+          >
+            <Stethoscope className="w-4 h-4" />
+            Agregar médico
+          </button>
+
+          {/* Filter pills vista (mobile) - solo cuando NO hay pills de especialidad visibles */}
+          <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-[999] flex sm:hidden gap-1">
+            {(["all", "doctors", "reports"] as MapView[]).map((view) => {
+              const labels: Record<MapView, string> = { all: "Todo", doctors: "🏥", reports: "📢" };
+              return (
+                <button
+                  key={view}
+                  onClick={() => setMapView(view)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold shadow transition-colors ${
+                    mapView === view
+                      ? "bg-green-500 text-white"
+                      : "bg-white text-gray-700 border border-gray-300"
+                  }`}
+                >
+                  {labels[view]}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Pills de especialidades */}
+          {(mapView === "all" || mapView === "doctors") && allSpecialties.length > 0 && (
+            <div className="absolute top-28 sm:top-16 left-0 right-0 z-[998] px-3 pointer-events-none">
+              <div className="flex gap-1.5 overflow-x-auto py-1 pointer-events-auto"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                <button
+                  onClick={() => setSelectedSpecialties([])}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold shadow transition-colors ${
+                    selectedSpecialties.length === 0
+                      ? "bg-gray-900 text-white"
+                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  Todas
+                </button>
+                {allSpecialties.map((esp) => (
+                  <button
+                    key={esp}
+                    onClick={() => toggleSpecialty(esp)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold shadow transition-colors ${
+                      selectedSpecialties.includes(esp)
+                        ? "bg-green-500 text-white"
+                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {esp}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <MapComponent
+            onMapClick={handleMapClick}
+            reports={filteredReports}
+            doctors={filteredDoctors}
+            showDoctors={mapView === "all" || mapView === "doctors"}
+            showReports={mapView === "all" || mapView === "reports"}
+            onDoctorClick={handleDoctorClick}
+          />
         </div>
       </div>
 
@@ -287,6 +433,27 @@ export default function Home() {
           report={selectedReport}
           onDelete={handleDeleteReport}
           onUpdate={handleUpdateReport}
+        />
+      )}
+
+      {/* Modal de detalle del médico */}
+      {selectedDoctor && (
+        <DoctorDetailModal
+          isOpen={isDoctorDetailOpen}
+          onClose={() => { setIsDoctorDetailOpen(false); setSelectedDoctor(null); }}
+          doctor={selectedDoctor}
+          onDoctorUpdate={handleDoctorUpdate}
+        />
+      )}
+
+      {/* Modal para agregar médico */}
+      {selectedLocation && isAddDoctorOpen && (
+        <AddDoctorModal
+          isOpen={isAddDoctorOpen}
+          onClose={() => { setIsAddDoctorOpen(false); setSelectedLocation(null); }}
+          lat={selectedLocation.lat}
+          lng={selectedLocation.lng}
+          onDoctorCreated={handleDoctorCreated}
         />
       )}
 

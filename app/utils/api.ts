@@ -1,4 +1,4 @@
-import { Report, ReportCategory } from "../types";
+import { Report, ReportCategory, Doctor } from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -195,6 +195,163 @@ export async function updateReport(
     throw error;
   }
 }
+
+// ─── DOCTORS ─────────────────────────────────────────────────────────────────
+
+export interface DoctorFilters {
+  especialidad?: string
+  obraSocial?: string
+  ciudad?: string
+}
+
+export interface CreateDoctorData {
+  nombre: string
+  especialidad: string
+  direccion: string
+  barrio?: string
+  ciudad?: string
+  telefono?: string
+  whatsapp?: string
+  lat: number
+  lng: number
+  obrasSociales?: string[]
+}
+
+export async function getDoctors(filters?: DoctorFilters): Promise<Doctor[]> {
+  try {
+    const params = new URLSearchParams()
+    if (filters?.especialidad) params.append("especialidad", filters.especialidad)
+    if (filters?.obraSocial) params.append("obraSocial", filters.obraSocial)
+    if (filters?.ciudad) params.append("ciudad", filters.ciudad)
+
+    const url = `${API_BASE_URL}/api/doctors${params.toString() ? `?${params}` : ""}`
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener médicos: ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching doctors:", error)
+    throw error
+  }
+}
+
+export async function getDoctor(id: string): Promise<Doctor> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/doctors/${id}`)
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener médico: ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching doctor:", error)
+    throw error
+  }
+}
+
+export async function createDoctor(data: CreateDoctorData): Promise<Doctor> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/doctors`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || `Error al crear médico: ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error creating doctor:", error)
+    throw error
+  }
+}
+
+export async function updateDoctor(id: string, data: Partial<CreateDoctorData>): Promise<Doctor> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/doctors/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || `Error al actualizar médico: ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error updating doctor:", error)
+    throw error
+  }
+}
+
+export async function deleteDoctor(id: string): Promise<void> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/doctors/${id}`, {
+      method: "DELETE",
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || `Error al eliminar médico: ${response.statusText}`)
+    }
+  } catch (error) {
+    console.error("Error deleting doctor:", error)
+    throw error
+  }
+}
+
+export async function confirmarDoctor(id: string, obraSocial: string, acepta: boolean): Promise<Doctor> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/doctors/${id}/confirmaciones`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ obraSocial, acepta }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || `Error al confirmar: ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error confirming doctor:", error)
+    throw error
+  }
+}
+
+export async function getDisponibilidad(doctorId: string) {
+  const res = await fetch(`${API_BASE_URL}/api/doctors/${doctorId}/disponibilidad`);
+  if (!res.ok) throw new Error("Error al obtener disponibilidad");
+  return res.json();
+}
+
+export async function reportarDisponibilidad(doctorId: string, data: {
+  dias: string[];
+  horario: string;
+  tipoTurno: string;
+  obraSocial: string;
+  nota?: string;
+}) {
+  const res = await fetch(`${API_BASE_URL}/api/doctors/${doctorId}/disponibilidad`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Error al reportar disponibilidad");
+  return res.json();
+}
+
+// ─── FIN DOCTORS ─────────────────────────────────────────────────────────────
 
 // Obtener estadísticas
 export async function getStats() {

@@ -1,18 +1,22 @@
 "use client";
 
+type MapView = "all" | "doctors" | "reports";
+
 interface NavbarProps {
   totalReports: number;
   onMenuClick: () => void;
+  mapView?: MapView;
+  onMapViewChange?: (view: MapView) => void;
 }
 
-export default function Navbar({ totalReports, onMenuClick }: NavbarProps) {
+export default function Navbar({ totalReports, onMenuClick, mapView = "all", onMapViewChange }: NavbarProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-[1002] bg-gray-900 text-white shadow-lg">
       <div className="flex items-center justify-between px-4 py-3">
-        {/* Botón hamburguesa - solo en mobile */}
+        {/* Botón hamburguesa */}
         <button
           onClick={onMenuClick}
-          className="md:hidden p-2 hover:bg-gray-800 rounded-lg transition-colors"
+          className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
           aria-label="Toggle menu"
         >
           <svg
@@ -36,6 +40,28 @@ export default function Navbar({ totalReports, onMenuClick }: NavbarProps) {
             Reportes Reconquista
           </h1>
         </div>
+
+        {/* Filter pills */}
+        {onMapViewChange && (
+          <div className="hidden sm:flex items-center gap-1">
+            {(["all", "doctors", "reports"] as MapView[]).map((view) => {
+              const labels: Record<MapView, string> = { all: "Todo", doctors: "🏥 Médicos", reports: "📢 Reportes" };
+              return (
+                <button
+                  key={view}
+                  onClick={() => onMapViewChange(view)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
+                    mapView === view
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  {labels[view]}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Contador de reportes */}
         <div className="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-full">
