@@ -201,11 +201,12 @@ function DoctorClusterLayer({ doctors, relocatingDoctorId, onDoctorClick, onDoct
       });
 
       if (!isRelocating) {
-        const popup = L.popup({ closeButton: false, autoPan: false, offset: [0, -40] }).setContent(`
-          <div style="min-width:140px;font-family:sans-serif;pointer-events:none">
+        const popup = L.popup({ closeButton: false, autoPan: false }).setContent(`
+          <div style="min-width:150px;font-family:sans-serif;pointer-events:none">
             <p style="font-weight:700;font-size:13px;margin:0 0 2px">${doctor.nombre}</p>
             <p style="color:#6b7280;font-size:11px;margin:0 0 2px">${doctor.especialidad}</p>
-            ${doctor.direccion ? `<p style="color:#9ca3af;font-size:11px;margin:0">${doctor.direccion}</p>` : ""}
+            ${doctor.direccion ? `<p style="color:#9ca3af;font-size:11px;margin:0 0 6px">${doctor.direccion}</p>` : "<div style='margin-bottom:6px'></div>"}
+            <p style="color:#16a34a;font-size:10px;margin:0;font-weight:600">👆 Tocá para ver info completa</p>
           </div>
         `);
         marker.bindPopup(popup);
