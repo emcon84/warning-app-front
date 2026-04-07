@@ -6,11 +6,15 @@ import {
   Marker,
   Popup,
   useMapEvents,
+  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { Report, ReportCategory, Doctor } from "../types";
 import L from "leaflet";
-import { useState, useEffect } from "react";
+import "leaflet.markercluster";
+import { useState, useEffect, useRef } from "react";
 import {
   getCategoryLabel,
   getCategoryIconSvg,
@@ -136,6 +140,102 @@ const createRelocateIcon = () => L.divIcon({
   popupAnchor: [0, -44],
 });
 
+// ─── Cluster layer para doctores ─────────────────────────────────────────────
+interface DoctorClusterLayerProps {
+  doctors: Doctor[];
+  relocatingDoctorId: string | null | undefined;
+  onDoctorClick?: (doctor: Doctor) => void;
+  onDoctorRelocated?: (doctorId: string, lat: number, lng: number) => void;
+}
+
+function DoctorClusterLayer({ doctors, relocatingDoctorId, onDoctorClick, onDoctorRelocated }: DoctorClusterLayerProps) {
+  const map = useMap();
+  const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
+
+  useEffect(() => {
+    // Crear cluster group con estilo personalizado
+    const clusterGroup = (L as any).markerClusterGroup({
+      maxClusterRadius: 50,
+      iconCreateFunction: (cluster: any) => {
+        const count = cluster.getChildCount();
+        return L.divIcon({
+          html: `<div style="
+            background: #16a34a;
+            color: white;
+            border-radius: 50%;
+            width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          ">${count}</div>`,
+          className: "",
+          iconSize: [38, 38],
+          iconAnchor: [19, 19],
+        });
+      },
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+    });
+
+    clusterGroupRef.current = clusterGroup;
+    map.addLayer(clusterGroup);
+
+    return () => {
+      map.removeLayer(clusterGroup);
+    };
+  }, [map]);
+
+  useEffect(() => {
+    const clusterGroup = clusterGroupRef.current;
+    if (!clusterGroup) return;
+
+    clusterGroup.clearLayers();
+
+    doctors.forEach((doctor) => {
+      const isRelocating = relocatingDoctorId === doctor.id;
+      const marker = L.marker([doctor.lat, doctor.lng], {
+        icon: isRelocating ? createRelocateIcon() : createDoctorIcon(doctor),
+        draggable: isRelocating,
+      });
+
+      if (!isRelocating) {
+        const popup = L.popup({ closeButton: false, autoPan: false }).setContent(`
+          <div style="min-width:160px;font-family:sans-serif">
+            <p style="font-weight:700;font-size:14px;margin:0 0 2px">${doctor.nombre}</p>
+            <p style="color:#6b7280;font-size:11px;margin:0 0 4px">${doctor.especialidad}</p>
+            ${doctor.direccion ? `<p style="color:#9ca3af;font-size:11px;margin:0 0 6px">${doctor.direccion}</p>` : ""}
+            <button id="ver-detalle-${doctor.id}" style="
+              width:100%;padding:6px;background:#16a34a;color:white;
+              border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer
+            ">Ver detalle</button>
+          </div>
+        `);
+        marker.bindPopup(popup);
+        marker.on("mouseover", () => marker.openPopup());
+        marker.on("mouseout", () => marker.closePopup());
+        marker.on("popupopen", () => {
+          const btn = document.getElementById(`ver-detalle-${doctor.id}`);
+          if (btn) btn.onclick = () => onDoctorClick?.(doctor);
+        });
+        marker.on("click", () => onDoctorClick?.(doctor));
+      }
+
+      if (isRelocating) {
+        marker.on("dragend", (e) => {
+          const { lat, lng } = e.target.getLatLng();
+          onDoctorRelocated?.(doctor.id, lat, lng);
+        });
+      }
+
+      clusterGroup.addLayer(marker);
+    });
+  }, [doctors, relocatingDoctorId, onDoctorClick, onDoctorRelocated]);
+
+  return null;
+}
+
 export default function MapComponent({
   onMapClick,
   reports,
@@ -164,45 +264,15 @@ export default function MapComponent({
       />
       <MapClickHandler onMapClick={onMapClick} />
 
-      {/* Marcadores de doctores */}
-      {showDoctors && doctors.map((doctor) => {
-        const isRelocating = relocatingDoctorId === doctor.id;
-        return (
-          <Marker
-            key={`doctor-${doctor.id}`}
-            position={[doctor.lat, doctor.lng]}
-            icon={isRelocating ? createRelocateIcon() : createDoctorIcon(doctor)}
-            draggable={isRelocating}
-            eventHandlers={{
-              mouseover: (e) => { if (!isRelocating) e.target.openPopup(); },
-              mouseout: (e) => { if (!isRelocating) e.target.closePopup(); },
-              click: () => { if (!isRelocating) onDoctorClick?.(doctor); },
-              dragend: (e) => {
-                if (isRelocating) {
-                  const { lat, lng } = e.target.getLatLng();
-                  onDoctorRelocated?.(doctor.id, lat, lng);
-                }
-              },
-            }}
-          >
-            {!isRelocating && (
-              <Popup closeButton={false} autoPan={false}>
-                <div className="text-sm min-w-[160px]">
-                  <p className="font-bold text-base leading-tight">{doctor.nombre}</p>
-                  <p className="text-gray-500 text-xs mt-0.5">{doctor.especialidad}</p>
-                  {doctor.direccion && <p className="text-gray-400 text-xs mt-1">{doctor.direccion}</p>}
-                  <button
-                    onClick={() => onDoctorClick?.(doctor)}
-                    className="mt-2 w-full px-3 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700"
-                  >
-                    Ver detalle
-                  </button>
-                </div>
-              </Popup>
-            )}
-          </Marker>
-        );
-      })}
+      {/* Marcadores de doctores con clustering */}
+      {showDoctors && (
+        <DoctorClusterLayer
+          doctors={doctors}
+          relocatingDoctorId={relocatingDoctorId}
+          onDoctorClick={onDoctorClick}
+          onDoctorRelocated={onDoctorRelocated}
+        />
+      )}
 
       {/* Marcadores de reportes */}
       {showReports && reports.map((report) => (
