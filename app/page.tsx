@@ -10,6 +10,7 @@ import AddDoctorModal from "./components/AddDoctorModal";
 import { Report, ReportCategory, Doctor } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
+import FloatingBottomNav from "./components/FloatingBottomNav";
 import { getReports, createReport, deleteReport, getDoctors } from "./utils/api";
 import { MapPin, AlertTriangle, Stethoscope } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
@@ -471,6 +472,9 @@ export default function Home() {
         }}
         onDelete={handleDeleteReport}
       />
+
+      {/* Botones de emergencia — solo en vista reportes/todo */}
+      {mapView !== "doctors" && <FloatingBottomNav />}
     </div>
   );
 }

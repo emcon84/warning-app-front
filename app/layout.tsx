@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import FloatingBottomNav from "./components/FloatingBottomNav";
 import NotificationPrompt from "./components/NotificationPrompt";
 
 const geistSans = Geist({
@@ -62,7 +61,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <FloatingBottomNav />
         <NotificationPrompt />
       </body>
     </html>
