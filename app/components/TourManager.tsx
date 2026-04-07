@@ -15,7 +15,7 @@ const STORAGE_KEYS = {
   reports: "tour_reports_done",
 };
 
-function buildDoctorsTour() {
+function buildDoctorsTour(onDone: () => void) {
   return driver({
     showProgress: true,
     progressText: "{{current}} de {{total}}",
@@ -24,6 +24,7 @@ function buildDoctorsTour() {
     doneBtnText: "¡Entendido!",
     allowClose: true,
     overlayOpacity: 0.55,
+    onDestroyed: onDone,
     steps: [
       {
         element: "[data-tour='view-pills']",
@@ -74,7 +75,7 @@ function buildDoctorsTour() {
   });
 }
 
-function buildReportsTour() {
+function buildReportsTour(onDone: () => void) {
   return driver({
     showProgress: true,
     progressText: "{{current}} de {{total}}",
@@ -83,6 +84,7 @@ function buildReportsTour() {
     doneBtnText: "¡Entendido!",
     allowClose: true,
     overlayOpacity: 0.55,
+    onDestroyed: onDone,
     steps: [
       {
         element: "[data-tour='view-pills']",
@@ -150,12 +152,8 @@ export default function TourManager({ mapView }: TourManagerProps) {
     // Pequeño delay para que el mapa termine de renderizar
     const timeout = setTimeout(() => {
       hasRunRef.current = true;
-      const tourInstance = mapView === "doctors" ? buildDoctorsTour() : buildReportsTour();
-      tourInstance.setConfig({
-        onDestroyed: () => {
-          localStorage.setItem(storageKey, "1");
-        },
-      });
+      const onDone = () => localStorage.setItem(storageKey, "1");
+      const tourInstance = mapView === "doctors" ? buildDoctorsTour(onDone) : buildReportsTour(onDone);
       tourInstance.drive();
     }, 800);
 
@@ -168,13 +166,10 @@ export default function TourManager({ mapView }: TourManagerProps) {
 // Hook para relanzar el tour manualmente
 export function useReplayTour(mapView: MapView) {
   return () => {
-    localStorage.removeItem(STORAGE_KEYS[mapView]);
-    const tourInstance = mapView === "doctors" ? buildDoctorsTour() : buildReportsTour();
-    tourInstance.setConfig({
-      onDestroyed: () => {
-        localStorage.setItem(STORAGE_KEYS[mapView], "1");
-      },
-    });
+    const storageKey = STORAGE_KEYS[mapView];
+    localStorage.removeItem(storageKey);
+    const onDone = () => localStorage.setItem(storageKey, "1");
+    const tourInstance = mapView === "doctors" ? buildDoctorsTour(onDone) : buildReportsTour(onDone);
     tourInstance.drive();
   };
 }
