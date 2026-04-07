@@ -99,6 +99,8 @@ interface MapComponentProps {
   showDoctors?: boolean;
   showReports?: boolean;
   onDoctorClick?: (doctor: Doctor) => void;
+  relocatingDoctorId?: string | null;
+  onDoctorRelocated?: (doctorId: string, lat: number, lng: number) => void;
 }
 
 function MapClickHandler({
@@ -115,6 +117,25 @@ function MapClickHandler({
   return null;
 }
 
+// Icono especial para el pin en modo relocalización
+const createRelocateIcon = () => L.divIcon({
+  html: `<div style="
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #f59e0b; border: 3px solid white;
+    box-shadow: 0 0 0 3px #f59e0b, 0 4px 12px rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    animation: pulse 1s infinite;
+  ">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/>
+    </svg>
+  </div>`,
+  className: "",
+  iconSize: [44, 44],
+  iconAnchor: [22, 44],
+  popupAnchor: [0, -44],
+});
+
 export default function MapComponent({
   onMapClick,
   reports,
@@ -122,6 +143,8 @@ export default function MapComponent({
   showDoctors = true,
   showReports = true,
   onDoctorClick,
+  relocatingDoctorId,
+  onDoctorRelocated,
 }: MapComponentProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -142,32 +165,44 @@ export default function MapComponent({
       <MapClickHandler onMapClick={onMapClick} />
 
       {/* Marcadores de doctores */}
-      {showDoctors && doctors.map((doctor) => (
-        <Marker
-          key={`doctor-${doctor.id}`}
-          position={[doctor.lat, doctor.lng]}
-          icon={createDoctorIcon(doctor)}
-          eventHandlers={{
-            mouseover: (e) => e.target.openPopup(),
-            mouseout: (e) => e.target.closePopup(),
-            click: () => onDoctorClick?.(doctor),
-          }}
-        >
-          <Popup closeButton={false} autoPan={false}>
-            <div className="text-sm min-w-[160px]">
-              <p className="font-bold text-base leading-tight">{doctor.nombre}</p>
-              <p className="text-gray-500 text-xs mt-0.5">{doctor.especialidad}</p>
-              {doctor.direccion && <p className="text-gray-400 text-xs mt-1">{doctor.direccion}</p>}
-              <button
-                onClick={() => onDoctorClick?.(doctor)}
-                className="mt-2 w-full px-3 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700"
-              >
-                Ver detalle
-              </button>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      {showDoctors && doctors.map((doctor) => {
+        const isRelocating = relocatingDoctorId === doctor.id;
+        return (
+          <Marker
+            key={`doctor-${doctor.id}`}
+            position={[doctor.lat, doctor.lng]}
+            icon={isRelocating ? createRelocateIcon() : createDoctorIcon(doctor)}
+            draggable={isRelocating}
+            eventHandlers={{
+              mouseover: (e) => { if (!isRelocating) e.target.openPopup(); },
+              mouseout: (e) => { if (!isRelocating) e.target.closePopup(); },
+              click: () => { if (!isRelocating) onDoctorClick?.(doctor); },
+              dragend: (e) => {
+                if (isRelocating) {
+                  const { lat, lng } = e.target.getLatLng();
+                  onDoctorRelocated?.(doctor.id, lat, lng);
+                }
+              },
+            }}
+          >
+            {!isRelocating && (
+              <Popup closeButton={false} autoPan={false}>
+                <div className="text-sm min-w-[160px]">
+                  <p className="font-bold text-base leading-tight">{doctor.nombre}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{doctor.especialidad}</p>
+                  {doctor.direccion && <p className="text-gray-400 text-xs mt-1">{doctor.direccion}</p>}
+                  <button
+                    onClick={() => onDoctorClick?.(doctor)}
+                    className="mt-2 w-full px-3 py-1.5 bg-green-600 text-white rounded text-xs font-semibold hover:bg-green-700"
+                  >
+                    Ver detalle
+                  </button>
+                </div>
+              </Popup>
+            )}
+          </Marker>
+        );
+      })}
 
       {/* Marcadores de reportes */}
       {showReports && reports.map((report) => (

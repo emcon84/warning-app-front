@@ -11,7 +11,7 @@ import { Report, ReportCategory, Doctor } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import FloatingBottomNav from "./components/FloatingBottomNav";
-import { getReports, createReport, deleteReport, getDoctors } from "./utils/api";
+import { getReports, createReport, deleteReport, getDoctors, updateDoctor } from "./utils/api";
 import { MapPin, AlertTriangle, Stethoscope } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
 import { getCategoryLabel } from "./utils/categoryHelpers";
@@ -52,6 +52,7 @@ export default function Home() {
   const [addMode, setAddMode] = useState<AddMode>(null);
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
   const { showNotification, permission } = useNotifications();
 
   // Cargar reportes y médicos al montar el componente
@@ -102,6 +103,23 @@ export default function Home() {
   const handleDoctorCreated = (doctor: Doctor) => {
     setDoctors([...doctors, doctor]);
     setAddMode(null);
+  };
+
+  const handleStartRelocate = (doctorId: string) => {
+    setIsDoctorDetailOpen(false);
+    setSelectedDoctor(null);
+    setRelocatingDoctorId(doctorId);
+    setMapView("doctors");
+  };
+
+  const handleDoctorRelocated = async (doctorId: string, lat: number, lng: number) => {
+    try {
+      const updated = await updateDoctor(doctorId, { lat, lng });
+      setDoctors(doctors.map((d) => d.id === doctorId ? updated : d));
+      setRelocatingDoctorId(null);
+    } catch {
+      alert("Error al guardar la ubicación. Intentá de nuevo.");
+    }
   };
 
   const handleDoctorUpdate = (updatedDoctor: Doctor) => {
@@ -318,12 +336,22 @@ export default function Home() {
         {/* Mapa */}
         <div className="flex-1 relative w-full h-full">
           {/* Indicador de instrucción */}
-          {/* Instrucción contextual — solo cuando es útil */}
-          {addMode === "doctor" && (
-            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-gray-900 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2">
-              <Stethoscope className="w-3.5 h-3.5 text-green-400" />
-              Tocá el mapa para ubicar el médico
-              <button onClick={() => setAddMode(null)} className="text-gray-400 hover:text-white ml-1">✕</button>
+          {/* Instrucción contextual */}
+          {(addMode === "doctor" || relocatingDoctorId) && (
+            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
+              {relocatingDoctorId ? (
+                <>
+                  <MapPin className="w-3.5 h-3.5" />
+                  Arrastrá el pin amarillo a la posición correcta
+                  <button onClick={() => setRelocatingDoctorId(null)} className="ml-1 hover:text-amber-100">✕</button>
+                </>
+              ) : (
+                <>
+                  <Stethoscope className="w-3.5 h-3.5" />
+                  Tocá el mapa para ubicar el médico
+                  <button onClick={() => setAddMode(null)} className="ml-1 hover:text-amber-100">✕</button>
+                </>
+              )}
             </div>
           )}
 
@@ -413,6 +441,8 @@ export default function Home() {
             showDoctors={mapView === "all" || mapView === "doctors"}
             showReports={mapView === "all" || mapView === "reports"}
             onDoctorClick={handleDoctorClick}
+            relocatingDoctorId={relocatingDoctorId}
+            onDoctorRelocated={handleDoctorRelocated}
           />
         </div>
       </div>
@@ -446,6 +476,7 @@ export default function Home() {
           onClose={() => { setIsDoctorDetailOpen(false); setSelectedDoctor(null); }}
           doctor={selectedDoctor}
           onDoctorUpdate={handleDoctorUpdate}
+          onRelocate={handleStartRelocate}
         />
       )}
 
