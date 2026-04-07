@@ -57,6 +57,7 @@ export default function Home() {
   const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
   const [selectedFarmacia, setSelectedFarmacia] = useState<Farmacia | null>(null);
   const [isFarmaciaDetailOpen, setIsFarmaciaDetailOpen] = useState(false);
+  const [relocatingFarmaciaId, setRelocatingFarmaciaId] = useState<string | null>(null);
   const { showNotification, permission } = useNotifications();
   const replayTour = useReplayTour(mapView);
 
@@ -161,6 +162,24 @@ export default function Home() {
   const handleFarmaciaUpdate = (updated: Farmacia) => {
     setFarmacias(prev => prev.map(f => f.id === updated.id ? { ...f, ...updated } : f));
     setSelectedFarmacia(prev => prev?.id === updated.id ? { ...prev, ...updated } : prev);
+  };
+
+  const handleStartFarmaciaRelocate = (farmaciaId: string) => {
+    setIsFarmaciaDetailOpen(false);
+    setSelectedFarmacia(null);
+    setRelocatingFarmaciaId(farmaciaId);
+    setMapView("farmacias");
+  };
+
+  const handleFarmaciaRelocated = async (farmaciaId: string, lat: number, lng: number) => {
+    try {
+      const { updateFarmacia } = await import("./utils/api");
+      const updated = await updateFarmacia(farmaciaId, { lat, lng });
+      setFarmacias(prev => prev.map(f => f.id === farmaciaId ? { ...f, ...updated } : f));
+      setRelocatingFarmaciaId(null);
+    } catch {
+      alert("Error al guardar la ubicación. Intentá de nuevo.");
+    }
   };
 
   const handleSubmitReport = async (data: {
@@ -381,6 +400,14 @@ export default function Home() {
             </div>
           )}
 
+          {relocatingFarmaciaId && (
+            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
+              <MapPin className="w-3.5 h-3.5" />
+              Arrastrá el pin de la farmacia a la posición correcta
+              <button onClick={() => setRelocatingFarmaciaId(null)} className="ml-1 hover:text-amber-100">✕</button>
+            </div>
+          )}
+
           {/* Hint "tocá para agregar" — solo en vista médicos */}
           {mapView === "doctors" && !relocatingDoctorId && (
             <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-sm border border-green-200 text-green-700 px-4 py-2 rounded-full shadow text-xs font-semibold flex items-center gap-1.5 pointer-events-none">
@@ -496,6 +523,8 @@ export default function Home() {
             relocatingDoctorId={relocatingDoctorId}
             onDoctorRelocated={handleDoctorRelocated}
             onFarmaciaClick={handleFarmaciaClick}
+            relocatingFarmaciaId={relocatingFarmaciaId}
+            onFarmaciaRelocated={handleFarmaciaRelocated}
           />
         </div>
       </div>
@@ -541,6 +570,7 @@ export default function Home() {
           onClose={() => { setIsFarmaciaDetailOpen(false); setSelectedFarmacia(null); }}
           farmacia={selectedFarmacia}
           onFarmaciaUpdate={handleFarmaciaUpdate}
+          onStartDrag={handleStartFarmaciaRelocate}
         />
       )}
 

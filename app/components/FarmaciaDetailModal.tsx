@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Phone, MapPin, XCircle, CheckCircle, Loader2 } from "lucide-react";
+import { X, Phone, MapPin, XCircle, CheckCircle, Loader2, Move } from "lucide-react";
 import { Farmacia } from "../types";
 import { updateFarmacia } from "../utils/api";
 
@@ -10,9 +10,10 @@ interface FarmaciaDetailModalProps {
   onClose: () => void;
   farmacia: Farmacia;
   onFarmaciaUpdate: (f: Farmacia) => void;
+  onStartDrag?: (farmaciaId: string) => void;
 }
 
-export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial, onFarmaciaUpdate }: FarmaciaDetailModalProps) {
+export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial, onFarmaciaUpdate, onStartDrag }: FarmaciaDetailModalProps) {
   const [farmacia, setFarmacia] = useState<Farmacia>(initial);
 
   // Relocalización
@@ -37,32 +38,41 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
     setRelocateResult(null);
     setRelocateError(null);
     try {
-      // Para intersecciones "Calle A y Calle B" probamos también "Calle A & Calle B"
       const raw = relocateAddress.trim();
-      const queries = [raw];
-      const intersectionMatch = raw.match(/^(.+?)\s+y\s+(.+)$/i);
-      if (intersectionMatch) {
-        queries.push(`${intersectionMatch[1].trim()} & ${intersectionMatch[2].trim()}`);
+      const bbox = "-59.85,-29.30,-59.45,-28.95";
+
+      // Normalizar separadores de intersección: "y", "-", "/", "esq.", "esquina"
+      const sepRegex = /\s+(?:y|e|-|\/|esq\.?|esquina)\s+/i;
+      const parts = raw.split(sepRegex).map(s => s.trim()).filter(Boolean);
+      const isIntersection = parts.length === 2;
+
+      // Armar lista de queries a probar en orden
+      const queries: string[] = [raw];
+      if (isIntersection) {
+        queries.push(`${parts[0]} & ${parts[1]}`);       // formato Nominatim para intersecciones
+        queries.push(`${parts[0]} at ${parts[1]}`);
+        queries.push(parts[0]);                            // solo primera calle como fallback
       }
 
-      const bbox = "-59.85,-29.30,-59.45,-28.95";
-      let found: { lat: number; lng: number } | null = null;
-
-      for (const q of queries) {
+      const doGeocode = async (q: string) => {
         const encoded = encodeURIComponent(`${q}, Reconquista, Santa Fe, Argentina`);
         const url = `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1&countrycodes=ar&viewbox=${bbox}&bounded=1`;
         const res = await fetch(url, { headers: { "User-Agent": "warning-app/1.0" } });
         const data = await res.json();
-        if (data.length > 0) {
-          found = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-          break;
-        }
+        return data.length > 0 ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) } : null;
+      };
+
+      let found: { lat: number; lng: number } | null = null;
+      for (const q of queries) {
+        found = await doGeocode(q);
+        if (found) break;
+        await new Promise(r => setTimeout(r, 300)); // respetar rate-limit Nominatim
       }
 
       if (found) {
         setRelocateResult(found);
       } else {
-        setRelocateError("No se encontró la dirección. Probá escribir solo la calle y número.");
+        setRelocateError("No se encontró la dirección. Usá el botón de arrastrar el pin para moverlo manualmente.");
       }
     } catch {
       setRelocateError("Error de conexión. Intentá de nuevo.");
@@ -140,6 +150,16 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
 
           {/* Corrección de ubicación */}
           <div className="border border-amber-200 bg-amber-50 rounded-xl p-4">
+            {/* Botón drag */}
+            {onStartDrag && (
+              <button
+                onClick={() => { onStartDrag(farmacia.id); handleClose(); }}
+                className="w-full mb-3 flex items-center justify-center gap-2 py-2 bg-white border border-amber-300 text-amber-700 text-sm font-semibold rounded-lg hover:bg-amber-50"
+              >
+                <Move className="w-4 h-4" />
+                Arrastrar pin en el mapa
+              </button>
+            )}
             <div className="flex items-center gap-2 mb-3">
               <MapPin className="w-4 h-4 text-amber-600" />
               <span className="text-sm font-semibold text-amber-800">Corregir ubicación del pin</span>

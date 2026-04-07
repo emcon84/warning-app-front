@@ -108,6 +108,8 @@ interface MapComponentProps {
   relocatingDoctorId?: string | null;
   onDoctorRelocated?: (doctorId: string, lat: number, lng: number) => void;
   onFarmaciaClick?: (farmacia: Farmacia) => void;
+  relocatingFarmaciaId?: string | null;
+  onFarmaciaRelocated?: (farmaciaId: string, lat: number, lng: number) => void;
 }
 
 function MapClickHandler({
@@ -265,6 +267,8 @@ export default function MapComponent({
   relocatingDoctorId,
   onDoctorRelocated,
   onFarmaciaClick,
+  relocatingFarmaciaId,
+  onFarmaciaRelocated,
 }: MapComponentProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -300,7 +304,14 @@ export default function MapComponent({
           key={`farmacia-${f.id}`}
           position={[f.lat, f.lng]}
           icon={createFarmaciaIcon(!!f.esDeturno)}
-          eventHandlers={{ click: () => onFarmaciaClick?.(f) }}
+          draggable={relocatingFarmaciaId === f.id}
+          eventHandlers={{
+            click: () => relocatingFarmaciaId !== f.id && onFarmaciaClick?.(f),
+            dragend: (e) => {
+              const { lat, lng } = (e.target as L.Marker).getLatLng();
+              onFarmaciaRelocated?.(f.id, lat, lng);
+            },
+          }}
         >
           <Popup closeButton={false} autoPan={false}>
             <div style={{ minWidth: "150px", fontFamily: "sans-serif", pointerEvents: "none" }}>
