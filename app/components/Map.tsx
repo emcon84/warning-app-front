@@ -107,6 +107,7 @@ interface MapComponentProps {
   onDoctorClick?: (doctor: Doctor) => void;
   relocatingDoctorId?: string | null;
   onDoctorRelocated?: (doctorId: string, lat: number, lng: number) => void;
+  onFarmaciaClick?: (farmacia: Farmacia) => void;
 }
 
 function MapClickHandler({
@@ -263,6 +264,7 @@ export default function MapComponent({
   onDoctorClick,
   relocatingDoctorId,
   onDoctorRelocated,
+  onFarmaciaClick,
 }: MapComponentProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -298,6 +300,7 @@ export default function MapComponent({
           key={`farmacia-${f.id}`}
           position={[f.lat, f.lng]}
           icon={createFarmaciaIcon(!!f.esDeturno)}
+          eventHandlers={{ click: () => onFarmaciaClick?.(f) }}
         >
           <Popup closeButton={false} autoPan={false}>
             <div style={{ minWidth: "150px", fontFamily: "sans-serif", pointerEvents: "none" }}>
@@ -311,11 +314,9 @@ export default function MapComponent({
               {f.telefono && (
                 <p style={{ color: "#9ca3af", fontSize: "11px", margin: 0 }}>📞 {f.telefono}</p>
               )}
-              {!f.esDeturno && (
-                <p style={{ color: "#9ca3af", fontSize: "10px", margin: "6px 0 0", fontStyle: "italic" }}>
-                  Tocá para ver más info
-                </p>
-              )}
+              <p style={{ color: "#9ca3af", fontSize: "10px", margin: "6px 0 0", fontStyle: "italic" }}>
+                Tocá para ver más info
+              </p>
             </div>
           </Popup>
         </Marker>

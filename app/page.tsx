@@ -7,6 +7,7 @@ import ReportDetailModal from "./components/ReportDetailModal";
 import ReportsTableModal from "./components/ReportsTableModal";
 import DoctorDetailModal from "./components/DoctorDetailModal";
 import AddDoctorModal from "./components/AddDoctorModal";
+import FarmaciaDetailModal from "./components/FarmaciaDetailModal";
 import { Report, ReportCategory, Doctor, Farmacia, TurnoResponse } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
@@ -54,6 +55,8 @@ export default function Home() {
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
   const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
+  const [selectedFarmacia, setSelectedFarmacia] = useState<Farmacia | null>(null);
+  const [isFarmaciaDetailOpen, setIsFarmaciaDetailOpen] = useState(false);
   const { showNotification, permission } = useNotifications();
   const replayTour = useReplayTour(mapView);
 
@@ -148,6 +151,16 @@ export default function Home() {
     setDoctors(doctors.filter((d) => d.id !== doctorId));
     setIsDoctorDetailOpen(false);
     setSelectedDoctor(null);
+  };
+
+  const handleFarmaciaClick = (farmacia: Farmacia) => {
+    setSelectedFarmacia(farmacia);
+    setIsFarmaciaDetailOpen(true);
+  };
+
+  const handleFarmaciaUpdate = (updated: Farmacia) => {
+    setFarmacias(prev => prev.map(f => f.id === updated.id ? { ...f, ...updated } : f));
+    setSelectedFarmacia(prev => prev?.id === updated.id ? { ...prev, ...updated } : prev);
   };
 
   const handleSubmitReport = async (data: {
@@ -482,6 +495,7 @@ export default function Home() {
             onDoctorClick={handleDoctorClick}
             relocatingDoctorId={relocatingDoctorId}
             onDoctorRelocated={handleDoctorRelocated}
+            onFarmaciaClick={handleFarmaciaClick}
           />
         </div>
       </div>
@@ -517,6 +531,16 @@ export default function Home() {
           onDoctorUpdate={handleDoctorUpdate}
           onRelocate={handleStartRelocate}
           onDelete={handleDoctorDelete}
+        />
+      )}
+
+      {/* Modal de detalle de farmacia */}
+      {selectedFarmacia && (
+        <FarmaciaDetailModal
+          isOpen={isFarmaciaDetailOpen}
+          onClose={() => { setIsFarmaciaDetailOpen(false); setSelectedFarmacia(null); }}
+          farmacia={selectedFarmacia}
+          onFarmaciaUpdate={handleFarmaciaUpdate}
         />
       )}
 

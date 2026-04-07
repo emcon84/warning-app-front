@@ -367,6 +367,16 @@ export async function getFarmaciasTurno() {
   return res.json();
 }
 
+export async function updateFarmacia(id: string, data: { lat?: number; lng?: number; direccion?: string; nombre?: string; telefono?: string }) {
+  const res = await fetch(`${API_BASE_URL}/api/farmacias/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Error al actualizar farmacia");
+  return res.json();
+}
+
 // Obtener estadísticas
 export async function getStats() {
   try {
