@@ -353,6 +353,20 @@ export async function reportarDisponibilidad(doctorId: string, data: {
 
 // ─── FIN DOCTORS ─────────────────────────────────────────────────────────────
 
+// ─── FARMACIAS ───────────────────────────────────────────────────────────────
+
+export async function getFarmacias() {
+  const res = await fetch(`${API_BASE_URL}/api/farmacias`);
+  if (!res.ok) throw new Error("Error al obtener farmacias");
+  return res.json();
+}
+
+export async function getFarmaciasTurno() {
+  const res = await fetch(`${API_BASE_URL}/api/farmacias/turno`);
+  if (!res.ok) throw new Error("Error al obtener turno");
+  return res.json();
+}
+
 // Obtener estadísticas
 export async function getStats() {
   try {

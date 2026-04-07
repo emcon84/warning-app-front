@@ -7,12 +7,12 @@ import ReportDetailModal from "./components/ReportDetailModal";
 import ReportsTableModal from "./components/ReportsTableModal";
 import DoctorDetailModal from "./components/DoctorDetailModal";
 import AddDoctorModal from "./components/AddDoctorModal";
-import { Report, ReportCategory, Doctor } from "./types";
+import { Report, ReportCategory, Doctor, Farmacia, TurnoResponse } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import FloatingBottomNav from "./components/FloatingBottomNav";
 import TourManager, { useReplayTour } from "./components/TourManager";
-import { getReports, createReport, deleteReport, getDoctors, updateDoctor } from "./utils/api";
+import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "./utils/api";
 import { MapPin, AlertTriangle, Stethoscope } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
 import { getCategoryLabel } from "./utils/categoryHelpers";
@@ -28,11 +28,13 @@ const MapComponent = dynamic(() => import("./components/Map"), {
 });
 
 type FilterPeriod = "today" | "week";
-type MapView = "doctors" | "reports";
+type MapView = "doctors" | "reports" | "farmacias";
 
 export default function Home() {
   const [reports, setReports] = useState<Report[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [farmacias, setFarmacias] = useState<Farmacia[]>([]);
+  const [turno, setTurno] = useState<TurnoResponse | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
@@ -59,6 +61,7 @@ export default function Home() {
   useEffect(() => {
     loadReports();
     loadDoctors();
+    loadFarmacias();
   }, []);
 
   const loadDoctors = async () => {
@@ -67,6 +70,17 @@ export default function Home() {
       setDoctors(data);
     } catch (err) {
       console.error("Error loading doctors:", err);
+    }
+  };
+
+  const loadFarmacias = async () => {
+    try {
+      const [todas, turnoData] = await Promise.all([getFarmacias(), getFarmaciasTurno()]);
+      setTurno(turnoData);
+      const turnoIds = new Set(turnoData.farmacias.map((f: Farmacia) => f.id));
+      setFarmacias(todas.map((f: Farmacia) => ({ ...f, esDeturno: turnoIds.has(f.id) })));
+    } catch (err) {
+      console.error("Error loading farmacias:", err);
     }
   };
 
@@ -88,6 +102,7 @@ export default function Home() {
 
   const handleMapClick = (lat: number, lng: number) => {
     if (relocatingDoctorId) return;
+    if (mapView === "farmacias") return;
     setSelectedLocation({ lat, lng });
     if (mapView === "doctors") {
       setIsAddDoctorOpen(true);
@@ -315,8 +330,8 @@ export default function Home() {
           totalReports={reports.length}
           onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
           mapView={mapView}
-          onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors") setIsSidebarOpen(false); }}
-          sidebarDisabled={mapView === "doctors"}
+          onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors" || v === "farmacias") setIsSidebarOpen(false); }}
+          sidebarDisabled={mapView === "doctors" || mapView === "farmacias"}
         />
       </div>
 
@@ -358,6 +373,42 @@ export default function Home() {
             <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-sm border border-green-200 text-green-700 px-4 py-2 rounded-full shadow text-xs font-semibold flex items-center gap-1.5 pointer-events-none">
               <Stethoscope className="w-3.5 h-3.5" />
               Tocá el mapa para agregar un médico
+            </div>
+          )}
+
+          {/* Card farmacia de turno */}
+          {mapView === "farmacias" && turno && (
+            <div className="absolute top-3 left-3 right-3 z-[999] bg-white rounded-2xl shadow-lg border border-green-200 p-3 max-w-sm mx-auto">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <span className="text-sm">💊</span>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">Farmacia de turno — {turno.fecha}</p>
+                  <p className="text-xs text-gray-400">Solo recetas y medicamentos de emergencia · 8h a 8h</p>
+                </div>
+              </div>
+              {turno.farmacias.length > 0 ? (
+                <div className="space-y-1.5">
+                  {turno.farmacias.map(f => (
+                    <div key={f.id} className="flex items-center justify-between bg-green-50 rounded-xl px-3 py-2">
+                      <div>
+                        <p className="text-sm font-bold text-green-800">{f.nombre}</p>
+                        <p className="text-xs text-gray-500">{f.direccion}</p>
+                      </div>
+                      {f.telefono && (
+                        <a href={`tel:${f.telefono}`} className="ml-2 flex-shrink-0 p-1.5 bg-green-600 text-white rounded-lg">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400 italic text-center py-1">No se encontró farmacia de turno para hoy</p>
+              )}
             </div>
           )}
 
@@ -424,8 +475,10 @@ export default function Home() {
             onMapClick={handleMapClick}
             reports={filteredReports}
             doctors={filteredDoctors}
+            farmacias={farmacias}
             showDoctors={mapView === "doctors"}
             showReports={mapView === "reports"}
+            showFarmacias={mapView === "farmacias"}
             onDoctorClick={handleDoctorClick}
             relocatingDoctorId={relocatingDoctorId}
             onDoctorRelocated={handleDoctorRelocated}
@@ -497,6 +550,7 @@ export default function Home() {
           <FloatingBottomNav />
         </div>
       )}
+
 
       {/* Tour onboarding */}
       <TourManager mapView={mapView} />

@@ -1,6 +1,6 @@
 "use client";
 
-type MapView = "doctors" | "reports";
+type MapView = "doctors" | "reports" | "farmacias";
 
 interface NavbarProps {
   totalReports: number;
@@ -11,8 +11,9 @@ interface NavbarProps {
 }
 
 const VIEW_CONFIG: Record<MapView, { label: string; mobileLabel: string; emoji: string }> = {
-  doctors: { label: "Médicos",  mobileLabel: "Médicos",  emoji: "🏥" },
-  reports: { label: "Reportes", mobileLabel: "Reportes", emoji: "📢" },
+  doctors:   { label: "Médicos",   mobileLabel: "Médicos",   emoji: "🏥" },
+  reports:   { label: "Reportes",  mobileLabel: "Reportes",  emoji: "📢" },
+  farmacias: { label: "Farmacias", mobileLabel: "Farmacias", emoji: "💊" },
 };
 
 export default function Navbar({ totalReports, onMenuClick, mapView = "reports", onMapViewChange, sidebarDisabled }: NavbarProps) {
@@ -39,7 +40,7 @@ export default function Navbar({ totalReports, onMenuClick, mapView = "reports",
         {/* Pills de vista — centro, todas las pantallas */}
         {onMapViewChange && (
           <div className="flex-1 flex items-center justify-center gap-1">
-            {(["doctors", "reports"] as MapView[]).map((view) => {
+            {(["doctors", "reports", "farmacias"] as MapView[]).map((view) => {
               const cfg = VIEW_CONFIG[view];
               return (
                 <button

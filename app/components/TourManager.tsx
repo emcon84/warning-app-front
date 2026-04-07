@@ -4,15 +4,16 @@ import { useEffect, useRef } from "react";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
-type MapView = "doctors" | "reports";
+type MapView = "doctors" | "reports" | "farmacias";
 
 interface TourManagerProps {
   mapView: MapView;
 }
 
-const STORAGE_KEYS = {
-  doctors: "tour_doctors_done",
-  reports: "tour_reports_done",
+const STORAGE_KEYS: Record<MapView, string> = {
+  doctors:   "tour_doctors_done",
+  reports:   "tour_reports_done",
+  farmacias: "tour_farmacias_done",
 };
 
 function buildDoctorsTour(onDone: () => void) {
@@ -153,7 +154,11 @@ export default function TourManager({ mapView }: TourManagerProps) {
     const timeout = setTimeout(() => {
       hasRunRef.current = true;
       const onDone = () => localStorage.setItem(storageKey, "1");
-      const tourInstance = mapView === "doctors" ? buildDoctorsTour(onDone) : buildReportsTour(onDone);
+      const tourInstance = mapView === "doctors"
+        ? buildDoctorsTour(onDone)
+        : mapView === "farmacias"
+        ? buildFarmaciasTour(onDone)
+        : buildReportsTour(onDone);
       tourInstance.drive();
     }, 800);
 
@@ -164,12 +169,58 @@ export default function TourManager({ mapView }: TourManagerProps) {
 }
 
 // Hook para relanzar el tour manualmente
+function buildFarmaciasTour(onDone: () => void) {
+  return driver({
+    showProgress: true,
+    progressText: "{{current}} de {{total}}",
+    nextBtnText: "Siguiente →",
+    prevBtnText: "← Anterior",
+    doneBtnText: "¡Entendido!",
+    allowClose: true,
+    overlayOpacity: 0.55,
+    onDestroyed: onDone,
+    steps: [
+      {
+        element: "[data-tour='view-pills']",
+        popover: {
+          title: "💊 Farmacias de Reconquista",
+          description: "En esta vista podés ver todas las farmacias de la ciudad y cuál está <strong>de turno hoy</strong>.",
+          side: "bottom",
+          align: "center",
+        },
+      },
+      {
+        element: "[data-tour='map-container']",
+        popover: {
+          title: "🟢 Farmacia de turno",
+          description: "El pin <strong>verde grande y animado</strong> es la farmacia de turno hoy. Atiende de 8h a 8h del día siguiente, solo recetas y medicamentos de emergencia.",
+          side: "top",
+          align: "center",
+        },
+      },
+      {
+        element: "[data-tour='map-container']",
+        popover: {
+          title: "📍 Todas las farmacias",
+          description: "Los pins grises son las demás farmacias. <strong>Pasá el mouse</strong> o tocá cualquier pin para ver la dirección y teléfono.",
+          side: "top",
+          align: "center",
+        },
+      },
+    ],
+  });
+}
+
 export function useReplayTour(mapView: MapView) {
   return () => {
     const storageKey = STORAGE_KEYS[mapView];
     localStorage.removeItem(storageKey);
     const onDone = () => localStorage.setItem(storageKey, "1");
-    const tourInstance = mapView === "doctors" ? buildDoctorsTour(onDone) : buildReportsTour(onDone);
+    const tourInstance = mapView === "doctors"
+      ? buildDoctorsTour(onDone)
+      : mapView === "farmacias"
+      ? buildFarmaciasTour(onDone)
+      : buildReportsTour(onDone);
     tourInstance.drive();
   };
 }

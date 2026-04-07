@@ -11,7 +11,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { Report, ReportCategory, Doctor } from "../types";
+import { Report, ReportCategory, Doctor, Farmacia } from "../types";
 import L from "leaflet";
 import "leaflet.markercluster";
 import { useState, useEffect, useRef } from "react";
@@ -100,8 +100,10 @@ interface MapComponentProps {
   onMapClick: (lat: number, lng: number) => void;
   reports: Report[];
   doctors?: Doctor[];
+  farmacias?: Farmacia[];
   showDoctors?: boolean;
   showReports?: boolean;
+  showFarmacias?: boolean;
   onDoctorClick?: (doctor: Doctor) => void;
   relocatingDoctorId?: string | null;
   onDoctorRelocated?: (doctorId: string, lat: number, lng: number) => void;
@@ -229,12 +231,35 @@ function DoctorClusterLayer({ doctors, relocatingDoctorId, onDoctorClick, onDoct
   return null;
 }
 
+const createFarmaciaIcon = (esDeturno: boolean) => L.divIcon({
+  html: `<div style="
+    width: ${esDeturno ? 44 : 36}px;
+    height: ${esDeturno ? 44 : 36}px;
+    border-radius: 50%;
+    background: ${esDeturno ? "#16a34a" : "#6b7280"};
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3)${esDeturno ? ", 0 0 0 3px #16a34a55" : ""};
+    display: flex; align-items: center; justify-content: center;
+    ${esDeturno ? "animation: pulse 2s infinite;" : ""}
+  ">
+    <svg xmlns="http://www.w3.org/2000/svg" width="${esDeturno ? 20 : 16}" height="${esDeturno ? 20 : 16}" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+  </div>`,
+  className: "",
+  iconSize: [esDeturno ? 44 : 36, esDeturno ? 44 : 36],
+  iconAnchor: [esDeturno ? 22 : 18, esDeturno ? 22 : 18],
+  popupAnchor: [0, esDeturno ? -22 : -18],
+});
+
 export default function MapComponent({
   onMapClick,
   reports,
   doctors = [],
+  farmacias = [],
   showDoctors = true,
   showReports = true,
+  showFarmacias = false,
   onDoctorClick,
   relocatingDoctorId,
   onDoctorRelocated,
@@ -266,6 +291,35 @@ export default function MapComponent({
           onDoctorRelocated={onDoctorRelocated}
         />
       )}
+
+      {/* Marcadores de farmacias */}
+      {showFarmacias && farmacias.map((f) => (
+        <Marker
+          key={`farmacia-${f.id}`}
+          position={[f.lat, f.lng]}
+          icon={createFarmaciaIcon(!!f.esDeturno)}
+        >
+          <Popup closeButton={false} autoPan={false}>
+            <div style={{ minWidth: "150px", fontFamily: "sans-serif", pointerEvents: "none" }}>
+              {f.esDeturno && (
+                <p style={{ color: "#16a34a", fontWeight: 700, fontSize: "10px", margin: "0 0 4px", textTransform: "uppercase" }}>
+                  🟢 De turno hoy
+                </p>
+              )}
+              <p style={{ fontWeight: 700, fontSize: "13px", margin: "0 0 2px" }}>{f.nombre}</p>
+              <p style={{ color: "#6b7280", fontSize: "11px", margin: "0 0 2px" }}>{f.direccion}</p>
+              {f.telefono && (
+                <p style={{ color: "#9ca3af", fontSize: "11px", margin: 0 }}>📞 {f.telefono}</p>
+              )}
+              {!f.esDeturno && (
+                <p style={{ color: "#9ca3af", fontSize: "10px", margin: "6px 0 0", fontStyle: "italic" }}>
+                  Tocá para ver más info
+                </p>
+              )}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
 
       {/* Marcadores de reportes */}
       {showReports && reports.map((report) => (
