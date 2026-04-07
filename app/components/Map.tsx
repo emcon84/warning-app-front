@@ -201,25 +201,17 @@ function DoctorClusterLayer({ doctors, relocatingDoctorId, onDoctorClick, onDoct
       });
 
       if (!isRelocating) {
-        const popup = L.popup({ closeButton: false, autoPan: false }).setContent(`
-          <div style="min-width:160px;font-family:sans-serif">
-            <p style="font-weight:700;font-size:14px;margin:0 0 2px">${doctor.nombre}</p>
-            <p style="color:#6b7280;font-size:11px;margin:0 0 4px">${doctor.especialidad}</p>
-            ${doctor.direccion ? `<p style="color:#9ca3af;font-size:11px;margin:0 0 6px">${doctor.direccion}</p>` : ""}
-            <button id="ver-detalle-${doctor.id}" style="
-              width:100%;padding:6px;background:#16a34a;color:white;
-              border:none;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer
-            ">Ver detalle</button>
+        const popup = L.popup({ closeButton: false, autoPan: false, offset: [0, -40] }).setContent(`
+          <div style="min-width:140px;font-family:sans-serif;pointer-events:none">
+            <p style="font-weight:700;font-size:13px;margin:0 0 2px">${doctor.nombre}</p>
+            <p style="color:#6b7280;font-size:11px;margin:0 0 2px">${doctor.especialidad}</p>
+            ${doctor.direccion ? `<p style="color:#9ca3af;font-size:11px;margin:0">${doctor.direccion}</p>` : ""}
           </div>
         `);
         marker.bindPopup(popup);
         marker.on("mouseover", () => marker.openPopup());
         marker.on("mouseout", () => marker.closePopup());
-        marker.on("popupopen", () => {
-          const btn = document.getElementById(`ver-detalle-${doctor.id}`);
-          if (btn) btn.onclick = () => onDoctorClick?.(doctor);
-        });
-        marker.on("click", () => onDoctorClick?.(doctor));
+        marker.on("click", () => { marker.closePopup(); onDoctorClick?.(doctor); });
       }
 
       if (isRelocating) {
