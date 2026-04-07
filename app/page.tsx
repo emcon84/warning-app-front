@@ -53,6 +53,7 @@ export default function Home() {
   const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
   const [mapView, setMapView] = useState<MapView>("reports");
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [filterIapos, setFilterIapos] = useState(false);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
   const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
   const [selectedFarmacia, setSelectedFarmacia] = useState<Farmacia | null>(null);
@@ -317,10 +318,9 @@ export default function Home() {
     );
   };
 
-  const filteredDoctors =
-    selectedSpecialties.length === 0
-      ? doctors
-      : doctors.filter((d) => selectedSpecialties.includes(d.especialidad));
+  const filteredDoctors = doctors
+    .filter((d) => selectedSpecialties.length === 0 || selectedSpecialties.includes(d.especialidad))
+    .filter((d) => !filterIapos || d.iapos);
 
   // Mostrar estado de carga
   if (isLoading) {
@@ -476,10 +476,10 @@ export default function Home() {
               <div className="fixed inset-0 z-[1500] bg-black/40" onClick={() => setShowFilterSheet(false)} />
               <div className="fixed bottom-0 left-0 right-0 z-[1501] bg-white rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
                 <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
-                  <h3 className="font-bold text-gray-900">Filtrar especialidades</h3>
+                  <h3 className="font-bold text-gray-900">Filtrar médicos</h3>
                   <div className="flex items-center gap-2">
-                    {selectedSpecialties.length > 0 && (
-                      <button onClick={() => setSelectedSpecialties([])} className="text-xs text-red-500 font-semibold">
+                    {(selectedSpecialties.length > 0 || filterIapos) && (
+                      <button onClick={() => { setSelectedSpecialties([]); setFilterIapos(false); }} className="text-xs text-red-500 font-semibold">
                         Limpiar
                       </button>
                     )}
@@ -490,7 +490,22 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-                <div className="overflow-y-auto p-4">
+                <div className="overflow-y-auto p-4 space-y-4">
+                  {/* Filtro obra social */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Obra Social</p>
+                    <button
+                      onClick={() => setFilterIapos(prev => !prev)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        filterIapos ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      🏥 Solo IAPOS
+                    </button>
+                  </div>
+                  {/* Filtro especialidad */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Especialidad</p>
                   <div className="flex flex-wrap gap-2">
                     {allSpecialties.map((esp) => (
                       <button
@@ -505,6 +520,7 @@ export default function Home() {
                         {esp}
                       </button>
                     ))}
+                  </div>
                   </div>
                 </div>
               </div>

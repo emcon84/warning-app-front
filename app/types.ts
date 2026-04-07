@@ -34,6 +34,7 @@ export interface Doctor {
   lat: number
   lng: number
   obrasSociales: string[]
+  iapos: boolean
   activo: boolean
   confirmaciones?: Confirmacion[]
   createdAt: string
