@@ -27,8 +27,7 @@ const MapComponent = dynamic(() => import("./components/Map"), {
 });
 
 type FilterPeriod = "today" | "week";
-type MapView = "all" | "doctors" | "reports";
-type AddMode = "report" | "doctor" | null;
+type MapView = "doctors" | "reports";
 
 export default function Home() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -48,8 +47,7 @@ export default function Home() {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isDoctorDetailOpen, setIsDoctorDetailOpen] = useState(false);
   const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
-  const [mapView, setMapView] = useState<MapView>("all");
-  const [addMode, setAddMode] = useState<AddMode>(null);
+  const [mapView, setMapView] = useState<MapView>("reports");
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
   const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
@@ -87,10 +85,11 @@ export default function Home() {
   };
 
   const handleMapClick = (lat: number, lng: number) => {
+    if (relocatingDoctorId) return;
     setSelectedLocation({ lat, lng });
-    if (addMode === "doctor") {
+    if (mapView === "doctors") {
       setIsAddDoctorOpen(true);
-    } else if (mapView !== "doctors") {
+    } else {
       setIsModalOpen(true);
     }
   };
@@ -102,7 +101,6 @@ export default function Home() {
 
   const handleDoctorCreated = (doctor: Doctor) => {
     setDoctors([...doctors, doctor]);
-    setAddMode(null);
   };
 
   const handleStartRelocate = (doctorId: string) => {
@@ -313,7 +311,7 @@ export default function Home() {
         totalReports={reports.length}
         onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
         mapView={mapView}
-        onMapViewChange={(v) => { setMapView(v); if (v === "doctors") setIsSidebarOpen(false); }}
+        onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors") setIsSidebarOpen(false); }}
         sidebarDisabled={mapView === "doctors"}
       />
 
@@ -341,41 +339,25 @@ export default function Home() {
 
         {/* Mapa */}
         <div className="flex-1 relative w-full h-full">
-          {/* Indicador de instrucción */}
-          {/* Instrucción contextual */}
-          {(addMode === "doctor" || relocatingDoctorId) && (
+          {/* Instrucción contextual — solo al relocalizar */}
+          {relocatingDoctorId && (
             <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
-              {relocatingDoctorId ? (
-                <>
-                  <MapPin className="w-3.5 h-3.5" />
-                  Arrastrá el pin amarillo a la posición correcta
-                  <button onClick={() => setRelocatingDoctorId(null)} className="ml-1 hover:text-amber-100">✕</button>
-                </>
-              ) : (
-                <>
-                  <Stethoscope className="w-3.5 h-3.5" />
-                  Tocá el mapa para ubicar el médico
-                  <button onClick={() => setAddMode(null)} className="ml-1 hover:text-amber-100">✕</button>
-                </>
-              )}
+              <MapPin className="w-3.5 h-3.5" />
+              Arrastrá el pin amarillo a la posición correcta
+              <button onClick={() => setRelocatingDoctorId(null)} className="ml-1 hover:text-amber-100">✕</button>
             </div>
           )}
 
-          {/* Botón agregar médico */}
-          <button
-            onClick={() => setAddMode(addMode === "doctor" ? null : "doctor")}
-            className={`absolute bottom-6 right-4 z-[999] flex items-center gap-2 px-4 py-2 rounded-full shadow-lg text-sm font-semibold transition-colors ${
-              addMode === "doctor"
-                ? "bg-green-600 text-white"
-                : "bg-white text-green-700 border border-green-300 hover:bg-green-50"
-            }`}
-          >
-            <Stethoscope className="w-4 h-4" />
-            Agregar médico
-          </button>
+          {/* Hint "tocá para agregar" — solo en vista médicos */}
+          {mapView === "doctors" && !relocatingDoctorId && (
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-sm border border-green-200 text-green-700 px-4 py-2 rounded-full shadow text-xs font-semibold flex items-center gap-1.5 pointer-events-none">
+              <Stethoscope className="w-3.5 h-3.5" />
+              Tocá el mapa para agregar un médico
+            </div>
+          )}
 
           {/* Botón filtrar especialidades */}
-          {(mapView === "all" || mapView === "doctors") && allSpecialties.length > 0 && (
+          {mapView === "doctors" && allSpecialties.length > 0 && (
             <button
               onClick={() => setShowFilterSheet(true)}
               className={`absolute top-3 left-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
@@ -444,8 +426,8 @@ export default function Home() {
             onMapClick={handleMapClick}
             reports={filteredReports}
             doctors={filteredDoctors}
-            showDoctors={mapView === "all" || mapView === "doctors"}
-            showReports={mapView === "all" || mapView === "reports"}
+            showDoctors={mapView === "doctors"}
+            showReports={mapView === "reports"}
             onDoctorClick={handleDoctorClick}
             relocatingDoctorId={relocatingDoctorId}
             onDoctorRelocated={handleDoctorRelocated}
@@ -512,7 +494,7 @@ export default function Home() {
       />
 
       {/* Botones de emergencia — solo en vista reportes/todo */}
-      {mapView !== "doctors" && <FloatingBottomNav />}
+      {mapView === "reports" && <FloatingBottomNav />}
     </div>
   );
 }
