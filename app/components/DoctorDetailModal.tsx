@@ -231,6 +231,8 @@ export default function DoctorDetailModal({
   };
 
   const getObrasSocialStatus = (os: string) => {
+    // IAPOS: dato oficial del padrón — no requiere confirmación de la comunidad
+    if (os === "IAPOS" && doctor.iapos) return "acepta";
     if (doctor.obrasSociales.includes(os)) return "acepta";
     const conf = (doctor.confirmaciones || []).filter((c) => c.obraSocial === os);
     if (conf.length > 0 && conf.some((c) => !c.acepta)) return "rechaza";
@@ -571,7 +573,12 @@ export default function DoctorDetailModal({
                       {status === "rechaza" && <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
                       {status === "desconocido" && <HelpCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />}
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">{os}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-sm font-semibold text-gray-800">{os}</p>
+                          {os === "IAPOS" && doctor.iapos && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">Padrón oficial</span>
+                          )}
+                        </div>
                         <p className={`text-xs ${status === "acepta" ? "text-green-600" : status === "rechaza" ? "text-red-500" : "text-gray-400"}`}>
                           {status === "acepta" ? "Acepta" : status === "rechaza" ? "No acepta" : "Sin información"}
                         </p>
