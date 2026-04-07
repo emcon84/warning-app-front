@@ -123,21 +123,25 @@ export default function ReportModal({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center p-2 sm:p-4"
-      style={{
-        zIndex: 9999,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        backdropFilter: "blur(4px)",
-      }}
+      className="fixed inset-0 flex items-end sm:items-center justify-center"
+      style={{ zIndex: 9999, backgroundColor: "rgba(0,0,0,0.6)" }}
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full p-4 sm:p-6 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+        className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-900">
-          Crear Reporte Ciudadano
-        </h2>
+        {/* Header sticky */}
+        <div className="flex items-center justify-between px-4 py-3 border-b sticky top-0 bg-white rounded-t-2xl z-10 flex-shrink-0">
+          <h2 className="text-base font-bold text-gray-900">Crear Reporte</h2>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-full">
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        {/* Contenido scrollable */}
+        <div className="overflow-y-auto flex-1 p-4 sm:p-6">
 
         <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded">
           <p className="flex items-center gap-1.5">
@@ -548,6 +552,7 @@ export default function ReportModal({
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

@@ -50,6 +50,7 @@ export default function Home() {
   const [mapView, setMapView] = useState<MapView>("all");
   const [addMode, setAddMode] = useState<AddMode>(null);
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
   const { showNotification, permission } = useNotifications();
 
   // Cargar reportes y médicos al montar el componente
@@ -287,7 +288,8 @@ export default function Home() {
         totalReports={reports.length}
         onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
         mapView={mapView}
-        onMapViewChange={setMapView}
+        onMapViewChange={(v) => { setMapView(v); if (v === "doctors") setIsSidebarOpen(false); }}
+        sidebarDisabled={mapView === "doctors"}
       />
 
       {/* Contenedor principal con navbar */}
@@ -315,28 +317,14 @@ export default function Home() {
         {/* Mapa */}
         <div className="flex-1 relative w-full h-full">
           {/* Indicador de instrucción */}
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999] bg-gray-900 text-white px-3 py-2 md:px-4 md:py-2 rounded-full shadow-lg text-xs md:text-sm max-w-[90%] md:max-w-none text-center flex items-center gap-2 justify-center">
-            {addMode === "doctor" ? (
-              <>
-                <Stethoscope className="w-4 h-4 text-green-400" />
-                Tocá el mapa para ubicar el médico
-                <button
-                  onClick={() => setAddMode(null)}
-                  className="ml-1 text-gray-400 hover:text-white"
-                >✕</button>
-              </>
-            ) : mapView === "doctors" ? (
-              <>
-                <Stethoscope className="w-4 h-4 text-green-400" />
-                Vista médicos — usá el botón para agregar uno
-              </>
-            ) : (
-              <>
-                <MapPin className="w-4 h-4" />
-                Tocá el mapa para crear un reporte
-              </>
-            )}
-          </div>
+          {/* Instrucción contextual — solo cuando es útil */}
+          {addMode === "doctor" && (
+            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-gray-900 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2">
+              <Stethoscope className="w-3.5 h-3.5 text-green-400" />
+              Tocá el mapa para ubicar el médico
+              <button onClick={() => setAddMode(null)} className="text-gray-400 hover:text-white ml-1">✕</button>
+            </div>
+          )}
 
           {/* Botón agregar médico */}
           <button
@@ -351,56 +339,70 @@ export default function Home() {
             Agregar médico
           </button>
 
-          {/* Filter pills vista (mobile) - solo cuando NO hay pills de especialidad visibles */}
-          <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-[999] flex sm:hidden gap-1">
-            {(["all", "doctors", "reports"] as MapView[]).map((view) => {
-              const labels: Record<MapView, string> = { all: "Todo", doctors: "🏥", reports: "📢" };
-              return (
-                <button
-                  key={view}
-                  onClick={() => setMapView(view)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold shadow transition-colors ${
-                    mapView === view
-                      ? "bg-green-500 text-white"
-                      : "bg-white text-gray-700 border border-gray-300"
-                  }`}
-                >
-                  {labels[view]}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Pills de especialidades */}
+          {/* Botón filtrar especialidades */}
           {(mapView === "all" || mapView === "doctors") && allSpecialties.length > 0 && (
-            <div className="absolute top-28 sm:top-16 left-0 right-0 z-[998] px-3 pointer-events-none">
-              <div className="flex gap-1.5 overflow-x-auto py-1 pointer-events-auto"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                <button
-                  onClick={() => setSelectedSpecialties([])}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold shadow transition-colors ${
-                    selectedSpecialties.length === 0
-                      ? "bg-gray-900 text-white"
-                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  Todas
-                </button>
-                {allSpecialties.map((esp) => (
+            <button
+              onClick={() => setShowFilterSheet(true)}
+              className={`absolute top-3 left-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
+                selectedSpecialties.length > 0
+                  ? "bg-green-500 text-white"
+                  : "bg-white text-gray-700 border border-gray-300"
+              }`}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
+              </svg>
+              {selectedSpecialties.length > 0 ? `${selectedSpecialties.length} filtro${selectedSpecialties.length > 1 ? "s" : ""}` : "Filtrar"}
+            </button>
+          )}
+
+          {/* Bottom sheet de filtros */}
+          {showFilterSheet && (
+            <>
+              <div className="fixed inset-0 z-[1500] bg-black/40" onClick={() => setShowFilterSheet(false)} />
+              <div className="fixed bottom-0 left-0 right-0 z-[1501] bg-white rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
+                <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
+                  <h3 className="font-bold text-gray-900">Filtrar especialidades</h3>
+                  <div className="flex items-center gap-2">
+                    {selectedSpecialties.length > 0 && (
+                      <button onClick={() => setSelectedSpecialties([])} className="text-xs text-red-500 font-semibold">
+                        Limpiar
+                      </button>
+                    )}
+                    <button onClick={() => setShowFilterSheet(false)} className="p-1 hover:bg-gray-100 rounded-full">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-y-auto p-4">
+                  <div className="flex flex-wrap gap-2">
+                    {allSpecialties.map((esp) => (
+                      <button
+                        key={esp}
+                        onClick={() => toggleSpecialty(esp)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          selectedSpecialties.includes(esp)
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {esp}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="px-4 py-3 border-t flex-shrink-0">
                   <button
-                    key={esp}
-                    onClick={() => toggleSpecialty(esp)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold shadow transition-colors ${
-                      selectedSpecialties.includes(esp)
-                        ? "bg-green-500 text-white"
-                        : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                    }`}
+                    onClick={() => setShowFilterSheet(false)}
+                    className="w-full py-2.5 bg-gray-900 text-white rounded-xl font-semibold text-sm"
                   >
-                    {esp}
+                    Ver {filteredDoctors.length} médico{filteredDoctors.length !== 1 ? "s" : ""}
                   </button>
-                ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
 
           <MapComponent
