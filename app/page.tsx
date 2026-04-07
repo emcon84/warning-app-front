@@ -410,14 +410,6 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div className="px-4 py-3 border-t flex-shrink-0">
-                  <button
-                    onClick={() => setShowFilterSheet(false)}
-                    className="w-full py-2.5 bg-gray-900 text-white rounded-xl font-semibold text-sm"
-                  >
-                    Ver {filteredDoctors.length} médico{filteredDoctors.length !== 1 ? "s" : ""}
-                  </button>
-                </div>
               </div>
             </>
           )}
