@@ -102,10 +102,12 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
     if (!relocateResult) return;
     setSavingRelocate(true);
     try {
+      // Solo actualizar dirección si el input es texto (no coordenadas)
+      const isCoords = !!parseCoords(relocateAddress);
       const updated = await updateFarmacia(farmacia.id, {
         lat: relocateResult.lat,
         lng: relocateResult.lng,
-        direccion: relocateAddress.trim(),
+        ...(isCoords ? {} : { direccion: relocateAddress.trim() }),
       });
       const merged = { ...farmacia, ...updated };
       setFarmacia(merged);

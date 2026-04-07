@@ -163,10 +163,11 @@ export default function DoctorDetailModal({
     if (!relocateResult) return;
     setSavingRelocate(true);
     try {
+      const isCoords = !!parseCoords(relocateAddress);
       const updated = await updateDoctor(doctor.id, {
         lat: relocateResult.lat,
         lng: relocateResult.lng,
-        direccion: relocateAddress.trim(),
+        ...(isCoords ? {} : { direccion: relocateAddress.trim() }),
       });
       setDoctor(updated);
       onDoctorUpdate(updated);
