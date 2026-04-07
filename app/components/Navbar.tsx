@@ -22,6 +22,7 @@ export default function Navbar({ totalReports, onMenuClick, mapView = "reports",
         {/* Hamburguesa */}
         <button
           onClick={sidebarDisabled ? undefined : onMenuClick}
+          data-tour="sidebar-toggle"
           className={`p-2 rounded-lg transition-colors flex-shrink-0 ${sidebarDisabled ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-800"}`}
           aria-label="Toggle menu"
         >

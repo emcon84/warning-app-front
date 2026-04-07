@@ -11,6 +11,7 @@ import { Report, ReportCategory, Doctor } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import FloatingBottomNav from "./components/FloatingBottomNav";
+import TourManager, { useReplayTour } from "./components/TourManager";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor } from "./utils/api";
 import { MapPin, AlertTriangle, Stethoscope } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
@@ -52,6 +53,7 @@ export default function Home() {
   const [showFilterSheet, setShowFilterSheet] = useState(false);
   const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
   const { showNotification, permission } = useNotifications();
+  const replayTour = useReplayTour(mapView);
 
   // Cargar reportes y médicos al montar el componente
   useEffect(() => {
@@ -307,13 +309,16 @@ export default function Home() {
       )}
 
       {/* Navbar */}
-      <Navbar
-        totalReports={reports.length}
-        onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        mapView={mapView}
-        onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors") setIsSidebarOpen(false); }}
-        sidebarDisabled={mapView === "doctors"}
-      />
+      {/* Navbar */}
+      <div data-tour="view-pills">
+        <Navbar
+          totalReports={reports.length}
+          onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          mapView={mapView}
+          onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors") setIsSidebarOpen(false); }}
+          sidebarDisabled={mapView === "doctors"}
+        />
+      </div>
 
       {/* Contenedor principal con navbar */}
       <div className="flex flex-1 overflow-hidden mt-[60px]">
@@ -338,7 +343,7 @@ export default function Home() {
         />
 
         {/* Mapa */}
-        <div className="flex-1 relative w-full h-full">
+        <div className="flex-1 relative w-full h-full" data-tour="map-container">
           {/* Instrucción contextual — solo al relocalizar */}
           {relocatingDoctorId && (
             <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
@@ -359,6 +364,7 @@ export default function Home() {
           {/* Botón filtrar especialidades */}
           {mapView === "doctors" && allSpecialties.length > 0 && (
             <button
+              data-tour="filter-btn"
               onClick={() => setShowFilterSheet(true)}
               className={`absolute top-3 left-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
                 selectedSpecialties.length > 0
@@ -486,7 +492,23 @@ export default function Home() {
       />
 
       {/* Botones de emergencia — solo en vista reportes/todo */}
-      {mapView === "reports" && <FloatingBottomNav />}
+      {mapView === "reports" && (
+        <div data-tour="emergency-buttons">
+          <FloatingBottomNav />
+        </div>
+      )}
+
+      {/* Tour onboarding */}
+      <TourManager mapView={mapView} />
+
+      {/* Botón relanzar tour */}
+      <button
+        onClick={replayTour}
+        title="Ver tutorial"
+        className="fixed bottom-20 right-4 z-[1000] w-9 h-9 bg-white border border-gray-200 rounded-full shadow-md flex items-center justify-center text-gray-500 hover:text-gray-700 hover:shadow-lg transition-all text-base font-bold"
+      >
+        ?
+      </button>
     </div>
   );
 }
