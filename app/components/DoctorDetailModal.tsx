@@ -53,10 +53,19 @@ export default function DoctorDetailModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Relocate by address
+  const [relocateAddress, setRelocateAddress] = useState("");
+  const [relocateResult, setRelocateResult] = useState<{ lat: number; lng: number } | null>(null);
+  const [relocating, setRelocating] = useState(false);
+  const [savingRelocate, setSavingRelocate] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       setDoctor(initialDoctor);
       setTab("info");
+      setRelocateAddress("");
+      setRelocateResult(null);
+      setConfirmDelete(false);
       getDisponibilidad(initialDoctor.id).then(setDisponibilidades).catch(() => {});
     }
   }, [isOpen, initialDoctor.id]);
@@ -91,6 +100,48 @@ export default function DoctorDetailModal({
       alert("Error al buscar la dirección.");
     } finally {
       setGeocoding(false);
+    }
+  };
+
+  const handleRelocateGeocode = async () => {
+    if (!relocateAddress.trim()) return;
+    setRelocating(true);
+    setRelocateResult(null);
+    try {
+      const query = encodeURIComponent(`${relocateAddress}, Reconquista, Santa Fe, Argentina`);
+      const bbox = "-59.85,-29.30,-59.45,-28.95";
+      const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=ar&viewbox=${bbox}&bounded=1`;
+      const res = await fetch(url, { headers: { "User-Agent": "warning-app/1.0" } });
+      const data = await res.json();
+      if (data.length > 0) {
+        setRelocateResult({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
+      } else {
+        alert("No se encontró la dirección en Reconquista. Probá con otra calle o usá el arrastre manual.");
+      }
+    } catch {
+      alert("Error al buscar la dirección.");
+    } finally {
+      setRelocating(false);
+    }
+  };
+
+  const handleSaveRelocate = async () => {
+    if (!relocateResult) return;
+    setSavingRelocate(true);
+    try {
+      const updated = await updateDoctor(doctor.id, {
+        lat: relocateResult.lat,
+        lng: relocateResult.lng,
+        direccion: relocateAddress.trim(),
+      });
+      setDoctor(updated);
+      onDoctorUpdate(updated);
+      setRelocateAddress("");
+      setRelocateResult(null);
+    } catch {
+      alert("Error al guardar la ubicación.");
+    } finally {
+      setSavingRelocate(false);
     }
   };
 
@@ -288,14 +339,47 @@ export default function DoctorDetailModal({
                 );
               })}
 
-              {/* Corregir ubicación con drag */}
-              {onRelocate && (
-                <button onClick={() => onRelocate(doctor.id)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 border border-amber-300 text-amber-600 rounded-xl text-sm font-semibold hover:bg-amber-50">
-                  <MapPin className="w-4 h-4" />
-                  Corregir ubicación arrastrando el pin
-                </button>
-              )}
+              {/* Corregir ubicación */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
+                <p className="text-xs font-bold text-amber-800 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5" /> Corregir ubicación del pin
+                </p>
+                <div className="flex gap-1.5">
+                  <input
+                    type="text"
+                    value={relocateAddress}
+                    onChange={(e) => { setRelocateAddress(e.target.value); setRelocateResult(null); }}
+                    placeholder="Ej: Belgrano 1234"
+                    className="flex-1 text-sm border border-amber-300 rounded-lg px-2.5 py-1.5 bg-white"
+                  />
+                  <button
+                    onClick={handleRelocateGeocode}
+                    disabled={relocating || !relocateAddress.trim()}
+                    className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600 disabled:opacity-40 flex items-center gap-1">
+                    <Search className="w-3.5 h-3.5" />
+                    {relocating ? "..." : "Buscar"}
+                  </button>
+                </div>
+                {relocateResult && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-green-600 flex items-center gap-1">
+                      <CheckCircle className="w-3.5 h-3.5" /> Dirección encontrada
+                    </p>
+                    <button
+                      onClick={handleSaveRelocate}
+                      disabled={savingRelocate}
+                      className="w-full py-1.5 bg-amber-600 text-white rounded-lg text-xs font-semibold hover:bg-amber-700 disabled:opacity-40">
+                      {savingRelocate ? "Guardando..." : "Mover pin a esta dirección"}
+                    </button>
+                  </div>
+                )}
+                {onRelocate && (
+                  <button onClick={() => onRelocate(doctor.id)}
+                    className="w-full text-xs text-amber-700 hover:underline text-center pt-0.5">
+                    O arrastrá el pin manualmente en el mapa
+                  </button>
+                )}
+              </div>
 
               {/* Eliminar médico */}
               {onDelete && (
