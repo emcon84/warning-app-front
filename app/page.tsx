@@ -129,6 +129,12 @@ export default function Home() {
     }
   };
 
+  const handleDoctorDelete = (doctorId: string) => {
+    setDoctors(doctors.filter((d) => d.id !== doctorId));
+    setIsDoctorDetailOpen(false);
+    setSelectedDoctor(null);
+  };
+
   const handleSubmitReport = async (data: {
     category: string;
     description: string;
@@ -477,6 +483,7 @@ export default function Home() {
           doctor={selectedDoctor}
           onDoctorUpdate={handleDoctorUpdate}
           onRelocate={handleStartRelocate}
+          onDelete={handleDoctorDelete}
         />
       )}
 

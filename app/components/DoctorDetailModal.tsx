@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { Doctor, TurnoDisponibilidad } from "../types";
 import { OBRAS_SOCIALES } from "../utils/doctorHelpers";
 import { confirmarDoctor, getDoctor, getDisponibilidad, reportarDisponibilidad, updateDoctor } from "../utils/api";
-import { X, Phone, MessageCircle, MapPin, Stethoscope, CheckCircle, XCircle, HelpCircle, Calendar, Plus, Clock, Pencil, Search } from "lucide-react";
+import { X, Phone, MessageCircle, MapPin, Stethoscope, CheckCircle, XCircle, HelpCircle, Calendar, Plus, Clock, Pencil, Search, Trash2 } from "lucide-react";
+import { deleteDoctor } from "../utils/api";
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 const HORARIOS = ["Mañana", "Tarde", "Todo el día"];
@@ -17,6 +18,7 @@ interface DoctorDetailModalProps {
   doctor: Doctor;
   onDoctorUpdate: (doctor: Doctor) => void;
   onRelocate?: (doctorId: string) => void;
+  onDelete?: (doctorId: string) => void;
 }
 
 export default function DoctorDetailModal({
@@ -25,6 +27,7 @@ export default function DoctorDetailModal({
   doctor: initialDoctor,
   onDoctorUpdate,
   onRelocate,
+  onDelete,
 }: DoctorDetailModalProps) {
   const [doctor, setDoctor] = useState<Doctor>(initialDoctor);
   const [tab, setTab] = useState<Tab>("info");
@@ -45,6 +48,10 @@ export default function DoctorDetailModal({
   // Obras sociales
   const [confirming, setConfirming] = useState<string | null>(null);
   const [loadingConfirm, setLoadingConfirm] = useState(false);
+
+  // Delete
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -288,6 +295,44 @@ export default function DoctorDetailModal({
                   <MapPin className="w-4 h-4" />
                   Corregir ubicación arrastrando el pin
                 </button>
+              )}
+
+              {/* Eliminar médico */}
+              {onDelete && (
+                confirmDelete ? (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 space-y-2">
+                    <p className="text-sm font-semibold text-red-700 text-center">¿Eliminar este médico del mapa?</p>
+                    <p className="text-xs text-red-500 text-center">Esta acción no se puede deshacer.</p>
+                    <div className="flex gap-2">
+                      <button
+                        disabled={deleting}
+                        onClick={async () => {
+                          setDeleting(true);
+                          try {
+                            await deleteDoctor(doctor.id);
+                            onDelete(doctor.id);
+                          } catch {
+                            alert("Error al eliminar.");
+                            setDeleting(false);
+                            setConfirmDelete(false);
+                          }
+                        }}
+                        className="flex-1 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold disabled:opacity-40">
+                        {deleting ? "Eliminando..." : "Sí, eliminar"}
+                      </button>
+                      <button onClick={() => setConfirmDelete(false)}
+                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button onClick={() => setConfirmDelete(true)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 border border-red-200 text-red-500 rounded-xl text-sm font-medium hover:bg-red-50">
+                    <Trash2 className="w-4 h-4" />
+                    Eliminar este médico
+                  </button>
+                )
               )}
             </div>
           )}
