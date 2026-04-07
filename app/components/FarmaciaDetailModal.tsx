@@ -32,11 +32,28 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
     onClose();
   };
 
+  const parseCoords = (input: string): { lat: number; lng: number } | null => {
+    const match = input.trim().match(/^(-?\d{1,3}\.?\d*)\s*,\s*(-?\d{1,3}\.?\d*)$/);
+    if (!match) return null;
+    const lat = parseFloat(match[1]);
+    const lng = parseFloat(match[2]);
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    return { lat, lng };
+  };
+
   const handleRelocateGeocode = async () => {
     if (!relocateAddress.trim()) return;
-    setRelocating(true);
     setRelocateResult(null);
     setRelocateError(null);
+
+    // Intentar parsear como coordenadas primero
+    const coords = parseCoords(relocateAddress);
+    if (coords) {
+      setRelocateResult(coords);
+      return;
+    }
+
+    setRelocating(true);
     try {
       const raw = relocateAddress.trim();
       const bbox = "-59.85,-29.30,-59.45,-28.95";
@@ -72,7 +89,7 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
       if (found) {
         setRelocateResult(found);
       } else {
-        setRelocateError("No se encontró la dirección. Usá el botón de arrastrar el pin para moverlo manualmente.");
+        setRelocateError("No se encontró. Probá pegar coordenadas desde Google Maps o arrastrá el pin.");
       }
     } catch {
       setRelocateError("Error de conexión. Intentá de nuevo.");
@@ -164,13 +181,16 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
               <MapPin className="w-4 h-4 text-amber-600" />
               <span className="text-sm font-semibold text-amber-800">Corregir ubicación del pin</span>
             </div>
-            <p className="text-xs text-amber-700 mb-3">
-              Si el pin está en el lugar incorrecto, ingresá la dirección exacta. Para esquinas usá el formato <strong>Calle A y Calle B</strong>.
+            <p className="text-xs text-amber-700 mb-1">
+              Ingresá la dirección o pegá coordenadas desde Google Maps.
+            </p>
+            <p className="text-xs text-amber-600 mb-3">
+              Para obtener coordenadas: abrí Google Maps, tocá el lugar exacto y copiá los números que aparecen abajo (ej: <strong>-29.1523, -59.6431</strong>).
             </p>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Ej: San Martín y Jorge Newbery"
+                placeholder="Ej: -29.1523, -59.6431 o San Martín 1034"
                 value={relocateAddress}
                 onChange={e => { setRelocateAddress(e.target.value); setRelocateResult(null); setRelocateError(null); }}
                 onKeyDown={e => e.key === "Enter" && handleRelocateGeocode()}

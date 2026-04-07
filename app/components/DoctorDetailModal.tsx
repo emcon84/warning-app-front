@@ -105,21 +105,52 @@ export default function DoctorDetailModal({
     }
   };
 
+  const parseCoords = (input: string): { lat: number; lng: number } | null => {
+    const match = input.trim().match(/^(-?\d{1,3}\.?\d*)\s*,\s*(-?\d{1,3}\.?\d*)$/);
+    if (!match) return null;
+    const lat = parseFloat(match[1]);
+    const lng = parseFloat(match[2]);
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    return { lat, lng };
+  };
+
   const handleRelocateGeocode = async () => {
     if (!relocateAddress.trim()) return;
-    setRelocating(true);
     setRelocateResult(null);
     setRelocateError(null);
+
+    // Intentar parsear como coordenadas primero
+    const coords = parseCoords(relocateAddress);
+    if (coords) {
+      setRelocateResult(coords);
+      return;
+    }
+
+    setRelocating(true);
     try {
-      const query = encodeURIComponent(`${relocateAddress}, Reconquista, Santa Fe, Argentina`);
+      const raw = relocateAddress.trim();
+      const sepRegex = /\s+(?:y|e|-|\/|esq\.?|esquina)\s+/i;
+      const parts = raw.split(sepRegex).map(s => s.trim()).filter(Boolean);
+      const queries = [raw];
+      if (parts.length === 2) {
+        queries.push(`${parts[0]} & ${parts[1]}`);
+        queries.push(`${parts[0]} at ${parts[1]}`);
+        queries.push(parts[0]);
+      }
       const bbox = "-59.85,-29.30,-59.45,-28.95";
-      const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=ar&viewbox=${bbox}&bounded=1`;
-      const res = await fetch(url, { headers: { "User-Agent": "warning-app/1.0" } });
-      const data = await res.json();
-      if (data.length > 0) {
-        setRelocateResult({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
+      let found: { lat: number; lng: number } | null = null;
+      for (const q of queries) {
+        const encoded = encodeURIComponent(`${q}, Reconquista, Santa Fe, Argentina`);
+        const url = `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1&countrycodes=ar&viewbox=${bbox}&bounded=1`;
+        const res = await fetch(url, { headers: { "User-Agent": "warning-app/1.0" } });
+        const data = await res.json();
+        if (data.length > 0) { found = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }; break; }
+        await new Promise(r => setTimeout(r, 300));
+      }
+      if (found) {
+        setRelocateResult(found);
       } else {
-        setRelocateError("No se encontró la dirección. Probá escribir solo la calle y número, o usá el arrastre manual.");
+        setRelocateError("No se encontró. Probá pegar coordenadas desde Google Maps o arrastrá el pin.");
       }
     } catch {
       setRelocateError("Error de conexión. Intentá de nuevo.");
@@ -347,12 +378,15 @@ export default function DoctorDetailModal({
                 <p className="text-xs font-bold text-amber-800 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" /> Corregir ubicación del pin
                 </p>
+                <p className="text-xs text-amber-600">
+                  Dirección <span className="font-medium">o coordenadas</span> (-29.1234, -59.6789) desde Google Maps.
+                </p>
                 <div className="flex gap-1.5">
                   <input
                     type="text"
                     value={relocateAddress}
                     onChange={(e) => { setRelocateAddress(e.target.value); setRelocateResult(null); setRelocateError(null); }}
-                    placeholder="Ej: Belgrano 1234"
+                    placeholder="Ej: Belgrano 1234 o -29.1523, -59.6431"
                     className="flex-1 text-sm border border-amber-300 rounded-lg px-2.5 py-1.5 bg-white"
                   />
                   <button
