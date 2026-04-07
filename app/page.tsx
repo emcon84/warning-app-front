@@ -14,7 +14,7 @@ import Navbar from "./components/Navbar";
 import FloatingBottomNav from "./components/FloatingBottomNav";
 import TourManager, { useReplayTour } from "./components/TourManager";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "./utils/api";
-import { MapPin, AlertTriangle, Stethoscope } from "lucide-react";
+import { MapPin, AlertTriangle, Stethoscope, Pill } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
 import { getCategoryLabel } from "./utils/categoryHelpers";
 
@@ -421,7 +421,7 @@ export default function Home() {
             <div className="absolute top-3 left-3 right-3 z-[999] bg-white rounded-2xl shadow-lg border border-green-200 p-3 max-w-sm mx-auto">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm">💊</span>
+                  <Pill className="w-4 h-4 text-green-600" />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-gray-900">Farmacia de turno — {turno.fecha}</p>
@@ -500,7 +500,7 @@ export default function Home() {
                         filterIapos ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                     >
-                      🏥 Solo IAPOS
+                      <Stethoscope className="w-3.5 h-3.5 inline mr-1" />Solo IAPOS
                     </button>
                   </div>
                   {/* Filtro especialidad */}

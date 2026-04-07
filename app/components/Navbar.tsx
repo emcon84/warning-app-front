@@ -1,5 +1,8 @@
 "use client";
 
+import type { ComponentType } from "react";
+import { Stethoscope, Megaphone, Pill } from "lucide-react";
+
 type MapView = "doctors" | "reports" | "farmacias";
 
 interface NavbarProps {
@@ -10,10 +13,10 @@ interface NavbarProps {
   sidebarDisabled?: boolean;
 }
 
-const VIEW_CONFIG: Record<MapView, { label: string; mobileLabel: string; emoji: string }> = {
-  doctors:   { label: "Médicos",   mobileLabel: "Médicos",   emoji: "🏥" },
-  reports:   { label: "Reportes",  mobileLabel: "Reportes",  emoji: "📢" },
-  farmacias: { label: "Farmacias", mobileLabel: "Farmacias", emoji: "💊" },
+const VIEW_CONFIG: Record<MapView, { label: string; Icon: ComponentType<{ className?: string }> }> = {
+  doctors:   { label: "Médicos",   Icon: Stethoscope },
+  reports:   { label: "Reportes",  Icon: Megaphone },
+  farmacias: { label: "Farmacias", Icon: Pill },
 };
 
 export default function Navbar({ totalReports, onMenuClick, mapView = "reports", onMapViewChange, sidebarDisabled }: NavbarProps) {
@@ -39,21 +42,21 @@ export default function Navbar({ totalReports, onMenuClick, mapView = "reports",
 
         {/* Pills de vista — centro, todas las pantallas */}
         {onMapViewChange && (
-          <div className="flex-1 flex items-center justify-center gap-1">
+          <div className="flex-1 flex items-center justify-center gap-1" data-tour="view-pills">
             {(["doctors", "reports", "farmacias"] as MapView[]).map((view) => {
-              const cfg = VIEW_CONFIG[view];
+              const { label, Icon } = VIEW_CONFIG[view];
               return (
                 <button
                   key={view}
                   onClick={() => onMapViewChange(view)}
-                  className={`px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
                     mapView === view
                       ? "bg-green-500 text-white"
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
                 >
-                  <span className="sm:hidden">{cfg.emoji} {cfg.mobileLabel}</span>
-                  <span className="hidden sm:inline">{cfg.emoji} {cfg.label}</span>
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
                 </button>
               );
             })}
