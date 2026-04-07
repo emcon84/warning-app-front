@@ -58,6 +58,7 @@ export default function DoctorDetailModal({
   const [relocateResult, setRelocateResult] = useState<{ lat: number; lng: number } | null>(null);
   const [relocating, setRelocating] = useState(false);
   const [savingRelocate, setSavingRelocate] = useState(false);
+  const [relocateError, setRelocateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -65,6 +66,7 @@ export default function DoctorDetailModal({
       setTab("info");
       setRelocateAddress("");
       setRelocateResult(null);
+      setRelocateError(null);
       setConfirmDelete(false);
       getDisponibilidad(initialDoctor.id).then(setDisponibilidades).catch(() => {});
     }
@@ -107,6 +109,7 @@ export default function DoctorDetailModal({
     if (!relocateAddress.trim()) return;
     setRelocating(true);
     setRelocateResult(null);
+    setRelocateError(null);
     try {
       const query = encodeURIComponent(`${relocateAddress}, Reconquista, Santa Fe, Argentina`);
       const bbox = "-59.85,-29.30,-59.45,-28.95";
@@ -116,10 +119,10 @@ export default function DoctorDetailModal({
       if (data.length > 0) {
         setRelocateResult({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
       } else {
-        alert("No se encontró la dirección en Reconquista. Probá con otra calle o usá el arrastre manual.");
+        setRelocateError("No se encontró la dirección. Probá escribir solo la calle y número, o usá el arrastre manual.");
       }
     } catch {
-      alert("Error al buscar la dirección.");
+      setRelocateError("Error de conexión. Intentá de nuevo.");
     } finally {
       setRelocating(false);
     }
@@ -348,7 +351,7 @@ export default function DoctorDetailModal({
                   <input
                     type="text"
                     value={relocateAddress}
-                    onChange={(e) => { setRelocateAddress(e.target.value); setRelocateResult(null); }}
+                    onChange={(e) => { setRelocateAddress(e.target.value); setRelocateResult(null); setRelocateError(null); }}
                     placeholder="Ej: Belgrano 1234"
                     className="flex-1 text-sm border border-amber-300 rounded-lg px-2.5 py-1.5 bg-white"
                   />
@@ -360,6 +363,11 @@ export default function DoctorDetailModal({
                     {relocating ? "..." : "Buscar"}
                   </button>
                 </div>
+                {relocateError && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <XCircle className="w-3.5 h-3.5" /> {relocateError}
+                  </p>
+                )}
                 {relocateResult && (
                   <div className="space-y-1.5">
                     <p className="text-xs text-green-600 flex items-center gap-1">
