@@ -60,9 +60,8 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
 
   const processAudio = useCallback(async (audioBlob: Blob) => {
     setState("processing");
-    showFeedback("Transcribiendo audio...");
+    showFeedback("Procesando audio...");
 
-    // Obtener GPS o centro de Reconquista
     let position = RECONQUISTA_CENTER;
     try {
       const geoPos = await new Promise<GeolocationPosition>((resolve, reject) =>
@@ -112,7 +111,6 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
   }, [onReportCreated]);
 
   const startRecording = async () => {
-    if (state !== "idle" && state !== "error") return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -131,7 +129,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       recorder.start();
       mediaRecorderRef.current = recorder;
       setState("listening");
-      showFeedback("Grabando... soltá para enviar");
+      showFeedback("Grabando... tocá de nuevo para enviar");
     } catch {
       setState("error");
       showFeedback("No se pudo acceder al micrófono.", true);
@@ -139,20 +137,18 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
   };
 
   const stopRecording = () => {
-    if (state !== "listening") return;
     mediaRecorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setState("processing");
   };
 
-  const handlePressStart = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    startRecording();
-  };
-
-  const handlePressEnd = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    stopRecording();
+  const handleTap = () => {
+    if (state === "idle" || state === "error") {
+      startRecording();
+    } else if (state === "listening") {
+      stopRecording();
+    }
+    // processing / success: no hacer nada
   };
 
   const isListening = state === "listening";
@@ -175,15 +171,11 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
         </div>
       )}
 
-      {/* Botón — mantené apretado para grabar */}
+      {/* Botón — tap para grabar, tap de nuevo para enviar */}
       <button
-        onMouseDown={handlePressStart}
-        onMouseUp={handlePressEnd}
-        onMouseLeave={handlePressEnd}
-        onTouchStart={handlePressStart}
-        onTouchEnd={handlePressEnd}
+        onClick={handleTap}
         disabled={isProcessing}
-        title="Mantené apretado para grabar"
+        title={isListening ? "Tocá para enviar" : "Tocá para grabar"}
         className={`
           w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all select-none
           ${isListening ? "bg-red-500 scale-110 ring-4 ring-red-300" : ""}
@@ -194,7 +186,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
         `}
       >
         {isProcessing && <Loader2 className="w-5 h-5 text-white animate-spin" />}
-        {isListening && <Mic className="w-6 h-6 text-white animate-pulse" />}
+        {isListening && <Square className="w-6 h-6 text-white" />}
         {isSuccess && <CheckCircle className="w-5 h-5 text-white" />}
         {(state === "idle" || isError) && <Mic className="w-5 h-5 text-white" />}
       </button>
