@@ -13,6 +13,7 @@ import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import FloatingBottomNav from "./components/FloatingBottomNav";
 import TourManager, { useReplayTour } from "./components/TourManager";
+import VoiceReportButton from "./components/VoiceReportButton";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "./utils/api";
 import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
@@ -649,6 +650,11 @@ export default function Home() {
       {/* Tour onboarding */}
       <TourManager mapView={mapView} />
 
+
+      {/* Botón crear reporte por voz */}
+      <VoiceReportButton
+        onReportCreated={(report) => setReports((prev) => [...prev, report])}
+      />
 
       {/* Botón tema claro/oscuro */}
       <button
