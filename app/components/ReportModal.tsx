@@ -190,7 +190,7 @@ export default function ReportModal({ isOpen, onClose, onSubmit, lat, lng }: Rep
                 <select
                   value={category}
                   onChange={e => { setCategory(e.target.value as ReportCategory); setIsUrgent(false); }}
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
@@ -241,7 +241,7 @@ export default function ReportModal({ isOpen, onClose, onSubmit, lat, lng }: Rep
                   value={barrio}
                   onChange={e => setBarrio(e.target.value)}
                   placeholder="Ej: Centro, Villa Ocampo..."
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   autoFocus
                 />
               </div>
@@ -254,7 +254,7 @@ export default function ReportModal({ isOpen, onClose, onSubmit, lat, lng }: Rep
                   value={direccion}
                   onChange={e => setDireccion(e.target.value)}
                   placeholder="Ej: Belgrano 1234"
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
               </div>
               <div>
@@ -265,7 +265,7 @@ export default function ReportModal({ isOpen, onClose, onSubmit, lat, lng }: Rep
                   type="date"
                   value={fecha}
                   onChange={e => setFecha(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Si no seleccionás una fecha, se usará la de hoy</p>
               </div>
