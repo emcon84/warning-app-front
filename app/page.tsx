@@ -73,6 +73,15 @@ export default function Home() {
       return next;
     });
   };
+
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+
   const { showNotification, permission } = useNotifications();
   const replayTour = useReplayTour(mapView);
 
@@ -349,7 +358,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden dark:bg-gray-950">
       {/* Mensaje de error si la API no está disponible */}
       {error && (
         <div className="absolute top-20 right-4 z-[1000] bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-md">
@@ -644,13 +653,13 @@ export default function Home() {
       <button
         onClick={toggleTheme}
         title={theme === "light" ? "Cambiar a tema oscuro" : "Cambiar a tema claro"}
-        className={`fixed bottom-32 right-4 z-[1000] w-9 h-9 rounded-full shadow-md flex items-center justify-center transition-all hover:shadow-lg ${
+        className={`fixed bottom-32 right-4 z-[1000] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all hover:shadow-xl ${
           theme === "dark"
             ? "bg-gray-800 border border-gray-600 text-yellow-300 hover:bg-gray-700"
             : "bg-white border border-gray-200 text-gray-600 hover:text-gray-900"
         }`}
       >
-        {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </button>
 
       {/* Botón relanzar tour */}

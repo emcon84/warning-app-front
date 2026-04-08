@@ -256,25 +256,25 @@ export default function DoctorDetailModal({
   return (
     <div className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[88vh]">
+      <div className="relative bg-white dark:bg-gray-900 w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[88vh]">
 
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b flex-shrink-0">
+        <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b dark:border-gray-700 flex-shrink-0">
           <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
             <Stethoscope className="w-5 h-5 text-green-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-base text-gray-900 truncate">{doctor.nombre}</h2>
-            <p className="text-xs text-green-700 font-medium">{doctor.especialidad}</p>
+            <h2 className="font-bold text-base text-gray-900 dark:text-white truncate">{doctor.nombre}</h2>
+            <p className="text-xs text-green-700 dark:text-green-400 font-medium">{doctor.especialidad}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-full flex-shrink-0">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full flex-shrink-0">
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         {/* Botones llamar — solo si tiene contacto */}
         {(doctor.telefono || doctor.whatsapp) && (
-          <div className="flex gap-2 px-4 py-2 border-b flex-shrink-0">
+          <div className="flex gap-2 px-4 py-2 border-b dark:border-gray-700 flex-shrink-0">
             {doctor.telefono && (
               <a href={`tel:${doctor.telefono}`}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700">
@@ -291,13 +291,13 @@ export default function DoctorDetailModal({
         )}
 
         {/* Tabs */}
-        <div className="flex border-b flex-shrink-0">
+        <div className="flex border-b dark:border-gray-700 flex-shrink-0">
           {TABS.map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${
                 tab === t.key
                   ? "border-b-2 border-green-500 text-green-600"
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               }`}>
               {t.label}
             </button>
@@ -317,9 +317,9 @@ export default function DoctorDetailModal({
                 const isEditing = editingField === field;
 
                 return (
-                  <div key={field} className="bg-gray-50 rounded-xl p-3">
+                  <div key={field} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
                         <Icon className="w-3.5 h-3.5" /> {labels[field]}
                       </label>
                       {!isEditing && (
@@ -338,7 +338,7 @@ export default function DoctorDetailModal({
                             value={editValue}
                             onChange={(e) => { setEditValue(e.target.value); setGeocodeResult(null); }}
                             placeholder={field === "direccion" ? "Ej: Belgrano 1234" : field === "telefono" ? "Ej: 03482-123456" : "Ej: 3482123456"}
-                            className="flex-1 text-sm border border-gray-300 rounded-lg px-2.5 py-1.5 bg-white"
+                            className="flex-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-1.5 bg-white dark:bg-gray-800"
                             autoFocus
                           />
                           {field === "direccion" && (
@@ -362,14 +362,14 @@ export default function DoctorDetailModal({
                             {savingField ? "Guardando..." : "Guardar"}
                           </button>
                           <button onClick={cancelEdit}
-                            className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg text-xs font-semibold">
+                            className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold">
                             Cancelar
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-800">
-                        {doctor[field] || <span className="text-gray-400 italic text-xs">No cargado</span>}
+                      <p className="text-sm text-gray-800 dark:text-gray-100">
+                        {doctor[field] || <span className="text-gray-400 dark:text-gray-500 italic text-xs">No cargado</span>}
                       </p>
                     )}
                   </div>
@@ -390,7 +390,7 @@ export default function DoctorDetailModal({
                     value={relocateAddress}
                     onChange={(e) => { setRelocateAddress(e.target.value); setRelocateResult(null); setRelocateError(null); }}
                     placeholder="Ej: Belgrano 1234 o -29.1523, -59.6431"
-                    className="flex-1 text-sm border border-amber-300 rounded-lg px-2.5 py-1.5 bg-white"
+                    className="flex-1 text-sm border border-amber-300 dark:border-amber-600 rounded-lg px-2.5 py-1.5 bg-white dark:bg-gray-800"
                   />
                   <button
                     onClick={handleRelocateGeocode}
@@ -450,7 +450,7 @@ export default function DoctorDetailModal({
                         {deleting ? "Eliminando..." : "Sí, eliminar"}
                       </button>
                       <button onClick={() => setConfirmDelete(false)}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold">
+                        className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold">
                         Cancelar
                       </button>
                     </div>
@@ -475,8 +475,8 @@ export default function DoctorDetailModal({
                   <Plus className="w-4 h-4" /> Reportar disponibilidad
                 </button>
               ) : (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-3">
-                  <p className="text-xs font-bold text-gray-700">¿Qué días atiende?</p>
+                <div className="bg-green-50 dark:bg-gray-800 border border-green-200 dark:border-green-900 rounded-xl p-3 space-y-3">
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">¿Qué días atiende?</p>
                   <div className="flex flex-wrap gap-1.5">
                     {DIAS.map((dia) => (
                       <button key={dia} onClick={() => toggleDia(dia)}
@@ -486,7 +486,7 @@ export default function DoctorDetailModal({
                     ))}
                   </div>
 
-                  <p className="text-xs font-bold text-gray-700">Horario</p>
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Horario</p>
                   <div className="flex gap-1.5">
                     {HORARIOS.map((h) => (
                       <button key={h} onClick={() => setFormDisp((p) => ({ ...p, horario: h }))}
@@ -496,7 +496,7 @@ export default function DoctorDetailModal({
                     ))}
                   </div>
 
-                  <p className="text-xs font-bold text-gray-700">¿Cómo se atiende?</p>
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">¿Cómo se atiende?</p>
                   <div className="flex flex-col gap-1.5">
                     {TIPOS_TURNO.map((t) => (
                       <button key={t} onClick={() => setFormDisp((p) => ({ ...p, tipoTurno: t }))}
@@ -508,7 +508,7 @@ export default function DoctorDetailModal({
 
                   <select value={formDisp.obraSocial}
                     onChange={(e) => setFormDisp((p) => ({ ...p, obraSocial: e.target.value }))}
-                    className="w-full text-sm border border-gray-300 rounded-lg px-2.5 py-2 bg-white">
+                    className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-2 bg-white dark:bg-gray-700">
                     <option value="Todas">Todas las obras sociales</option>
                     {OBRAS_SOCIALES.map((os) => <option key={os} value={os}>{os}</option>)}
                   </select>
@@ -516,7 +516,7 @@ export default function DoctorDetailModal({
                   <input type="text" placeholder="Nota opcional..."
                     value={formDisp.nota}
                     onChange={(e) => setFormDisp((p) => ({ ...p, nota: e.target.value }))}
-                    className="w-full text-sm border border-gray-300 rounded-lg px-2.5 py-2 bg-white" />
+                    className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-2 bg-white dark:bg-gray-700" />
 
                   <div className="flex gap-2">
                     <button onClick={handleSubmitDisp}
@@ -525,7 +525,7 @@ export default function DoctorDetailModal({
                       {savingDisp ? "Guardando..." : "Confirmar"}
                     </button>
                     <button onClick={() => setShowFormDisp(false)}
-                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold">
+                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold">
                       Cancelar
                     </button>
                   </div>
@@ -537,18 +537,18 @@ export default function DoctorDetailModal({
               ) : (
                 <div className="space-y-2">
                   {disponibilidades.map((d) => (
-                    <div key={d.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                    <div key={d.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="text-sm font-semibold text-gray-800">{d.dias.join(", ")}</p>
+                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{d.dias.join(", ")}</p>
                           <div className="flex flex-wrap gap-1.5 mt-1">
-                            <span className="text-xs text-gray-500 flex items-center gap-1"><Clock className="w-3 h-3" />{d.horario}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{d.horario}</span>
                             <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{d.tipoTurno}</span>
                             {d.obraSocial !== "Todas" && <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{d.obraSocial}</span>}
                           </div>
                           {d.nota && <p className="text-xs text-gray-500 mt-1 italic">"{d.nota}"</p>}
                         </div>
-                        <span className="text-[10px] text-gray-400 flex-shrink-0 ml-2">{formatFecha(d.createdAt)}</span>
+                        <span className="text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2">{formatFecha(d.createdAt)}</span>
                       </div>
                     </div>
                   ))}
@@ -560,14 +560,14 @@ export default function DoctorDetailModal({
           {/* ── TAB OBRAS SOCIALES ── */}
           {tab === "obras" && (
             <div className="space-y-2">
-              <p className="text-xs text-gray-500 mb-3">Confirmado por la comunidad. Ayudá actualizando la info.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Confirmado por la comunidad. Ayudá actualizando la info.</p>
               {OBRAS_SOCIALES.map((os) => {
                 const status = getObrasSocialStatus(os);
                 return (
                   <div key={os} className={`flex items-center justify-between rounded-xl p-3 ${
                     status === "acepta" ? "bg-green-50 border border-green-200" :
                     status === "rechaza" ? "bg-red-50 border border-red-200" :
-                    "bg-gray-50 border border-gray-200"
+                    "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
                   }`}>
                     <div className="flex items-center gap-2">
                       {status === "acepta" && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
@@ -575,7 +575,7 @@ export default function DoctorDetailModal({
                       {status === "desconocido" && <HelpCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />}
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <p className="text-sm font-semibold text-gray-800">{os}</p>
+                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{os}</p>
                           {os === "IAPOS" && doctor.iapos && (
                             <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">Padrón oficial</span>
                           )}

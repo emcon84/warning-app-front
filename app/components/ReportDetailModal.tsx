@@ -177,17 +177,17 @@ export default function ReportDetailModal({
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center bg-linear-to-r from-gray-50 to-white shrink-0">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-linear-to-r from-gray-50 dark:from-gray-800 to-white dark:to-gray-900 shrink-0">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               Detalle del Reporte
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 transition-colors"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full p-2 transition-colors"
             >
               <svg
                 className="w-6 h-6"
@@ -262,7 +262,7 @@ export default function ReportDetailModal({
 
               {/* Category Badge */}
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block">
                   Categoría
                 </label>
                 <div
@@ -280,10 +280,10 @@ export default function ReportDetailModal({
             <div className="space-y-4">
               {/* Description */}
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block">
                   Descripción
                 </label>
-                <p className="text-base text-gray-900 leading-relaxed bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <p className="text-base text-gray-900 dark:text-gray-100 leading-relaxed bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                   {report.description}
                 </p>
               </div>
@@ -291,20 +291,20 @@ export default function ReportDetailModal({
               {/* Location Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <MapPin className="w-4 h-4" />
                     Barrio
                   </label>
-                  <p className="text-sm text-gray-900 font-medium">
+                  <p className="text-sm text-gray-900 dark:text-white font-medium">
                     {report.barrio}
                   </p>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <Home className="w-4 h-4" />
                     Dirección
                   </label>
-                  <p className="text-sm text-gray-900 font-medium">
+                  <p className="text-sm text-gray-900 dark:text-white font-medium">
                     {report.direccion}
                   </p>
                 </div>
@@ -316,7 +316,7 @@ export default function ReportDetailModal({
                   <Navigation className="w-4 h-4" />
                   Coordenadas
                 </label>
-                <p className="text-gray-700 font-mono text-xs bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                <p className="text-gray-700 dark:text-gray-300 font-mono text-xs bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded border border-gray-200 dark:border-gray-700">
                   {report.lat.toFixed(6)}, {report.lng.toFixed(6)}
                 </p>
               </div>
@@ -428,7 +428,7 @@ export default function ReportDetailModal({
           </div>
 
           {/* Footer Actions */}
-          <div className="px-4 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 shrink-0">
+          <div className="px-4 py-3 sm:py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shrink-0">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-3">
               <div className="flex flex-col sm:flex-row gap-2">
                 <button
@@ -456,7 +456,7 @@ export default function ReportDetailModal({
                 </button>
                 <button
                   onClick={onClose}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold text-sm"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors font-semibold text-sm"
                 >
                   Cerrar
                 </button>

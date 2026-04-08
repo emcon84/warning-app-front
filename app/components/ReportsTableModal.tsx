@@ -223,36 +223,36 @@ export default function ReportsTableModal({
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
+          className="bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="p-3 sm:p-6 border-b flex justify-between items-center">
+          <div className="p-3 sm:p-6 border-b dark:border-gray-700 flex justify-between items-center">
             <div>
-              <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
+              <h2 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
                 Todos los Reportes
               </h2>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {sortedReports.length} reporte(s) encontrado(s)
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl sm:text-3xl font-bold ml-2"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl sm:text-3xl font-bold ml-2"
             >
               ×
             </button>
           </div>
 
           {/* Filtros y Búsqueda */}
-          <div className="p-2 sm:p-4 border-b bg-gray-50 space-y-2 sm:space-y-4">
+          <div className="p-2 sm:p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800 space-y-2 sm:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
               <input
                 type="text"
                 placeholder="Buscar..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
+                className="px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base bg-white dark:bg-gray-700"
               />
 
               <select
@@ -260,7 +260,7 @@ export default function ReportsTableModal({
                 onChange={(e) =>
                   setCategoryFilter(e.target.value as ReportCategory | "all")
                 }
-                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
+                className="px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base bg-white dark:bg-gray-700"
               >
                 <option value="all">Todas las categorías</option>
                 <option value="basura">Basura</option>
@@ -295,7 +295,7 @@ export default function ReportsTableModal({
                     e.target.value as "all" | "today" | "week" | "month",
                   )
                 }
-                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
+                className="px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base bg-white dark:bg-gray-700"
               >
                 <option value="all">Todas las fechas</option>
                 <option value="today">Hoy</option>
@@ -329,7 +329,7 @@ export default function ReportsTableModal({
               {currentReports.map((report) => (
                 <div
                   key={report.id}
-                  className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow"
+                  className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
                 >
                   <div
                     className="cursor-pointer"
@@ -345,14 +345,14 @@ export default function ReportsTableModal({
                         })()}
                         {getCategoryLabel(report.category)}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {formatDate(report.createdAt)}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white mb-1 line-clamp-2">
                       {report.description}
                     </p>
-                    <div className="text-xs text-gray-600 space-y-1">
+                    <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                       <p className="truncate flex items-center gap-1">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -407,10 +407,10 @@ export default function ReportsTableModal({
 
             {/* Vista de tabla para desktop */}
             <table className="w-full text-sm hidden lg:table">
-              <thead className="bg-gray-100 sticky top-0">
+              <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0">
                 <tr>
                   <th
-                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200"
+                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
                     onClick={() => handleSort("createdAt")}
                   >
                     Fecha{" "}
@@ -418,7 +418,7 @@ export default function ReportsTableModal({
                       (sortDirection === "asc" ? "↑" : "↓")}
                   </th>
                   <th
-                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200"
+                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
                     onClick={() => handleSort("category")}
                   >
                     Categoría{" "}
@@ -426,26 +426,26 @@ export default function ReportsTableModal({
                       (sortDirection === "asc" ? "↑" : "↓")}
                   </th>
                   <th
-                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200"
+                    className="px-4 py-3 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
                     onClick={() => handleSort("barrio")}
                   >
                     Barrio{" "}
                     {sortField === "barrio" &&
                       (sortDirection === "asc" ? "↑" : "↓")}
                   </th>
-                  <th className="px-4 py-3 text-left">Dirección</th>
-                  <th className="px-4 py-3 text-left">Descripción</th>
-                  <th className="px-4 py-3 text-left">Acciones</th>
+                  <th className="px-4 py-3 text-left dark:text-gray-300">Dirección</th>
+                  <th className="px-4 py-3 text-left dark:text-gray-300">Descripción</th>
+                  <th className="px-4 py-3 text-left dark:text-gray-300">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {currentReports.map((report) => (
                   <tr
                     key={report.id}
-                    className="border-b hover:bg-gray-50 cursor-pointer"
+                    className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                     onClick={() => onReportClick(report)}
                   >
-                    <td className="px-4 py-3 text-gray-700 text-xs">
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300 text-xs">
                       {formatDate(report.createdAt)}
                     </td>
                     <td className="px-4 py-3">
@@ -459,11 +459,11 @@ export default function ReportsTableModal({
                         {getCategoryLabel(report.category)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-700">{report.barrio}</td>
-                    <td className="px-4 py-3 text-gray-700">
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{report.barrio}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {report.direccion}
                     </td>
-                    <td className="px-4 py-3 text-gray-700">
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                       {report.description.length > 50
                         ? report.description.substring(0, 50) + "..."
                         : report.description}
@@ -499,7 +499,7 @@ export default function ReportsTableModal({
             </table>
 
             {currentReports.length === 0 && (
-              <div className="text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">
+              <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-gray-400 text-sm sm:text-base">
                 No se encontraron reportes con los filtros seleccionados
               </div>
             )}
@@ -507,8 +507,8 @@ export default function ReportsTableModal({
 
           {/* Paginación */}
           {totalPages > 1 && (
-            <div className="p-2 sm:p-4 border-t bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
-              <div className="text-xs sm:text-sm text-gray-600">
+            <div className="p-2 sm:p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 Mostrando {indexOfFirstItem + 1} -{" "}
                 {Math.min(indexOfLastItem, sortedReports.length)} de{" "}
                 {sortedReports.length}
@@ -517,11 +517,11 @@ export default function ReportsTableModal({
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-2 sm:px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
+                  className="px-2 sm:px-3 py-1 border dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm dark:text-gray-300"
                 >
                   Anterior
                 </button>
-                <span className="px-2 sm:px-3 py-1 text-gray-700 text-xs sm:text-sm">
+                <span className="px-2 sm:px-3 py-1 text-gray-700 dark:text-gray-300 text-xs sm:text-sm">
                   Página {currentPage} de {totalPages}
                 </span>
                 <button
@@ -529,7 +529,7 @@ export default function ReportsTableModal({
                     setCurrentPage(Math.min(totalPages, currentPage + 1))
                   }
                   disabled={currentPage === totalPages}
-                  className="px-2 sm:px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
+                  className="px-2 sm:px-3 py-1 border dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm dark:text-gray-300"
                 >
                   Siguiente
                 </button>
