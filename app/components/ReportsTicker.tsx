@@ -88,11 +88,15 @@ export default function ReportsTicker({ reports, onReportClick }: ReportsTickerP
     : "translate-x-full opacity-0";
 
   return (
-    <div className="fixed bottom-28 left-3 right-16 z-[900] pointer-events-none flex justify-start">
+    <div
+      className="fixed bottom-28 left-3 right-16 z-[900] flex justify-start"
+      onTouchStart={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <button
         onClick={() => onReportClick?.(report)}
         className={`
-          pointer-events-auto w-full max-w-sm
+          w-full max-w-sm
           flex items-center gap-3 px-4 py-3
           rounded-2xl shadow-xl
           bg-white/90 dark:bg-gray-900/90 backdrop-blur-md

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Report, ReportCategory } from "../types";
-import { MapPin, Calendar, Trash2, X, AlertTriangle } from "lucide-react";
+import { MapPin, X, AlertTriangle } from "lucide-react";
 
 interface EditReportModalProps {
   isOpen: boolean;
@@ -18,12 +18,36 @@ interface EditReportModalProps {
   report: Report;
 }
 
-export default function EditReportModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  report,
-}: EditReportModalProps) {
+const CATEGORIES: { value: ReportCategory; label: string }[] = [
+  { value: "basura", label: "🗑️ Recolección de basura" },
+  { value: "alumbrado", label: "💡 Alumbrado público" },
+  { value: "baches", label: "🕳️ Baches" },
+  { value: "pastizales", label: "🌿 Pastizales" },
+  { value: "robo", label: "🚨 Robo" },
+  { value: "personas_sospechosas", label: "👥 Personas sospechosas" },
+  { value: "fugas_agua", label: "💧 Fugas de agua" },
+  { value: "drenaje", label: "🚿 Drenaje" },
+  { value: "banquetas", label: "🚶 Banquetas dañadas" },
+  { value: "semaforos", label: "🚦 Semáforos" },
+  { value: "limpieza", label: "🧹 Limpieza" },
+  { value: "graffiti", label: "🎨 Graffiti" },
+  { value: "escombros", label: "🏗️ Escombros" },
+  { value: "arboles", label: "🌳 Árboles caídos" },
+  { value: "vandalismo", label: "⚠️ Vandalismo" },
+  { value: "vehiculos_abandonados", label: "🚗 Vehículos abandonados" },
+  { value: "iluminacion", label: "🔦 Iluminación" },
+  { value: "animales_callejeros", label: "🐕 Animales callejeros" },
+  { value: "plagas", label: "🐀 Plagas" },
+  { value: "senalizacion", label: "🛑 Señalización" },
+  { value: "estacionamiento", label: "🅿️ Estacionamiento" },
+  { value: "transporte", label: "🚌 Transporte público" },
+  { value: "voz", label: "🎙️ Reporte de voz" },
+];
+
+const inputClass = "w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm";
+const labelClass = "block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5";
+
+export default function EditReportModal({ isOpen, onClose, onSubmit, report }: EditReportModalProps) {
   const [category, setCategory] = useState<ReportCategory>(report.category);
   const [description, setDescription] = useState(report.description);
   const [barrio, setBarrio] = useState(report.barrio);
@@ -33,7 +57,6 @@ export default function EditReportModal({
   const [isUrgent, setIsUrgent] = useState(report.isUrgent || false);
   const [keepExistingPhotos, setKeepExistingPhotos] = useState(true);
 
-  // Resetear estado cuando cambia el reporte
   useEffect(() => {
     if (isOpen) {
       setCategory(report.category);
@@ -51,35 +74,23 @@ export default function EditReportModal({
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      setPhotos(files);
-      setKeepExistingPhotos(false);
-
-      const previews: string[] = [];
-      let loadedCount = 0;
-
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          previews.push(reader.result as string);
-          loadedCount++;
-          if (loadedCount === files.length) {
-            setPhotoPreviews(previews);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-  };
-
-  const removePhoto = (index: number) => {
-    setPhotos(photos.filter((_, i) => i !== index));
-    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
+    if (files.length === 0) return;
+    setPhotos(files);
+    setKeepExistingPhotos(false);
+    const previews: string[] = [];
+    let loaded = 0;
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        previews.push(reader.result as string);
+        if (++loaded === files.length) setPhotoPreviews([...previews]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (description.trim() && barrio.trim() && direccion.trim()) {
       onSubmit({
         category,
@@ -87,244 +98,115 @@ export default function EditReportModal({
         barrio,
         direccion,
         photos: photos.length > 0 ? photos : undefined,
-        isUrgent:
-          category === "robo" || category === "personas_sospechosas"
-            ? isUrgent
-            : false,
+        isUrgent: (category === "robo" || category === "personas_sospechosas") ? isUrgent : false,
       });
     }
   };
 
   const existingPhotos = report.photos || (report.photo ? [report.photo] : []);
+  const isSecurityCat = category === "robo" || category === "personas_sospechosas";
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center p-2 sm:p-4"
-      style={{
-        zIndex: 10000,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        backdropFilter: "blur(4px)",
-      }}
+      className="fixed inset-0 flex items-center justify-center p-3"
+      style={{ zIndex: 10000, backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(4px)" }}
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full p-4 sm:p-6 max-h-[95vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-            Editar Reporte
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 p-1"
-          >
-            <X className="w-6 h-6" />
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Editar Reporte</h2>
+          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
-        <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 bg-gray-50 p-2 sm:p-3 rounded">
-          <p className="flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5" />
-            <strong>Ubicación:</strong>
-          </p>
-          <p className="break-all">
-            Lat: {report.lat.toFixed(6)}, Lng: {report.lng.toFixed(6)}
-          </p>
-        </div>
+        <form onSubmit={handleSubmit} className="px-5 py-4 space-y-4">
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="category"
-              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Categoría: <span className="text-red-500">*</span>
-            </label>
+          {/* Ubicación */}
+          <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-lg flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span>Lat: {report.lat.toFixed(6)}, Lng: {report.lng.toFixed(6)}</span>
+          </div>
+
+          {/* Categoría */}
+          <div>
+            <label className={labelClass}>Categoría <span className="text-red-500">*</span></label>
             <select
-              id="category"
               value={category}
-              onChange={(e) => setCategory(e.target.value as ReportCategory)}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
+              onChange={(e) => { setCategory(e.target.value as ReportCategory); setIsUrgent(false); }}
+              className={inputClass}
               required
             >
-              <option value="basura">🗑️ Recolección de basura</option>
-              <option value="alumbrado">💡 Alumbrado público</option>
-              <option value="baches">🕳️ Baches</option>
-              <option value="pastizales">🌿 Limpieza de pastizales</option>
-              <option value="robo">🚨 Robo</option>
-              <option value="personas_sospechosas">
-                👥 Personas sospechosas
-              </option>
-              <option value="fugas_agua">💧 Fugas de agua</option>
-              <option value="drenaje">🚿 Drenaje</option>
-              <option value="banquetas">🚶 Banquetas dañadas</option>
-              <option value="semaforos">🚦 Semáforos</option>
-              <option value="limpieza">🧹 Limpieza de espacios públicos</option>
-              <option value="graffiti">🎨 Graffiti</option>
-              <option value="escombros">🏗️ Escombros</option>
-              <option value="arboles">🌳 Árboles caídos</option>
-              <option value="vandalismo">⚠️ Vandalismo</option>
-              <option value="vehiculos_abandonados">
-                🚗 Vehículos abandonados
-              </option>
-              <option value="iluminacion">🔦 Iluminación deficiente</option>
-              <option value="animales_callejeros">
-                🐕 Animales callejeros
-              </option>
-              <option value="plagas">🐀 Plagas</option>
-              <option value="senalizacion">🛑 Señalización</option>
-              <option value="estacionamiento">🅿️ Estacionamiento ilegal</option>
-              <option value="transporte">
-                🚌 Problemas de transporte público
-              </option>
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
             </select>
           </div>
 
-          {(category === "robo" || category === "personas_sospechosas") && (
-            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-red-900 mb-2">
-                    {category === "robo"
-                      ? "¿Robo en ejecución?"
-                      : "¿Situación en curso?"}
-                  </h3>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={isUrgent}
-                      onChange={(e) => setIsUrgent(e.target.checked)}
-                      className="w-4 h-4 text-red-600 rounded focus:ring-red-500"
-                    />
-                    <span className="text-sm text-red-800">
-                      {category === "robo"
-                        ? "Este robo está sucediendo ahora"
-                        : "Esta situación está ocurriendo ahora"}
-                    </span>
-                  </label>
-                </div>
+          {/* Seguridad */}
+          {isSecurityCat && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-xl p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+                <h3 className="font-bold text-red-900 dark:text-red-300 text-sm">
+                  {category === "robo" ? "¿Robo en ejecución?" : "¿Situación en curso?"}
+                </h3>
               </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={isUrgent} onChange={(e) => setIsUrgent(e.target.checked)} className="w-4 h-4 text-red-600 rounded" />
+                <span className="text-xs text-red-800 dark:text-red-300">
+                  {category === "robo" ? "Este robo está sucediendo ahora" : "Esta situación está ocurriendo ahora"}
+                </span>
+              </label>
             </div>
           )}
 
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="barrio"
-              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Barrio: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="barrio"
-              value={barrio}
-              onChange={(e) => setBarrio(e.target.value)}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-              placeholder="Ej: Centro, Villa Ocampo, etc."
-              required
-            />
+          {/* Barrio */}
+          <div>
+            <label className={labelClass}>Barrio <span className="text-red-500">*</span></label>
+            <input type="text" value={barrio} onChange={(e) => setBarrio(e.target.value)} placeholder="Ej: Centro, San Martín..." className={inputClass} required />
           </div>
 
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="direccion"
-              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Dirección: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="direccion"
-              value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-              placeholder="Ej: Calle Falsa 123"
-              required
-            />
+          {/* Dirección */}
+          <div>
+            <label className={labelClass}>Dirección <span className="text-red-500">*</span></label>
+            <input type="text" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ej: Belgrano 1234" className={inputClass} required />
           </div>
 
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="description"
-              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Descripción del problema: <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-              placeholder="Describe el problema que quieres reportar..."
-              required
-            />
+          {/* Descripción */}
+          <div>
+            <label className={labelClass}>Descripción <span className="text-red-500">*</span></label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Describí el problema..." className={`${inputClass} resize-none`} required />
           </div>
 
           {/* Fotos existentes */}
           {keepExistingPhotos && existingPhotos.length > 0 && (
-            <div className="mb-3 sm:mb-4">
-              <label className="block text-gray-700 font-medium mb-2 text-sm sm:text-base">
-                Fotos actuales:
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {existingPhotos.map((photo, index) => (
-                  <div key={index} className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={
-                        photo.startsWith("http")
-                          ? photo
-                          : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${photo}`
-                      }
-                      alt={`Foto ${index + 1}`}
-                      className="w-full h-24 object-cover rounded border border-gray-300"
-                    />
-                  </div>
+            <div>
+              <label className={labelClass}>Fotos actuales</label>
+              <div className="grid grid-cols-3 gap-2">
+                {existingPhotos.map((photo, i) => (
+                  <img key={i} src={photo.startsWith("http") ? photo : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${photo}`} alt={`Foto ${i + 1}`} className="w-full h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-700" />
                 ))}
               </div>
-              <p className="text-xs text-gray-600 mt-2">
-                Las fotos actuales se mantendrán a menos que subas nuevas
-              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Se mantienen salvo que subas nuevas</p>
             </div>
           )}
 
           {/* Nuevas fotos */}
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="photo"
-              className="block text-gray-700 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              {keepExistingPhotos
-                ? "Reemplazar fotos (opcional):"
-                : "Nuevas fotos:"}
-            </label>
-            <input
-              type="file"
-              id="photo"
-              accept="image/*"
-              multiple
-              onChange={handlePhotoChange}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-            />
+          <div>
+            <label className={labelClass}>{keepExistingPhotos ? "Reemplazar fotos (opcional)" : "Nuevas fotos"}</label>
+            <input type="file" accept="image/*" multiple onChange={handlePhotoChange} className="w-full text-xs text-gray-600 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400" />
             {photoPreviews.length > 0 && (
-              <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {photoPreviews.map((preview, index) => (
-                  <div key={index} className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-24 object-cover rounded border border-gray-300"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {photoPreviews.map((preview, i) => (
+                  <div key={i} className="relative">
+                    <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-20 object-cover rounded-lg" />
+                    <button type="button" onClick={() => { setPhotos(photos.filter((_, j) => j !== i)); setPhotoPreviews(photoPreviews.filter((_, j) => j !== i)); }} className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                      <X className="w-3 h-3" />
                     </button>
                   </div>
                 ))}
@@ -332,18 +214,12 @@ export default function EditReportModal({
             )}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full sm:flex-1 px-4 py-2 sm:py-2.5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-semibold text-sm sm:text-base"
-            >
+          {/* Botones */}
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 font-semibold text-sm transition-colors">
               Cancelar
             </button>
-            <button
-              type="submit"
-              className="w-full sm:flex-1 px-4 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base"
-            >
+            <button type="submit" className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-colors">
               Guardar Cambios
             </button>
           </div>
