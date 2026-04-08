@@ -226,18 +226,6 @@ export default function ReportModal({ isOpen, onClose, onSubmit, lat, lng }: Rep
                 </div>
               )}
 
-              {/* Contacto Servicios Públicos */}
-              {isServiciosCat && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded-xl p-3">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Construction className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <h3 className="font-bold text-blue-900 dark:text-blue-300 text-sm">Contacto Rápido — Servicios Públicos</h3>
-                  </div>
-                  <p className="text-xs text-blue-700 dark:text-blue-400 mb-2">
-                    Completá el lugar y la descripción en los pasos siguientes para habilitar el envío directo.
-                  </p>
-                </div>
-              )}
             </div>
           )}
 
@@ -326,15 +314,27 @@ export default function ReportModal({ isOpen, onClose, onSubmit, lat, lng }: Rep
                 )}
               </div>
 
-              {/* Botones de envío contextual */}
-              {isServiciosCat && canSubmit && (
-                <button
-                  type="button"
-                  onClick={sendServiciosPublicos}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm"
-                >
-                  <Share2 className="w-4 h-4" /> Enviar Reclamo a Servicios Públicos
-                </button>
+              {/* Contacto Rápido Servicios Públicos */}
+              {isServiciosCat && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded-xl p-3">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Construction className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <h3 className="font-bold text-blue-900 dark:text-blue-300 text-sm">Contacto Rápido — Servicios Públicos</h3>
+                  </div>
+                  {!canSubmit && (
+                    <p className="text-xs text-blue-700 dark:text-blue-400 mb-2">
+                      Completá la descripción para habilitar el envío directo.
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={sendServiciosPublicos}
+                    disabled={!canSubmit}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg font-semibold text-sm"
+                  >
+                    <Share2 className="w-4 h-4" /> Enviar Reclamo a Servicios Públicos
+                  </button>
+                </div>
               )}
 
               {isSecurityCat && isUrgent && canSubmit && (
