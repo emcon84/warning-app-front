@@ -112,6 +112,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
   }, [onReportCreated]);
 
   const startRecording = async () => {
+    if (state !== "idle" && state !== "error") return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -130,7 +131,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       recorder.start();
       mediaRecorderRef.current = recorder;
       setState("listening");
-      showFeedback("Grabando... tocá de nuevo para terminar");
+      showFeedback("Grabando... soltá para enviar");
     } catch {
       setState("error");
       showFeedback("No se pudo acceder al micrófono.", true);
@@ -138,14 +139,20 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
   };
 
   const stopRecording = () => {
+    if (state !== "listening") return;
     mediaRecorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((t) => t.stop());
     setState("processing");
   };
 
-  const handleClick = () => {
-    if (state === "listening") stopRecording();
-    else if (state === "idle" || state === "error") startRecording();
+  const handlePressStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    startRecording();
+  };
+
+  const handlePressEnd = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    stopRecording();
   };
 
   const isListening = state === "listening";
@@ -168,22 +175,26 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
         </div>
       )}
 
-      {/* Botón */}
+      {/* Botón — mantené apretado para grabar */}
       <button
-        onClick={handleClick}
+        onMouseDown={handlePressStart}
+        onMouseUp={handlePressEnd}
+        onMouseLeave={handlePressEnd}
+        onTouchStart={handlePressStart}
+        onTouchEnd={handlePressEnd}
         disabled={isProcessing}
-        title="Crear reporte por voz"
+        title="Mantené apretado para grabar"
         className={`
-          w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all
-          ${isListening ? "bg-red-500 hover:bg-red-600 animate-pulse" : ""}
+          w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all select-none
+          ${isListening ? "bg-red-500 scale-110 ring-4 ring-red-300" : ""}
           ${isProcessing ? "bg-blue-500 cursor-not-allowed" : ""}
           ${isSuccess ? "bg-green-500" : ""}
-          ${isError ? "bg-red-400 hover:bg-red-500" : ""}
-          ${state === "idle" ? "bg-purple-600 hover:bg-purple-700" : ""}
+          ${isError ? "bg-red-400" : ""}
+          ${state === "idle" ? "bg-purple-600 active:scale-110 active:bg-purple-700" : ""}
         `}
       >
         {isProcessing && <Loader2 className="w-5 h-5 text-white animate-spin" />}
-        {isListening && <Square className="w-4 h-4 text-white fill-white" />}
+        {isListening && <Mic className="w-6 h-6 text-white animate-pulse" />}
         {isSuccess && <CheckCircle className="w-5 h-5 text-white" />}
         {(state === "idle" || isError) && <Mic className="w-5 h-5 text-white" />}
       </button>
