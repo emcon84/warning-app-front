@@ -376,10 +376,10 @@ export default function ReportDetailModal({
                 "baches",
                 "banquetas",
               ].includes(report.category) && (
-                <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-xl">
                   <div className="flex items-center gap-2 mb-3">
-                    <Construction className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-sm font-bold text-blue-900 uppercase">
+                    <Construction className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <h3 className="text-sm font-bold text-blue-900 dark:text-blue-300 uppercase">
                       Servicios Públicos
                     </h3>
                   </div>
