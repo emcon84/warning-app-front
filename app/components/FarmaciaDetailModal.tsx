@@ -161,9 +161,9 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
           )}
 
           {farmacia.esDeturno && (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-800">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 text-sm text-green-800 dark:text-green-400">
               <p className="font-semibold mb-1">Farmacia de turno</p>
-              <p className="text-green-700 text-xs">Atiende de 8h a 8h del día siguiente. Solo recetas y medicamentos de emergencia.</p>
+              <p className="text-green-700 dark:text-green-500 text-xs">Atiende de 8h a 8h del día siguiente. Solo recetas y medicamentos de emergencia.</p>
             </div>
           )}
 
