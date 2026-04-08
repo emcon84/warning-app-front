@@ -20,7 +20,8 @@ export type ReportCategory =
   | "plagas"
   | "senalizacion"
   | "estacionamiento"
-  | "transporte";
+  | "transporte"
+  | "voz";
 
 export interface Doctor {
   id: string

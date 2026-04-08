@@ -54,6 +54,12 @@ export default function ReportsTicker({ reports, onReportClick }: ReportsTickerP
   useEffect(() => {
     if (recent.length === 0) return;
     setIndex(0);
+    if (recent.length === 1) {
+      // Un solo reporte: mostrar estático, sin ciclo
+      setAnimState("entering");
+      const t = setTimeout(() => setAnimState("visible"), 30);
+      return () => clearTimeout(t);
+    }
     setAnimState("entering");
     const t1 = setTimeout(() => {
       setAnimState("visible");

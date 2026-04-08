@@ -349,8 +349,8 @@ export default function MapComponent({
         </Marker>
       ))}
 
-      {/* Marcadores de reportes */}
-      {showReports && reports.map((report) => (
+      {/* Marcadores de reportes (excluye reportes de voz) */}
+      {showReports && reports.filter((r) => r.category !== "voz").map((report) => (
         <Marker
           key={report.id}
           position={[report.lat, report.lng]}

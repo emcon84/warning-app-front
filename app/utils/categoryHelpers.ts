@@ -22,6 +22,7 @@ import {
   ParkingCircle,
   Bus,
   Users,
+  Mic,
 } from "lucide-react";
 
 export const getCategoryLabel = (category: ReportCategory): string => {
@@ -48,8 +49,9 @@ export const getCategoryLabel = (category: ReportCategory): string => {
     senalizacion: "Señalización dañada",
     estacionamiento: "Problemas de estacionamiento",
     transporte: "Problemas de transporte público",
+    voz: "Reporte de voz",
   };
-  return labels[category];
+  return labels[category] ?? category;
 };
 
 export const getCategoryIcon = (category: ReportCategory) => {
@@ -76,6 +78,7 @@ export const getCategoryIcon = (category: ReportCategory) => {
     senalizacion: SignpostBig,
     estacionamiento: ParkingCircle,
     transporte: Bus,
+    voz: Mic,
   };
   return icons[category];
 };
@@ -104,8 +107,9 @@ export const getCategoryIconSvg = (category: ReportCategory): string => {
     senalizacion: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8"/><path d="M12 3v3"/><path d="M18 6a2 2 0 0 1 1.387.56l2.307 2.22a1 1 0 0 1 0 1.44l-2.307 2.22A2 2 0 0 1 18 13H6a2 2 0 0 1-1.387-.56l-2.306-2.22a1 1 0 0 1 0-1.44l2.306-2.22A2 2 0 0 1 6 6z"/></svg>`,
     estacionamiento: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>`,
     transporte: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/></svg>`,
+    voz: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>`,
   };
-  return svgs[category];
+  return svgs[category] ?? svgs["basura"];
 };
 
 export const getCategoryColor = (category: ReportCategory): string => {
@@ -132,6 +136,7 @@ export const getCategoryColor = (category: ReportCategory): string => {
     senalizacion: "bg-indigo-100 text-indigo-800 border-indigo-300",
     estacionamiento: "bg-violet-100 text-violet-800 border-violet-300",
     transporte: "bg-blue-100 text-blue-800 border-blue-300",
+    voz: "bg-purple-100 text-purple-800 border-purple-300",
   };
-  return colors[category];
+  return colors[category] ?? "bg-gray-100 text-gray-800 border-gray-300";
 };
