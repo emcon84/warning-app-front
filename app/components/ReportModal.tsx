@@ -2,17 +2,7 @@
 
 import { useState } from "react";
 import { ReportCategory } from "../types";
-import {
-  MapPin,
-  Calendar,
-  Trash2,
-  Lightbulb,
-  Construction,
-  Trees,
-  Phone,
-  AlertTriangle,
-  Share2,
-} from "lucide-react";
+import { MapPin, Calendar, Trash2, Construction, Phone, AlertTriangle, Share2, ChevronRight, ChevronLeft, Camera } from "lucide-react";
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -31,527 +21,376 @@ interface ReportModalProps {
   lng: number;
 }
 
-export default function ReportModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  lat,
-  lng,
-}: ReportModalProps) {
+const CATEGORIES: { value: ReportCategory; label: string }[] = [
+  { value: "basura", label: "Falta de recolección de basura" },
+  { value: "alumbrado", label: "Falta de alumbrado público" },
+  { value: "baches", label: "Baches en vía pública" },
+  { value: "pastizales", label: "Falta de limpieza de pastizales" },
+  { value: "robo", label: "Robo" },
+  { value: "personas_sospechosas", label: "Personas sospechosas" },
+  { value: "fugas_agua", label: "Fugas de agua" },
+  { value: "drenaje", label: "Problemas de alcantarillado/drenaje" },
+  { value: "banquetas", label: "Banquetas dañadas/obstruidas" },
+  { value: "semaforos", label: "Semáforos descompuestos" },
+  { value: "limpieza", label: "Falta de limpieza en áreas públicas" },
+  { value: "graffiti", label: "Vandalismo/grafiti" },
+  { value: "escombros", label: "Escombros o residuos voluminosos" },
+  { value: "arboles", label: "Árboles caídos/peligrosos" },
+  { value: "vandalismo", label: "Daños a propiedad pública" },
+  { value: "vehiculos_abandonados", label: "Vehículos abandonados" },
+  { value: "iluminacion", label: "Falta de iluminación" },
+  { value: "animales_callejeros", label: "Animales callejeros" },
+  { value: "plagas", label: "Plagas urbanas" },
+  { value: "senalizacion", label: "Señalización dañada" },
+  { value: "estacionamiento", label: "Problemas de estacionamiento" },
+  { value: "transporte", label: "Problemas de transporte público" },
+];
+
+const SERVICIOS_PUBLICOS_CATS = ["basura", "alumbrado", "pastizales", "fugas_agua", "drenaje", "limpieza", "escombros", "baches", "banquetas"];
+
+export default function ReportModal({ isOpen, onClose, onSubmit, lat, lng }: ReportModalProps) {
+  const [step, setStep] = useState(1);
   const [category, setCategory] = useState<ReportCategory>("basura");
-  const [description, setDescription] = useState("");
+  const [isUrgent, setIsUrgent] = useState(false);
   const [barrio, setBarrio] = useState("");
   const [direccion, setDireccion] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
-  const [fecha, setFecha] = useState<string>("");
-  const [isUrgent, setIsUrgent] = useState(false);
 
   if (!isOpen) return null;
 
+  const isSecurityCat = category === "robo" || category === "personas_sospechosas";
+  const isServiciosCat = SERVICIOS_PUBLICOS_CATS.includes(category);
+
+  const reset = () => {
+    setStep(1);
+    setCategory("basura");
+    setIsUrgent(false);
+    setBarrio("");
+    setDireccion("");
+    setFecha("");
+    setDescription("");
+    setPhotos([]);
+    setPhotoPreviews([]);
+  };
+
+  const handleClose = () => { reset(); onClose(); };
+
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      setPhotos(files);
-
-      // Crear previews para todas las imágenes
-      const previews: string[] = [];
-      let loadedCount = 0;
-
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          previews.push(reader.result as string);
-          loadedCount++;
-          if (loadedCount === files.length) {
-            setPhotoPreviews(previews);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
+    if (!files.length) return;
+    setPhotos(files);
+    const previews: string[] = [];
+    let loaded = 0;
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        previews.push(reader.result as string);
+        if (++loaded === files.length) setPhotoPreviews([...previews]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
-  const removePhoto = (index: number) => {
-    setPhotos(photos.filter((_, i) => i !== index));
-    setPhotoPreviews(photoPreviews.filter((_, i) => i !== index));
+  const removePhoto = (i: number) => {
+    setPhotos(photos.filter((_, idx) => idx !== i));
+    setPhotoPreviews(photoPreviews.filter((_, idx) => idx !== i));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Formulario enviado");
-    console.log("Valores:", {
+  const handleSubmit = () => {
+    if (!description.trim() || !barrio.trim() || !direccion.trim()) return;
+    onSubmit({
       category,
       description,
       barrio,
       direccion,
-      photos,
-      fecha,
-      isUrgent,
+      photos: photos.length > 0 ? photos : undefined,
+      fecha: fecha || undefined,
+      isUrgent: isSecurityCat ? isUrgent : false,
     });
-
-    if (description.trim() && barrio.trim() && direccion.trim()) {
-      console.log("Validación pasada, enviando reporte...");
-      onSubmit({
-        category,
-        description,
-        barrio,
-        direccion,
-        photos: photos.length > 0 ? photos : undefined,
-        fecha: fecha || undefined,
-        isUrgent:
-          category === "robo" || category === "personas_sospechosas"
-            ? isUrgent
-            : false,
-      });
-      setCategory("basura");
-      setDescription("");
-      setBarrio("");
-      setDireccion("");
-      setPhotos([]);
-      setPhotoPreviews([]);
-      setFecha("");
-      setIsUrgent(false);
-    } else {
-      console.log("Validación fallida:", {
-        description: description.trim(),
-        barrio: barrio.trim(),
-        direccion: direccion.trim(),
-      });
-    }
+    reset();
   };
+
+  const canGoStep2 = true; // categoría siempre tiene un valor
+  const canGoStep3 = barrio.trim() && direccion.trim();
+  const canSubmit = description.trim() && barrio.trim() && direccion.trim();
+
+  // Mensaje de WhatsApp para servicios públicos
+  const sendServiciosPublicos = () => {
+    const labels: Record<string, string> = { basura: "Basura sin recolectar", alumbrado: "Problema de alumbrado", pastizales: "Pastizales altos", fugas_agua: "Fuga de agua", drenaje: "Problema de drenaje", limpieza: "Falta de limpieza", escombros: "Escombros", baches: "Baches", banquetas: "Banquetas dañadas" };
+    const msg = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*\n\n📋 *Tipo:* ${labels[category] || category}\n📝 *Descripción:* ${description}\n📍 *Barrio:* ${barrio}\n📍 *Dirección:* ${direccion}\n🗺️ https://www.google.com/maps?q=${lat},${lng}\n📅 ${new Date().toLocaleDateString("es-AR")}\n🌐 reportesreconquista.com`;
+    window.open(`https://wa.me/5493482519279?text=${encodeURIComponent(msg)}`, "_blank");
+  };
+
+  const sendUrgente = () => {
+    const title = category === "robo" ? "ALERTA DE ROBO EN EJECUCIÓN" : "ALERTA DE PERSONAS SOSPECHOSAS";
+    const msg = `🚨 *${title}*\n\n⚠️ *URGENTE - Reconquista, Santa Fe*\n📝 *Descripción:* ${description}\n📍 Barrio: ${barrio}\n📍 Dirección: ${direccion}\n🗺️ https://www.google.com/maps?q=${lat},${lng}\n⏰ Ahora mismo\n🌐 reportesreconquista.com`;
+    window.open(`https://wa.me/5493482730030?text=${encodeURIComponent(msg)}`, "_blank");
+  };
+
+  const STEP_LABELS = ["Categoría", "Lugar", "Detalle"];
 
   return (
     <div
       className="fixed inset-0 flex items-end sm:items-center justify-center"
       style={{ zIndex: 9999, backgroundColor: "rgba(0,0,0,0.6)" }}
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
-        className="bg-white dark:bg-gray-900 w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]"
-        onClick={(e) => e.stopPropagation()}
+        className="bg-white dark:bg-gray-900 w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col"
+        style={{ maxHeight: "92vh" }}
+        onClick={e => e.stopPropagation()}
       >
-        {/* Header sticky */}
-        <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 rounded-t-2xl z-10 flex-shrink-0">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 flex-shrink-0">
           <h2 className="text-base font-bold text-gray-900 dark:text-white">Crear Reporte</h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button onClick={handleClose} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+            <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        {/* Contenido scrollable */}
-        <div className="overflow-y-auto flex-1 p-4 sm:p-6">
 
-        <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 p-2 sm:p-3 rounded">
-          <p className="flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5" />
-            <strong>Ubicación:</strong>
-          </p>
-          <p className="break-all">
-            Lat: {lat.toFixed(6)}, Lng: {lng.toFixed(6)}
-          </p>
+        {/* Progress */}
+        <div className="flex items-center px-4 py-2 gap-2 flex-shrink-0">
+          {STEP_LABELS.map((label, i) => {
+            const n = i + 1;
+            const active = step === n;
+            const done = step > n;
+            return (
+              <div key={n} className="flex items-center gap-2 flex-1">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${done ? "bg-green-500 text-white" : active ? "bg-blue-600 text-white" : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"}`}>
+                  {done ? "✓" : n}
+                </div>
+                <span className={`text-xs font-medium truncate ${active ? "text-blue-600 dark:text-blue-400" : done ? "text-green-600 dark:text-green-400" : "text-gray-400"}`}>{label}</span>
+                {i < STEP_LABELS.length - 1 && <div className={`h-0.5 flex-1 rounded ${done ? "bg-green-400" : "bg-gray-200 dark:bg-gray-700"}`} />}
+              </div>
+            );
+          })}
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="category"
-              className="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Categoría del reporte: <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value as ReportCategory);
-                setIsUrgent(false); // Reset urgent flag when changing category
-              }}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-              required
-            >
-              <option value="basura">Falta de recolección de basura</option>
-              <option value="alumbrado">Falta de alumbrado público</option>
-              <option value="baches">Baches en vía pública</option>
-              <option value="pastizales">
-                Falta de limpieza de pastizales
-              </option>
-              <option value="robo">Robo</option>
-              <option value="personas_sospechosas">Personas sospechosas</option>
-              <option value="fugas_agua">Fugas de agua</option>
-              <option value="drenaje">
-                Problemas de alcantarillado/drenaje
-              </option>
-              <option value="banquetas">Banquetas dañadas/obstruidas</option>
-              <option value="semaforos">Semáforos descompuestos</option>
-              <option value="limpieza">
-                Falta de limpieza en áreas públicas
-              </option>
-              <option value="graffiti">Vandalismo/grafiti</option>
-              <option value="escombros">
-                Escombros o residuos voluminosos
-              </option>
-              <option value="arboles">Árboles caídos/peligrosos</option>
-              <option value="vandalismo">Daños a propiedad pública</option>
-              <option value="vehiculos_abandonados">
-                Vehículos abandonados
-              </option>
-              <option value="iluminacion">Falta de iluminación</option>
-              <option value="animales_callejeros">Animales callejeros</option>
-              <option value="plagas">Plagas urbanas</option>
-              <option value="senalizacion">Señalización dañada</option>
-              <option value="estacionamiento">
-                Problemas de estacionamiento
-              </option>
-              <option value="transporte">
-                Problemas de transporte público
-              </option>
-            </select>
-          </div>
+        {/* Ubicación (siempre visible) */}
+        <div className="mx-4 mb-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg flex items-center gap-1.5 flex-shrink-0">
+          <MapPin className="w-3 h-3 flex-shrink-0" />
+          {lat.toFixed(5)}, {lng.toFixed(5)}
+        </div>
 
-          {/* Alerta especial para robo y personas sospechosas */}
-          {(category === "robo" || category === "personas_sospechosas") && (
-            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-red-900 mb-2">
-                    {category === "robo"
-                      ? "¿Robo en ejecución?"
-                      : "¿Situación en curso?"}
-                  </h3>
-                  <label className="flex items-center gap-2 mb-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={isUrgent}
-                      onChange={(e) => setIsUrgent(e.target.checked)}
-                      className="w-4 h-4 text-red-600 rounded focus:ring-red-500"
-                    />
-                    <span className="text-sm text-red-800">
-                      {category === "robo"
-                        ? "Este robo está sucediendo ahora"
-                        : "Esta situación está ocurriendo ahora"}
+        {/* Contenido del paso — no scrollable salvo overflow extremo */}
+        <div className="flex-1 overflow-y-auto px-4 pb-2">
+
+          {/* ── PASO 1: Categoría ── */}
+          {step === 1 && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  Categoría del reporte <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={category}
+                  onChange={e => { setCategory(e.target.value as ReportCategory); setIsUrgent(false); }}
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                  {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+              </div>
+
+              {/* Alerta seguridad */}
+              {isSecurityCat && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-xl p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+                    <h3 className="font-bold text-red-900 dark:text-red-300 text-sm">
+                      {category === "robo" ? "¿Robo en ejecución?" : "¿Situación en curso?"}
+                    </h3>
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer mb-2">
+                    <input type="checkbox" checked={isUrgent} onChange={e => setIsUrgent(e.target.checked)} className="w-4 h-4 text-red-600 rounded" />
+                    <span className="text-xs text-red-800 dark:text-red-300">
+                      {category === "robo" ? "Este robo está sucediendo ahora" : "Esta situación está ocurriendo ahora"}
                     </span>
                   </label>
-
                   {isUrgent && (
-                    <div className="space-y-2">
-                      {/* Advertencia si faltan datos */}
-                      {(!description.trim() ||
-                        !barrio.trim() ||
-                        !direccion.trim()) && (
-                        <div className="bg-yellow-50 border border-yellow-300 rounded p-2 mb-2">
-                          <p className="text-xs text-yellow-800 font-medium">
-                            ⚠️ Completa todos los campos obligatorios antes de
-                            enviar la alerta
-                          </p>
-                        </div>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          window.location.href = "tel:911";
-                        }}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 animate-pulse"
-                      >
-                        <Phone className="w-5 h-5" />
-                        LLAMAR AL 911 AHORA
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          // Validar que todos los campos estén completos
-                          if (
-                            !description.trim() ||
-                            !barrio.trim() ||
-                            !direccion.trim()
-                          ) {
-                            alert(
-                              "⚠️ Por favor completa todos los campos obligatorios antes de enviar la alerta:\n\n• Descripción del problema\n• Barrio\n• Dirección",
-                            );
-                            return;
-                          }
-
-                          const alertTitle =
-                            category === "robo"
-                              ? "ALERTA DE ROBO EN EJECUCIÓN"
-                              : "ALERTA DE PERSONAS SOSPECHOSAS";
-                          const message = `🚨 *${alertTitle}*
-
-⚠️ *URGENTE - Reconquista, Santa Fe*
-
-📝 *Descripción:* ${description}
-
-📍 *Ubicación:*
-• Barrio: ${barrio}
-• Dirección: ${direccion}
-
-🗺️ Ver ubicación exacta: https://www.google.com/maps?q=${lat},${lng}
-
-⏰ *Ahora mismo*
-
-🌐 *Reporta incidentes en:* https://reportesreconquista.com`;
-
-                          const encodedMessage = encodeURIComponent(message);
-                          const whatsappUrl = `https://wa.me/5493482730030?text=${encodedMessage}`;
-                          window.open(whatsappUrl, "_blank");
-                        }}
-                        disabled={
-                          !description.trim() ||
-                          !barrio.trim() ||
-                          !direccion.trim()
-                        }
-                        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-all duration-200 shadow-md ${
-                          !description.trim() ||
-                          !barrio.trim() ||
-                          !direccion.trim()
-                            ? "bg-gray-400 cursor-not-allowed opacity-60"
-                            : "bg-orange-600 hover:bg-orange-700 hover:shadow-lg active:scale-95"
-                        }`}
-                      >
-                        <Share2 className="w-5 h-5" />
-                        Avisar a Ojos en Alerta
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => window.location.href = "tel:911"}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-sm animate-pulse"
+                    >
+                      <Phone className="w-4 h-4" /> LLAMAR AL 911 AHORA
+                    </button>
                   )}
-
-                  <p className="text-xs text-red-700 mt-2">
-                    {category === "robo"
-                      ? "Si el robo está en curso, llama al 911 primero. El reporte se guardará de todas formas."
-                      : "Si la situación es peligrosa, llama al 911 primero. El reporte se guardará de todas formas."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Botón para Servicios Públicos */}
-          {[
-            "basura",
-            "alumbrado",
-            "pastizales",
-            "fugas_agua",
-            "drenaje",
-            "limpieza",
-            "escombros",
-            "baches",
-            "banquetas",
-          ].includes(category) && (
-            <div className="mb-3 sm:mb-4 bg-blue-50 border-2 border-blue-300 rounded-lg p-3 sm:p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Construction className="w-5 h-5 text-blue-600" />
-                <h3 className="text-sm sm:text-base font-bold text-blue-900">
-                  Contacto Rápido - Servicios Públicos
-                </h3>
-              </div>
-
-              {/* Advertencia si faltan datos */}
-              {(!description.trim() || !barrio.trim() || !direccion.trim()) && (
-                <div className="bg-yellow-50 border border-yellow-300 rounded p-2 mb-2">
-                  <p className="text-xs text-yellow-800 font-medium">
-                    ⚠️ Completa todos los campos obligatorios antes de enviar el
-                    reclamo
+                  <p className="text-xs text-red-700 dark:text-red-400 mt-2">
+                    {category === "robo" ? "Si el robo está en curso, llamá al 911 primero." : "Si la situación es peligrosa, llamá al 911 primero."}
                   </p>
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={() => {
-                  // Validar que todos los campos estén completos
-                  if (
-                    !description.trim() ||
-                    !barrio.trim() ||
-                    !direccion.trim()
-                  ) {
-                    alert(
-                      "⚠️ Por favor completa todos los campos obligatorios antes de enviar el reclamo:\n\n• Descripción del problema\n• Barrio\n• Dirección",
-                    );
-                    return;
-                  }
-
-                  const categoryLabels: { [key: string]: string } = {
-                    basura: "Basura sin recolectar",
-                    alumbrado: "Problema de alumbrado público",
-                    pastizales: "Pastizales altos",
-                    fugas_agua: "Fuga de agua",
-                    drenaje: "Problema de drenaje",
-                    limpieza: "Falta de limpieza",
-                    escombros: "Escombros",
-                    baches: "Baches",
-                    banquetas: "Banquetas dañadas",
-                  };
-
-                  const message = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*
-
-📋 *Tipo de Reclamo:* ${categoryLabels[category] || category}
-
-📝 *Descripción:* ${description}
-
-📍 *Ubicación:*
-• Barrio: ${barrio}
-• Dirección: ${direccion}
-
-🗺️ Ver ubicación: https://www.google.com/maps?q=${lat},${lng}
-
-📅 *Fecha:* ${new Date().toLocaleDateString("es-AR")}
-
-🌐 *Reporta incidentes en:* https://reportesreconquista.com`;
-
-                  const encodedMessage = encodeURIComponent(message);
-                  const whatsappUrl = `https://wa.me/5493482519279?text=${encodedMessage}`;
-                  window.open(whatsappUrl, "_blank");
-                }}
-                disabled={
-                  !description.trim() || !barrio.trim() || !direccion.trim()
-                }
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md ${
-                  !description.trim() || !barrio.trim() || !direccion.trim()
-                    ? "bg-gray-400 cursor-not-allowed opacity-60"
-                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg active:scale-95 text-white"
-                }`}
-              >
-                <Share2 className="w-5 h-5" />
-                Enviar Reclamo a Servicios Públicos
-              </button>
-
-              <p className="text-xs text-blue-700 mt-2">
-                Este botón enviará tu reclamo directamente a la oficina de
-                Servicios Públicos.
-              </p>
+              {/* Contacto Servicios Públicos */}
+              {isServiciosCat && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded-xl p-3">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Construction className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <h3 className="font-bold text-blue-900 dark:text-blue-300 text-sm">Contacto Rápido — Servicios Públicos</h3>
+                  </div>
+                  <p className="text-xs text-blue-700 dark:text-blue-400 mb-2">
+                    Completá el lugar y la descripción en los pasos siguientes para habilitar el envío directo.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="barrio"
-              className="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Barrio: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="barrio"
-              value={barrio}
-              onChange={(e) => setBarrio(e.target.value)}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-              placeholder="Ej: Centro, Villa Ocampo, etc."
-              required
-            />
-          </div>
-
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="direccion"
-              className="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Dirección: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="direccion"
-              value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-              placeholder="Ej: Calle Falsa 123"
-              required
-            />
-          </div>
-
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="fecha"
-              className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              <Calendar className="w-4 h-4" />
-              Fecha (opcional):
-            </label>
-            <input
-              type="date"
-              id="fecha"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-            />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Si no seleccionas una fecha, se usará la fecha de hoy
-            </p>
-          </div>
-
-          <div className="mb-3 sm:mb-4">
-            <label
-              htmlFor="description"
-              className="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              Descripción del problema: <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm sm:text-base"
-              rows={3}
-              placeholder="Describe qué sucedió (ej: La basura lleva 3 días sin recoger)"
-              required
-            />
-          </div>
-
-          <div className="mb-4 sm:mb-6">
-            <label
-              htmlFor="photo"
-              className="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base"
-            >
-              📷 Fotos (opcional):
-            </label>
-            <input
-              type="file"
-              id="photo"
-              accept="image/*"
-              multiple
-              onChange={handlePhotoChange}
-              className="w-full px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 text-xs sm:text-sm file:mr-2 sm:file:mr-4 file:py-1 sm:file:py-2 file:px-2 sm:file:px-4 file:rounded-full file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-            {photoPreviews.length > 0 && (
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                {photoPreviews.map((preview, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(index)}
-                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+          {/* ── PASO 2: Lugar ── */}
+          {step === 2 && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  Barrio <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={barrio}
+                  onChange={e => setBarrio(e.target.value)}
+                  placeholder="Ej: Centro, Villa Ocampo..."
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  autoFocus
+                />
               </div>
-            )}
-          </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  Dirección <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={direccion}
+                  onChange={e => setDireccion(e.target.value)}
+                  placeholder="Ej: Belgrano 1234"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+              <div>
+                <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  <Calendar className="w-4 h-4" /> Fecha <span className="font-normal text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="date"
+                  value={fecha}
+                  onChange={e => setFecha(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Si no seleccionás una fecha, se usará la de hoy</p>
+              </div>
+            </div>
+          )}
 
-          <div className="flex gap-2 sm:gap-3 justify-end">
+          {/* ── PASO 3: Detalle + envío ── */}
+          {step === 3 && (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  Descripción <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  rows={3}
+                  placeholder="Describe qué sucedió (ej: La basura lleva 3 días sin recoger)"
+                  className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  <Camera className="w-4 h-4" /> Fotos <span className="font-normal text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoChange}
+                  className="w-full text-xs text-gray-600 dark:text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 dark:file:bg-blue-900/30 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100"
+                />
+                {photoPreviews.length > 0 && (
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {photoPreviews.map((preview, i) => (
+                      <div key={i} className="relative">
+                        <img src={preview} alt={`Preview ${i + 1}`} className="w-full h-20 object-cover rounded-lg" />
+                        <button type="button" onClick={() => removePhoto(i)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                          <Trash2 className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Botones de envío contextual */}
+              {isServiciosCat && canSubmit && (
+                <button
+                  type="button"
+                  onClick={sendServiciosPublicos}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm"
+                >
+                  <Share2 className="w-4 h-4" /> Enviar Reclamo a Servicios Públicos
+                </button>
+              )}
+
+              {isSecurityCat && isUrgent && canSubmit && (
+                <button
+                  type="button"
+                  onClick={sendUrgente}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold text-sm"
+                >
+                  <Share2 className="w-4 h-4" /> Avisar a Ojos en Alerta
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer con botones de navegación */}
+        <div className="flex gap-2 px-4 py-3 border-t dark:border-gray-700 flex-shrink-0">
+          {step > 1 ? (
             <button
               type="button"
-              onClick={onClose}
-              className="px-3 sm:px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm sm:text-base"
+              onClick={() => setStep(s => s - 1)}
+              className="flex items-center gap-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <ChevronLeft className="w-4 h-4" /> Atrás
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-200 dark:hover:bg-gray-700"
             >
               Cancelar
             </button>
+          )}
+
+          <div className="flex-1" />
+
+          {step < 3 ? (
             <button
-              type="submit"
-              className="px-3 sm:px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
+              type="button"
+              onClick={() => setStep(s => s + 1)}
+              disabled={step === 2 && !canGoStep3}
+              className="flex items-center gap-1 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Crear Reporte
+              Siguiente <ChevronRight className="w-4 h-4" />
             </button>
-          </div>
-        </form>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className="flex items-center gap-1 px-5 py-2.5 bg-green-600 text-white rounded-xl font-semibold text-sm hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Crear Reporte ✓
+            </button>
+          )}
         </div>
       </div>
     </div>
