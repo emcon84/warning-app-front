@@ -19,7 +19,20 @@ export default function ReportsTicker({ reports, onReportClick }: ReportsTickerP
   const [animState, setAnimState] = useState<AnimState>("hidden");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const recent = reports.slice(-20).reverse(); // últimos 20, más reciente primero
+  // Solo reportes de hoy
+  const today = new Date();
+  const isToday = (date: Date | string) => {
+    const d = new Date(date);
+    return (
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate()
+    );
+  };
+  const recent = reports
+    .filter((r) => isToday(r.createdAt))
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 20);
 
   const clear = () => { if (timerRef.current) clearTimeout(timerRef.current); };
 
