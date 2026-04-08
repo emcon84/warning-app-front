@@ -48,7 +48,8 @@ const createCustomIcon = (category: ReportCategory) => {
     senalizacion: "#6366f1", // indigo-500
     estacionamiento: "#8b5cf6", // violet-500
     transporte: "#3b82f6", // blue-500
-  };
+    voz: "#a855f7", // purple-500
+  } as Record<ReportCategory, string>;
 
   const iconSvg = getCategoryIconSvg(category);
 

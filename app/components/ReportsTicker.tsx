@@ -88,7 +88,7 @@ export default function ReportsTicker({ reports, onReportClick }: ReportsTickerP
     : "translate-x-full opacity-0";
 
   return (
-    <div className="fixed bottom-[4.5rem] left-3 right-3 z-[900] pointer-events-none flex justify-center">
+    <div className="fixed bottom-28 left-3 right-16 z-[900] pointer-events-none flex justify-start">
       <button
         onClick={() => onReportClick?.(report)}
         className={`
