@@ -377,11 +377,11 @@ export default function DoctorDetailModal({
               })}
 
               {/* Corregir ubicación */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
-                <p className="text-xs font-bold text-amber-800 flex items-center gap-1.5">
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-3 space-y-2">
+                <p className="text-xs font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" /> Corregir ubicación del pin
                 </p>
-                <p className="text-xs text-amber-600">
+                <p className="text-xs text-amber-600 dark:text-amber-400">
                   Dirección <span className="font-medium">o coordenadas</span> (-29.1234, -59.6789) desde Google Maps.
                 </p>
                 <div className="flex gap-1.5">
@@ -420,7 +420,7 @@ export default function DoctorDetailModal({
                 )}
                 {onRelocate && (
                   <button onClick={() => onRelocate(doctor.id)}
-                    className="w-full text-xs text-amber-700 hover:underline text-center pt-0.5">
+                    className="w-full text-xs text-amber-700 dark:text-amber-400 hover:underline text-center pt-0.5">
                     O arrastrá el pin manualmente en el mapa
                   </button>
                 )}
