@@ -8,6 +8,7 @@ import ReportsTableModal from "./components/ReportsTableModal";
 import DoctorDetailModal from "./components/DoctorDetailModal";
 import AddDoctorModal from "./components/AddDoctorModal";
 import FarmaciaDetailModal from "./components/FarmaciaDetailModal";
+import VoiceReportButton from "./components/VoiceReportButton";
 import { Report, ReportCategory, Doctor, Farmacia, TurnoResponse } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
@@ -648,6 +649,13 @@ export default function Home() {
 
       {/* Tour onboarding */}
       <TourManager mapView={mapView} />
+
+      {/* Botón crear reporte por voz */}
+      <VoiceReportButton
+        onReportCreated={(report) => {
+          setReports(prev => [...prev, report]);
+        }}
+      />
 
       {/* Botón tema claro/oscuro */}
       <button
