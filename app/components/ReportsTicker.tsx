@@ -87,18 +87,22 @@ export default function ReportsTicker({ reports, onReportClick }: ReportsTickerP
     : animState === "leaving" ? "-translate-x-full opacity-0"
     : "translate-x-full opacity-0";
 
+  const handleTouch = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    e.preventDefault(); // evita que Leaflet capture el touch
+    onReportClick?.(report);
+  };
+
   return (
-    <div
-      className="fixed bottom-28 left-3 right-16 z-[900] flex justify-start"
-      onTouchStart={(e) => e.stopPropagation()}
-      onMouseDown={(e) => e.stopPropagation()}
-    >
+    <div className="fixed bottom-28 left-3 right-16 z-[900] flex justify-start">
       <button
         onClick={() => onReportClick?.(report)}
+        onTouchStart={(e) => { e.stopPropagation(); e.preventDefault(); }}
+        onTouchEnd={handleTouch}
         className={`
           w-full max-w-sm
           flex items-center gap-3 px-4 py-3
-          rounded-2xl shadow-xl
+          rounded-2xl shadow-xl cursor-pointer
           bg-white/90 dark:bg-gray-900/90 backdrop-blur-md
           border border-gray-200/60 dark:border-gray-700/60
           transition-all duration-[420ms] ease-in-out
