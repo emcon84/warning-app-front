@@ -96,6 +96,17 @@ const createDoctorIcon = (doctor: Doctor) => {
 // Centro en Reconquista, Santa Fe, Argentina
 const defaultCenter: [number, number] = [-29.15, -59.65];
 
+const TILE_LAYERS = {
+  light: {
+    url: "https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png",
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  },
+  dark: {
+    url: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  },
+} as const;
+
 interface MapComponentProps {
   onMapClick: (lat: number, lng: number) => void;
   reports: Report[];
@@ -110,6 +121,7 @@ interface MapComponentProps {
   onFarmaciaClick?: (farmacia: Farmacia) => void;
   relocatingFarmaciaId?: string | null;
   onFarmaciaRelocated?: (farmaciaId: string, lat: number, lng: number) => void;
+  theme?: "light" | "dark";
 }
 
 function MapClickHandler({
@@ -269,6 +281,7 @@ export default function MapComponent({
   onFarmaciaClick,
   relocatingFarmaciaId,
   onFarmaciaRelocated,
+  theme = "light",
 }: MapComponentProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -283,8 +296,9 @@ export default function MapComponent({
       className="z-0"
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        key={theme}
+        attribution={TILE_LAYERS[theme].attribution}
+        url={TILE_LAYERS[theme].url}
       />
       <MapClickHandler onMapClick={onMapClick} />
 

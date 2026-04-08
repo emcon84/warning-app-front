@@ -14,7 +14,7 @@ import Navbar from "./components/Navbar";
 import FloatingBottomNav from "./components/FloatingBottomNav";
 import TourManager, { useReplayTour } from "./components/TourManager";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "./utils/api";
-import { MapPin, AlertTriangle, Stethoscope, Pill } from "lucide-react";
+import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
 import { getCategoryLabel } from "./utils/categoryHelpers";
 
@@ -59,6 +59,20 @@ export default function Home() {
   const [selectedFarmacia, setSelectedFarmacia] = useState<Farmacia | null>(null);
   const [isFarmaciaDetailOpen, setIsFarmaciaDetailOpen] = useState(false);
   const [relocatingFarmaciaId, setRelocatingFarmaciaId] = useState<string | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("map_theme") as "light" | "dark") || "light";
+    }
+    return "light";
+  });
+
+  const toggleTheme = () => {
+    setTheme(prev => {
+      const next = prev === "light" ? "dark" : "light";
+      localStorage.setItem("map_theme", next);
+      return next;
+    });
+  };
   const { showNotification, permission } = useNotifications();
   const replayTour = useReplayTour(mapView);
 
@@ -541,6 +555,7 @@ export default function Home() {
             onFarmaciaClick={handleFarmaciaClick}
             relocatingFarmaciaId={relocatingFarmaciaId}
             onFarmaciaRelocated={handleFarmaciaRelocated}
+            theme={theme}
           />
         </div>
       </div>
@@ -624,6 +639,19 @@ export default function Home() {
 
       {/* Tour onboarding */}
       <TourManager mapView={mapView} />
+
+      {/* Botón tema claro/oscuro */}
+      <button
+        onClick={toggleTheme}
+        title={theme === "light" ? "Cambiar a tema oscuro" : "Cambiar a tema claro"}
+        className={`fixed bottom-32 right-4 z-[1000] w-9 h-9 rounded-full shadow-md flex items-center justify-center transition-all hover:shadow-lg ${
+          theme === "dark"
+            ? "bg-gray-800 border border-gray-600 text-yellow-300 hover:bg-gray-700"
+            : "bg-white border border-gray-200 text-gray-600 hover:text-gray-900"
+        }`}
+      >
+        {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      </button>
 
       {/* Botón relanzar tour */}
       <button
