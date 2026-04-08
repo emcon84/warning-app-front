@@ -90,8 +90,18 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
 
       setState("success");
       const label = CATEGORY_LABELS[data.report.category] || data.report.category;
-      showFeedback(`✓ Reporte creado: ${label} en ${data.report.direccion}`, true);
-      onReportCreated(data.report);
+      const r = data.report;
+
+      // Envío automático a servicios públicos si el usuario lo pidió
+      if (data.extracted?.enviar_servicios) {
+        const msg = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*\n\n📋 *Tipo:* ${label}\n📝 *Descripción:* ${r.description}\n📍 *Barrio:* ${r.barrio}\n📍 *Dirección:* ${r.direccion}\n🗺️ https://www.google.com/maps?q=${r.lat},${r.lng}\n📅 ${new Date().toLocaleDateString("es-AR")}\n🌐 reportesreconquista.com`;
+        window.open(`https://wa.me/5493482519279?text=${encodeURIComponent(msg)}`, "_blank");
+        showFeedback(`✓ Reporte creado y enviado a Servicios Públicos`, true);
+      } else {
+        showFeedback(`✓ Reporte creado: ${label} en ${r.direccion}`, true);
+      }
+
+      onReportCreated(r);
     } catch {
       setState("error");
       showFeedback("Error de conexión. Intentá de nuevo.", true);
