@@ -12,7 +12,6 @@ import { Report, ReportCategory, Doctor, Farmacia, TurnoResponse } from "./types
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import FloatingBottomNav from "./components/FloatingBottomNav";
-import TourManager, { useReplayTour } from "./components/TourManager";
 import VoiceReportButton from "./components/VoiceReportButton";
 import ReportsTicker from "./components/ReportsTicker";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "./utils/api";
@@ -85,7 +84,6 @@ export default function Home() {
   }, [theme]);
 
   const { showNotification, permission } = useNotifications();
-  const replayTour = useReplayTour(mapView);
 
   // Cargar reportes y médicos al montar el componente
   useEffect(() => {
@@ -648,8 +646,6 @@ export default function Home() {
       )}
 
 
-      {/* Tour onboarding */}
-      <TourManager mapView={mapView} />
 
 
       {/* Ticker de reportes recientes */}
@@ -678,14 +674,6 @@ export default function Home() {
         {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </button>
 
-      {/* Botón relanzar tour */}
-      <button
-        onClick={replayTour}
-        title="Ver tutorial"
-        className="fixed bottom-20 right-4 z-[1000] w-9 h-9 bg-white border border-gray-200 rounded-full shadow-md flex items-center justify-center text-gray-500 hover:text-gray-700 hover:shadow-lg transition-all text-base font-bold"
-      >
-        ?
-      </button>
     </div>
   );
 }
