@@ -498,17 +498,17 @@ export default function Home() {
           {showFilterSheet && (
             <>
               <div className="fixed inset-0 z-[1500] bg-black/40" onClick={() => setShowFilterSheet(false)} />
-              <div className="fixed bottom-0 left-0 right-0 z-[1501] bg-white rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
-                <div className="flex items-center justify-between px-4 py-3 border-b flex-shrink-0">
-                  <h3 className="font-bold text-gray-900">Filtrar médicos</h3>
+              <div className="fixed bottom-0 left-0 right-0 z-[1501] bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
+                <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 flex-shrink-0">
+                  <h3 className="font-bold text-gray-900 dark:text-white">Filtrar médicos</h3>
                   <div className="flex items-center gap-2">
                     {(selectedSpecialties.length > 0 || filterIapos) && (
                       <button onClick={() => { setSelectedSpecialties([]); setFilterIapos(false); }} className="text-xs text-red-500 font-semibold">
                         Limpiar
                       </button>
                     )}
-                    <button onClick={() => setShowFilterSheet(false)} className="p-1 hover:bg-gray-100 rounded-full">
-                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button onClick={() => setShowFilterSheet(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
@@ -517,11 +517,11 @@ export default function Home() {
                 <div className="overflow-y-auto p-4 space-y-4">
                   {/* Filtro obra social */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Obra Social</p>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Obra Social</p>
                     <button
                       onClick={() => setFilterIapos(prev => !prev)}
                       className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                        filterIapos ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        filterIapos ? "bg-blue-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                       }`}
                     >
                       <Stethoscope className="w-3.5 h-3.5 inline mr-1" />Solo IAPOS
@@ -529,7 +529,7 @@ export default function Home() {
                   </div>
                   {/* Filtro especialidad */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Especialidad</p>
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Especialidad</p>
                   <div className="flex flex-wrap gap-2">
                     {allSpecialties.map((esp) => (
                       <button
@@ -538,7 +538,7 @@ export default function Home() {
                         className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                           selectedSpecialties.includes(esp)
                             ? "bg-green-500 text-white"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                         }`}
                       >
                         {esp}
