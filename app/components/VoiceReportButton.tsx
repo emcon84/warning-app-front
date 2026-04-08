@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Mic, MicOff, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Mic, Square, Loader2, CheckCircle } from "lucide-react";
 
 interface VoiceReportButtonProps {
   onReportCreated: (report: any) => void;
@@ -39,31 +39,30 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function VoiceReportButton({ onReportCreated }: VoiceReportButtonProps) {
   const [state, setState] = useState<State>("idle");
   const [feedback, setFeedback] = useState<string>("");
-  const [transcript, setTranscript] = useState<string>("");
   const [showToast, setShowToast] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showFeedback = (msg: string, autoHide = false) => {
     setFeedback(msg);
+    setShowToast(true);
     if (autoHide) {
-      setShowToast(true);
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {
         setShowToast(false);
         setState("idle");
         setFeedback("");
-        setTranscript("");
       }, 4000);
     }
   };
 
-  const processTranscript = useCallback(async (text: string) => {
+  const processAudio = useCallback(async (audioBlob: Blob) => {
     setState("processing");
-    setTranscript(text);
-    showFeedback(`Procesando: "${text}"`);
+    showFeedback("Transcribiendo audio...");
 
-    // Obtener posición GPS o usar centro de Reconquista como fallback
+    // Obtener GPS o centro de Reconquista
     let position = RECONQUISTA_CENTER;
     try {
       const geoPos = await new Promise<GeolocationPosition>((resolve, reject) =>
@@ -74,10 +73,15 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
 
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "audio.webm");
+      formData.append("lat", String(position.lat));
+      formData.append("lng", String(position.lng));
+
       const res = await fetch(`${apiBase}/api/voice/report`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: text, lat: position.lat, lng: position.lng }),
+        body: formData,
       });
 
       const data = await res.json();
@@ -92,13 +96,12 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       const label = CATEGORY_LABELS[data.report.category] || data.report.category;
       const r = data.report;
 
-      // Envío automático a servicios públicos si el usuario lo pidió
       if (data.extracted?.enviar_servicios) {
         const msg = `🏛️ *RECLAMO DE SERVICIOS PÚBLICOS*\n\n📋 *Tipo:* ${label}\n📝 *Descripción:* ${r.description}\n📍 *Barrio:* ${r.barrio}\n📍 *Dirección:* ${r.direccion}\n🗺️ https://www.google.com/maps?q=${r.lat},${r.lng}\n📅 ${new Date().toLocaleDateString("es-AR")}\n🌐 reportesreconquista.com`;
         window.open(`https://wa.me/5493482519279?text=${encodeURIComponent(msg)}`, "_blank");
         showFeedback(`✓ Reporte creado y enviado a Servicios Públicos`, true);
       } else {
-        showFeedback(`✓ Reporte creado: ${label} en ${r.direccion}`, true);
+        showFeedback(`✓ ${label} en ${r.direccion}`, true);
       }
 
       onReportCreated(r);
@@ -108,67 +111,41 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
     }
   }, [onReportCreated]);
 
-  const startListening = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      chunksRef.current = [];
 
-    if (!SpeechRecognition) {
-      setState("error");
-      showFeedback("Tu browser no soporta reconocimiento de voz. Usá Chrome.", true);
-      return;
-    }
+      const recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        stream.getTracks().forEach((t) => t.stop());
+        processAudio(blob);
+      };
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "es-AR";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognitionRef.current = recognition;
-
-    recognition.onstart = () => {
+      recorder.start();
+      mediaRecorderRef.current = recorder;
       setState("listening");
-      showFeedback("Escuchando... hablá ahora");
-    };
-
-    recognition.onresult = (event: any) => {
-      const text = event.results[0][0].transcript;
-      recognition.stop();
-      processTranscript(text);
-    };
-
-    recognition.onerror = (event: any) => {
-      if (event.error === "no-speech") {
-        setState("error");
-        showFeedback("No se detectó voz. Intentá de nuevo.", true);
-      } else if (event.error === "not-allowed") {
-        setState("error");
-        showFeedback("Permiso de micrófono denegado.", true);
-      } else {
-        setState("error");
-        showFeedback("Error al grabar. Intentá de nuevo.", true);
-      }
-    };
-
-    recognition.onend = () => {
-      if (state === "listening") {
-        setState("idle");
-      }
-    };
-
-    recognition.start();
+      showFeedback("Grabando... tocá de nuevo para terminar");
+    } catch {
+      setState("error");
+      showFeedback("No se pudo acceder al micrófono.", true);
+    }
   };
 
-  const stopListening = () => {
-    recognitionRef.current?.stop();
-    setState("idle");
-    setFeedback("");
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    setState("processing");
   };
 
   const handleClick = () => {
-    if (state === "listening") {
-      stopListening();
-    } else if (state === "idle" || state === "error") {
-      startListening();
-    }
+    if (state === "listening") stopRecording();
+    else if (state === "idle" || state === "error") startRecording();
   };
 
   const isListening = state === "listening";
@@ -178,20 +155,20 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
 
   return (
     <div className="fixed bottom-44 right-4 flex flex-col items-end gap-2" style={{ zIndex: 1000 }}>
-      {/* Toast de feedback */}
-      {feedback && (showToast || state === "listening" || state === "processing") && (
+      {/* Toast */}
+      {showToast && feedback && (
         <div className={`
           max-w-xs px-3 py-2 rounded-xl text-xs font-medium shadow-lg animate-slide-up
           ${isSuccess ? "bg-green-600 text-white" : ""}
           ${isError ? "bg-red-600 text-white" : ""}
-          ${isListening ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900" : ""}
+          ${isListening ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900" : ""}
           ${isProcessing ? "bg-blue-600 text-white" : ""}
         `}>
           {feedback}
         </div>
       )}
 
-      {/* Botón micrófono */}
+      {/* Botón */}
       <button
         onClick={handleClick}
         disabled={isProcessing}
@@ -206,7 +183,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
         `}
       >
         {isProcessing && <Loader2 className="w-5 h-5 text-white animate-spin" />}
-        {isListening && <MicOff className="w-5 h-5 text-white" />}
+        {isListening && <Square className="w-4 h-4 text-white fill-white" />}
         {isSuccess && <CheckCircle className="w-5 h-5 text-white" />}
         {(state === "idle" || isError) && <Mic className="w-5 h-5 text-white" />}
       </button>
