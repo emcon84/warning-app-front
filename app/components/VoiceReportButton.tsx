@@ -167,7 +167,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
   const isError = state === "error";
 
   return (
-    <div className="fixed bottom-32 right-20 flex flex-col items-end gap-2" style={{ zIndex: 1000 }}>
+    <div className="fixed bottom-44 right-4 flex flex-col items-end gap-2" style={{ zIndex: 1000 }}>
       {/* Toast de feedback */}
       {feedback && (showToast || state === "listening" || state === "processing") && (
         <div className={`
