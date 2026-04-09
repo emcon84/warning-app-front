@@ -124,14 +124,18 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
                       </span>
                     )}
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{supermarket.name}</p>
+                  <div className="text-center w-full">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight mb-2">{supermarket.name}</p>
                     {(supermarket.offerCount ?? 0) > 0 ? (
-                      <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-bold">
-                        {supermarket.offerCount} oferta{supermarket.offerCount !== 1 ? "s" : ""} →
-                      </p>
+                      <div className="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm shadow-green-500/30">
+                        <span className="text-sm font-extrabold leading-none">{supermarket.offerCount}</span>
+                        <span className="font-medium opacity-90">oferta{supermarket.offerCount !== 1 ? "s" : ""}</span>
+                      </div>
                     ) : (
-                      <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">😔 Sin ofertas</p>
+                      <div className="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-full">
+                        <span>😔</span>
+                        <span>Sin ofertas</span>
+                      </div>
                     )}
                   </div>
                 </Link>
