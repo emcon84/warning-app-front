@@ -19,6 +19,7 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
   const [newAddress, setNewAddress] = useState("");
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Supermarket | null>(null);
 
   useEffect(() => {
     if (!isVisible) return;
@@ -48,13 +49,18 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
     }
   };
 
-  const handleDelete = async (supermarket: Supermarket, e: React.MouseEvent) => {
+  const handleDeleteClick = (supermarket: Supermarket, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm(`¿Eliminar "${supermarket.name}" y todas sus ofertas?`)) return;
-    setDeletingId(supermarket.id);
+    setConfirmDelete(supermarket);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmDelete) return;
+    setDeletingId(confirmDelete.id);
+    setConfirmDelete(null);
     try {
-      await deleteSupermarket(supermarket.id);
-      setSupermarkets((prev) => prev.filter((s) => s.id !== supermarket.id));
+      await deleteSupermarket(confirmDelete.id);
+      setSupermarkets((prev) => prev.filter((s) => s.id !== confirmDelete.id));
     } catch (err) {
       console.error(err);
     } finally {
@@ -116,7 +122,7 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
                   </div>
                 </button>
                 <button
-                  onClick={(e) => handleDelete(supermarket, e)}
+                  onClick={(e) => handleDeleteClick(supermarket, e)}
                   disabled={deletingId === supermarket.id}
                   className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/50 transition-all disabled:opacity-50"
                   aria-label="Eliminar"
@@ -190,6 +196,44 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmar eliminación */}
+      {confirmDelete && (
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ zIndex: 1300, backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+          onClick={() => setConfirmDelete(null)}
+        >
+          <div
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 mx-auto mb-4">
+              <Trash2 className="w-6 h-6 text-red-500 dark:text-red-400" />
+            </div>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white text-center mb-1">
+              Eliminar supermercado
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+              ¿Eliminás <span className="font-semibold text-gray-900 dark:text-white">{confirmDelete.name}</span> y todas sus ofertas? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-semibold text-sm transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold text-sm transition-colors"
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
         </div>
       )}
