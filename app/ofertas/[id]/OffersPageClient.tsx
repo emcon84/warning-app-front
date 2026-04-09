@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Share2 } from "lucide-react";
 import { Supermarket, Offer } from "../../types";
 import { deleteSupermarketOffer } from "../../utils/api";
 import AddOfferModal from "../../components/AddOfferModal";
@@ -31,6 +31,16 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
   const handleOfferUpdated = (updated: Offer) => {
     setOffers((prev) => prev.map((o) => (o.id === updated.id ? updated : o)));
     setEditingOffer(null);
+  };
+
+  const handleShare = (offer: Offer) => {
+    const url = `${window.location.origin}/ofertas/${supermarket.id}#offer-${offer.id}`;
+    const text = `🛒 ${offer.description}${offer.price ? ` — $${offer.price}` : ""} en ${supermarket.name}, Reconquista`;
+    if (navigator.share) {
+      navigator.share({ title: offer.description, text, url }).catch(() => {});
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`, "_blank");
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -113,7 +123,8 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
             {offers.map((offer) => (
               <div
                 key={offer.id}
-                className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm flex flex-col"
+                id={`offer-${offer.id}`}
+                className="relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm flex flex-col scroll-mt-20"
               >
                 {offer.photo ? (
                   <img
@@ -142,6 +153,14 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
                 </div>
 
                 <div className="flex border-t border-gray-100 dark:border-gray-800">
+                  <button
+                    onClick={() => handleShare(offer)}
+                    className="flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-medium text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
+                  >
+                    <Share2 className="w-3 h-3" />
+                    Compartir
+                  </button>
+                  <div className="w-px bg-gray-100 dark:bg-gray-800" />
                   <button
                     onClick={() => setEditingOffer(offer)}
                     className="flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"

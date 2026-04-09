@@ -52,14 +52,14 @@ export default function Navbar({ totalReports, onMenuClick, mapView = "reports",
                 <button
                   key={view}
                   onClick={() => view === "ofertas" ? router.push("/ofertas") : onMapViewChange(view)}
-                  className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
+                  className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
                     mapView === view
                       ? "bg-green-500 text-white"
                       : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  {label}
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="hidden sm:inline">{label}</span>
                 </button>
               );
             })}
