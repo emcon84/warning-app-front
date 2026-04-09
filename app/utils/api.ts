@@ -438,6 +438,32 @@ export async function deleteSupermarketOffer(id: string): Promise<void> {
   if (!res.ok) throw new Error("Error al eliminar oferta");
 }
 
+export async function updateOffer(id: string, data: {
+  description?: string;
+  price?: string;
+  validUntil?: string;
+  photo?: File;
+}): Promise<Offer> {
+  let body: FormData | string;
+  let headers: HeadersInit = {};
+
+  if (data.photo instanceof File) {
+    const formData = new FormData();
+    if (data.description) formData.append("description", data.description);
+    if (data.price !== undefined) formData.append("price", data.price);
+    if (data.validUntil !== undefined) formData.append("validUntil", data.validUntil);
+    formData.append("photo", data.photo);
+    body = formData;
+  } else {
+    headers = { "Content-Type": "application/json" };
+    body = JSON.stringify(data);
+  }
+
+  const res = await fetch(`${API_BASE_URL}/api/offers/${id}`, { method: "PUT", headers, body });
+  if (!res.ok) throw new Error("Error al actualizar oferta");
+  return res.json();
+}
+
 export async function deleteSupermarket(id: string): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/api/supermarkets/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error("Error al eliminar supermercado");
