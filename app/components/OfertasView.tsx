@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { ShoppingCart, Plus, X, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { Supermarket } from "../types";
 import { getSupermarkets, createSupermarket, deleteSupermarket } from "../utils/api";
-import SupermarketOffersModal from "./SupermarketOffersModal";
 
 interface OfertasViewProps {
   isVisible: boolean;
@@ -13,7 +13,6 @@ interface OfertasViewProps {
 export default function OfertasView({ isVisible }: OfertasViewProps) {
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSupermarket, setSelectedSupermarket] = useState<Supermarket | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [newAddress, setNewAddress] = useState("");
@@ -103,9 +102,9 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {supermarkets.map((supermarket) => (
               <div key={supermarket.id} className="relative group">
-                <button
-                  onClick={() => setSelectedSupermarket(supermarket)}
-                  className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm text-left flex flex-col items-center gap-3 hover:border-green-400 dark:hover:border-green-600 transition-colors active:scale-95"
+                <Link
+                  href={`/ofertas/${supermarket.id}`}
+                  className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm text-left flex flex-col items-center gap-3 hover:border-green-400 dark:hover:border-green-600 transition-colors active:scale-95 block"
                 >
                   <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
                     {supermarket.logo ? (
@@ -126,7 +125,7 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
                       <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">😔 Sin ofertas</p>
                     )}
                   </div>
-                </button>
+                </Link>
                 <button
                   onClick={(e) => handleDeleteClick(supermarket, e)}
                   disabled={deletingId === supermarket.id}
@@ -244,10 +243,6 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
         </div>
       )}
 
-      <SupermarketOffersModal
-        supermarket={selectedSupermarket}
-        onClose={() => setSelectedSupermarket(null)}
-      />
     </div>
   );
 }
