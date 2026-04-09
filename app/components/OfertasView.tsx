@@ -20,13 +20,22 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Supermarket | null>(null);
 
-  useEffect(() => {
-    if (!isVisible) return;
+  const fetchSupermarkets = () => {
     setLoading(true);
     getSupermarkets()
       .then(setSupermarkets)
       .catch(console.error)
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!isVisible) return;
+    fetchSupermarkets();
+
+    // Re-fetch al volver de otra página (Next.js restaura el estado del cache)
+    const onVisible = () => { if (!document.hidden) fetchSupermarkets(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, [isVisible]);
 
   if (!isVisible) return null;
