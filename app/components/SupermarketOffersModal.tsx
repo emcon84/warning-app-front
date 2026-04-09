@@ -75,24 +75,22 @@ export default function SupermarketOffersModal({ supermarket, onClose }: Superma
             </div>
             <h2 className="text-base font-bold text-gray-900 dark:text-white">{supermarket.name}</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors text-sm font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver
-          </button>
-        </div>
-
-        {/* Botón agregar */}
-        <div className="flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-          <button
-            onClick={() => setIsAddOpen(true)}
-            className="flex items-center gap-2 w-full justify-center px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Agregar oferta
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsAddOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Agregar oferta
+            </button>
+            <button
+              onClick={onClose}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors text-sm font-medium"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Volver
+            </button>
+          </div>
         </div>
 
         {/* Grid de ofertas */}
