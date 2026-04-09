@@ -127,9 +127,13 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
                   <div className="text-center w-full">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight mb-2">{supermarket.name}</p>
                     {(supermarket.offerCount ?? 0) > 0 ? (
-                      <div className="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm shadow-green-500/30">
-                        <span className="text-sm font-extrabold leading-none">{supermarket.offerCount}</span>
-                        <span className="font-medium opacity-90">oferta{supermarket.offerCount !== 1 ? "s" : ""}</span>
+                      <div className="relative inline-flex items-center justify-center">
+                        {/* Ping radar */}
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60 animate-ping" />
+                        <div className="relative inline-flex items-center gap-1.5 bg-green-500 text-white font-bold px-3 py-1.5 rounded-full shadow-md shadow-green-500/40">
+                          <span className="text-lg font-black leading-none">{supermarket.offerCount}</span>
+                          <span className="text-xs font-semibold opacity-90">oferta{supermarket.offerCount !== 1 ? "s" : ""}</span>
+                        </div>
                       </div>
                     ) : (
                       <div className="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-full">
