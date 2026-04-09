@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { Supermarket, Offer } from "../types";
 import { getOffers } from "../utils/api";
 import AddOfferModal from "./AddOfferModal";
@@ -51,10 +51,11 @@ export default function SupermarketOffersModal({ supermarket, onClose }: Superma
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
-            aria-label="Cerrar"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors text-sm font-medium"
+            aria-label="Volver"
           >
-            <X className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
+            Volver
           </button>
         </div>
 

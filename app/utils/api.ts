@@ -385,6 +385,16 @@ export async function getSupermarkets(): Promise<Supermarket[]> {
   return res.json();
 }
 
+export async function createSupermarket(data: { name: string; address: string }): Promise<Supermarket> {
+  const res = await fetch(`${API_BASE_URL}/api/supermarkets`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Error al crear supermercado");
+  return res.json();
+}
+
 export async function getOffers(supermarketId: string): Promise<Offer[]> {
   const res = await fetch(`${API_BASE_URL}/api/supermarkets/${supermarketId}/offers`);
   if (!res.ok) throw new Error("Error al obtener ofertas");
@@ -426,6 +436,11 @@ export async function createOffer(data: {
 export async function deleteSupermarketOffer(id: string): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/api/offers/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error("Error al eliminar oferta");
+}
+
+export async function deleteSupermarket(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/supermarkets/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Error al eliminar supermercado");
 }
 
 // ─── FIN SUPERMARKETS & OFERTAS ──────────────────────────────────────────────
