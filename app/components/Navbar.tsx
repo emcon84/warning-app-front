@@ -2,6 +2,7 @@
 
 import type { ComponentType } from "react";
 import { Stethoscope, Megaphone, Pill, ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type MapView = "doctors" | "reports" | "farmacias" | "ofertas";
 
@@ -21,6 +22,7 @@ const VIEW_CONFIG: Record<MapView, { label: string; Icon: ComponentType<{ classN
 };
 
 export default function Navbar({ totalReports, onMenuClick, mapView = "reports", onMapViewChange, sidebarDisabled }: NavbarProps) {
+  const router = useRouter();
   return (
     <nav className="fixed top-0 left-0 right-0 z-[1002] bg-gray-900 text-white shadow-lg">
       <div className="flex items-center gap-2 px-3 py-2">
@@ -49,7 +51,7 @@ export default function Navbar({ totalReports, onMenuClick, mapView = "reports",
               return (
                 <button
                   key={view}
-                  onClick={() => onMapViewChange(view)}
+                  onClick={() => view === "ofertas" ? router.push("/ofertas") : onMapViewChange(view)}
                   className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap ${
                     mapView === view
                       ? "bg-green-500 text-white"
