@@ -1,4 +1,4 @@
-import { Report, ReportCategory, Doctor } from "../types";
+import { Report, ReportCategory, Doctor, Supermarket, Offer } from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -376,6 +376,59 @@ export async function updateFarmacia(id: string, data: { lat?: number; lng?: num
   if (!res.ok) throw new Error("Error al actualizar farmacia");
   return res.json();
 }
+
+// ─── SUPERMARKETS & OFERTAS ──────────────────────────────────────────────────
+
+export async function getSupermarkets(): Promise<Supermarket[]> {
+  const res = await fetch(`${API_BASE_URL}/api/supermarkets`);
+  if (!res.ok) throw new Error("Error al obtener supermercados");
+  return res.json();
+}
+
+export async function getOffers(supermarketId: string): Promise<Offer[]> {
+  const res = await fetch(`${API_BASE_URL}/api/supermarkets/${supermarketId}/offers`);
+  if (!res.ok) throw new Error("Error al obtener ofertas");
+  return res.json();
+}
+
+export async function createOffer(data: {
+  supermarketId: string;
+  description: string;
+  price?: string;
+  validUntil?: string;
+  photo?: File;
+}): Promise<Offer> {
+  let body: FormData | string;
+  let headers: HeadersInit = {};
+
+  if (data.photo instanceof File) {
+    const formData = new FormData();
+    formData.append("supermarketId", data.supermarketId);
+    formData.append("description", data.description);
+    if (data.price) formData.append("price", data.price);
+    if (data.validUntil) formData.append("validUntil", data.validUntil);
+    formData.append("photo", data.photo);
+    body = formData;
+  } else {
+    headers = { "Content-Type": "application/json" };
+    body = JSON.stringify(data);
+  }
+
+  const res = await fetch(`${API_BASE_URL}/api/offers`, {
+    method: "POST",
+    headers,
+    body,
+  });
+  if (!res.ok) throw new Error("Error al crear oferta");
+  return res.json();
+}
+
+export async function deleteSupermarketOffer(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/offers/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Error al eliminar oferta");
+}
+
+// ─── FIN SUPERMARKETS & OFERTAS ──────────────────────────────────────────────
 
 // Obtener estadísticas
 export async function getStats() {

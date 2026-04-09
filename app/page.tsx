@@ -8,6 +8,7 @@ import ReportsTableModal from "./components/ReportsTableModal";
 import DoctorDetailModal from "./components/DoctorDetailModal";
 import AddDoctorModal from "./components/AddDoctorModal";
 import FarmaciaDetailModal from "./components/FarmaciaDetailModal";
+import OfertasView from "./components/OfertasView";
 import { Report, ReportCategory, Doctor, Farmacia, TurnoResponse } from "./types";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
@@ -30,7 +31,7 @@ const MapComponent = dynamic(() => import("./components/Map"), {
 });
 
 type FilterPeriod = "today" | "week";
-type MapView = "doctors" | "reports" | "farmacias";
+type MapView = "doctors" | "reports" | "farmacias" | "ofertas";
 
 export default function Home() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -130,7 +131,7 @@ export default function Home() {
 
   const handleMapClick = (lat: number, lng: number) => {
     if (relocatingDoctorId) return;
-    if (mapView === "farmacias") return;
+    if (mapView === "farmacias" || mapView === "ofertas") return;
     setSelectedLocation({ lat, lng });
     if (mapView === "doctors") {
       setIsAddDoctorOpen(true);
@@ -385,8 +386,8 @@ export default function Home() {
           totalReports={reports.length}
           onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
           mapView={mapView}
-          onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors" || v === "farmacias") setIsSidebarOpen(false); }}
-          sidebarDisabled={mapView === "doctors" || mapView === "farmacias"}
+          onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors" || v === "farmacias" || v === "ofertas") setIsSidebarOpen(false); }}
+          sidebarDisabled={mapView === "doctors" || mapView === "farmacias" || mapView === "ofertas"}
         />
       </div>
 
@@ -647,6 +648,9 @@ export default function Home() {
 
 
 
+
+      {/* Vista de ofertas de supermercados */}
+      <OfertasView isVisible={mapView === "ofertas"} />
 
       {/* Ticker de reportes recientes */}
       {mapView === "reports" && (

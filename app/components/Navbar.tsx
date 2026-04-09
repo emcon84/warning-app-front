@@ -1,9 +1,9 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Stethoscope, Megaphone, Pill } from "lucide-react";
+import { Stethoscope, Megaphone, Pill, ShoppingCart } from "lucide-react";
 
-type MapView = "doctors" | "reports" | "farmacias";
+type MapView = "doctors" | "reports" | "farmacias" | "ofertas";
 
 interface NavbarProps {
   totalReports: number;
@@ -17,6 +17,7 @@ const VIEW_CONFIG: Record<MapView, { label: string; Icon: ComponentType<{ classN
   doctors:   { label: "Médicos",   Icon: Stethoscope },
   reports:   { label: "Reportes",  Icon: Megaphone },
   farmacias: { label: "Farmacias", Icon: Pill },
+  ofertas:   { label: "Ofertas",   Icon: ShoppingCart },
 };
 
 export default function Navbar({ totalReports, onMenuClick, mapView = "reports", onMapViewChange, sidebarDisabled }: NavbarProps) {
@@ -43,7 +44,7 @@ export default function Navbar({ totalReports, onMenuClick, mapView = "reports",
         {/* Pills de vista — centro, todas las pantallas */}
         {onMapViewChange && (
           <div className="flex-1 flex items-center justify-center gap-1" data-tour="view-pills">
-            {(["doctors", "reports", "farmacias"] as MapView[]).map((view) => {
+            {(["doctors", "reports", "farmacias", "ofertas"] as MapView[]).map((view) => {
               const { label, Icon } = VIEW_CONFIG[view];
               return (
                 <button
