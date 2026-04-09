@@ -18,7 +18,7 @@ async function getSupermarket(id: string): Promise<Supermarket | null> {
 
 async function getOffers(id: string): Promise<Offer[]> {
   try {
-    const res = await fetch(`${API}/api/supermarkets/${id}/offers`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API}/api/supermarkets/${id}/offers`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

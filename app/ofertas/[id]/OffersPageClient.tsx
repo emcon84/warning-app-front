@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import { Supermarket, Offer } from "../../types";
 import { deleteSupermarketOffer } from "../../utils/api";
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export default function OffersPageClient({ supermarket, initialOffers }: Props) {
+  const router = useRouter();
   const [offers, setOffers] = useState<Offer[]>(initialOffers);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
@@ -51,13 +52,13 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link
-            href="/"
+          <button
+            onClick={() => router.back()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors text-sm font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             Volver
-          </Link>
+          </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
               {supermarket.logo ? (
