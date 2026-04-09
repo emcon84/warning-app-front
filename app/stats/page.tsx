@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, BarChart2, FileText, MapPin, ArrowLeft, TrendingUp } from "lucide-react";
+import { Users, BarChart2, FileText, MapPin, ArrowLeft, TrendingUp, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -80,6 +80,22 @@ export default function StatsPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const saved = (localStorage.getItem("map_theme") as "light" | "dark") || "light";
+    setTheme(saved);
+    document.documentElement.classList.toggle("dark", saved === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === "light" ? "dark" : "light";
+      localStorage.setItem("map_theme", next);
+      document.documentElement.classList.toggle("dark", next === "dark");
+      return next;
+    });
+  };
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/analytics`)
@@ -103,10 +119,16 @@ export default function StatsPage() {
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <div>
+        <div className="flex-1">
           <h1 className="text-base font-bold text-gray-900 dark:text-white">Dashboard</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400">Reportes Reconquista</p>
         </div>
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+        >
+          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
