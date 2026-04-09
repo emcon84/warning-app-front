@@ -19,6 +19,7 @@ import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFa
 import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon } from "lucide-react";
 import { useNotifications } from "./hooks/useNotifications";
 import { getCategoryLabel } from "./utils/categoryHelpers";
+import { trackSection } from "./utils/tracking";
 
 // Cargar el mapa dinámicamente para evitar errores de SSR
 const MapComponent = dynamic(() => import("./components/Map"), {
@@ -85,6 +86,11 @@ export default function Home() {
   }, [theme]);
 
   const { showNotification, permission } = useNotifications();
+
+  // Trackear sección activa
+  useEffect(() => {
+    trackSection(mapView);
+  }, [mapView]);
 
   // Cargar reportes y médicos al montar el componente
   useEffect(() => {
