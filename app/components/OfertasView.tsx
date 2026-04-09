@@ -125,7 +125,7 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
                     )}
                   </div>
                   <div className="text-center w-full">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight mb-2">{supermarket.name}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight mb-2 truncate w-full">{supermarket.name}</p>
                     {(supermarket.offerCount ?? 0) > 0 ? (
                       <div className="relative inline-flex items-center justify-center">
                         {/* Ping radar */}
