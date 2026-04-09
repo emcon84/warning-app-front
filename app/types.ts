@@ -102,6 +102,7 @@ export interface Supermarket {
   lng: number;
   logo?: string;
   createdAt: string;
+  offerCount?: number;
 }
 
 export interface Offer {

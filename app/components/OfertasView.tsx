@@ -118,7 +118,13 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{supermarket.name}</p>
-                    <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-medium">Ver ofertas →</p>
+                    {(supermarket.offerCount ?? 0) > 0 ? (
+                      <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-bold">
+                        {supermarket.offerCount} oferta{supermarket.offerCount !== 1 ? "s" : ""} →
+                      </p>
+                    ) : (
+                      <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">😔 Sin ofertas</p>
+                    )}
                   </div>
                 </button>
                 <button
