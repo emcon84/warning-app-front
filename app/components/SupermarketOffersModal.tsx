@@ -127,15 +127,15 @@ export default function SupermarketOffersModal({ supermarket, onClose }: Superma
                   )}
 
                   {/* Contenido */}
-                  <div className="p-2.5 flex-1 space-y-1">
-                    <p className="text-xs font-medium text-gray-900 dark:text-white leading-snug line-clamp-3">{offer.description}</p>
+                  <div className="p-2.5 flex-1 flex flex-col gap-1.5">
                     {offer.price && (
-                      <span className="inline-block bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        {offer.price}
-                      </span>
+                      <div className="bg-green-500 dark:bg-green-600 rounded-lg px-2.5 py-1.5 text-center">
+                        <p className="text-white font-extrabold text-base leading-none tracking-tight">{offer.price}</p>
+                      </div>
                     )}
+                    <p className="text-xs font-medium text-gray-900 dark:text-white leading-snug line-clamp-3">{offer.description}</p>
                     {offer.validUntil && (
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-auto">
                         Hasta: {new Date(offer.validUntil).toLocaleDateString("es-AR")}
                       </p>
                     )}

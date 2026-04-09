@@ -47,7 +47,7 @@ export default function AddOfferModal({
       const offer = await createOffer({
         supermarketId,
         description: description.trim(),
-        price: price.trim() || undefined,
+        price: price.trim(),
         validUntil: validUntil || undefined,
         photo,
       });
@@ -100,7 +100,7 @@ export default function AddOfferModal({
 
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-              Precio (opcional)
+              Precio <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -108,6 +108,7 @@ export default function AddOfferModal({
               onChange={(e) => setPrice(e.target.value)}
               placeholder="Ej: $1.500 o 3x$2.000"
               className="w-full px-3 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
             />
           </div>
 
@@ -145,7 +146,7 @@ export default function AddOfferModal({
             </button>
             <button
               type="submit"
-              disabled={loading || !description.trim()}
+              disabled={loading || !description.trim() || !price.trim()}
               className="flex-1 py-2.5 px-4 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors"
             >
               {loading ? "Guardando..." : "Agregar Oferta"}

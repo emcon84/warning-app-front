@@ -77,8 +77,8 @@ export default function EditOfferModal({ offer, onClose, onOfferUpdated }: EditO
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Precio (opcional)</label>
-            <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ej: $1.500 o 3x$2.000" className={inputClass} />
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Precio <span className="text-red-500">*</span></label>
+            <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Ej: $1.500 o 3x$2.000" className={inputClass} required />
           </div>
 
           {offer.photo && !photo && (
@@ -107,7 +107,7 @@ export default function EditOfferModal({ offer, onClose, onOfferUpdated }: EditO
             <button type="button" onClick={onClose} className="flex-1 py-2.5 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors">
               Cancelar
             </button>
-            <button type="submit" disabled={loading || !description.trim()} className="flex-1 py-2.5 px-4 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 disabled:opacity-50 rounded-xl transition-colors">
+            <button type="submit" disabled={loading || !description.trim() || !price.trim()} className="flex-1 py-2.5 px-4 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 disabled:opacity-50 rounded-xl transition-colors">
               {loading ? "Guardando..." : "Guardar cambios"}
             </button>
           </div>
