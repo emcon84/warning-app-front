@@ -100,7 +100,7 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
             <p className="text-xs text-center">Tocá "Agregar super" para sumar el primero.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {supermarkets.map((supermarket) => (
               <div key={supermarket.id} className="relative group">
                 <button
