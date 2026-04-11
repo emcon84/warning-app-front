@@ -175,14 +175,19 @@ export default function ProfileClient({ pro, slug }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-8">
+
+      {/* Contenido: flex col debajo del navbar */}
+      <div className="flex flex-col flex-1 overflow-hidden max-w-xl mx-auto w-full">
+
+        {/* BLOQUE FIJO: header + descripción */}
+        <div className="flex-shrink-0 px-4 pt-4 pb-3">
 
         {/* Volver */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white mb-6 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white mb-4 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -241,8 +246,8 @@ export default function ProfileClient({ pro, slug }: Props) {
 
         {/* Fotos de trabajos */}
         {pro.fotos && pro.fotos.length > 0 && (
-          <div className="mb-6">
-            <p className="text-sm font-medium text-gray-400 mb-3">Trabajos realizados</p>
+          <div className="mb-3">
+            <p className="text-sm font-medium text-gray-400 mb-2">Trabajos realizados</p>
             <div className="grid grid-cols-3 gap-2">
               {pro.fotos.map((url, i) => (
                 <div key={i} className="aspect-square rounded-xl overflow-hidden border border-gray-800">
@@ -253,8 +258,12 @@ export default function ProfileClient({ pro, slug }: Props) {
           </div>
         )}
 
+        </div>{/* fin bloque fijo */}
+
+        {/* BLOQUE SCROLLEABLE: opiniones */}
+        <div className="flex-1 overflow-y-auto px-4 pb-2">
         {/* Sección Opiniones */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-medium text-gray-300">
               Opiniones{reviews.length > 0 ? ` (${reviews.length})` : ""}
@@ -381,9 +390,11 @@ export default function ProfileClient({ pro, slug }: Props) {
             </div>
           )}
         </div>
+        </div>{/* fin bloque scrolleable */}
 
-        {/* Acciones */}
-        <div className="flex flex-col gap-3 sticky bottom-4">
+        {/* BLOQUE FIJO: botones de acción */}
+        <div className="flex-shrink-0 px-4 pt-2 pb-4 bg-gray-950 border-t border-gray-900">
+        <div className="flex flex-col gap-2">
           <button
             onClick={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
             className="w-full py-3.5 rounded-2xl bg-white text-gray-950 font-semibold text-sm hover:bg-gray-100 transition-colors"
@@ -429,6 +440,7 @@ export default function ProfileClient({ pro, slug }: Props) {
             </button>
           </div>
         </div>
+        </div>{/* fin botones */}
 
       </div>
     </div>

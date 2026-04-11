@@ -65,11 +65,11 @@ export default function RootLayout({
       variables: {
         colorBackground: "#111827",
         colorInputBackground: "#1f2937",
-        colorText: "#f9fafb",
-        colorTextSecondary: "#9ca3af",
+        colorText: "#ffffff",
+        colorTextSecondary: "#e5e7eb",
         colorInputText: "#f9fafb",
-        colorPrimary: "#ffffff",
-        colorNeutral: "#374151",
+        colorPrimary: "#6366f1",
+        colorNeutral: "#ffffff",
       },
     }}>
       <html lang="es">
