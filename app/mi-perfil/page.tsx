@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
+import { MapPin, Phone, MessageCircle } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const ADMIN_CLERK_IDS = (process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
@@ -229,9 +230,9 @@ function ProfessionalProfileSection({
             <p className="text-sm text-gray-400">{profile.descripcion}</p>
           )}
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-            {profile.barrio && <span>📍 {profile.barrio}</span>}
-            {profile.telefono && <span>📞 {profile.telefono}</span>}
-            {profile.whatsapp && <span>💬 WhatsApp: {profile.whatsapp}</span>}
+            {profile.barrio && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{profile.barrio}</span>}
+            {profile.telefono && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{profile.telefono}</span>}
+            {profile.whatsapp && <span className="flex items-center gap-1"><MessageCircle className="w-3 h-3" />WhatsApp: {profile.whatsapp}</span>}
           </div>
         </div>
       )}

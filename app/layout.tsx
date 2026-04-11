@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import NotificationPrompt from "./components/NotificationPrompt";
+import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,6 +13,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -52,17 +60,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <head>
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-        <NotificationPrompt />
-      </body>
-    </html>
+    <ClerkProvider appearance={{
+      baseTheme: dark,
+      variables: {
+        colorBackground: "#111827",
+        colorInputBackground: "#1f2937",
+        colorText: "#f9fafb",
+        colorTextSecondary: "#9ca3af",
+        colorInputText: "#f9fafb",
+        colorPrimary: "#ffffff",
+        colorNeutral: "#374151",
+      },
+    }}>
+      <html lang="es">
+        <head>
+          <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+          <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        </head>
+        <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}>
+          {children}
+          <NotificationPrompt />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
