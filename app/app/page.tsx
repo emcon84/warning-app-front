@@ -17,6 +17,7 @@ import VoiceReportButton from "../components/VoiceReportButton";
 import ReportsTicker from "../components/ReportsTicker";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "../utils/api";
 import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon } from "lucide-react";
+import WelcomeTutorial from "../components/WelcomeTutorial";
 import { useNotifications } from "../hooks/useNotifications";
 import { getCategoryLabel } from "../utils/categoryHelpers";
 import { trackSection } from "../utils/tracking";
@@ -683,6 +684,9 @@ export default function Home() {
       >
         {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </button>
+
+      {/* Tutorial de bienvenida */}
+      <WelcomeTutorial />
 
     </div>
   );
