@@ -1,10 +1,10 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User } from "lucide-react";
+import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SignInButton, UserButton, useUser, useAuth } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -27,11 +27,34 @@ const VIEW_CONFIG: Record<MapViewItem, { label: string; Icon: ComponentType<{ cl
   ofertas:   { label: "Ofertas",   Icon: ShoppingCart },
 };
 
+interface UnreadConversation {
+  id: string;
+  professionalName: string;
+  lastMessage: string;
+  lastMessageTime: string;
+}
+
+function formatTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  if (diffHours < 24) {
+    return date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+  }
+  return date.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit" });
+}
+
 export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChange, sidebarDisabled }: NavbarProps) {
   const router = useRouter();
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [unreadConversations, setUnreadConversations] = useState<UnreadConversation[]>([]);
+  const [loadingConversations, setLoadingConversations] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isSignedIn) return;
@@ -50,9 +73,77 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     }
 
     fetchUnread();
-    const interval = setInterval(fetchUnread, 30_000); // polling cada 30s
+    const interval = setInterval(fetchUnread, 30_000);
     return () => { cancelled = true; clearInterval(interval); };
   }, [isSignedIn]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
+
+  async function fetchUnreadConversations() {
+    const token = await getToken();
+    if (!token) return;
+    setLoadingConversations(true);
+    try {
+      const res = await fetch(`${API}/api/conversations/professional`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const unread: UnreadConversation[] = (data as any[])
+        .filter((conv) =>
+          Array.isArray(conv.Message) &&
+          conv.Message.some(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (msg: any) => msg.read === false && msg.senderType === "client"
+          )
+        )
+        .slice(0, 5)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((conv: any) => {
+          const unreadMessages = conv.Message.filter(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (msg: any) => msg.read === false && msg.senderType === "client"
+          );
+          const lastMsg = unreadMessages[unreadMessages.length - 1];
+          const professional = conv.Professional ?? {};
+          return {
+            id: conv.id,
+            professionalName: `${professional.nombre ?? ""} ${professional.apellido ?? ""}`.trim() || "Profesional",
+            lastMessage: (lastMsg?.content ?? "").slice(0, 60),
+            lastMessageTime: lastMsg?.createdAt ?? "",
+          };
+        });
+
+      setUnreadConversations(unread);
+    } finally {
+      setLoadingConversations(false);
+    }
+  }
+
+  function handleBellClick() {
+    const next = !dropdownOpen;
+    setDropdownOpen(next);
+    if (next) {
+      fetchUnreadConversations();
+    }
+  }
+
+  function handleConversationClick(id: string) {
+    router.push(`/chat/${id}`);
+    setDropdownOpen(false);
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[1002] bg-gray-900 text-white shadow-lg">
@@ -120,18 +211,67 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
         {/* Auth */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {isSignedIn ? (
-            <div className="relative">
+            <>
+              {/* Campana de notificaciones */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={handleBellClick}
+                  className="relative p-1.5 rounded-lg hover:bg-gray-800 transition-colors"
+                  aria-label="Notificaciones"
+                >
+                  <Bell className="w-5 h-5 text-gray-300" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+                  )}
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-10 w-80 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl z-50">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                      <span className="text-sm font-semibold text-white">Mensajes</span>
+                      <button
+                        onClick={() => setDropdownOpen(false)}
+                        className="text-gray-400 hover:text-white transition-colors"
+                        aria-label="Cerrar"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Body */}
+                    {loadingConversations ? (
+                      <div className="px-4 py-6 text-center text-xs text-gray-500">Cargando...</div>
+                    ) : unreadConversations.length === 0 ? (
+                      <div className="px-4 py-6 text-center text-xs text-gray-500">Sin mensajes nuevos</div>
+                    ) : (
+                      <ul>
+                        {unreadConversations.map((conv) => (
+                          <li
+                            key={conv.id}
+                            onClick={() => handleConversationClick(conv.id)}
+                            className="hover:bg-gray-800 cursor-pointer px-4 py-3 flex flex-col gap-0.5 first:rounded-t-none last:rounded-b-2xl transition-colors"
+                          >
+                            <span className="text-sm font-semibold text-white">{conv.professionalName}</span>
+                            <span className="text-xs text-gray-400 truncate">{conv.lastMessage}</span>
+                            {conv.lastMessageTime && (
+                              <span className="text-xs text-gray-600">{formatTime(conv.lastMessageTime)}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* UserButton sin badge */}
               <UserButton>
                 <UserButton.MenuItems>
                   <UserButton.Link label="Mi perfil" labelIcon={<User className="w-4 h-4" />} href="/mi-perfil" />
                 </UserButton.MenuItems>
               </UserButton>
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none pointer-events-none">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </div>
+            </>
           ) : (
             <SignInButton mode="modal">
               <button className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white text-gray-900 hover:bg-gray-200 transition-colors">
