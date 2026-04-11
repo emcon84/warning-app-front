@@ -44,11 +44,16 @@ const STATUS_MAP: Record<string, { label: string; dot: string }> = {
   completed: { label: "Finalizado", dot: "bg-gray-500" },
 };
 
+function fotoUrl(foto?: string) {
+  if (!foto) return undefined;
+  return foto.startsWith("/uploads/") ? `${API}${foto}` : foto;
+}
+
 function ProAvatar({ foto, nombre, size = "md" }: { foto?: string; nombre: string; size?: "sm" | "md" }) {
   const cls = size === "sm" ? "w-9 h-9 text-xs" : "w-11 h-11 text-sm";
   return (
     <div className={`${cls} rounded-full overflow-hidden flex-shrink-0 bg-gray-700 flex items-center justify-center font-bold text-gray-300`}>
-      {foto ? <img src={foto} alt={nombre} className="w-full h-full object-cover" /> : nombre[0].toUpperCase()}
+      {foto ? <img src={fotoUrl(foto)} alt={nombre} className="w-full h-full object-cover" /> : nombre[0].toUpperCase()}
     </div>
   );
 }
@@ -172,7 +177,7 @@ function ProfessionalProfileSection({
         <div className="relative flex-shrink-0">
           <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center font-bold text-gray-300 text-xl ring-2 ring-gray-700">
             {profile.foto
-              ? <img src={profile.foto} alt={profile.nombre} className="w-full h-full object-cover" />
+              ? <img src={fotoUrl(profile.foto)} alt={profile.nombre} className="w-full h-full object-cover" />
               : profile.nombre[0].toUpperCase()}
           </div>
           {/* Botón cámara */}

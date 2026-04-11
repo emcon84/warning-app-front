@@ -1,0 +1,436 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { ProfessionalDetail, PublicReview } from "../../types";
+import Navbar from "../../components/Navbar";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+const SITE_URL =
+  typeof window !== "undefined"
+    ? window.location.origin
+    : "https://reportesreconquista.com";
+
+interface Props {
+  pro: ProfessionalDetail;
+  slug: string;
+}
+
+const STAR_PATH = "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z";
+
+function Stars({ score, size = "sm" }: { score: number; size?: "sm" | "md" }) {
+  const cls = size === "md" ? "w-5 h-5" : "w-3.5 h-3.5";
+  return (
+    <div className="flex">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <svg key={i} className={`${cls} ${i <= score ? "text-yellow-400" : "text-gray-700"}`} fill="currentColor" viewBox="0 0 20 20">
+          <path d={STAR_PATH} />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <button
+          key={i}
+          type="button"
+          onMouseEnter={() => setHover(i)}
+          onMouseLeave={() => setHover(0)}
+          onClick={() => onChange(i)}
+          className="focus:outline-none"
+        >
+          <svg className={`w-7 h-7 transition-colors ${i <= (hover || value) ? "text-yellow-400" : "text-gray-600"}`} fill="currentColor" viewBox="0 0 20 20">
+            <path d={STAR_PATH} />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export default function ProfileClient({ pro, slug }: Props) {
+  const router = useRouter();
+  const { isSignedIn } = useUser();
+  const { getToken } = useAuth();
+  const [copied, setCopied] = useState(false);
+  const profileUrl = `${SITE_URL}/profesional/${pro.slug}`;
+
+  // Favorito
+  const [isFav, setIsFav] = useState(false);
+  const [favLoading, setFavLoading] = useState(false);
+
+  // Reviews
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
+  // Formulario
+  const [showForm, setShowForm] = useState(false);
+  const [formScore, setFormScore] = useState(0);
+  const [formName, setFormName] = useState("");
+  const [formComment, setFormComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Cargar estado de favorito si está logueado
+  useEffect(() => {
+    if (!isSignedIn) return;
+    getToken().then((token) => {
+      if (!token) return;
+      fetch(`${API}/api/favorites`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.json())
+        .then((favs: { Professional: { slug: string } }[]) => {
+          setIsFav(favs.some((f) => f.Professional?.slug === slug));
+        })
+        .catch(() => {});
+    });
+  }, [isSignedIn, slug]);
+
+  async function toggleFav() {
+    if (!isSignedIn) { router.push("/sign-in"); return; }
+    setFavLoading(true);
+    const wasAdding = !isFav;
+    setIsFav(wasAdding); // optimistic
+    try {
+      const token = await getToken();
+      console.log("[fav] token:", token ? token.slice(0, 30) + "..." : "NULL");
+      if (!token) { setIsFav(!wasAdding); return; }
+      const headers: Record<string, string> = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+      const res = wasAdding
+        ? await fetch(`${API}/api/favorites`, { method: "POST", headers, body: JSON.stringify({ professionalId: pro.id }) })
+        : await fetch(`${API}/api/favorites/${pro.id}`, { method: "DELETE", headers });
+      if (!res.ok) {
+        console.error("[fav] API error:", res.status, await res.text());
+        setIsFav(!wasAdding); // revert
+      }
+    } catch (err) {
+      console.error("[fav] fetch error:", err);
+      setIsFav(!wasAdding); // revert
+    } finally {
+      setFavLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetch(`${API}/api/professionals/${slug}/reviews`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setReviews(data);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingReviews(false));
+  }, [slug]);
+
+  async function handleSubmitReview(e: React.FormEvent) {
+    e.preventDefault();
+    if (formScore === 0 || formComment.trim().length < 10) return;
+    setSubmitting(true);
+    setSubmitError("");
+    try {
+      const res = await fetch(`${API}/api/professionals/${slug}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          score: formScore,
+          comment: formComment.trim(),
+          reviewerName: formName.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error al enviar opinión");
+      }
+      const newReview: PublicReview = await res.json();
+      setReviews((prev) => [newReview, ...prev]);
+      setSubmitSuccess(true);
+      setShowForm(false);
+      setFormScore(0);
+      setFormName("");
+      setFormComment("");
+    } catch (err: any) {
+      setSubmitError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function handleShare() {
+    const text = `Mirá el perfil de ${pro.nombre} ${pro.apellido}, ${pro.oficios[0]} en Reconquista:\n${profileUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white">
+      <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
+      <div className="max-w-xl mx-auto px-4 pt-20 pb-8">
+
+        {/* Volver */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white mb-6 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Volver
+        </button>
+
+        {/* Header del perfil */}
+        <div className="flex items-start gap-5 mb-6">
+          <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-700 bg-gray-800">
+            {pro.foto ? (
+              <img src={pro.foto?.startsWith("/uploads/") ? `${API}${pro.foto}` : pro.foto} alt={pro.nombre} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-400">
+                {pro.nombre[0].toUpperCase()}
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-white">{pro.nombre} {pro.apellido}</h1>
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {pro.oficios.map((o) => (
+                <span key={o} className="text-xs px-2.5 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-300 capitalize">
+                  {o}
+                </span>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500 mt-1.5">{pro.barrio}, Reconquista</p>
+            <div className="flex items-center gap-2 mt-2">
+              <Stars score={Math.round(pro.ratingAvg)} size="sm" />
+              <span className="text-sm text-gray-400">
+                {pro.ratingCount > 0
+                  ? `${pro.ratingAvg.toFixed(1)} (${pro.ratingCount} opinión${pro.ratingCount !== 1 ? "es" : ""})`
+                  : "Sin opiniones aún"}
+              </span>
+            </div>
+            {pro.disponible ? (
+              <span className="inline-block mt-2 text-xs px-2.5 py-1 rounded-full bg-green-900/50 text-green-400 border border-green-800">
+                Disponible
+              </span>
+            ) : (
+              <span className="inline-block mt-2 text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-500 border border-gray-700">
+                No disponible
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Descripción */}
+        {pro.descripcion && (
+          <div className="mb-6 p-4 rounded-2xl bg-gray-900 border border-gray-800">
+            <p className="text-sm text-gray-300 leading-relaxed">{pro.descripcion}</p>
+          </div>
+        )}
+
+        {/* Fotos de trabajos */}
+        {pro.fotos && pro.fotos.length > 0 && (
+          <div className="mb-6">
+            <p className="text-sm font-medium text-gray-400 mb-3">Trabajos realizados</p>
+            <div className="grid grid-cols-3 gap-2">
+              {pro.fotos.map((url, i) => (
+                <div key={i} className="aspect-square rounded-xl overflow-hidden border border-gray-800">
+                  <img src={url} alt={`Trabajo ${i + 1}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Sección Opiniones */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-medium text-gray-300">
+              Opiniones{reviews.length > 0 ? ` (${reviews.length})` : ""}
+            </p>
+            {!showForm && !submitSuccess && (
+              <button
+                onClick={() => setShowForm(true)}
+                className="text-xs px-3 py-1.5 rounded-full bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 transition-colors"
+              >
+                + Dejar opinión
+              </button>
+            )}
+          </div>
+
+          {/* Mensaje de éxito */}
+          {submitSuccess && (
+            <div className="mb-4 p-3 rounded-xl bg-green-900/30 border border-green-800 text-sm text-green-400">
+              ¡Gracias por tu opinión!
+            </div>
+          )}
+
+          {/* Formulario nueva opinión */}
+          {showForm && (
+            <form
+              onSubmit={handleSubmitReview}
+              className="mb-5 p-4 rounded-2xl bg-gray-900 border border-gray-800 flex flex-col gap-3"
+            >
+              <div>
+                <p className="text-xs text-gray-400 mb-2">Tu calificación</p>
+                <StarPicker value={formScore} onChange={setFormScore} />
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-400 mb-1.5 block">Tu nombre <span className="text-gray-600">(opcional)</span></label>
+                <input
+                  type="text"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  placeholder="Vecino anónimo"
+                  maxLength={60}
+                  style={{ color: "#f9fafb" }}
+                  className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 placeholder-gray-600 text-sm focus:outline-none focus:border-gray-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-400 mb-1.5 block">
+                  Comentario <span className="text-gray-600">({formComment.length}/500)</span>
+                </label>
+                <textarea
+                  value={formComment}
+                  onChange={(e) => setFormComment(e.target.value.slice(0, 500))}
+                  placeholder="¿Cómo fue tu experiencia con este profesional?"
+                  rows={3}
+                  style={{ color: "#f9fafb" }}
+                  className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 placeholder-gray-600 text-sm focus:outline-none focus:border-gray-500 resize-none"
+                />
+                {formComment.length > 0 && formComment.length < 10 && (
+                  <p className="text-xs text-yellow-600 mt-1">Mínimo 10 caracteres.</p>
+                )}
+              </div>
+
+              {submitError && (
+                <p className="text-xs text-red-400">{submitError}</p>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowForm(false); setSubmitError(""); }}
+                  className="flex-1 py-2.5 rounded-xl bg-gray-800 text-gray-400 text-sm hover:bg-gray-700 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={formScore === 0 || formComment.trim().length < 10 || submitting}
+                  className="flex-1 py-2.5 rounded-xl bg-white text-gray-950 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+                >
+                  {submitting ? "Enviando..." : "Publicar"}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Lista de reviews */}
+          {loadingReviews ? (
+            <div className="flex flex-col gap-3">
+              {[1, 2].map((i) => (
+                <div key={i} className="h-20 rounded-2xl bg-gray-900 border border-gray-800 animate-pulse" />
+              ))}
+            </div>
+          ) : reviews.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {reviews.map((r) => (
+                <div key={r.id} className="p-4 rounded-2xl bg-gray-900 border border-gray-800">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300">
+                        {r.reviewerName[0].toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium text-gray-200">{r.reviewerName}</span>
+                    </div>
+                    <Stars score={r.score} size="sm" />
+                  </div>
+                  <p className="text-sm text-gray-300 leading-relaxed">{r.comment}</p>
+                  <p className="text-xs text-gray-600 mt-2">
+                    {new Date(r.createdAt).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center">
+              <p className="text-sm text-gray-600">Aún no hay opiniones.</p>
+              {!showForm && (
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="mt-2 text-sm text-gray-400 hover:text-white underline transition-colors"
+                >
+                  Sé el primero en opinar
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Acciones */}
+        <div className="flex flex-col gap-3 sticky bottom-4">
+          <button
+            onClick={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
+            className="w-full py-3.5 rounded-2xl bg-white text-gray-950 font-semibold text-sm hover:bg-gray-100 transition-colors"
+          >
+            Contactar
+          </button>
+
+          <div className="flex gap-2">
+            <button
+              onClick={handleShare}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-green-600 hover:bg-green-500 text-white font-medium text-sm transition-colors"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              Compartir por WhatsApp
+            </button>
+
+            <button
+              onClick={toggleFav}
+              disabled={favLoading}
+              title={isFav ? "Quitar de favoritos" : "Guardar en favoritos"}
+              className={`px-4 py-3 rounded-2xl text-sm transition-colors border ${
+                isFav
+                  ? "bg-red-900/40 border-red-800 text-red-400 hover:bg-red-900/60"
+                  : "bg-gray-800 border-gray-700 text-gray-400 hover:text-red-400 hover:bg-gray-700"
+              }`}
+            >
+              <svg className="w-4 h-4" fill={isFav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+
+            <button
+              onClick={handleCopy}
+              className="px-4 py-3 rounded-2xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm transition-colors border border-gray-700"
+            >
+              {copied ? "✓" : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
