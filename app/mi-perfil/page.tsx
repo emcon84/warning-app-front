@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useUser, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
-import { MapPin, Phone, MessageCircle } from "lucide-react";
+import { MapPin, Phone, MessageCircle, Bell } from "lucide-react";
+import { useNotifications } from "../hooks/useNotifications";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const ADMIN_CLERK_IDS = (process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
@@ -66,6 +67,54 @@ function EmptyState({ text, cta, href }: { text: string; cta: string; href: stri
       <Link href={href} className="mt-2 inline-block text-sm text-gray-400 hover:text-white underline transition-colors">
         {cta} →
       </Link>
+    </div>
+  );
+}
+
+function NotificationBanner() {
+  const { permission, isSupported, requestPermission } = useNotifications();
+  const [dismissed, setDismissed] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setDismissed(localStorage.getItem("notif-banner-dismissed") === "1");
+  }, []);
+
+  async function handleActivar() {
+    const granted = await requestPermission();
+    if (granted) setDismissed(true);
+  }
+
+  function handleDismiss() {
+    localStorage.setItem("notif-banner-dismissed", "1");
+    setDismissed(true);
+  }
+
+  if (!mounted || !isSupported || permission === "granted" || dismissed) return null;
+
+  return (
+    <div className="bg-blue-950/50 border border-blue-800 rounded-2xl px-4 py-3 mb-6 flex items-start gap-3">
+      <Bell className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-blue-100">
+          Activa las notificaciones para saber cuando un cliente te contacta
+        </p>
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={handleActivar}
+            className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors"
+          >
+            Activar notificaciones
+          </button>
+          <button
+            onClick={handleDismiss}
+            className="px-3 py-1.5 rounded-lg text-blue-300 hover:text-blue-100 text-xs font-medium transition-colors"
+          >
+            Ahora no
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -435,10 +484,13 @@ export default function MiPerfilPage() {
 
         {/* Sección perfil profesional (solo si tiene perfil) */}
         {hasProfessionalProfile === true && professionalProfile && (
-          <ProfessionalProfileSection
-            profile={professionalProfile}
-            onUpdate={setProfessionalProfile}
-          />
+          <>
+            <ProfessionalProfileSection
+              profile={professionalProfile}
+              onUpdate={setProfessionalProfile}
+            />
+            <NotificationBanner />
+          </>
         )}
 
         {/* CTA: crear perfil profesional */}
