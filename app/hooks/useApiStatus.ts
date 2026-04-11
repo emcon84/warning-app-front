@@ -16,7 +16,7 @@ export function useApiStatus() {
     const timer = setTimeout(() => controller.abort(), TIMEOUT);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/health`, {
+      const res = await fetch(`${API_BASE_URL}/api/health`, {
         signal: controller.signal,
         cache: "no-store",
       });
