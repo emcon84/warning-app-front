@@ -182,7 +182,7 @@ export default function ProfileClient({ pro, slug }: Props) {
       <div className="flex flex-col flex-1 overflow-hidden max-w-xl mx-auto w-full">
 
         {/* BLOQUE FIJO: header + descripción */}
-        <div className="flex-shrink-0 px-4 pt-4 pb-3">
+        <div className="flex-shrink-0 px-4 pt-16 pb-3">
 
         {/* Volver */}
         <button

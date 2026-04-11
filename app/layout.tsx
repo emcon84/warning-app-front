@@ -71,6 +71,13 @@ export default function RootLayout({
         colorPrimary: "#6366f1",
         colorNeutral: "#ffffff",
       },
+      elements: {
+        userPreviewMainIdentifier: { color: "#ffffff", fontWeight: "600" },
+        userPreviewSecondaryIdentifier: { color: "#e5e7eb" },
+        userButtonPopoverActionButton__manageAccount: { color: "#ffffff" },
+        userButtonPopoverActionButtonText: { color: "#ffffff" },
+        userButtonPopoverFooter: { display: "none" },
+      },
     }}>
       <html lang="es">
         <head>
