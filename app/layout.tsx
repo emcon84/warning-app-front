@@ -77,6 +77,14 @@ export default function RootLayout({
         userButtonPopoverActionButton__manageAccount: { color: "#ffffff" },
         userButtonPopoverActionButtonText: { color: "#ffffff" },
         userButtonPopoverFooter: { display: "none" },
+        formFieldLabel: { color: "#e5e7eb" },
+        formFieldInput: { color: "#f9fafb", backgroundColor: "#1f2937", borderColor: "#374151" },
+        headerTitle: { color: "#ffffff" },
+        headerSubtitle: { color: "#d1d5db" },
+        identityPreviewText: { color: "#e5e7eb" },
+        formResendCodeLink: { color: "#818cf8" },
+        footerActionLink: { color: "#818cf8" },
+        dividerText: { color: "#9ca3af" },
       },
     }}>
       <html lang="es">
