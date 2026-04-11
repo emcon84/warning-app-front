@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Plus, X, Trash2, ArrowLeft } from "lucide-react";
+import { ShoppingCart, Plus, X, Trash2 } from "lucide-react";
 import { Supermarket } from "../types";
 import { getSupermarkets, createSupermarket, deleteSupermarket } from "../utils/api";
+import Navbar from "../components/Navbar";
 
 interface Props {
   initialSupermarkets: Supermarket[];
@@ -53,22 +54,12 @@ export default function OfertasPageClient({ initialSupermarkets }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors text-sm font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Inicio
-          </Link>
-          <div>
-            <h1 className="text-sm font-bold text-gray-900 dark:text-white leading-none">Ofertas del día</h1>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Reconquista, Santa Fe</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-950">
+      <Navbar mapView="ofertas" />
+
+      {/* Subheader con acción */}
+      <div className="fixed top-14 left-0 right-0 z-40 bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between">
+        <p className="text-sm font-semibold text-white">Ofertas del día</p>
         <button
           onClick={() => setIsAddOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-colors"
@@ -80,7 +71,7 @@ export default function OfertasPageClient({ initialSupermarkets }: Props) {
       </div>
 
       {/* Grid */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 pt-28 pb-6">
         {supermarkets.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 gap-3 text-gray-400 dark:text-gray-600">
             <ShoppingCart className="w-12 h-12" />

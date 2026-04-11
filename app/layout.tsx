@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import NotificationPrompt from "./components/NotificationPrompt";
+import ApiStatusBanner from "./components/ApiStatusBanner";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
@@ -93,6 +94,7 @@ export default function RootLayout({
           <link rel="apple-touch-icon" href="/icon-192x192.png" />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} font-sans antialiased`}>
+          <ApiStatusBanner />
           {children}
           <NotificationPrompt />
         </body>

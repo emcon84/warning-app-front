@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -18,6 +19,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function useNotifications() {
+  const { getToken } = useAuth();
   const [permission, setPermission] = useState<NotificationPermission>(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
       return Notification.permission;
@@ -75,11 +77,13 @@ export function useNotifications() {
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
 
-      // Enviar la suscripción al servidor
+      // Enviar la suscripción al servidor (con auth si está logueado)
+      const token = await getToken().catch(() => null);
       const response = await fetch(`${API_URL}/api/push/subscribe`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(subscription.toJSON()),
       });

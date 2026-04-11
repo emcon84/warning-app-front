@@ -114,3 +114,39 @@ export interface Offer {
   validUntil?: string;
   createdAt: string;
 }
+
+// ─── Profesionales de Oficio ─────────────────────────────────────────────────
+
+export interface Professional {
+  id: string;
+  nombre: string;
+  apellido: string;
+  slug: string;
+  oficios: string[];
+  barrio: string;
+  foto?: string | null;
+  fotos?: string[];
+  disponible: boolean;
+  ratingAvg: number;
+  ratingCount: number;
+  descripcion?: string | null;
+}
+
+export interface ProfessionalRating {
+  scoreByClient: number;
+  commentByClient?: string | null;
+  createdAt: string;
+}
+
+export interface ProfessionalDetail extends Professional {
+  ratings: ProfessionalRating[];
+}
+
+export interface PublicReview {
+  id: string;
+  professionalId: string;
+  reviewerName: string;
+  score: number;
+  comment: string;
+  createdAt: string;
+}
