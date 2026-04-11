@@ -84,7 +84,7 @@ export default function RootLayout({
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/icon-192x192.png" />
         </head>
-        <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} font-sans antialiased`}>
           {children}
           <NotificationPrompt />
         </body>

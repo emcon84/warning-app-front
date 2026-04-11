@@ -231,7 +231,7 @@ export default function LandingPage() {
             <p className="dark:text-gray-400 text-gray-600 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
               Reportá baches e inundaciones, encontrá médicos IAPOS y PAMI,
               consultá las farmacias de turno, contratá profesionales y seguí las
-              ofertas de supermercados — todo para los vecinos de{" "}
+              ofertas de supermercados. Todo para los vecinos de{" "}
               <strong className="dark:text-gray-200 text-gray-800">Reconquista, Santa Fe</strong>.
             </p>
 
@@ -243,7 +243,7 @@ export default function LandingPage() {
                 Abrir la app
                 <ChevronRight className="w-5 h-5" />
               </Link>
-              <p className="dark:text-gray-500 text-gray-500 text-sm">Gratis — sin registro para ver el mapa</p>
+              <p className="dark:text-gray-500 text-gray-500 text-sm">Gratis, sin registro para ver el mapa</p>
             </div>
 
             {/* Stats visuales */}
@@ -343,8 +343,8 @@ export default function LandingPage() {
                   Plomeros, electricistas, albañiles y decenas de rubros más.
                   Los vecinos de Reconquista, Santa Fe, pueden contactar
                   directamente a los profesionales por{" "}
-                  <strong className="dark:text-white text-gray-900">chat en tiempo real</strong> —
-                  sin intermediarios, sin comisiones.
+                  <strong className="dark:text-white text-gray-900">chat en tiempo real</strong>,
+                  sin intermediarios ni comisiones.
                 </p>
                 <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 text-sm">
                   <MessageCircle className="w-4 h-4 text-indigo-400" />
@@ -396,7 +396,7 @@ export default function LandingPage() {
               <img src="/icon.svg" className="w-10 h-10" alt="Reportes Reconquista" />
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 dark:text-white text-gray-900">
-              Empezá ahora — es gratis
+              Empezá ahora, es gratis
             </h2>
             <p className="dark:text-gray-400 text-gray-600 text-lg mb-8">
               Unite a los vecinos de{" "}
@@ -412,7 +412,7 @@ export default function LandingPage() {
               <ChevronRight className="w-5 h-5" />
             </Link>
             <p className="dark:text-gray-600 text-gray-400 text-xs mt-4">
-              PWA instalable en tu celular — sin descarga de tienda
+              PWA instalable en tu celular, sin descarga de tienda
             </p>
           </div>
         </section>
@@ -423,7 +423,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2">
               <img src="/icon.svg" className="w-6 h-6" alt="Reportes Reconquista" />
               <span className="dark:text-gray-400 text-gray-500 text-sm">
-                Reportes Reconquista — Reconquista, Santa Fe, Argentina
+                Reportes Reconquista · Reconquista, Santa Fe, Argentina
               </span>
             </div>
             <div className="flex items-center gap-6 text-sm dark:text-gray-500 text-gray-500">
