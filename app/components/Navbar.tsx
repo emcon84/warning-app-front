@@ -163,13 +163,13 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
           </button>
         )}
 
-        {/* Título */}
-        <h1
-          className="text-sm font-bold truncate flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+        {/* Logo */}
+        <img
+          src="/icon.svg"
+          className="w-7 h-7 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+          alt="Reportes RQ"
           onClick={() => router.push("/app")}
-        >
-          Reportes RQ
-        </h1>
+        />
 
         {/* Pills de vista */}
         <div className="flex-1 flex items-center justify-center gap-1 overflow-x-auto" data-tour="view-pills">

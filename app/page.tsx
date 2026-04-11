@@ -14,6 +14,7 @@ import {
   Bell,
   CheckCircle,
 } from "lucide-react";
+import LandingThemeToggle from "./components/LandingThemeToggle";
 
 export const metadata: Metadata = {
   title: "Reportes Reconquista | App ciudadana para Reconquista, Santa Fe",
@@ -184,23 +185,24 @@ export default function LandingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen dark:bg-gray-950 bg-white dark:text-white text-gray-900">
         {/* Header */}
-        <header className="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
+        <header className="sticky top-0 z-50 dark:bg-gray-950/90 bg-white/90 backdrop-blur-md border-b dark:border-gray-800 border-gray-200">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-green-500 flex items-center justify-center">
-                <MapPin className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-white text-sm">Reportes Reconquista</span>
+              <img src="/icon.svg" className="w-8 h-8" alt="Reportes Reconquista" />
+              <span className="font-bold dark:text-white text-gray-900 text-sm">Reportes Reconquista</span>
             </div>
-            <Link
-              href="/app"
-              className="flex items-center gap-1.5 bg-green-500 hover:bg-green-400 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
-            >
-              Abrir app
-              <ChevronRight className="w-4 h-4" />
-            </Link>
+            <div className="flex items-center gap-2">
+              <LandingThemeToggle />
+              <Link
+                href="/app"
+                className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
+              >
+                Abrir app
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </header>
 
@@ -211,37 +213,37 @@ export default function LandingPage() {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34,197,94,0.15) 0%, rgba(99,102,241,0.08) 50%, transparent 100%)",
+                "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37,99,235,0.15) 0%, rgba(99,102,241,0.08) 50%, transparent 100%)",
             }}
           />
 
           <div className="relative max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
-            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+            <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-600/20 text-blue-500 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
               <MapPin className="w-3.5 h-3.5" />
               Reconquista, Santa Fe, Argentina
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight dark:text-white text-gray-900">
               La app ciudadana de{" "}
-              <span className="text-green-400">Reconquista</span>
+              <span className="text-blue-500">Reconquista</span>
             </h1>
 
-            <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+            <p className="dark:text-gray-400 text-gray-600 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
               Reportá baches e inundaciones, encontrá médicos IAPOS y PAMI,
               consultá las farmacias de turno, contratá profesionales y seguí las
               ofertas de supermercados — todo para los vecinos de{" "}
-              <strong className="text-gray-200">Reconquista, Santa Fe</strong>.
+              <strong className="dark:text-gray-200 text-gray-800">Reconquista, Santa Fe</strong>.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/app"
-                className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-green-500/25"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-blue-600/25"
               >
                 Abrir la app
                 <ChevronRight className="w-5 h-5" />
               </Link>
-              <p className="text-gray-500 text-sm">Gratis — sin registro para ver el mapa</p>
+              <p className="dark:text-gray-500 text-gray-500 text-sm">Gratis — sin registro para ver el mapa</p>
             </div>
 
             {/* Stats visuales */}
@@ -251,9 +253,9 @@ export default function LandingPage() {
                 { label: "Médicos registrados", value: "IAPOS · PAMI" },
                 { label: "Profesionales", value: "Con chat" },
               ].map((stat) => (
-                <div key={stat.label} className="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center">
-                  <p className="text-green-400 font-bold text-xs">{stat.value}</p>
-                  <p className="text-gray-500 text-[10px] mt-0.5">{stat.label}</p>
+                <div key={stat.label} className="dark:bg-gray-900 bg-gray-100 dark:border-gray-800 border border-gray-200 rounded-xl p-3 text-center">
+                  <p className="text-blue-500 font-bold text-xs">{stat.value}</p>
+                  <p className="dark:text-gray-500 text-gray-500 text-[10px] mt-0.5">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -263,10 +265,10 @@ export default function LandingPage() {
         {/* Features */}
         <section className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 dark:text-white text-gray-900">
               Todo lo que necesitás en Reconquista
             </h2>
-            <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            <p className="dark:text-gray-400 text-gray-600 text-lg max-w-xl mx-auto">
               Una plataforma pensada para los vecinos de Reconquista, Santa Fe.
             </p>
           </div>
@@ -275,26 +277,26 @@ export default function LandingPage() {
             {features.map((f) => (
               <div
                 key={f.title}
-                className={`bg-gray-900 border rounded-2xl p-6 flex flex-col gap-3 ${f.bg}`}
+                className={`dark:bg-gray-900 bg-gray-100 border rounded-2xl p-6 flex flex-col gap-3 ${f.bg}`}
               >
-                <div className={`w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center ${f.color}`}>
+                <div className={`w-10 h-10 rounded-xl dark:bg-gray-800 bg-white flex items-center justify-center ${f.color}`}>
                   <f.icon className="w-5 h-5" />
                 </div>
-                <h3 className="font-bold text-white text-lg">{f.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{f.description}</p>
+                <h3 className="font-bold dark:text-white text-gray-900 text-lg">{f.title}</h3>
+                <p className="dark:text-gray-400 text-gray-600 text-sm leading-relaxed">{f.description}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* Cómo funciona */}
-        <section className="bg-gray-900 border-y border-gray-800 py-20">
+        <section className="dark:bg-gray-900 bg-gray-50 dark:border-gray-800 border-gray-200 border-y py-20">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+              <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 dark:text-white text-gray-900">
                 Tres pasos, sin vueltas
               </h2>
-              <p className="text-gray-400 text-lg max-w-xl mx-auto">
+              <p className="dark:text-gray-400 text-gray-600 text-lg max-w-xl mx-auto">
                 Reportes ciudadanos en Reconquista nunca fue tan fácil.
               </p>
             </div>
@@ -304,17 +306,17 @@ export default function LandingPage() {
                 <div key={step.number} className="relative flex flex-col items-center text-center gap-4">
                   {/* Línea conectora */}
                   {i < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-8 left-[calc(50%+2.5rem)] right-0 h-px bg-gray-700" />
+                    <div className="hidden md:block absolute top-8 left-[calc(50%+2.5rem)] right-0 h-px dark:bg-gray-700 bg-gray-300" />
                   )}
-                  <div className="w-16 h-16 rounded-2xl bg-gray-800 border border-gray-700 flex items-center justify-center flex-shrink-0 relative">
-                    <step.icon className="w-7 h-7 text-green-400" />
-                    <span className="absolute -top-2 -right-2 text-[10px] font-bold bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl dark:bg-gray-800 bg-white dark:border-gray-700 border border-gray-200 flex items-center justify-center flex-shrink-0 relative">
+                    <step.icon className="w-7 h-7 text-blue-500" />
+                    <span className="absolute -top-2 -right-2 text-[10px] font-bold bg-blue-600 text-white w-5 h-5 rounded-full flex items-center justify-center">
                       {step.number.replace("0", "")}
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-lg mb-2">{step.title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                    <h3 className="font-bold dark:text-white text-gray-900 text-lg mb-2">{step.title}</h3>
+                    <p className="dark:text-gray-400 text-gray-600 text-sm leading-relaxed">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -324,7 +326,7 @@ export default function LandingPage() {
 
         {/* Oficios highlight */}
         <section className="max-w-6xl mx-auto px-4 py-20">
-          <div className="bg-gray-900 border border-indigo-500/20 rounded-3xl p-8 sm:p-12">
+          <div className="dark:bg-gray-900 bg-gray-50 border border-indigo-500/20 rounded-3xl p-8 sm:p-12">
             <div className="flex flex-col md:flex-row gap-10 items-start">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-4">
@@ -333,26 +335,26 @@ export default function LandingPage() {
                   </div>
                   <span className="text-indigo-400 font-semibold text-sm">Directorio de profesionales</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+                <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 dark:text-white text-gray-900">
                   Encontrá el profesional que necesitás en{" "}
                   <span className="text-indigo-400">Reconquista</span>
                 </h2>
-                <p className="text-gray-400 text-lg leading-relaxed mb-6">
+                <p className="dark:text-gray-400 text-gray-600 text-lg leading-relaxed mb-6">
                   Plomeros, electricistas, albañiles y decenas de rubros más.
                   Los vecinos de Reconquista, Santa Fe, pueden contactar
                   directamente a los profesionales por{" "}
-                  <strong className="text-white">chat en tiempo real</strong> —
+                  <strong className="dark:text-white text-gray-900">chat en tiempo real</strong> —
                   sin intermediarios, sin comisiones.
                 </p>
-                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 text-sm">
                   <MessageCircle className="w-4 h-4 text-indigo-400" />
                   Chat en tiempo real incluido
                 </div>
-                <div className="flex items-center gap-2 text-gray-400 text-sm mt-2">
+                <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 text-sm mt-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
                   Perfiles verificados con reseñas
                 </div>
-                <div className="flex items-center gap-2 text-gray-400 text-sm mt-2">
+                <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 text-sm mt-2">
                   <Bell className="w-4 h-4 text-yellow-400" />
                   Notificaciones de respuesta
                 </div>
@@ -366,14 +368,14 @@ export default function LandingPage() {
               </div>
 
               <div className="flex-shrink-0 w-full md:w-64">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
+                <p className="text-xs font-semibold dark:text-gray-500 text-gray-500 uppercase tracking-widest mb-3">
                   Rubros disponibles
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {trades.map((trade) => (
                     <span
                       key={trade}
-                      className="bg-gray-800 border border-gray-700 text-gray-300 text-sm px-3 py-1.5 rounded-full"
+                      className="dark:bg-gray-800 bg-white dark:border-gray-700 border border-gray-200 dark:text-gray-300 text-gray-700 text-sm px-3 py-1.5 rounded-full"
                     >
                       {trade}
                     </span>
@@ -388,52 +390,50 @@ export default function LandingPage() {
         </section>
 
         {/* CTA final */}
-        <section className="bg-gray-900 border-t border-gray-800 py-20">
+        <section className="dark:bg-gray-900 bg-gray-50 dark:border-gray-800 border-gray-200 border-t py-20">
           <div className="max-w-2xl mx-auto px-4 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-              <MapPin className="w-8 h-8 text-green-400" />
+            <div className="w-16 h-16 rounded-2xl bg-blue-600/20 flex items-center justify-center mx-auto mb-6">
+              <img src="/icon.svg" className="w-10 h-10" alt="Reportes Reconquista" />
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 dark:text-white text-gray-900">
               Empezá ahora — es gratis
             </h2>
-            <p className="text-gray-400 text-lg mb-8">
+            <p className="dark:text-gray-400 text-gray-600 text-lg mb-8">
               Unite a los vecinos de{" "}
-              <strong className="text-white">Reconquista, Santa Fe</strong> que
+              <strong className="dark:text-white text-gray-900">Reconquista, Santa Fe</strong> que
               ya usan la app para mejorar la ciudad, encontrar médicos y
               contratar profesionales de confianza.
             </p>
             <Link
               href="/app"
-              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-green-500/25"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-blue-600/25"
             >
               Abrir Reportes Reconquista
               <ChevronRight className="w-5 h-5" />
             </Link>
-            <p className="text-gray-600 text-xs mt-4">
+            <p className="dark:text-gray-600 text-gray-400 text-xs mt-4">
               PWA instalable en tu celular — sin descarga de tienda
             </p>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-gray-800 py-8">
+        <footer className="dark:border-gray-800 border-gray-200 border-t py-8">
           <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-green-500 flex items-center justify-center">
-                <MapPin className="w-3.5 h-3.5 text-white" />
-              </div>
-              <span className="text-gray-400 text-sm">
+              <img src="/icon.svg" className="w-6 h-6" alt="Reportes Reconquista" />
+              <span className="dark:text-gray-400 text-gray-500 text-sm">
                 Reportes Reconquista — Reconquista, Santa Fe, Argentina
               </span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <Link href="/app" className="hover:text-gray-300 transition-colors">
+            <div className="flex items-center gap-6 text-sm dark:text-gray-500 text-gray-500">
+              <Link href="/app" className="dark:hover:text-gray-300 hover:text-gray-700 transition-colors">
                 Abrir la app
               </Link>
-              <Link href="/profesionales" className="hover:text-gray-300 transition-colors">
+              <Link href="/profesionales" className="dark:hover:text-gray-300 hover:text-gray-700 transition-colors">
                 Profesionales
               </Link>
-              <Link href="/ofertas" className="hover:text-gray-300 transition-colors">
+              <Link href="/ofertas" className="dark:hover:text-gray-300 hover:text-gray-700 transition-colors">
                 Ofertas
               </Link>
             </div>
