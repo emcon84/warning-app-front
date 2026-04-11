@@ -1,689 +1,445 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
+import {
+  Map,
+  AlertTriangle,
+  Stethoscope,
+  Pill,
+  ShoppingCart,
+  Wrench,
+  MessageCircle,
+  ChevronRight,
+  MapPin,
+  Users,
+  Bell,
+  CheckCircle,
+} from "lucide-react";
 
-import { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
-import ReportModal from "./components/ReportModal";
-import ReportDetailModal from "./components/ReportDetailModal";
-import ReportsTableModal from "./components/ReportsTableModal";
-import DoctorDetailModal from "./components/DoctorDetailModal";
-import AddDoctorModal from "./components/AddDoctorModal";
-import FarmaciaDetailModal from "./components/FarmaciaDetailModal";
-import OfertasView from "./components/OfertasView";
-import { Report, ReportCategory, Doctor, Farmacia, TurnoResponse } from "./types";
-import Sidebar from "./components/Sidebar";
-import Navbar from "./components/Navbar";
-import FloatingBottomNav from "./components/FloatingBottomNav";
-import VoiceReportButton from "./components/VoiceReportButton";
-import ReportsTicker from "./components/ReportsTicker";
-import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "./utils/api";
-import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon } from "lucide-react";
-import { useNotifications } from "./hooks/useNotifications";
-import { getCategoryLabel } from "./utils/categoryHelpers";
-import { trackSection } from "./utils/tracking";
+export const metadata: Metadata = {
+  title: "Reportes Reconquista | App ciudadana para Reconquista, Santa Fe",
+  description:
+    "La app ciudadana de Reconquista, Santa Fe. Reportá baches, inundaciones y problemas urbanos. Encontrá médicos IAPOS/PAMI, farmacias de turno, profesionales y ofertas de supermercados.",
+  keywords: [
+    "Reconquista",
+    "Santa Fe",
+    "reportes ciudadanos",
+    "baches Reconquista",
+    "médicos IAPOS Reconquista",
+    "farmacias turno Reconquista",
+    "profesionales Reconquista",
+    "plomeros electricistas Reconquista",
+    "ofertas supermercados Reconquista",
+    "app vecinos Reconquista",
+  ],
+  alternates: {
+    canonical: "https://reportesreconquista.com",
+  },
+  openGraph: {
+    type: "website",
+    url: "https://reportesreconquista.com",
+    siteName: "Reportes Reconquista",
+    title: "Reportes Reconquista | App ciudadana para Reconquista, Santa Fe",
+    description:
+      "Reportá baches, encontrá médicos IAPOS/PAMI, farmacias de turno, profesionales y ofertas en Reconquista, Santa Fe.",
+    locale: "es_AR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Reportes Reconquista | App ciudadana para Reconquista, Santa Fe",
+    description:
+      "Reportá baches, encontrá médicos IAPOS/PAMI, farmacias de turno, profesionales y ofertas en Reconquista, Santa Fe.",
+  },
+};
 
-// Cargar el mapa dinámicamente para evitar errores de SSR
-const MapComponent = dynamic(() => import("./components/Map"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-full bg-gray-100">
-      <p className="text-gray-600">Cargando mapa...</p>
-    </div>
-  ),
-});
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://reportesreconquista.com/#app",
+      name: "Reportes Reconquista",
+      url: "https://reportesreconquista.com",
+      description:
+        "Plataforma ciudadana para reportes urbanos, directorio de médicos, farmacias de turno, profesionales y ofertas de supermercados en Reconquista, Santa Fe, Argentina.",
+      applicationCategory: "UtilitiesApplication",
+      operatingSystem: "Web, Android, iOS",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "ARS",
+      },
+      featureList: [
+        "Reportes ciudadanos geolocalizados",
+        "Directorio de médicos IAPOS y PAMI",
+        "Farmacias de turno en tiempo real",
+        "Directorio de profesionales y oficios con chat",
+        "Ofertas de supermercados locales",
+        "Notificaciones push",
+        "PWA instalable",
+      ],
+    },
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://reportesreconquista.com/#business",
+      name: "Reportes Reconquista",
+      url: "https://reportesreconquista.com",
+      description: "Plataforma de servicios ciudadanos para Reconquista, Santa Fe.",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Reconquista",
+        addressRegion: "Santa Fe",
+        addressCountry: "AR",
+      },
+      areaServed: {
+        "@type": "City",
+        name: "Reconquista",
+      },
+    },
+  ],
+};
 
-type FilterPeriod = "today" | "week";
-type MapView = "doctors" | "reports" | "farmacias" | "ofertas";
+const features = [
+  {
+    icon: AlertTriangle,
+    title: "Reportes ciudadanos",
+    description:
+      "Reportá baches, inundaciones, alumbrado roto o pastizales en el mapa interactivo de Reconquista. Los reportes quedan geolocalizados para que el municipio y los vecinos los vean.",
+    color: "text-orange-400",
+    bg: "bg-orange-500/10 border-orange-500/20",
+  },
+  {
+    icon: Stethoscope,
+    title: "Médicos IAPOS y PAMI",
+    description:
+      "Directorio completo de médicos en Reconquista con especialidad, obra social y ubicación en el mapa. Filtrá por IAPOS, PAMI o especialidad.",
+    color: "text-blue-400",
+    bg: "bg-blue-500/10 border-blue-500/20",
+  },
+  {
+    icon: Pill,
+    title: "Farmacias de turno",
+    description:
+      "Sabé cuál farmacia está de turno hoy en Reconquista, Santa Fe. Información actualizada diariamente con dirección y teléfono.",
+    color: "text-green-400",
+    bg: "bg-green-500/10 border-green-500/20",
+  },
+  {
+    icon: Wrench,
+    title: "Profesionales y oficios",
+    description:
+      "Encontrá plomeros, electricistas, albañiles, pintores y más profesionales de Reconquista. Contactalos por chat en tiempo real directamente desde la app.",
+    color: "text-indigo-400",
+    bg: "bg-indigo-500/10 border-indigo-500/20",
+  },
+  {
+    icon: ShoppingCart,
+    title: "Ofertas de supermercados",
+    description:
+      "Las mejores ofertas y promociones de los supermercados de Reconquista en un solo lugar. Ahorrá en tus compras del día a día.",
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10 border-yellow-500/20",
+  },
+];
 
-export default function Home() {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [farmacias, setFarmacias] = useState<Farmacia[]>([]);
-  const [turno, setTurno] = useState<TurnoResponse | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>("week");
-  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [isDoctorDetailOpen, setIsDoctorDetailOpen] = useState(false);
-  const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
-  const [mapView, setMapView] = useState<MapView>("reports");
-  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
-  const [filterIapos, setFilterIapos] = useState(false);
-  const [showFilterSheet, setShowFilterSheet] = useState(false);
-  const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
-  const [selectedFarmacia, setSelectedFarmacia] = useState<Farmacia | null>(null);
-  const [isFarmaciaDetailOpen, setIsFarmaciaDetailOpen] = useState(false);
-  const [relocatingFarmaciaId, setRelocatingFarmaciaId] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("map_theme") as "light" | "dark") || "light";
-    }
-    return "light";
-  });
+const steps = [
+  {
+    number: "01",
+    icon: Map,
+    title: "Abrí el mapa",
+    description:
+      "Accedé al mapa interactivo de Reconquista y visualizá reportes ciudadanos, médicos y farmacias en tiempo real.",
+  },
+  {
+    number: "02",
+    icon: AlertTriangle,
+    title: "Reportá un problema",
+    description:
+      "Tocá cualquier punto del mapa para reportar un bache, inundación o problema urbano en tu barrio de Reconquista.",
+  },
+  {
+    number: "03",
+    icon: Users,
+    title: "Encontrá servicios",
+    description:
+      "Buscá médicos por especialidad y obra social, farmacias de turno, o contratá un profesional de Reconquista vía chat.",
+  },
+];
 
-  const toggleTheme = () => {
-    setTheme(prev => {
-      const next = prev === "light" ? "dark" : "light";
-      localStorage.setItem("map_theme", next);
-      return next;
-    });
-  };
+const trades = [
+  "Plomeros",
+  "Electricistas",
+  "Albañiles",
+  "Pintores",
+  "Cerrajeros",
+  "Gasistas",
+  "Técnicos",
+  "Jardineros",
+];
 
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
-
-  const { showNotification, permission } = useNotifications();
-
-  // Trackear sección activa
-  useEffect(() => {
-    trackSection(mapView);
-  }, [mapView]);
-
-  // Cargar reportes y médicos al montar el componente
-  useEffect(() => {
-    loadReports();
-    loadDoctors();
-    loadFarmacias();
-  }, []);
-
-  const loadDoctors = async () => {
-    try {
-      const data = await getDoctors();
-      setDoctors(data);
-    } catch (err) {
-      console.error("Error loading doctors:", err);
-    }
-  };
-
-  const loadFarmacias = async () => {
-    try {
-      const [todas, turnoData] = await Promise.all([getFarmacias(), getFarmaciasTurno()]);
-      setTurno(turnoData);
-      const turnoIds = new Set(turnoData.farmacias.map((f: Farmacia) => f.id));
-      setFarmacias(todas.map((f: Farmacia) => ({ ...f, esDeturno: turnoIds.has(f.id) })));
-    } catch (err) {
-      console.error("Error loading farmacias:", err);
-    }
-  };
-
-  const loadReports = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getReports();
-      setReports(data);
-    } catch (err) {
-      console.error("Error loading reports:", err);
-      setError(
-        "Error al cargar los reportes. Asegurate de que la API esté corriendo.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleMapClick = (lat: number, lng: number) => {
-    if (relocatingDoctorId) return;
-    if (mapView === "farmacias" || mapView === "ofertas") return;
-    setSelectedLocation({ lat, lng });
-    if (mapView === "doctors") {
-      setIsAddDoctorOpen(true);
-    } else {
-      setIsModalOpen(true);
-    }
-  };
-
-  const handleDoctorClick = (doctor: Doctor) => {
-    setSelectedDoctor(doctor);
-    setIsDoctorDetailOpen(true);
-  };
-
-  const handleDoctorCreated = (doctor: Doctor) => {
-    setDoctors([...doctors, doctor]);
-  };
-
-  const handleStartRelocate = (doctorId: string) => {
-    setIsDoctorDetailOpen(false);
-    setSelectedDoctor(null);
-    setRelocatingDoctorId(doctorId);
-    setMapView("doctors");
-  };
-
-  const handleDoctorRelocated = async (doctorId: string, lat: number, lng: number) => {
-    try {
-      const updated = await updateDoctor(doctorId, { lat, lng });
-      setDoctors(doctors.map((d) => d.id === doctorId ? updated : d));
-      setRelocatingDoctorId(null);
-    } catch {
-      alert("Error al guardar la ubicación. Intentá de nuevo.");
-    }
-  };
-
-  const handleDoctorUpdate = (updatedDoctor: Doctor) => {
-    setDoctors(doctors.map((d) => (d.id === updatedDoctor.id ? updatedDoctor : d)));
-    if (selectedDoctor?.id === updatedDoctor.id) {
-      setSelectedDoctor(updatedDoctor);
-    }
-  };
-
-  const handleDoctorDelete = (doctorId: string) => {
-    setDoctors(doctors.filter((d) => d.id !== doctorId));
-    setIsDoctorDetailOpen(false);
-    setSelectedDoctor(null);
-  };
-
-  const handleFarmaciaClick = (farmacia: Farmacia) => {
-    setSelectedFarmacia(farmacia);
-    setIsFarmaciaDetailOpen(true);
-  };
-
-  const handleFarmaciaUpdate = (updated: Farmacia) => {
-    setFarmacias(prev => prev.map(f => f.id === updated.id ? { ...f, ...updated } : f));
-    setSelectedFarmacia(prev => prev?.id === updated.id ? { ...prev, ...updated } : prev);
-  };
-
-  const handleStartFarmaciaRelocate = (farmaciaId: string) => {
-    setIsFarmaciaDetailOpen(false);
-    setSelectedFarmacia(null);
-    setRelocatingFarmaciaId(farmaciaId);
-    setMapView("farmacias");
-  };
-
-  const handleFarmaciaRelocated = async (farmaciaId: string, lat: number, lng: number) => {
-    try {
-      const { updateFarmacia } = await import("./utils/api");
-      const updated = await updateFarmacia(farmaciaId, { lat, lng });
-      setFarmacias(prev => prev.map(f => f.id === farmaciaId ? { ...f, ...updated } : f));
-      setRelocatingFarmaciaId(null);
-    } catch {
-      alert("Error al guardar la ubicación. Intentá de nuevo.");
-    }
-  };
-
-  const handleSubmitReport = async (data: {
-    category: string;
-    description: string;
-    barrio: string;
-    direccion: string;
-    photo?: File;
-    photos?: File[];
-    fecha?: string;
-    isUrgent?: boolean;
-  }) => {
-    console.log("handleSubmitReport llamado con:", data);
-    console.log("selectedLocation:", selectedLocation);
-
-    if (selectedLocation) {
-      try {
-        const newReport = await createReport({
-          lat: selectedLocation.lat,
-          lng: selectedLocation.lng,
-          category: data.category as ReportCategory,
-          description: data.description,
-          barrio: data.barrio,
-          direccion: data.direccion,
-          photo: data.photo,
-          photos: data.photos,
-          fecha: data.fecha,
-          isUrgent: data.isUrgent,
-        });
-
-        console.log("Reporte creado exitosamente:", newReport);
-
-        // Actualizar la lista local
-        setReports([...reports, newReport]);
-        // Enviar notificación push
-        if (permission === "granted") {
-          const categoryLabel = getCategoryLabel(newReport.category);
-          const isUrgent = newReport.category === "robo" && newReport.isUrgent;
-
-          await showNotification(
-            isUrgent
-              ? "🚨 ALERTA: Robo en ejecución"
-              : `🚨 Nuevo Reporte: ${categoryLabel}`,
-            {
-              body: `${newReport.description}\nBarrio: ${newReport.barrio}`,
-              tag: newReport.id,
-              requireInteraction: isUrgent,
-              data: {
-                reportId: newReport.id,
-                lat: newReport.lat,
-                lng: newReport.lng,
-              },
-            },
-          );
-        }
-
-        console.log("Reporte agregado, cerrando modal...");
-        setIsModalOpen(false);
-        setSelectedLocation(null);
-      } catch (error) {
-        console.error("Error al crear reporte:", error);
-        alert(
-          "Error al crear el reporte. Asegurate de que la API esté corriendo.",
-        );
-      }
-    } else {
-      console.log("ERROR: No hay selectedLocation");
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedLocation(null);
-  };
-
-  const handleReportClick = (report: Report) => {
-    setSelectedReport(report);
-    setIsDetailModalOpen(true);
-  };
-
-  const handleCloseDetailModal = () => {
-    setIsDetailModalOpen(false);
-    setSelectedReport(null);
-  };
-
-  const handleDeleteReport = async (reportId: string) => {
-    try {
-      await deleteReport(reportId);
-      // Actualizar la lista local eliminando el reporte
-      setReports(reports.filter((r) => r.id !== reportId));
-    } catch (error) {
-      console.error("Error al eliminar reporte:", error);
-      throw error;
-    }
-  };
-
-  const handleUpdateReport = (updatedReport: Report) => {
-    // Actualizar la lista local con el reporte actualizado
-    setReports(
-      reports.map((r) => (r.id === updatedReport.id ? updatedReport : r)),
-    );
-    // Actualizar el reporte seleccionado si es el mismo
-    if (selectedReport?.id === updatedReport.id) {
-      setSelectedReport(updatedReport);
-    }
-  };
-
-  const handleViewAll = () => {
-    setIsTableModalOpen(true);
-  };
-
-  const getFilteredReports = () => {
-    const now = new Date();
-    return reports.filter((report) => {
-      const reportDate = new Date(report.createdAt);
-      switch (filterPeriod) {
-        case "today":
-          return reportDate.toDateString() === now.toDateString();
-        case "week":
-          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          return reportDate >= weekAgo;
-        default:
-          return true;
-      }
-    });
-  };
-
-  const filteredReports = getFilteredReports();
-
-  const allSpecialties = [...new Set(doctors.map((d) => d.especialidad))].sort();
-
-  const toggleSpecialty = (esp: string) => {
-    setSelectedSpecialties((prev) =>
-      prev.includes(esp) ? prev.filter((s) => s !== esp) : [...prev, esp]
-    );
-  };
-
-  const filteredDoctors = doctors
-    .filter((d) => selectedSpecialties.length === 0 || selectedSpecialties.includes(d.especialidad))
-    .filter((d) => !filterIapos || d.iapos);
-
-  // Mostrar estado de carga
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando reportes...</p>
-        </div>
-      </div>
-    );
-  }
-
+export default function LandingPage() {
   return (
-    <div className="flex flex-col h-screen overflow-hidden dark:bg-gray-950">
-      {/* Mensaje de error si la API no está disponible */}
-      {error && (
-        <div className="absolute top-20 right-4 z-[1000] bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-md">
-          <div className="flex items-start">
-            <AlertTriangle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Error de conexión</p>
-              <p className="text-sm">{error}</p>
-              <button
-                onClick={loadReports}
-                className="mt-2 text-sm underline hover:no-underline"
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <div className="min-h-screen bg-gray-950 text-white">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-gray-950/90 backdrop-blur-md border-b border-gray-800">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-green-500 flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold text-white text-sm">Reportes Reconquista</span>
+            </div>
+            <Link
+              href="/app"
+              className="flex items-center gap-1.5 bg-green-500 hover:bg-green-400 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
+            >
+              Abrir app
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </header>
+
+        {/* Hero */}
+        <section className="relative overflow-hidden">
+          {/* Gradiente de fondo */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34,197,94,0.15) 0%, rgba(99,102,241,0.08) 50%, transparent 100%)",
+            }}
+          />
+
+          <div className="relative max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
+            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+              <MapPin className="w-3.5 h-3.5" />
+              Reconquista, Santa Fe, Argentina
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+              La app ciudadana de{" "}
+              <span className="text-green-400">Reconquista</span>
+            </h1>
+
+            <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+              Reportá baches e inundaciones, encontrá médicos IAPOS y PAMI,
+              consultá las farmacias de turno, contratá profesionales y seguí las
+              ofertas de supermercados — todo para los vecinos de{" "}
+              <strong className="text-gray-200">Reconquista, Santa Fe</strong>.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/app"
+                className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-green-500/25"
               >
-                Reintentar
-              </button>
+                Abrir la app
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+              <p className="text-gray-500 text-sm">Gratis — sin registro para ver el mapa</p>
+            </div>
+
+            {/* Stats visuales */}
+            <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto mt-14">
+              {[
+                { label: "Reportes activos", value: "Mapa en vivo" },
+                { label: "Médicos registrados", value: "IAPOS · PAMI" },
+                { label: "Profesionales", value: "Con chat" },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-gray-900 border border-gray-800 rounded-xl p-3 text-center">
+                  <p className="text-green-400 font-bold text-xs">{stat.value}</p>
+                  <p className="text-gray-500 text-[10px] mt-0.5">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      )}
+        </section>
 
-      {/* Navbar */}
-      {/* Navbar */}
-      <div data-tour="view-pills">
-        <Navbar
-          totalReports={reports.length}
-          onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          mapView={mapView}
-          onMapViewChange={(v) => { setMapView(v as MapView); if (v === "doctors" || v === "farmacias" || v === "ofertas") setIsSidebarOpen(false); }}
-          sidebarDisabled={mapView === "doctors" || mapView === "farmacias" || mapView === "ofertas"}
-        />
-      </div>
+        {/* Features */}
+        <section className="max-w-6xl mx-auto px-4 py-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+              Todo lo que necesitás en Reconquista
+            </h2>
+            <p className="text-gray-400 text-lg max-w-xl mx-auto">
+              Una plataforma pensada para los vecinos de Reconquista, Santa Fe.
+            </p>
+          </div>
 
-      {/* Contenedor principal con navbar */}
-      <div className="flex flex-1 overflow-hidden mt-[60px]">
-        {/* Overlay para cerrar sidebar - solo mobile */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-[999] sm:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-
-        {/* Sidebar */}
-        <Sidebar
-          reports={filteredReports}
-          filterPeriod={filterPeriod}
-          onFilterChange={setFilterPeriod}
-          totalReports={reports.length}
-          onReportClick={handleReportClick}
-          onViewAll={handleViewAll}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
-
-        {/* Mapa */}
-        <div className="flex-1 relative w-full h-full" data-tour="map-container">
-          {/* Instrucción contextual — solo al relocalizar */}
-          {relocatingDoctorId && (
-            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
-              <MapPin className="w-3.5 h-3.5" />
-              Arrastrá el pin amarillo a la posición correcta
-              <button onClick={() => setRelocatingDoctorId(null)} className="ml-1 hover:text-amber-100">✕</button>
-            </div>
-          )}
-
-          {relocatingFarmaciaId && (
-            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
-              <MapPin className="w-3.5 h-3.5" />
-              Arrastrá el pin de la farmacia a la posición correcta
-              <button onClick={() => setRelocatingFarmaciaId(null)} className="ml-1 hover:text-amber-100">✕</button>
-            </div>
-          )}
-
-          {/* Hint "tocá para agregar" — solo en vista médicos */}
-          {mapView === "doctors" && !relocatingDoctorId && (
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-sm border border-green-200 text-green-700 px-4 py-2 rounded-full shadow text-xs font-semibold flex items-center gap-1.5 pointer-events-none">
-              <Stethoscope className="w-3.5 h-3.5" />
-              Tocá el mapa para agregar un médico
-            </div>
-          )}
-
-          {/* Card farmacia de turno */}
-          {mapView === "farmacias" && turno && (
-            <div className="absolute top-3 left-3 right-3 z-[999] bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-green-200 dark:border-green-800 p-3 max-w-sm mx-auto">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center flex-shrink-0">
-                  <Pill className="w-4 h-4 text-green-600 dark:text-green-400" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {features.map((f) => (
+              <div
+                key={f.title}
+                className={`bg-gray-900 border rounded-2xl p-6 flex flex-col gap-3 ${f.bg}`}
+              >
+                <div className={`w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center ${f.color}`}>
+                  <f.icon className="w-5 h-5" />
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-900 dark:text-white">Farmacia de turno — {turno.fecha}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">Solo recetas y medicamentos de emergencia · 8h a 8h</p>
-                </div>
+                <h3 className="font-bold text-white text-lg">{f.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{f.description}</p>
               </div>
-              {turno.farmacias.length > 0 ? (
-                <div className="space-y-1.5">
-                  {turno.farmacias.map(f => (
-                    <div key={f.id} className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 rounded-xl px-3 py-2">
-                      <div>
-                        <p className="text-sm font-bold text-green-800 dark:text-green-400">{f.nombre}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{f.direccion}</p>
-                      </div>
-                      {f.telefono && (
-                        <a href={`tel:${f.telefono}`} className="ml-2 flex-shrink-0 p-1.5 bg-green-600 text-white rounded-lg">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                          </svg>
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-gray-400 dark:text-gray-500 italic text-center py-1">No se encontró farmacia de turno para hoy</p>
-              )}
+            ))}
+          </div>
+        </section>
+
+        {/* Cómo funciona */}
+        <section className="bg-gray-900 border-y border-gray-800 py-20">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+                Tres pasos, sin vueltas
+              </h2>
+              <p className="text-gray-400 text-lg max-w-xl mx-auto">
+                Reportes ciudadanos en Reconquista nunca fue tan fácil.
+              </p>
             </div>
-          )}
 
-          {/* Botón filtrar especialidades */}
-          {mapView === "doctors" && allSpecialties.length > 0 && (
-            <button
-              data-tour="filter-btn"
-              onClick={() => setShowFilterSheet(true)}
-              className={`absolute top-3 left-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
-                selectedSpecialties.length > 0
-                  ? "bg-green-500 text-white"
-                  : "bg-white text-gray-700 border border-gray-300"
-              }`}
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
-              </svg>
-              {selectedSpecialties.length > 0 ? `${selectedSpecialties.length} filtro${selectedSpecialties.length > 1 ? "s" : ""}` : "Filtrar"}
-            </button>
-          )}
-
-          {/* Bottom sheet de filtros */}
-          {showFilterSheet && (
-            <>
-              <div className="fixed inset-0 z-[1500] bg-black/40" onClick={() => setShowFilterSheet(false)} />
-              <div className="fixed bottom-0 left-0 right-0 z-[1501] bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
-                <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700 flex-shrink-0">
-                  <h3 className="font-bold text-gray-900 dark:text-white">Filtrar médicos</h3>
-                  <div className="flex items-center gap-2">
-                    {(selectedSpecialties.length > 0 || filterIapos) && (
-                      <button onClick={() => { setSelectedSpecialties([]); setFilterIapos(false); }} className="text-xs text-red-500 font-semibold">
-                        Limpiar
-                      </button>
-                    )}
-                    <button onClick={() => setShowFilterSheet(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
-                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {steps.map((step, i) => (
+                <div key={step.number} className="relative flex flex-col items-center text-center gap-4">
+                  {/* Línea conectora */}
+                  {i < steps.length - 1 && (
+                    <div className="hidden md:block absolute top-8 left-[calc(50%+2.5rem)] right-0 h-px bg-gray-700" />
+                  )}
+                  <div className="w-16 h-16 rounded-2xl bg-gray-800 border border-gray-700 flex items-center justify-center flex-shrink-0 relative">
+                    <step.icon className="w-7 h-7 text-green-400" />
+                    <span className="absolute -top-2 -right-2 text-[10px] font-bold bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center">
+                      {step.number.replace("0", "")}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-lg mb-2">{step.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
                   </div>
                 </div>
-                <div className="overflow-y-auto p-4 space-y-4">
-                  {/* Filtro obra social */}
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Obra Social</p>
-                    <button
-                      onClick={() => setFilterIapos(prev => !prev)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                        filterIapos ? "bg-blue-500 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                      }`}
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Oficios highlight */}
+        <section className="max-w-6xl mx-auto px-4 py-20">
+          <div className="bg-gray-900 border border-indigo-500/20 rounded-3xl p-8 sm:p-12">
+            <div className="flex flex-col md:flex-row gap-10 items-start">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                    <Wrench className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <span className="text-indigo-400 font-semibold text-sm">Directorio de profesionales</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+                  Encontrá el profesional que necesitás en{" "}
+                  <span className="text-indigo-400">Reconquista</span>
+                </h2>
+                <p className="text-gray-400 text-lg leading-relaxed mb-6">
+                  Plomeros, electricistas, albañiles y decenas de rubros más.
+                  Los vecinos de Reconquista, Santa Fe, pueden contactar
+                  directamente a los profesionales por{" "}
+                  <strong className="text-white">chat en tiempo real</strong> —
+                  sin intermediarios, sin comisiones.
+                </p>
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <MessageCircle className="w-4 h-4 text-indigo-400" />
+                  Chat en tiempo real incluido
+                </div>
+                <div className="flex items-center gap-2 text-gray-400 text-sm mt-2">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  Perfiles verificados con reseñas
+                </div>
+                <div className="flex items-center gap-2 text-gray-400 text-sm mt-2">
+                  <Bell className="w-4 h-4 text-yellow-400" />
+                  Notificaciones de respuesta
+                </div>
+                <Link
+                  href="/app"
+                  className="inline-flex items-center gap-2 mt-8 bg-indigo-500 hover:bg-indigo-400 text-white font-bold px-6 py-3 rounded-xl transition-colors"
+                >
+                  Explorar profesionales
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="flex-shrink-0 w-full md:w-64">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
+                  Rubros disponibles
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {trades.map((trade) => (
+                    <span
+                      key={trade}
+                      className="bg-gray-800 border border-gray-700 text-gray-300 text-sm px-3 py-1.5 rounded-full"
                     >
-                      <Stethoscope className="w-3.5 h-3.5 inline mr-1" />Solo IAPOS
-                    </button>
-                  </div>
-                  {/* Filtro especialidad */}
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Especialidad</p>
-                  <div className="flex flex-wrap gap-2">
-                    {allSpecialties.map((esp) => (
-                      <button
-                        key={esp}
-                        onClick={() => toggleSpecialty(esp)}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                          selectedSpecialties.includes(esp)
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                        }`}
-                      >
-                        {esp}
-                      </button>
-                    ))}
-                  </div>
-                  </div>
+                      {trade}
+                    </span>
+                  ))}
+                  <span className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm px-3 py-1.5 rounded-full">
+                    y muchos más...
+                  </span>
                 </div>
               </div>
-            </>
-          )}
+            </div>
+          </div>
+        </section>
 
-          <MapComponent
-            onMapClick={handleMapClick}
-            reports={filteredReports}
-            doctors={filteredDoctors}
-            farmacias={farmacias}
-            showDoctors={mapView === "doctors"}
-            showReports={mapView === "reports"}
-            showFarmacias={mapView === "farmacias"}
-            onDoctorClick={handleDoctorClick}
-            relocatingDoctorId={relocatingDoctorId}
-            onDoctorRelocated={handleDoctorRelocated}
-            onFarmaciaClick={handleFarmaciaClick}
-            relocatingFarmaciaId={relocatingFarmaciaId}
-            onFarmaciaRelocated={handleFarmaciaRelocated}
-            theme={theme}
-          />
-        </div>
+        {/* CTA final */}
+        <section className="bg-gray-900 border-t border-gray-800 py-20">
+          <div className="max-w-2xl mx-auto px-4 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mx-auto mb-6">
+              <MapPin className="w-8 h-8 text-green-400" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
+              Empezá ahora — es gratis
+            </h2>
+            <p className="text-gray-400 text-lg mb-8">
+              Unite a los vecinos de{" "}
+              <strong className="text-white">Reconquista, Santa Fe</strong> que
+              ya usan la app para mejorar la ciudad, encontrar médicos y
+              contratar profesionales de confianza.
+            </p>
+            <Link
+              href="/app"
+              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-green-500/25"
+            >
+              Abrir Reportes Reconquista
+              <ChevronRight className="w-5 h-5" />
+            </Link>
+            <p className="text-gray-600 text-xs mt-4">
+              PWA instalable en tu celular — sin descarga de tienda
+            </p>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t border-gray-800 py-8">
+          <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-green-500 flex items-center justify-center">
+                <MapPin className="w-3.5 h-3.5 text-white" />
+              </div>
+              <span className="text-gray-400 text-sm">
+                Reportes Reconquista — Reconquista, Santa Fe, Argentina
+              </span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-gray-500">
+              <Link href="/app" className="hover:text-gray-300 transition-colors">
+                Abrir la app
+              </Link>
+              <Link href="/profesionales" className="hover:text-gray-300 transition-colors">
+                Profesionales
+              </Link>
+              <Link href="/ofertas" className="hover:text-gray-300 transition-colors">
+                Ofertas
+              </Link>
+            </div>
+          </div>
+        </footer>
       </div>
-
-      {/* Modal de reporte - fuera del contenedor del mapa */}
-      {selectedLocation && (
-        <ReportModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onSubmit={handleSubmitReport}
-          lat={selectedLocation.lat}
-          lng={selectedLocation.lng}
-        />
-      )}
-
-      {/* Modal de detalle del reporte */}
-      {selectedReport && (
-        <ReportDetailModal
-          isOpen={isDetailModalOpen}
-          onClose={handleCloseDetailModal}
-          report={selectedReport}
-          onDelete={handleDeleteReport}
-          onUpdate={handleUpdateReport}
-        />
-      )}
-
-      {/* Modal de detalle del médico */}
-      {selectedDoctor && (
-        <DoctorDetailModal
-          isOpen={isDoctorDetailOpen}
-          onClose={() => { setIsDoctorDetailOpen(false); setSelectedDoctor(null); }}
-          doctor={selectedDoctor}
-          onDoctorUpdate={handleDoctorUpdate}
-          onRelocate={handleStartRelocate}
-          onDelete={handleDoctorDelete}
-        />
-      )}
-
-      {/* Modal de detalle de farmacia */}
-      {selectedFarmacia && (
-        <FarmaciaDetailModal
-          isOpen={isFarmaciaDetailOpen}
-          onClose={() => { setIsFarmaciaDetailOpen(false); setSelectedFarmacia(null); }}
-          farmacia={selectedFarmacia}
-          onFarmaciaUpdate={handleFarmaciaUpdate}
-          onStartDrag={handleStartFarmaciaRelocate}
-        />
-      )}
-
-      {/* Modal para agregar médico */}
-      {selectedLocation && isAddDoctorOpen && (
-        <AddDoctorModal
-          isOpen={isAddDoctorOpen}
-          onClose={() => { setIsAddDoctorOpen(false); setSelectedLocation(null); }}
-          lat={selectedLocation.lat}
-          lng={selectedLocation.lng}
-          onDoctorCreated={handleDoctorCreated}
-        />
-      )}
-
-      {/* Modal de tabla de todos los reportes */}
-      <ReportsTableModal
-        isOpen={isTableModalOpen}
-        onClose={() => setIsTableModalOpen(false)}
-        reports={reports}
-        onReportClick={(report) => {
-          setIsTableModalOpen(false);
-          setSelectedReport(report);
-          setIsDetailModalOpen(true);
-        }}
-        onDelete={handleDeleteReport}
-      />
-
-      {/* Botones de emergencia — solo en vista reportes/todo */}
-      {mapView === "reports" && (
-        <div data-tour="emergency-buttons">
-          <FloatingBottomNav />
-        </div>
-      )}
-
-
-
-
-      {/* Vista de ofertas de supermercados */}
-      <OfertasView isVisible={mapView === "ofertas"} />
-
-      {/* Ticker de reportes recientes */}
-      {mapView === "reports" && (
-        <ReportsTicker
-          reports={reports}
-          onReportClick={(r) => setSelectedReport(r)}
-        />
-      )}
-
-      {/* Botón crear reporte por voz */}
-      <VoiceReportButton
-        onReportCreated={(report) => setReports((prev) => [...prev, report])}
-      />
-
-      {/* Botón tema claro/oscuro */}
-      <button
-        onClick={toggleTheme}
-        title={theme === "light" ? "Cambiar a tema oscuro" : "Cambiar a tema claro"}
-        className={`fixed bottom-44 right-4 z-[1000] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all hover:shadow-xl ${
-          theme === "dark"
-            ? "bg-gray-800 border border-gray-600 text-yellow-300 hover:bg-gray-700"
-            : "bg-white border border-gray-200 text-gray-600 hover:text-gray-900"
-        }`}
-      >
-        {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
-
-    </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, BarChart2, FileText, MapPin, ArrowLeft, TrendingUp, Sun, Moon } from "lucide-react";
+import { Users, BarChart2, FileText, MapPin, ArrowLeft, TrendingUp, Sun, Moon, Briefcase, MessageSquare, Star } from "lucide-react";
 import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -27,6 +27,10 @@ interface Analytics {
   totalReports: number;
   reportsByCategory: { category: string; count: number }[];
   topBarrios: { barrio: string; count: number }[];
+  professionals?: { total: number; active: number };
+  users?: number;
+  conversations?: { total: number; active: number };
+  reviews?: number;
 }
 
 function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
@@ -114,7 +118,7 @@ export default function StatsPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
         <Link
-          href="/"
+          href="/app"
           className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -192,6 +196,32 @@ export default function StatsPage() {
                       color={SECTION_COLORS[s.section] ?? "bg-gray-400"}
                     />
                   ))}
+                </div>
+              </section>
+            )}
+
+            {/* Plataforma */}
+            {(data.professionals || data.users !== undefined || data.conversations || data.reviews !== undefined) && (
+              <section>
+                <div className="flex items-center gap-2 mb-3">
+                  <Briefcase className="w-4 h-4 text-indigo-500" />
+                  <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Plataforma</h2>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {data.professionals && (
+                    <>
+                      <StatCard label="Profesionales" value={data.professionals.total} sub={`${data.professionals.active} activos`} />
+                    </>
+                  )}
+                  {data.users !== undefined && (
+                    <StatCard label="Usuarios registrados" value={data.users} />
+                  )}
+                  {data.conversations && (
+                    <StatCard label="Conversaciones" value={data.conversations.total} sub={`${data.conversations.active} activas`} />
+                  )}
+                  {data.reviews !== undefined && (
+                    <StatCard label="Reseñas" value={data.reviews} />
+                  )}
                 </div>
               </section>
             )}

@@ -166,7 +166,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
         {/* Título */}
         <h1
           className="text-sm font-bold truncate flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/app")}
         >
           Reportes RQ
         </h1>
@@ -178,7 +178,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
             const handleClick = () => {
               if (view === "ofertas") return router.push("/ofertas");
               if (onMapViewChange) return onMapViewChange(view);
-              router.push("/");
+              router.push("/app");
             };
             return (
               <button
