@@ -272,20 +272,25 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
               </p>
               <h1
                 className="text-3xl sm:text-5xl font-black leading-tight mb-3 text-center"
-                style={{
-                  fontFamily: "var(--font-montserrat)",
-                  background: isDark
-                    ? "linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%)"
-                    : "linear-gradient(135deg, #111827 0%, #6b7280 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
+                style={
+                  isDark
+                    ? {
+                        fontFamily: "var(--font-montserrat)",
+                        background: "linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }
+                    : {
+                        fontFamily: "var(--font-montserrat)",
+                        color: "#111827",
+                      }
+                }
               >
                 Oficios &amp; Servicios
               </h1>
               <p className={`text-sm mb-6 text-center ${labelColor}`}>
-                Plomeros, electricistas, gasistas y más — cerca tuyo.
+                Plomeros, electricistas, gasistas y mas, cerca tuyo.
               </p>
             </div>
 
