@@ -304,7 +304,7 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar plomero, electricista, etc."
-                style={{ color: inputColor }}
+                style={{ color: inputColor, backgroundColor: isDark ? "#111827" : "#ffffff" }}
                 className={`w-full pl-12 pr-10 py-4 rounded-2xl border text-sm focus:outline-none transition-colors ${inputBg}`}
               />
               {query && (
