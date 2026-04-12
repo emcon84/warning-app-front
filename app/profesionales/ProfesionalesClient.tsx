@@ -232,7 +232,7 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
   const labelColor = isDark ? "text-gray-400" : "text-gray-500";
 
   return (
-    <div className={`min-h-screen ${bg} transition-colors duration-300 flex flex-col`}>
+    <div className={`min-h-screen pb-16 md:pb-0 ${bg} transition-colors duration-300 flex flex-col`}>
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
 
       {/* Toggle tema */}
@@ -258,7 +258,7 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
         {/* Buscador — animado de centro a top */}
         <div
           className="w-full transition-all duration-500 ease-in-out"
-          style={{ paddingTop: showResults ? "5rem" : "calc(50vh - 170px)" }}
+          style={{ paddingTop: showResults ? "4rem" : "calc(50vh - 180px)" }}
         >
           <div className="max-w-2xl mx-auto px-4">
 
@@ -271,7 +271,7 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
                 Reconquista · Santa Fe
               </p>
               <h1
-                className="text-5xl font-black leading-tight mb-3 text-center"
+                className="text-3xl sm:text-5xl font-black leading-tight mb-3 text-center"
                 style={{
                   fontFamily: "var(--font-montserrat)",
                   background: isDark
@@ -343,7 +343,7 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
                 <>
                   <p className={`text-sm font-medium mb-5 ${labelColor}`}>Profesionales destacados</p>
                   {featured.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-6">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 sm:gap-6">
                       {featured.map((pro) => <FeaturedCard key={pro.id} pro={pro} dark={isDark} />)}
                     </div>
                   ) : (

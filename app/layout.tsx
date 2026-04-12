@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import NotificationPrompt from "./components/NotificationPrompt";
 import ApiStatusBanner from "./components/ApiStatusBanner";
+import MobileBottomNav from "./components/MobileBottomNav";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
@@ -96,6 +97,7 @@ export default function RootLayout({
         <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} font-sans antialiased`}>
           <ApiStatusBanner />
           {children}
+          <MobileBottomNav />
           <NotificationPrompt />
         </body>
       </html>
