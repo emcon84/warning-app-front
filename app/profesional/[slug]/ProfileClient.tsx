@@ -280,11 +280,11 @@ export default function ProfileClient({ pro, slug }: Props) {
               </span>
             </div>
             {pro.disponible ? (
-              <span className="inline-block mt-2 text-xs px-2.5 py-1 rounded-full bg-green-900/50 text-green-400 border border-green-800">
+              <span className={`inline-block mt-2 text-xs px-2.5 py-1 rounded-full border ${isDark ? "bg-green-900/50 text-green-400 border-green-800" : "bg-green-100 text-green-700 border-green-300"}`}>
                 Disponible
               </span>
             ) : (
-              <span className="inline-block mt-2 text-xs px-2.5 py-1 rounded-full bg-gray-800 text-gray-500 border border-gray-700">
+              <span className={`inline-block mt-2 text-xs px-2.5 py-1 rounded-full border ${isDark ? "bg-gray-800 text-gray-500 border-gray-700" : "bg-gray-100 text-gray-500 border-gray-300"}`}>
                 No disponible
               </span>
             )}

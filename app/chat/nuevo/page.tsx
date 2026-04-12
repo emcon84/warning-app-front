@@ -23,10 +23,22 @@ function NuevoChat() {
   const { isLoaded, isSignedIn } = useUser();
   const { getToken, userId } = useAuth();
 
+  const [isDark, setIsDark] = useState(true);
   const [professional, setProfessional] = useState<{ nombre: string; apellido: string; oficios: string[]; foto?: string } | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    setIsDark(stored !== "light");
+
+    function onStorage(e: StorageEvent) {
+      if (e.key === "theme") setIsDark(e.newValue !== "light");
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   useEffect(() => {
     if (!professionalId) return;
@@ -70,22 +82,41 @@ function NuevoChat() {
     }
   }
 
+  // Theme helpers
+  const bg         = isDark ? "bg-gray-950" : "bg-gray-50";
+  const textPrimary = isDark ? "text-white" : "text-gray-900";
+  const textSec    = isDark ? "text-gray-400" : "text-gray-500";
+  const textMuted  = isDark ? "text-gray-600" : "text-gray-400";
+  const cardBg     = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const inputCls   = isDark
+    ? "bg-gray-900 border-gray-700 placeholder-gray-600 focus:border-gray-500"
+    : "bg-white border-gray-200 placeholder-gray-400 focus:border-gray-400";
+  const inputColor = isDark ? "#f9fafb" : "#111827";
+  const inputBg    = isDark ? "#111827" : "#ffffff";
+  const infoBg     = isDark ? "bg-blue-950/40 border-blue-900/50" : "bg-blue-50 border-blue-200";
+  const infoText   = isDark ? "text-blue-300" : "text-blue-700";
+  const infoIcon   = isDark ? "text-blue-400" : "text-blue-500";
+  const errorCls   = isDark
+    ? "text-red-400 bg-red-900/20 border-red-800"
+    : "text-red-600 bg-red-50 border-red-300";
+  const backBtn    = isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900";
+
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-gray-700 border-t-white rounded-full animate-spin" />
+      <div className={`min-h-screen ${bg} flex items-center justify-center`}>
+        <div className={`w-6 h-6 border-2 rounded-full animate-spin ${isDark ? "border-gray-700 border-t-white" : "border-gray-200 border-t-gray-700"}`} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
       <Navbar sidebarDisabled mapView="profesionales" />
 
       <div className="flex-1 flex flex-col max-w-xl mx-auto w-full px-4 pt-24 pb-8">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white mb-6 transition-colors"
+          className={`flex items-center gap-1.5 text-sm mb-6 transition-colors ${backBtn}`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -94,51 +125,51 @@ function NuevoChat() {
         </button>
 
         {professional && (
-          <div className="flex items-center gap-3 mb-8 p-4 rounded-2xl bg-gray-900 border border-gray-800">
-            <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-700 flex-shrink-0 flex items-center justify-center text-xl font-bold text-gray-300">
+          <div className={`flex items-center gap-3 mb-8 p-4 rounded-2xl border ${cardBg}`}>
+            <div className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center text-xl font-bold ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"}`}>
               {professional.foto
                 ? <img src={professional.foto} alt="" className="w-full h-full object-cover" />
                 : professional.nombre[0].toUpperCase()}
             </div>
             <div>
-              <p className="font-semibold text-white">{professional.nombre} {professional.apellido}</p>
-              <p className="text-sm text-gray-400 capitalize">{professional.oficios[0]}</p>
+              <p className={`font-semibold ${textPrimary}`}>{professional.nombre} {professional.apellido}</p>
+              <p className={`text-sm capitalize ${textSec}`}>{professional.oficios[0]}</p>
             </div>
           </div>
         )}
 
-        <h1 className="text-xl font-bold mb-1">Iniciar contacto</h1>
-        <p className="text-sm text-gray-400 mb-6">
-          Tu mensaje es privado. El profesional no ve tu teléfono ni datos de contacto hasta que acordés trabajar juntos.
+        <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Iniciar contacto</h1>
+        <p className={`text-sm mb-6 ${textSec}`}>
+          Tu mensaje es privado. El profesional no ve tu telefono ni datos de contacto hasta que acordes trabajar juntos.
         </p>
 
         <form onSubmit={handleStart} className="flex flex-col gap-4">
           <div>
-            <label className="text-xs text-gray-400 mb-1.5 block">
-              ¿Qué necesitás? <span className="text-gray-600">({message.length}/500)</span>
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
+              Que necesitas? <span className={textMuted}>({message.length}/500)</span>
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value.slice(0, 500))}
-              placeholder="Ej: Necesito un plomero para arreglar una pérdida de agua en la cocina..."
+              placeholder="Ej: Necesito un plomero para arreglar una perdida de agua en la cocina..."
               rows={5}
               autoFocus
-              style={{ color: "#f9fafb" }}
-              className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 placeholder-gray-600 text-sm focus:outline-none focus:border-gray-500 resize-none"
+              style={{ color: inputColor, backgroundColor: inputBg }}
+              className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
             />
           </div>
 
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-950/40 border border-blue-900/50">
-            <svg className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className={`flex items-start gap-2 p-3 rounded-xl border ${infoBg}`}>
+            <svg className={`w-4 h-4 mt-0.5 flex-shrink-0 ${infoIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-xs text-blue-300">
-              Tu privacidad está protegida. El número de teléfono y datos de contacto se comparten solo cuando ambos acuerdan.
+            <p className={`text-xs ${infoText}`}>
+              Tu privacidad esta protegida. El numero de telefono y datos de contacto se comparten solo cuando ambos acuerdan.
             </p>
           </div>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-900/20 border border-red-800 rounded-xl px-4 py-3">{error}</p>
+            <p className={`text-sm border rounded-xl px-4 py-3 ${errorCls}`}>{error}</p>
           )}
 
           <button

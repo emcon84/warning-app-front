@@ -22,17 +22,24 @@ const OFICIOS_SUGERIDOS = [
 ];
 
 function Step4Notificaciones({
+  isDark,
   permission,
   isSupported,
   requestPermission,
   onFinish,
 }: {
+  isDark: boolean;
   permission: NotificationPermission;
   isSupported: boolean;
   requestPermission: () => Promise<boolean>;
   onFinish: () => void;
 }) {
   const [activating, setActivating] = useState(false);
+
+  const textSec = isDark ? "text-gray-400" : "text-gray-500";
+  const btnSecondary = isDark
+    ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
+    : "bg-gray-100 text-gray-600 hover:bg-gray-200";
 
   useEffect(() => {
     if (permission === "granted") {
@@ -50,11 +57,13 @@ function Step4Notificaciones({
   if (permission === "granted") {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <div className="w-16 h-16 rounded-full bg-green-900/40 border border-green-700 flex items-center justify-center">
-          <CheckCircle className="w-8 h-8 text-green-400" />
+        <div className={`w-16 h-16 rounded-full border flex items-center justify-center ${
+          isDark ? "bg-green-900/40 border-green-700" : "bg-green-100 border-green-300"
+        }`}>
+          <CheckCircle className={`w-8 h-8 ${isDark ? "text-green-400" : "text-green-600"}`} />
         </div>
-        <p className="text-white font-semibold text-lg">Notificaciones activadas</p>
-        <p className="text-sm text-gray-400 text-center">Te vamos a avisar cuando un cliente te contacte.</p>
+        <p className={`font-semibold text-lg ${isDark ? "text-white" : "text-gray-900"}`}>Notificaciones activadas</p>
+        <p className={`text-sm text-center ${textSec}`}>Te vamos a avisar cuando un cliente te contacte.</p>
       </div>
     );
   }
@@ -62,15 +71,17 @@ function Step4Notificaciones({
   return (
     <div>
       <div className="flex flex-col items-center text-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-blue-950/60 border border-blue-800 flex items-center justify-center mb-4">
-          <Bell className="w-8 h-8 text-blue-400" />
+        <div className={`w-16 h-16 rounded-full border flex items-center justify-center mb-4 ${
+          isDark ? "bg-blue-950/60 border-blue-800" : "bg-blue-50 border-blue-200"
+        }`}>
+          <Bell className={`w-8 h-8 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
         </div>
-        <h1 className="text-xl font-bold mb-1">Activa las notificaciones</h1>
-        <p className="text-sm text-gray-400">Para saber cuando un cliente te contacta</p>
+        <h1 className={`text-xl font-bold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>Activa las notificaciones</h1>
+        <p className={`text-sm ${textSec}`}>Para saber cuando un cliente te contacta</p>
       </div>
 
       {!isSupported && (
-        <p className="text-xs text-gray-500 text-center mb-6">
+        <p className={`text-xs text-center mb-6 ${isDark ? "text-gray-500" : "text-gray-400"}`}>
           Tu navegador no soporta notificaciones push. Podras activarlas despues desde tu perfil.
         </p>
       )}
@@ -87,7 +98,7 @@ function Step4Notificaciones({
         )}
         <button
           onClick={onFinish}
-          className="w-full py-3.5 rounded-2xl bg-gray-800 text-gray-300 font-semibold text-sm hover:bg-gray-700 transition-colors"
+          className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-colors ${btnSecondary}`}
         >
           Omitir por ahora
         </button>
@@ -101,6 +112,7 @@ export default function NuevoProfesionalClient() {
   const { getToken } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
 
+  const [isDark, setIsDark] = useState(true);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -117,6 +129,51 @@ export default function NuevoProfesionalClient() {
     descripcion: "",
     experiencia: "",
   });
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    setIsDark(stored !== "light");
+
+    function onStorage(e: StorageEvent) {
+      if (e.key === "theme") setIsDark(e.newValue !== "light");
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // Theme helpers
+  const bg          = isDark ? "bg-gray-950" : "bg-gray-50";
+  const textPrimary = isDark ? "text-white" : "text-gray-900";
+  const textSec     = isDark ? "text-gray-400" : "text-gray-500";
+  const textMuted   = isDark ? "text-gray-600" : "text-gray-400";
+  const inputCls    = isDark
+    ? "bg-gray-900 border-gray-700 placeholder-gray-500 focus:border-gray-500"
+    : "bg-white border-gray-200 placeholder-gray-400 focus:border-gray-400";
+  const inputColor  = isDark ? "#f9fafb" : "#111827";
+  const inputBg     = isDark ? "#111827" : "#ffffff";
+  const btnSecondary = isDark
+    ? "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
+    : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200";
+  const stepFuture  = isDark ? "bg-gray-800 text-gray-500" : "bg-gray-200 text-gray-400";
+  const stepLine    = isDark ? "bg-gray-700" : "bg-gray-200";
+  const tagActive   = isDark
+    ? "bg-white text-gray-900 border-white"
+    : "bg-gray-900 text-white border-gray-900";
+  const tagInactive = isDark
+    ? "bg-gray-900 text-gray-300 border-gray-700 hover:border-gray-500"
+    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400";
+  const selectedTag = isDark
+    ? "bg-green-900/50 text-green-400 border-green-800"
+    : "bg-green-100 text-green-700 border-green-300";
+  const customInput = isDark
+    ? "bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-gray-500"
+    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-gray-400";
+  const addBtn      = isDark
+    ? "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
+    : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200";
+  const errorCls    = isDark
+    ? "text-red-400 bg-red-900/20 border-red-800"
+    : "text-red-600 bg-red-50 border-red-300";
 
   function toggleOficio(oficio: string) {
     setForm((f) => ({
@@ -182,7 +239,7 @@ export default function NuevoProfesionalClient() {
   const canSubmit = form.descripcion.length >= 30;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
       <Navbar sidebarDisabled />
 
       <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-24 pb-12">
@@ -193,12 +250,12 @@ export default function NuevoProfesionalClient() {
             <div key={s} className="flex items-center gap-2 flex-1">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
                 s < step ? "bg-green-500 text-white" :
-                s === step ? "bg-white text-gray-900" :
-                "bg-gray-800 text-gray-500"
+                s === step ? (isDark ? "bg-white text-gray-900" : "bg-gray-900 text-white") :
+                stepFuture
               }`}>
                 {s < step ? "✓" : s}
               </div>
-              {s < 4 && <div className={`h-px flex-1 transition-colors ${s < step ? "bg-green-500" : "bg-gray-700"}`} />}
+              {s < 4 && <div className={`h-px flex-1 transition-colors ${s < step ? "bg-green-500" : stepLine}`} />}
             </div>
           ))}
         </div>
@@ -206,61 +263,66 @@ export default function NuevoProfesionalClient() {
         {/* Step 1 — Datos personales */}
         {step === 1 && (
           <div>
-            <h1 className="text-xl font-bold mb-1">Tus datos</h1>
-            <p className="text-sm text-gray-400 mb-6">Cómo te van a ver los clientes.</p>
+            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Tus datos</h1>
+            <p className={`text-sm mb-6 ${textSec}`}>Como te van a ver los clientes.</p>
 
             <div className="flex flex-col gap-4">
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-400 mb-1.5 block">Nombre</label>
+                  <label className={`text-xs mb-1.5 block ${textSec}`}>Nombre</label>
                   <input
                     value={form.nombre}
                     onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
                     placeholder="Juan"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
+                    style={{ color: inputColor, backgroundColor: inputBg }}
+                    className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-xs text-gray-400 mb-1.5 block">Apellido</label>
+                  <label className={`text-xs mb-1.5 block ${textSec}`}>Apellido</label>
                   <input
                     value={form.apellido}
                     onChange={(e) => setForm((f) => ({ ...f, apellido: e.target.value }))}
-                    placeholder="García"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
+                    placeholder="Garcia"
+                    style={{ color: inputColor, backgroundColor: inputBg }}
+                    className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">Barrio donde trabajás</label>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>Barrio donde trabajas</label>
                 <select
                   value={form.barrio}
                   onChange={(e) => setForm((f) => ({ ...f, barrio: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white focus:outline-none focus:border-gray-500 text-sm"
+                  style={{ color: inputColor, backgroundColor: inputBg }}
+                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                 >
-                  <option value="">Seleccioná un barrio</option>
+                  <option value="">Selecciona un barrio</option>
                   {BARRIOS.map((b) => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">Teléfono</label>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>Telefono</label>
                 <input
                   value={form.telefono}
                   onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))}
                   placeholder="03482-XXXXXX"
-                  className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
+                  style={{ color: inputColor, backgroundColor: inputBg }}
+                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                 />
-                <p className="text-xs text-gray-600 mt-1">Solo se comparte cuando acordás con un cliente.</p>
+                <p className={`text-xs mt-1 ${textMuted}`}>Solo se comparte cuando acordas con un cliente.</p>
               </div>
 
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">WhatsApp <span className="text-gray-600">(opcional)</span></label>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>WhatsApp <span className={textMuted}>(opcional)</span></label>
                 <input
                   value={form.whatsapp}
                   onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
                   placeholder="5493482XXXXXX"
-                  className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
+                  style={{ color: inputColor, backgroundColor: inputBg }}
+                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                 />
               </div>
             </div>
@@ -278,8 +340,8 @@ export default function NuevoProfesionalClient() {
         {/* Step 2 — Oficios */}
         {step === 2 && (
           <div>
-            <h1 className="text-xl font-bold mb-1">¿Qué hacés?</h1>
-            <p className="text-sm text-gray-400 mb-6">Elegí hasta 3 oficios. Los clientes te van a encontrar por estos.</p>
+            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Que haces?</h1>
+            <p className={`text-sm mb-6 ${textSec}`}>Elegí hasta 3 oficios. Los clientes te van a encontrar por estos.</p>
 
             <div className="flex flex-wrap gap-2 mb-5">
               {OFICIOS_SUGERIDOS.map((o) => (
@@ -287,9 +349,7 @@ export default function NuevoProfesionalClient() {
                   key={o}
                   onClick={() => toggleOficio(o)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                    form.oficios.includes(o)
-                      ? "bg-white text-gray-900 border-white"
-                      : "bg-gray-900 text-gray-300 border-gray-700 hover:border-gray-500"
+                    form.oficios.includes(o) ? tagActive : tagInactive
                   }`}
                 >
                   {o}
@@ -303,11 +363,12 @@ export default function NuevoProfesionalClient() {
                 onChange={(e) => setForm((f) => ({ ...f, oficioCustom: e.target.value }))}
                 onKeyDown={(e) => e.key === "Enter" && addCustomOficio()}
                 placeholder="Otro oficio..."
-                className="flex-1 px-4 py-2.5 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm"
+                style={{ color: inputColor, backgroundColor: inputBg }}
+                className={`flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${customInput}`}
               />
               <button
                 onClick={addCustomOficio}
-                className="px-4 py-2.5 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 text-sm border border-gray-700"
+                className={`px-4 py-2.5 rounded-xl text-sm border transition-colors ${addBtn}`}
               >
                 Agregar
               </button>
@@ -316,9 +377,9 @@ export default function NuevoProfesionalClient() {
             {form.oficios.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {form.oficios.map((o) => (
-                  <span key={o} className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-900/50 text-green-400 border border-green-800 text-sm">
+                  <span key={o} className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm ${selectedTag}`}>
                     {o}
-                    <button onClick={() => toggleOficio(o)} className="hover:text-green-200">✕</button>
+                    <button onClick={() => toggleOficio(o)} className="hover:opacity-70">✕</button>
                   </span>
                 ))}
               </div>
@@ -327,9 +388,9 @@ export default function NuevoProfesionalClient() {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 py-3.5 rounded-2xl bg-gray-800 text-gray-300 font-semibold text-sm hover:bg-gray-700 transition-colors"
+                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
               >
-                Atrás
+                Atras
               </button>
               <button
                 onClick={() => setStep(3)}
@@ -342,63 +403,55 @@ export default function NuevoProfesionalClient() {
           </div>
         )}
 
-        {/* Step 4 — Notificaciones */}
-        {step === 4 && (
-          <Step4Notificaciones
-            permission={permission}
-            isSupported={isSupported}
-            requestPermission={requestPermission}
-            onFinish={() => router.push(`/profesional/${createdSlug}`)}
-          />
-        )}
-
         {/* Step 3 — Perfil */}
         {step === 3 && (
           <div>
-            <h1 className="text-xl font-bold mb-1">Tu perfil</h1>
-            <p className="text-sm text-gray-400 mb-6">Contale a los clientes quién sos y qué hacés. Esto es lo primero que van a leer.</p>
+            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Tu perfil</h1>
+            <p className={`text-sm mb-6 ${textSec}`}>Contale a los clientes quien sos y que haces. Esto es lo primero que van a leer.</p>
 
             <div className="flex flex-col gap-4">
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">
-                  Descripción <span className="text-gray-600">({form.descripcion.length}/500)</span>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>
+                  Descripcion <span className={textMuted}>({form.descripcion.length}/500)</span>
                 </label>
                 <textarea
                   value={form.descripcion}
                   onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value.slice(0, 500) }))}
-                  placeholder="Contá qué hacés, cómo trabajás, en qué zonas atendés. Cuanto más claro, mejor."
+                  placeholder="Conta que haces, como trabajas, en que zonas atendes. Cuanto mas claro, mejor."
                   rows={5}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm resize-none"
+                  style={{ color: inputColor, backgroundColor: inputBg }}
+                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
                 />
                 {form.descripcion.length > 0 && form.descripcion.length < 30 && (
-                  <p className="text-xs text-yellow-600 mt-1">Mínimo 30 caracteres.</p>
+                  <p className="text-xs text-yellow-600 mt-1">Minimo 30 caracteres.</p>
                 )}
               </div>
 
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">
-                  Años de experiencia y trabajos destacados <span className="text-gray-600">(opcional)</span>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>
+                  Anos de experiencia y trabajos destacados <span className={textMuted}>(opcional)</span>
                 </label>
                 <textarea
                   value={form.experiencia}
                   onChange={(e) => setForm((f) => ({ ...f, experiencia: e.target.value.slice(0, 300) }))}
-                  placeholder="Ej: 10 años trabajando en Reconquista. Hice la instalación eléctrica del Colegio X, el barrio Y..."
+                  placeholder="Ej: 10 anos trabajando en Reconquista. Hice la instalacion electrica del Colegio X, el barrio Y..."
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-gray-500 text-sm resize-none"
+                  style={{ color: inputColor, backgroundColor: inputBg }}
+                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
                 />
               </div>
             </div>
 
             {error && (
-              <p className="mt-4 text-sm text-red-400 bg-red-900/20 border border-red-800 rounded-xl px-4 py-3">{error}</p>
+              <p className={`mt-4 text-sm border rounded-xl px-4 py-3 ${errorCls}`}>{error}</p>
             )}
 
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setStep(2)}
-                className="flex-1 py-3.5 rounded-2xl bg-gray-800 text-gray-300 font-semibold text-sm hover:bg-gray-700 transition-colors"
+                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
               >
-                Atrás
+                Atras
               </button>
               <button
                 onClick={handleSubmit}
@@ -410,6 +463,18 @@ export default function NuevoProfesionalClient() {
             </div>
           </div>
         )}
+
+        {/* Step 4 — Notificaciones */}
+        {step === 4 && (
+          <Step4Notificaciones
+            isDark={isDark}
+            permission={permission}
+            isSupported={isSupported}
+            requestPermission={requestPermission}
+            onFinish={() => router.push(`/profesional/${createdSlug}`)}
+          />
+        )}
+
       </div>
     </div>
   );
