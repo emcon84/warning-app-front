@@ -171,6 +171,9 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
           onClick={() => router.push("/app")}
         />
 
+        {/* Spacer mobile — empuja auth a la derecha cuando las pills están ocultas */}
+        <div className="flex-1 md:hidden" />
+
         {/* Pills de vista — ocultas en mobile, se muestran en el bottom nav */}
         <div className="hidden md:flex flex-1 items-center justify-center gap-1 overflow-x-auto" data-tour="view-pills">
           {(["doctors", "reports", "farmacias", "ofertas"] as MapViewItem[]).map((view) => {
