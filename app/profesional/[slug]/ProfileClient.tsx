@@ -20,12 +20,12 @@ interface Props {
 
 const STAR_PATH = "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z";
 
-function Stars({ score, size = "sm" }: { score: number; size?: "sm" | "md" }) {
+function Stars({ score, size = "sm", dark = true }: { score: number; size?: "sm" | "md"; dark?: boolean }) {
   const cls = size === "md" ? "w-5 h-5" : "w-3.5 h-3.5";
   return (
     <div className="flex">
       {[1, 2, 3, 4, 5].map((i) => (
-        <svg key={i} className={`${cls} ${i <= score ? "text-yellow-400" : "text-gray-700"}`} fill="currentColor" viewBox="0 0 20 20">
+        <svg key={i} className={`${cls} ${i <= score ? "text-yellow-400" : dark ? "text-gray-700" : "text-gray-300"}`} fill="currentColor" viewBox="0 0 20 20">
           <path d={STAR_PATH} />
         </svg>
       ))}
@@ -61,6 +61,12 @@ export default function ProfileClient({ pro, slug }: Props) {
   const { getToken } = useAuth();
   const [copied, setCopied] = useState(false);
   const profileUrl = `${SITE_URL}/profesional/${pro.slug}`;
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    setIsDark(saved ? saved === "dark" : true);
+  }, []);
 
   // Favorito
   const [isFav, setIsFav] = useState(false);
@@ -175,8 +181,20 @@ export default function ProfileClient({ pro, slug }: Props) {
     } catch {}
   }
 
+  const bg          = isDark ? "bg-gray-950"                                      : "bg-gray-50";
+  const textPrimary  = isDark ? "text-white"                                       : "text-gray-900";
+  const textSec      = isDark ? "text-gray-400"                                    : "text-gray-500";
+  const textMuted    = isDark ? "text-gray-500"                                    : "text-gray-400";
+  const cardBg       = isDark ? "bg-gray-900 border-gray-800"                      : "bg-white border-gray-200";
+  const tagBg        = isDark ? "bg-gray-800 border-gray-700 text-gray-300"        : "bg-gray-100 border-gray-200 text-gray-600";
+  const inputCls     = isDark ? "bg-gray-800 border-gray-700 placeholder-gray-600" : "bg-white border-gray-300 placeholder-gray-400";
+  const inputColor   = isDark ? "#f9fafb"                                          : "#111827";
+  const bottomBar    = isDark ? `${bg} border-gray-900`                            : "bg-white border-gray-200";
+  const secBtn       = isDark ? "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700" : "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200";
+  const starEmpty    = isDark ? "text-gray-700"                                    : "text-gray-300";
+
   return (
-    <div className="h-screen bg-gray-950 text-white flex flex-col overflow-hidden">
+    <div className={`h-screen ${bg} ${textPrimary} flex flex-col overflow-hidden transition-colors`}>
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
 
       {/* Modal: requiere login para favoritos */}
@@ -223,7 +241,7 @@ export default function ProfileClient({ pro, slug }: Props) {
         {/* Volver */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-white mb-4 transition-colors"
+          className={`flex items-center gap-1.5 text-sm mb-4 transition-colors ${textSec} hover:${textPrimary}`}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -233,29 +251,29 @@ export default function ProfileClient({ pro, slug }: Props) {
 
         {/* Header del perfil */}
         <div className="flex items-start gap-5 mb-6">
-          <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-700 bg-gray-800">
+          <div className={`w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 border ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-100"}`}>
             {pro.foto ? (
               <img src={pro.foto?.startsWith("/uploads/") ? `${API}${pro.foto}` : pro.foto} alt={pro.nombre} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-400">
+              <div className={`w-full h-full flex items-center justify-center text-4xl font-bold ${textMuted}`}>
                 {pro.nombre[0].toUpperCase()}
               </div>
             )}
           </div>
 
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">{pro.nombre} {pro.apellido}</h1>
+            <h1 className={`text-xl font-bold ${textPrimary}`}>{pro.nombre} {pro.apellido}</h1>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {pro.oficios.map((o) => (
-                <span key={o} className="text-xs px-2.5 py-1 rounded-full bg-gray-800 border border-gray-700 text-gray-300 capitalize">
+                <span key={o} className={`text-xs px-2.5 py-1 rounded-full border capitalize ${tagBg}`}>
                   {o}
                 </span>
               ))}
             </div>
-            <p className="text-sm text-gray-500 mt-1.5">{pro.barrio}, Reconquista</p>
+            <p className={`text-sm mt-1.5 ${textMuted}`}>{pro.barrio}, Reconquista</p>
             <div className="flex items-center gap-2 mt-2">
-              <Stars score={Math.round(pro.ratingAvg)} size="sm" />
-              <span className="text-sm text-gray-400">
+              <Stars score={Math.round(pro.ratingAvg)} size="sm" dark={isDark} />
+              <span className={`text-sm ${textSec}`}>
                 {pro.ratingCount > 0
                   ? `${pro.ratingAvg.toFixed(1)} (${pro.ratingCount} opinión${pro.ratingCount !== 1 ? "es" : ""})`
                   : "Sin opiniones aún"}
@@ -275,18 +293,18 @@ export default function ProfileClient({ pro, slug }: Props) {
 
         {/* Descripción */}
         {pro.descripcion && (
-          <div className="mb-6 p-4 rounded-2xl bg-gray-900 border border-gray-800">
-            <p className="text-sm text-gray-300 leading-relaxed">{pro.descripcion}</p>
+          <div className={`mb-6 p-4 rounded-2xl border ${cardBg}`}>
+            <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>{pro.descripcion}</p>
           </div>
         )}
 
         {/* Fotos de trabajos */}
         {pro.fotos && pro.fotos.length > 0 && (
           <div className="mb-3">
-            <p className="text-sm font-medium text-gray-400 mb-2">Trabajos realizados</p>
+            <p className={`text-sm font-medium mb-2 ${textSec}`}>Trabajos realizados</p>
             <div className="grid grid-cols-3 gap-2">
               {pro.fotos.map((url, i) => (
-                <div key={i} className="aspect-square rounded-xl overflow-hidden border border-gray-800">
+                <div key={i} className={`aspect-square rounded-xl overflow-hidden border ${isDark ? "border-gray-800" : "border-gray-200"}`}>
                   <img src={url} alt={`Trabajo ${i + 1}`} className="w-full h-full object-cover" />
                 </div>
               ))}
@@ -301,13 +319,13 @@ export default function ProfileClient({ pro, slug }: Props) {
         {/* Sección Opiniones */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-medium text-gray-300">
+            <p className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
               Opiniones{reviews.length > 0 ? ` (${reviews.length})` : ""}
             </p>
             {!showForm && !submitSuccess && (
               <button
                 onClick={() => setShowForm(true)}
-                className="text-xs px-3 py-1.5 rounded-full bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 transition-colors"
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${tagBg} hover:opacity-80`}
               >
                 + Dejar opinión
               </button>
@@ -325,37 +343,37 @@ export default function ProfileClient({ pro, slug }: Props) {
           {showForm && (
             <form
               onSubmit={handleSubmitReview}
-              className="mb-5 p-4 rounded-2xl bg-gray-900 border border-gray-800 flex flex-col gap-3"
+              className={`mb-5 p-4 rounded-2xl border flex flex-col gap-3 ${cardBg}`}
             >
               <div>
-                <p className="text-xs text-gray-400 mb-2">Tu calificación</p>
+                <p className={`text-xs mb-2 ${textSec}`}>Tu calificación</p>
                 <StarPicker value={formScore} onChange={setFormScore} />
               </div>
 
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">Tu nombre <span className="text-gray-600">(opcional)</span></label>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>Tu nombre <span className={textMuted}>(opcional)</span></label>
                 <input
                   type="text"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Vecino anónimo"
                   maxLength={60}
-                  style={{ color: "#f9fafb" }}
-                  className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 placeholder-gray-600 text-sm focus:outline-none focus:border-gray-500"
+                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                 />
               </div>
 
               <div>
-                <label className="text-xs text-gray-400 mb-1.5 block">
-                  Comentario <span className="text-gray-600">({formComment.length}/500)</span>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>
+                  Comentario <span className={textMuted}>({formComment.length}/500)</span>
                 </label>
                 <textarea
                   value={formComment}
                   onChange={(e) => setFormComment(e.target.value.slice(0, 500))}
                   placeholder="¿Cómo fue tu experiencia con este profesional?"
                   rows={3}
-                  style={{ color: "#f9fafb" }}
-                  className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 placeholder-gray-600 text-sm focus:outline-none focus:border-gray-500 resize-none"
+                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
                 />
                 {formComment.length > 0 && formComment.length < 10 && (
                   <p className="text-xs text-yellow-600 mt-1">Mínimo 10 caracteres.</p>
@@ -370,7 +388,7 @@ export default function ProfileClient({ pro, slug }: Props) {
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setSubmitError(""); }}
-                  className="flex-1 py-2.5 rounded-xl bg-gray-800 text-gray-400 text-sm hover:bg-gray-700 transition-colors"
+                  className={`flex-1 py-2.5 rounded-xl text-sm transition-colors border ${secBtn}`}
                 >
                   Cancelar
                 </button>
@@ -389,24 +407,24 @@ export default function ProfileClient({ pro, slug }: Props) {
           {loadingReviews ? (
             <div className="flex flex-col gap-3">
               {[1, 2].map((i) => (
-                <div key={i} className="h-20 rounded-2xl bg-gray-900 border border-gray-800 animate-pulse" />
+                <div key={i} className={`h-20 rounded-2xl border animate-pulse ${cardBg}`} />
               ))}
             </div>
           ) : reviews.length > 0 ? (
             <div className="flex flex-col gap-3">
               {reviews.map((r) => (
-                <div key={r.id} className="p-4 rounded-2xl bg-gray-900 border border-gray-800">
+                <div key={r.id} className={`p-4 rounded-2xl border ${cardBg}`}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300">
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-600"}`}>
                         {r.reviewerName[0].toUpperCase()}
                       </div>
-                      <span className="text-sm font-medium text-gray-200">{r.reviewerName}</span>
+                      <span className={`text-sm font-medium ${isDark ? "text-gray-200" : "text-gray-800"}`}>{r.reviewerName}</span>
                     </div>
-                    <Stars score={r.score} size="sm" />
+                    <Stars score={r.score} size="sm" dark={isDark} />
                   </div>
-                  <p className="text-sm text-gray-300 leading-relaxed">{r.comment}</p>
-                  <p className="text-xs text-gray-600 mt-2">
+                  <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>{r.comment}</p>
+                  <p className={`text-xs mt-2 ${textMuted}`}>
                     {new Date(r.createdAt).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}
                   </p>
                 </div>
@@ -414,11 +432,11 @@ export default function ProfileClient({ pro, slug }: Props) {
             </div>
           ) : (
             <div className="py-8 text-center">
-              <p className="text-sm text-gray-600">Aún no hay opiniones.</p>
+              <p className={`text-sm ${textMuted}`}>Aun no hay opiniones.</p>
               {!showForm && (
                 <button
                   onClick={() => setShowForm(true)}
-                  className="mt-2 text-sm text-gray-400 hover:text-white underline transition-colors"
+                  className={`mt-2 text-sm underline transition-colors ${textSec} hover:${textPrimary}`}
                 >
                   Sé el primero en opinar
                 </button>
@@ -429,7 +447,7 @@ export default function ProfileClient({ pro, slug }: Props) {
         </div>{/* fin bloque scrolleable */}
 
         {/* BLOQUE FIJO: botones de acción */}
-        <div className="flex-shrink-0 px-4 pt-2 pb-4 bg-gray-950 border-t border-gray-900">
+        <div className={`flex-shrink-0 px-4 pt-2 pb-4 md:pb-4 pb-20 border-t ${bottomBar}`}>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
@@ -456,7 +474,7 @@ export default function ProfileClient({ pro, slug }: Props) {
               className={`px-4 py-3 rounded-2xl text-sm transition-colors border ${
                 isFav
                   ? "bg-red-900/40 border-red-800 text-red-400 hover:bg-red-900/60"
-                  : "bg-gray-800 border-gray-700 text-gray-400 hover:text-red-400 hover:bg-gray-700"
+                  : secBtn
               }`}
             >
               <svg className="w-4 h-4" fill={isFav ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -466,7 +484,7 @@ export default function ProfileClient({ pro, slug }: Props) {
 
             <button
               onClick={handleCopy}
-              className="px-4 py-3 rounded-2xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm transition-colors border border-gray-700"
+              className={`px-4 py-3 rounded-2xl text-sm transition-colors border ${secBtn}`}
             >
               {copied ? "✓" : (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
