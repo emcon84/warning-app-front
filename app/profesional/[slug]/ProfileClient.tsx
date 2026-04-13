@@ -72,6 +72,7 @@ export default function ProfileClient({ pro, slug }: Props) {
   const [isFav, setIsFav] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginModalContext, setLoginModalContext] = useState<"fav" | "review">("fav");
 
   // Reviews
   const [reviews, setReviews] = useState<PublicReview[]>([]);
@@ -85,6 +86,7 @@ export default function ProfileClient({ pro, slug }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
 
   // Cargar estado de favorito si está logueado
   useEffect(() => {
@@ -101,7 +103,7 @@ export default function ProfileClient({ pro, slug }: Props) {
   }, [isSignedIn, slug]);
 
   async function toggleFav() {
-    if (!isSignedIn) { setShowLoginModal(true); return; }
+    if (!isSignedIn) { setLoginModalContext("fav"); setShowLoginModal(true); return; }
     setFavLoading(true);
     const wasAdding = !isFav;
     setIsFav(wasAdding); // optimistic
@@ -141,13 +143,19 @@ export default function ProfileClient({ pro, slug }: Props) {
     setSubmitting(true);
     setSubmitError("");
     try {
+      const clerkToken = await getToken();
+      const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
       const res = await fetch(`${API}/api/professionals/${slug}/reviews`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
+        },
         body: JSON.stringify({
           score: formScore,
           comment: formComment.trim(),
           reviewerName: formName.trim() || undefined,
+          clientToken: clientToken || undefined,
         }),
       });
       if (!res.ok) {
@@ -166,6 +174,19 @@ export default function ProfileClient({ pro, slug }: Props) {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function handleReport(reviewId: string) {
+    if (!isSignedIn) { setLoginModalContext("review"); setShowLoginModal(true); return; }
+    if (reportedIds.has(reviewId)) return;
+    try {
+      const clerkToken = await getToken();
+      await fetch(`${API}/api/professionals/${slug}/reviews/${reviewId}/report`, {
+        method: "POST",
+        headers: { ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}) },
+      });
+      setReportedIds((prev) => new Set([...prev, reviewId]));
+    } catch {}
   }
 
   function handleShare() {
@@ -208,8 +229,14 @@ export default function ProfileClient({ pro, slug }: Props) {
               </svg>
             </div>
             <div className="text-center">
-              <h3 className="font-bold text-white text-lg">Guardá tus favoritos</h3>
-              <p className="text-sm text-gray-400 mt-1">Creá una cuenta gratis para guardar profesionales favoritos y acceder a ellos desde cualquier dispositivo.</p>
+              <h3 className="font-bold text-white text-lg">
+                {loginModalContext === "review" ? "Iniciá sesión para opinar" : "Guardá tus favoritos"}
+              </h3>
+              <p className="text-sm text-gray-400 mt-1">
+                {loginModalContext === "review"
+                  ? "Necesitás una cuenta para dejar opiniones. Además, solo pueden opinar usuarios que contactaron al profesional."
+                  : "Creá una cuenta gratis para guardar profesionales favoritos y acceder a ellos desde cualquier dispositivo."}
+              </p>
             </div>
             <button
               onClick={() => router.push("/sign-up")}
@@ -330,9 +357,17 @@ export default function ProfileClient({ pro, slug }: Props) {
             <p className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
               Opiniones{reviews.length > 0 ? ` (${reviews.length})` : ""}
             </p>
-            {!showForm && !submitSuccess && (
+            {!showForm && !submitSuccess && isSignedIn && (
               <button
                 onClick={() => setShowForm(true)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${tagBg} hover:opacity-80`}
+              >
+                + Dejar opinión
+              </button>
+            )}
+            {!showForm && !submitSuccess && !isSignedIn && (
+              <button
+                onClick={() => { setLoginModalContext("review"); setShowLoginModal(true); }}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${tagBg} hover:opacity-80`}
               >
                 + Dejar opinión
@@ -432,9 +467,22 @@ export default function ProfileClient({ pro, slug }: Props) {
                     <Stars score={r.score} size="sm" dark={isDark} />
                   </div>
                   <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>{r.comment}</p>
-                  <p className={`text-xs mt-2 ${textMuted}`}>
-                    {new Date(r.createdAt).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}
-                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className={`text-xs ${textMuted}`}>
+                      {new Date(r.createdAt).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}
+                    </p>
+                    <button
+                      onClick={() => handleReport(r.id)}
+                      disabled={reportedIds.has(r.id)}
+                      className={`text-xs transition-colors ${
+                        reportedIds.has(r.id)
+                          ? "text-orange-400 cursor-default"
+                          : isDark ? "text-gray-600 hover:text-gray-400" : "text-gray-400 hover:text-gray-600"
+                      }`}
+                    >
+                      {reportedIds.has(r.id) ? "Reportada" : "Reportar"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
