@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import ReportModal from "../components/ReportModal";
 import ReportDetailModal from "../components/ReportDetailModal";
@@ -36,8 +36,9 @@ const MapComponent = dynamic(() => import("../components/Map"), {
 type FilterPeriod = "today" | "week";
 type MapView = "doctors" | "reports" | "farmacias" | "ofertas";
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [reports, setReports] = useState<Report[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [farmacias, setFarmacias] = useState<Farmacia[]>([]);
@@ -57,13 +58,13 @@ export default function Home() {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isDoctorDetailOpen, setIsDoctorDetailOpen] = useState(false);
   const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
-  const [mapView, setMapView] = useState<MapView>(() => {
-    if (typeof window !== "undefined") {
-      const view = new URLSearchParams(window.location.search).get("view") as MapView;
-      if (["doctors", "reports", "farmacias", "ofertas"].includes(view)) return view;
-    }
-    return "reports";
-  });
+  const mapView = (["doctors", "reports", "farmacias", "ofertas"].includes(searchParams.get("view") ?? "")
+    ? searchParams.get("view")
+    : "reports") as MapView;
+
+  function setMapView(view: MapView) {
+    router.replace(`/app?view=${view}`, { scroll: false });
+  }
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [filterIapos, setFilterIapos] = useState(false);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
@@ -95,11 +96,6 @@ export default function Home() {
   }, [theme]);
 
   const { showNotification, permission } = useNotifications();
-
-  // Sincronizar URL cuando cambia la vista
-  useEffect(() => {
-    router.replace(`/app?view=${mapView}`, { scroll: false });
-  }, [mapView]);
 
   // Trackear sección activa
   useEffect(() => {
@@ -702,5 +698,13 @@ export default function Home() {
       <WelcomeTutorial />
 
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }
