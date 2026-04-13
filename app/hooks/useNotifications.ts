@@ -44,7 +44,7 @@ export function useNotifications() {
     // Registrar el service worker
     if (isSupported) {
       navigator.serviceWorker
-        .register("/sw.js")
+        .register("/sw-custom.js")
         .then((reg) => {
           console.log("Service Worker registrado:", reg);
           setRegistration(reg);
