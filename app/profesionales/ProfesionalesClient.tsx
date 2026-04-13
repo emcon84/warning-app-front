@@ -243,7 +243,7 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
   const labelColor = isDark ? "text-gray-400" : "text-gray-500";
 
   return (
-    <div className={`min-h-screen pb-16 md:pb-0 ${bg} transition-colors duration-300 flex flex-col`}>
+    <div className={`min-h-screen pb-24 md:pb-0 ${bg} transition-colors duration-300 flex flex-col`}>
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
 
       {/* Toggle tema */}

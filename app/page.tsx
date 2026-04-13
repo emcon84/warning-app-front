@@ -197,10 +197,10 @@ export default function LandingPage() {
               <LandingThemeToggle />
               <Link
                 href="/app"
-                className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
+                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition-colors sm:text-sm sm:px-4 sm:py-2 sm:gap-1.5"
               >
                 Abrir app
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Link>
             </div>
           </div>
