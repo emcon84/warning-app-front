@@ -73,6 +73,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   const [peerTyping, setPeerTyping] = useState(false);
   const [showExitWarning, setShowExitWarning] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [now, setNow] = useState(Date.now());
 
   const wsRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -174,6 +175,12 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [connectWS]);
+
+  // Tick cada minuto para re-evaluar shouldShowWhatsApp
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
 
   // Guardar conversationId en localStorage para usuarios anónimos (para poder recuperarla)
   useEffect(() => {
@@ -329,7 +336,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     && conversation.Professional.whatsapp
     && messages.length > 0
     && messages[messages.length - 1].senderType === "client"
-    && Date.now() - new Date(messages[0].createdAt).getTime() > 10 * 60 * 1000;
+    && now - new Date(messages[0].createdAt).getTime() > 10 * 60 * 1000;
 
   return (
     <div className={`h-[100dvh] ${bg} ${textPrimary} flex flex-col`}>
