@@ -262,7 +262,14 @@ export default function ProfileClient({ pro, slug }: Props) {
           </div>
 
           <div className="flex-1">
-            <h1 className={`text-xl font-bold ${textPrimary}`}>{pro.nombre} {pro.apellido}</h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className={`text-xl font-bold ${textPrimary}`}>{pro.nombre} {pro.apellido}</h1>
+              {pro.slug.startsWith("test-") && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 leading-none">
+                  PERFIL DE PRUEBA
+                </span>
+              )}
+            </div>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {pro.oficios.map((o) => (
                 <span key={o} className={`text-xs px-2.5 py-1 rounded-full border capitalize ${tagBg}`}>

@@ -51,9 +51,16 @@ function FeaturedCard({ pro, dark }: { pro: Professional; dark: boolean }) {
         </div>
         {/* Info */}
         <div className="text-center">
-          <p className={`text-sm font-semibold leading-tight ${dark ? "text-white" : "text-gray-900"}`}>
-            {pro.nombre}
-          </p>
+          <div className="flex items-center justify-center gap-1.5 flex-wrap">
+            <p className={`text-sm font-semibold leading-tight ${dark ? "text-white" : "text-gray-900"}`}>
+              {pro.nombre}
+            </p>
+            {pro.slug.startsWith("test-") && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 leading-none">
+                TEST
+              </span>
+            )}
+          </div>
           <p className={`text-xs capitalize mt-0.5 ${dark ? "text-gray-500" : "text-gray-400"}`}>
             {pro.oficios[0]}
           </p>
@@ -139,6 +146,11 @@ function ResultCard({ pro, dark, favIds, onToggleFav }: {
             <p className={`font-semibold ${dark ? "text-white" : "text-gray-900"}`}>
               {pro.nombre} {pro.apellido}
             </p>
+            {pro.slug.startsWith("test-") && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 leading-none">
+                TEST
+              </span>
+            )}
             <span className={`text-xs px-2 py-0.5 rounded-full border ${
               pro.disponible
                 ? "bg-green-900/40 text-green-400 border-green-800"
