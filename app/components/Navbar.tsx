@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, X } from "lucide-react";
+import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, X, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SignInButton, UserButton, useUser, useAuth } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -272,6 +272,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               <UserButton>
                 <UserButton.MenuItems>
                   <UserButton.Link label="Mi perfil" labelIcon={<User className="w-4 h-4" />} href="/mi-perfil" />
+                  <UserButton.Link label="Configuración" labelIcon={<Settings className="w-4 h-4" />} href="/settings" />
                 </UserButton.MenuItems>
               </UserButton>
             </>
