@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import NotificationPrompt from "./components/NotificationPrompt";
@@ -47,13 +47,15 @@ export const metadata: Metadata = {
     title: "Reportes Ciudadanos - Reconquista",
     description: "Sistema de reportes ciudadanos para Reconquista, Santa Fe",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   themeColor: "#111827",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({
