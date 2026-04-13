@@ -4,6 +4,7 @@ import "./globals.css";
 import NotificationPrompt from "./components/NotificationPrompt";
 import ApiStatusBanner from "./components/ApiStatusBanner";
 import MobileBottomNav from "./components/MobileBottomNav";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
@@ -101,6 +102,7 @@ export default function RootLayout({
           {children}
           <MobileBottomNav />
           <NotificationPrompt />
+          <PWAInstallPrompt />
         </body>
       </html>
     </ClerkProvider>
