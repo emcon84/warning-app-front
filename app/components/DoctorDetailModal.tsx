@@ -565,8 +565,8 @@ export default function DoctorDetailModal({
                 const status = getObrasSocialStatus(os);
                 return (
                   <div key={os} className={`flex items-center justify-between rounded-xl p-3 ${
-                    status === "acepta" ? "bg-green-50 border border-green-200" :
-                    status === "rechaza" ? "bg-red-50 border border-red-200" :
+                    status === "acepta" ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" :
+                    status === "rechaza" ? "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800" :
                     "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
                   }`}>
                     <div className="flex items-center gap-2">
@@ -577,10 +577,10 @@ export default function DoctorDetailModal({
                         <div className="flex items-center gap-1.5">
                           <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{os}</p>
                           {os === "IAPOS" && doctor.iapos && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">Padrón oficial</span>
+                            <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-medium">Padrón oficial</span>
                           )}
                         </div>
-                        <p className={`text-xs ${status === "acepta" ? "text-green-600" : status === "rechaza" ? "text-red-500" : "text-gray-400"}`}>
+                        <p className={`text-xs ${status === "acepta" ? "text-green-600 dark:text-green-400" : status === "rechaza" ? "text-red-500 dark:text-red-400" : "text-gray-400"}`}>
                           {status === "acepta" ? "Acepta" : status === "rechaza" ? "No acepta" : "Sin información"}
                         </p>
                       </div>
