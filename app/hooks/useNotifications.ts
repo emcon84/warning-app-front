@@ -61,18 +61,23 @@ export function useNotifications() {
   }, [isSupported]);
 
   const subscribeToPush = async () => {
-    if (!registration) {
-      console.error("Service Worker no registrado");
-      return false;
-    }
-
     try {
+      // Usar serviceWorker.ready para garantizar que el SW está listo
+      const reg = registration ?? await navigator.serviceWorker.ready;
+
       // Obtener la clave pública VAPID del servidor
       const keyResponse = await fetch(`${API_URL}/api/push/vapid-public-key`);
       const { publicKey } = await keyResponse.json();
+      if (!publicKey) throw new Error("VAPID key no disponible");
 
-      // Suscribirse a push notifications
-      const subscription = await registration.pushManager.subscribe({
+      // Cancelar suscripción vieja si existe (puede ser incompatible con el nuevo SW)
+      const existing = await reg.pushManager.getSubscription();
+      if (existing) {
+        await existing.unsubscribe();
+      }
+
+      // Nueva suscripción
+      const subscription = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
@@ -89,15 +94,12 @@ export function useNotifications() {
       });
 
       if (response.ok) {
-        console.log("Suscripción guardada en el servidor");
         setIsSubscribed(true);
         return true;
-      } else {
-        console.error("Error guardando suscripción");
-        return false;
       }
+      throw new Error(`Server error: ${response.status}`);
     } catch (error) {
-      console.error("Error suscribiéndose a push:", error);
+      console.error("[push] Error al suscribirse:", error);
       return false;
     }
   };
