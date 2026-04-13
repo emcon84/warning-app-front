@@ -332,7 +332,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     && Date.now() - new Date(messages[0].createdAt).getTime() > 30 * 60 * 1000;
 
   return (
-    <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
+    <div className={`h-[100dvh] ${bg} ${textPrimary} flex flex-col`}>
 
       {/* Modal advertencia salida anónimo */}
       {showExitWarning && (
@@ -420,7 +420,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
       {/* Mensajes */}
       <div
         className="flex-1 overflow-y-auto px-4 pb-32"
-        style={{ paddingTop: isAgreed || isCompleted ? "9rem" : "7rem" }}
+        style={{ paddingTop: isAgreed || isCompleted ? "10rem" : "8rem" }}
       >
         <div className="max-w-xl mx-auto flex flex-col gap-2 py-4">
 

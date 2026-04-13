@@ -110,76 +110,86 @@ function NuevoChat() {
   }
 
   return (
-    <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
+    <div className={`h-[100dvh] ${bg} ${textPrimary} flex flex-col`}>
       <Navbar sidebarDisabled mapView="profesionales" />
 
-      <div className="flex-1 flex flex-col max-w-xl mx-auto w-full px-4 pt-24 pb-8">
-        <button
-          onClick={() => router.back()}
-          className={`flex items-center gap-1.5 text-sm mb-6 transition-colors ${backBtn}`}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Volver
-        </button>
-
-        {professional && (
-          <div className={`flex items-center gap-3 mb-8 p-4 rounded-2xl border ${cardBg}`}>
-            <div className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center text-xl font-bold ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"}`}>
-              {professional.foto
-                ? <img src={professional.foto} alt="" className="w-full h-full object-cover" />
-                : professional.nombre[0].toUpperCase()}
-            </div>
-            <div>
-              <p className={`font-semibold ${textPrimary}`}>{professional.nombre} {professional.apellido}</p>
-              <p className={`text-sm capitalize ${textSec}`}>{professional.oficios[0]}</p>
-            </div>
-          </div>
-        )}
-
-        <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Iniciar contacto</h1>
-        <p className={`text-sm mb-6 ${textSec}`}>
-          Tu mensaje es privado. El profesional no ve tu telefono ni datos de contacto hasta que acordes trabajar juntos.
-        </p>
-
-        <form onSubmit={handleStart} className="flex flex-col gap-4">
-          <div>
-            <label className={`text-xs mb-1.5 block ${textSec}`}>
-              Que necesitas? <span className={textMuted}>({message.length}/500)</span>
-            </label>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value.slice(0, 500))}
-              placeholder="Ej: Necesito un plomero para arreglar una perdida de agua en la cocina..."
-              rows={5}
-              autoFocus
-              style={{ color: inputColor, backgroundColor: inputBg }}
-              className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
-            />
-          </div>
-
-          <div className={`flex items-start gap-2 p-3 rounded-xl border ${infoBg}`}>
-            <svg className={`w-4 h-4 mt-0.5 flex-shrink-0 ${infoIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      {/* Área scrolleable */}
+      <div className="flex-1 overflow-y-auto px-4 pt-20 pb-4">
+        <div className="max-w-xl mx-auto">
+          <button
+            onClick={() => router.back()}
+            className={`flex items-center gap-1.5 text-sm mb-6 transition-colors ${backBtn}`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <p className={`text-xs ${infoText}`}>
-              Tu privacidad esta protegida. El numero de telefono y datos de contacto se comparten solo cuando ambos acuerdan.
-            </p>
-          </div>
+            Volver
+          </button>
 
-          {error && (
-            <p className={`text-sm border rounded-xl px-4 py-3 ${errorCls}`}>{error}</p>
+          {professional && (
+            <div className={`flex items-center gap-3 mb-8 p-4 rounded-2xl border ${cardBg}`}>
+              <div className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center text-xl font-bold ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-600"}`}>
+                {professional.foto
+                  ? <img src={professional.foto} alt="" className="w-full h-full object-cover" />
+                  : professional.nombre[0].toUpperCase()}
+              </div>
+              <div>
+                <p className={`font-semibold ${textPrimary}`}>{professional.nombre} {professional.apellido}</p>
+                <p className={`text-sm capitalize ${textSec}`}>{professional.oficios[0]}</p>
+              </div>
+            </div>
           )}
 
+          <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Iniciar contacto</h1>
+          <p className={`text-sm mb-6 ${textSec}`}>
+            Tu mensaje es privado. El profesional no ve tu telefono ni datos de contacto hasta que acordes trabajar juntos.
+          </p>
+
+          <form id="nuevo-chat-form" onSubmit={handleStart} className="flex flex-col gap-4">
+            <div>
+              <label className={`text-xs mb-1.5 block ${textSec}`}>
+                Que necesitas? <span className={textMuted}>({message.length}/500)</span>
+              </label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value.slice(0, 500))}
+                placeholder="Ej: Necesito un plomero para arreglar una perdida de agua en la cocina..."
+                rows={5}
+                autoFocus
+                style={{ color: inputColor, backgroundColor: inputBg }}
+                className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
+              />
+            </div>
+
+            <div className={`flex items-start gap-2 p-3 rounded-xl border ${infoBg}`}>
+              <svg className={`w-4 h-4 mt-0.5 flex-shrink-0 ${infoIcon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className={`text-xs ${infoText}`}>
+                Tu privacidad esta protegida. El numero de telefono y datos de contacto se comparten solo cuando ambos acuerdan.
+              </p>
+            </div>
+
+            {error && (
+              <p className={`text-sm border rounded-xl px-4 py-3 ${errorCls}`}>{error}</p>
+            )}
+          </form>
+        </div>
+      </div>
+
+      {/* Botón siempre visible, sobre el teclado */}
+      <div className={`flex-shrink-0 px-4 py-3 border-t ${isDark ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-200"}`}
+        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}>
+        <div className="max-w-xl mx-auto">
           <button
             type="submit"
+            form="nuevo-chat-form"
             disabled={message.trim().length < 10 || loading}
             className="w-full py-3.5 rounded-2xl bg-white text-gray-950 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
           >
             {loading ? "Iniciando..." : "Enviar mensaje"}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
