@@ -110,11 +110,11 @@ function NuevoChat() {
   }
 
   return (
-    <div className={`h-[100dvh] ${bg} ${textPrimary} flex flex-col`}>
+    <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar sidebarDisabled mapView="profesionales" />
 
       {/* Área scrolleable */}
-      <div className="flex-1 overflow-y-auto px-4 pt-20 pb-4">
+      <div className="px-4 pt-20 pb-[5.5rem]">
         <div className="max-w-xl mx-auto">
           <button
             onClick={() => router.back()}
@@ -177,9 +177,11 @@ function NuevoChat() {
         </div>
       </div>
 
-      {/* Botón siempre visible, sobre el teclado */}
-      <div className={`flex-shrink-0 px-4 py-3 border-t ${isDark ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-200"}`}
-        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}>
+      {/* Botón fijo arriba del teclado — igual que el input del chat */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-40 px-4 py-3 border-t ${isDark ? "bg-gray-950 border-gray-800" : "bg-gray-50 border-gray-200"}`}
+        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
+      >
         <div className="max-w-xl mx-auto">
           <button
             type="submit"
