@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { Suspense } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Map, Stethoscope, Pill, ShoppingCart, Wrench } from "lucide-react";
 
 const ITEMS = [
@@ -13,11 +14,11 @@ const ITEMS = [
 
 const HIDDEN_PATHS = ["/", "/sign-in", "/sign-up", "/profesional/nuevo", "/profesional/editar"];
 
-export default function MobileBottomNav() {
+function Nav() {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Ocultar en ciertas rutas
   const shouldHide =
     HIDDEN_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
     pathname.startsWith("/chat/") ||
@@ -25,20 +26,20 @@ export default function MobileBottomNav() {
 
   if (shouldHide) return null;
 
+  const currentView = searchParams.get("view") || "reports";
+
   function handleClick(href: string, view: string | null) {
     if (view) {
-      // Guardar vista para que /app la levante al montar
-      localStorage.setItem("mapView", view);
+      router.push(`${href}?view=${view}`);
+    } else {
+      router.push(href);
     }
-    router.push(href);
   }
 
   function isActive(href: string, view: string | null) {
     if (href === "/app") {
       if (pathname !== "/app") return false;
-      if (!view) return false;
-      const savedView = typeof window !== "undefined" ? localStorage.getItem("mapView") : null;
-      return savedView === view || (!savedView && view === "reports");
+      return (view ?? "reports") === currentView;
     }
     return pathname === href || pathname.startsWith(href + "/");
   }
@@ -71,5 +72,13 @@ export default function MobileBottomNav() {
         })}
       </div>
     </nav>
+  );
+}
+
+export default function MobileBottomNav() {
+  return (
+    <Suspense fallback={null}>
+      <Nav />
+    </Suspense>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import ReportModal from "../components/ReportModal";
 import ReportDetailModal from "../components/ReportDetailModal";
@@ -36,6 +37,7 @@ type FilterPeriod = "today" | "week";
 type MapView = "doctors" | "reports" | "farmacias" | "ofertas";
 
 export default function Home() {
+  const router = useRouter();
   const [reports, setReports] = useState<Report[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [farmacias, setFarmacias] = useState<Farmacia[]>([]);
@@ -55,7 +57,13 @@ export default function Home() {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isDoctorDetailOpen, setIsDoctorDetailOpen] = useState(false);
   const [isAddDoctorOpen, setIsAddDoctorOpen] = useState(false);
-  const [mapView, setMapView] = useState<MapView>("reports");
+  const [mapView, setMapView] = useState<MapView>(() => {
+    if (typeof window !== "undefined") {
+      const view = new URLSearchParams(window.location.search).get("view") as MapView;
+      if (["doctors", "reports", "farmacias", "ofertas"].includes(view)) return view;
+    }
+    return "reports";
+  });
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [filterIapos, setFilterIapos] = useState(false);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
@@ -87,6 +95,11 @@ export default function Home() {
   }, [theme]);
 
   const { showNotification, permission } = useNotifications();
+
+  // Sincronizar URL cuando cambia la vista
+  useEffect(() => {
+    router.replace(`/app?view=${mapView}`, { scroll: false });
+  }, [mapView]);
 
   // Trackear sección activa
   useEffect(() => {
