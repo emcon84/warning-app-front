@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { Send, UserPlus } from "lucide-react";
+import Link from "next/link";
 import Navbar from "../../components/Navbar";
-import AnonymousChatBanner from "../../components/AnonymousChatBanner";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
@@ -31,6 +32,31 @@ function getLocalClientToken(): string | null {
   return localStorage.getItem("clientToken");
 }
 
+function MessageTicks({ read, isDark }: { read: boolean; isDark: boolean }) {
+  if (read) {
+    return <span className="text-[10px] text-blue-400 ml-0.5 leading-none">✓✓</span>;
+  }
+  return <span className={`text-[10px] ml-0.5 leading-none ${isDark ? "text-gray-500" : "text-gray-400"}`}>✓</span>;
+}
+
+function TypingBubble({ isDark }: { isDark: boolean }) {
+  return (
+    <div className="flex justify-start">
+      <div className={`px-4 py-3 rounded-2xl rounded-bl-sm ${isDark ? "bg-gray-800" : "bg-gray-200"}`}>
+        <div className="flex gap-1 items-center">
+          {[0, 150, 300].map((delay) => (
+            <div
+              key={delay}
+              className={`w-2 h-2 rounded-full animate-bounce ${isDark ? "bg-gray-500" : "bg-gray-400"}`}
+              style={{ animationDelay: `${delay}ms` }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ChatPage({ params }: { params: Promise<{ conversationId: string }> }) {
   const { conversationId } = use(params);
   const router = useRouter();
@@ -44,15 +70,30 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   const [connected, setConnected] = useState(false);
   const [senderType, setSenderType] = useState<"client" | "professional" | null>(null);
   const [wsToken, setWsToken] = useState<string | null>(null);
+  const [peerTyping, setPeerTyping] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Refs para reconexión (evitar closures stale)
+  const conversationRef = useRef<Conversation | null>(null);
+  const wsTokenRef = useRef<string | null>(null);
+  const senderTypeRef = useRef<"client" | "professional" | null>(null);
+  const manualCloseRef = useRef(false);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTypingSentRef = useRef(0);
+
+  // Sincronizar refs con estado
+  useEffect(() => { conversationRef.current = conversation; }, [conversation]);
+  useEffect(() => { wsTokenRef.current = wsToken; }, [wsToken]);
+  useEffect(() => { senderTypeRef.current = senderType; }, [senderType]);
+
+  // Tema
   useEffect(() => {
     const stored = localStorage.getItem("theme");
     setIsDark(stored !== "light");
-
     function onStorage(e: StorageEvent) {
       if (e.key === "theme") setIsDark(e.newValue !== "light");
     }
@@ -60,7 +101,75 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // Cargar conversacion
+  // Función de conexión WebSocket (estable, lee estado via refs)
+  const connectWS = useCallback(() => {
+    if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+
+    const conv = conversationRef.current;
+    const token = wsTokenRef.current;
+    const sender = senderTypeRef.current;
+    if (!conv || !token || !sender) return;
+
+    if (wsRef.current && wsRef.current.readyState < 2) {
+      manualCloseRef.current = true;
+      wsRef.current.close();
+    }
+    manualCloseRef.current = false;
+
+    const wsUrl = `${WS_URL}/ws?conversationId=${conv.id}&token=${encodeURIComponent(token)}&senderType=${sender}`;
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => setConnected(true);
+
+    ws.onclose = () => {
+      setConnected(false);
+      if (!manualCloseRef.current) {
+        // Reconectar en 3 segundos
+        reconnectTimerRef.current = setTimeout(connectWS, 3000);
+      }
+    };
+
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+
+        if (msg.type === "message") {
+          setMessages((prev) => {
+            if (prev.find((m) => m.id === msg.data.id)) return prev;
+            return [...prev, msg.data];
+          });
+        } else if (msg.type === "typing") {
+          if (msg.senderType !== senderTypeRef.current) {
+            setPeerTyping(true);
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => setPeerTyping(false), 3000);
+          }
+        } else if (msg.type === "read") {
+          setMessages((prev) =>
+            prev.map((m) => m.senderType === msg.senderType ? { ...m, read: true } : m)
+          );
+        }
+      } catch {}
+    };
+
+    wsRef.current = ws;
+  }, []);
+
+  // Reconectar al volver de background (celular desbloqueado)
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === "visible") {
+        const ws = wsRef.current;
+        if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+          connectWS();
+        }
+      }
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [connectWS]);
+
+  // Cargar conversación
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -104,40 +213,32 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     load().catch(() => { router.push("/profesionales"); });
   }, [isLoaded, isSignedIn, conversationId]);
 
-  // Conectar WebSocket
+  // Conectar WebSocket cuando tenemos todo lo necesario
   useEffect(() => {
     if (!senderType || !conversation || !wsToken) return;
-
-    function connect() {
-      const wsUrl = `${WS_URL}/ws?conversationId=${conversation!.id}&token=${encodeURIComponent(wsToken!)}&senderType=${senderType}`;
-      const ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => setConnected(true);
-      ws.onclose = () => setConnected(false);
-
-      ws.onmessage = (e) => {
-        try {
-          const msg = JSON.parse(e.data);
-          if (msg.type === "message") {
-            setMessages((prev) => {
-              if (prev.find((m) => m.id === msg.data.id)) return prev;
-              return [...prev, msg.data];
-            });
-          }
-        } catch {}
-      };
-
-      wsRef.current = ws;
-    }
-
-    connect();
-    return () => { wsRef.current?.close(); };
-  }, [senderType, conversation, wsToken]);
+    connectWS();
+    return () => {
+      manualCloseRef.current = true;
+      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      wsRef.current?.close();
+    };
+  }, [senderType, conversation, wsToken, connectWS]);
 
   // Scroll al último mensaje
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, peerTyping]);
+
+  function handleInputChange(value: string) {
+    setInput(value);
+    // Enviar evento de typing (máx una vez cada 2 seg)
+    const now = Date.now();
+    if (now - lastTypingSentRef.current > 2000 && wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "typing" }));
+      lastTypingSentRef.current = now;
+    }
+  }
 
   function sendMessage() {
     const content = input.trim();
@@ -210,14 +311,14 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
             <p className={`text-xs capitalize ${textSec}`}>{pro.oficios[0]}</p>
           </div>
 
-          <div className={`w-2 h-2 rounded-full ${connected ? "bg-green-500" : "bg-gray-400"}`} title={connected ? "Conectado" : "Sin conexion"} />
+          <div
+            className={`w-2 h-2 rounded-full transition-colors ${connected ? "bg-green-500" : "bg-gray-500"}`}
+            title={connected ? "Conectado" : "Reconectando..."}
+          />
         </div>
       </div>
 
-      {/* Banner para usuarios anonimos */}
-      {!isSignedIn && <AnonymousChatBanner />}
-
-      {/* Estado de la conversacion */}
+      {/* Estado de la conversación */}
       {(isAgreed || isCompleted) && (
         <div className="fixed top-28 left-0 right-0 z-40 px-4">
           <div className={`max-w-xl mx-auto py-2 px-4 rounded-xl text-xs text-center border ${
@@ -233,12 +334,30 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
       {/* Mensajes */}
       <div
         className="flex-1 overflow-y-auto px-4 pb-32"
-        style={{ paddingTop: !isSignedIn ? (isAgreed || isCompleted ? "12rem" : "10rem") : (isAgreed || isCompleted ? "9rem" : "7rem") }}
+        style={{ paddingTop: isAgreed || isCompleted ? "9rem" : "7rem" }}
       >
         <div className="max-w-xl mx-auto flex flex-col gap-2 py-4">
+
+          {/* Banner anónimo inline (no fixed) */}
+          {!isSignedIn && (
+            <div className={`flex items-center gap-3 mb-2 px-3 py-2.5 rounded-xl border ${isDark ? "bg-blue-950/50 border-blue-800" : "bg-blue-50 border-blue-200"}`}>
+              <UserPlus className={`w-4 h-4 flex-shrink-0 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
+              <p className={`flex-1 text-xs ${isDark ? "text-blue-200" : "text-blue-700"}`}>
+                Queres guardar tus chats y ver tus favoritos?
+              </p>
+              <Link
+                href="/sign-up"
+                className={`flex-shrink-0 text-xs font-semibold border rounded-lg px-2.5 py-1 transition-colors ${isDark ? "text-blue-400 border-blue-700 hover:text-blue-300" : "text-blue-600 border-blue-300 hover:text-blue-500"}`}
+              >
+                Crear cuenta
+              </Link>
+            </div>
+          )}
+
           {messages.length === 0 && (
             <p className={`text-center text-sm py-8 ${isDark ? "text-gray-600" : "text-gray-400"}`}>Sin mensajes aun.</p>
           )}
+
           {messages.map((msg) => {
             const isMine = msg.senderType === senderType;
             return (
@@ -251,13 +370,20 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
                   }`}
                 >
                   <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-                  <p className="text-xs mt-1 text-gray-500">
-                    {new Date(msg.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
-                  </p>
+                  <div className={`flex items-center gap-0.5 mt-1 ${isMine ? "justify-end" : "justify-start"}`}>
+                    <p className={`text-xs ${isMine ? "text-gray-500" : isDark ? "text-gray-500" : "text-gray-400"}`}>
+                      {new Date(msg.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                    {isMine && <MessageTicks read={msg.read} isDark={isDark} />}
+                  </div>
                 </div>
               </div>
             );
           })}
+
+          {/* Typing indicator */}
+          {peerTyping && <TypingBubble isDark={isDark} />}
+
           <div ref={bottomRef} />
         </div>
       </div>
@@ -281,12 +407,12 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
               </a>
             </div>
           )}
-          <div className="px-4 py-3">
+          <div className="px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
             <div className="max-w-xl mx-auto flex gap-2 items-end">
               <textarea
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => handleInputChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Escribe un mensaje..."
                 rows={1}
@@ -298,9 +424,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
                 disabled={!input.trim() || !connected}
                 className="w-10 h-10 rounded-full bg-white text-gray-950 flex items-center justify-center flex-shrink-0 disabled:opacity-30 hover:bg-gray-200 transition-colors"
               >
-                <svg className="w-4 h-4 rotate-90" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                </svg>
+                <Send className="w-4 h-4" />
               </button>
             </div>
           </div>
