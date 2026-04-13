@@ -68,6 +68,7 @@ function HomeContent() {
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [filterIapos, setFilterIapos] = useState(false);
   const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const [turnoExpanded, setTurnoExpanded] = useState(false);
   const [relocatingDoctorId, setRelocatingDoctorId] = useState<string | null>(null);
   const [selectedFarmacia, setSelectedFarmacia] = useState<Farmacia | null>(null);
   const [isFarmaciaDetailOpen, setIsFarmaciaDetailOpen] = useState(false);
@@ -456,38 +457,54 @@ function HomeContent() {
             </div>
           )}
 
-          {/* Card farmacia de turno */}
+          {/* Card farmacia de turno — colapsable en mobile */}
           {mapView === "farmacias" && turno && (
-            <div className="absolute top-3 left-3 right-3 z-[999] bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-green-200 dark:border-green-800 p-3 max-w-sm mx-auto">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center flex-shrink-0">
-                  <Pill className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <div className="absolute top-3 left-3 right-3 z-[999] max-w-sm mx-auto">
+              {/* Pill colapsado (siempre visible) */}
+              <button
+                onClick={() => setTurnoExpanded(v => !v)}
+                className="w-full flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-green-200 dark:border-green-800"
+              >
+                <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center flex-shrink-0">
+                  <Pill className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-gray-900 dark:text-white">Farmacia de turno — {turno.fecha}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">Solo recetas y medicamentos de emergencia · 8h a 8h</p>
-                </div>
-              </div>
-              {turno.farmacias.length > 0 ? (
-                <div className="space-y-1.5">
-                  {turno.farmacias.map(f => (
-                    <div key={f.id} className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 rounded-xl px-3 py-2">
-                      <div>
-                        <p className="text-sm font-bold text-green-800 dark:text-green-400">{f.nombre}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{f.direccion}</p>
-                      </div>
-                      {f.telefono && (
-                        <a href={`tel:${f.telefono}`} className="ml-2 flex-shrink-0 p-1.5 bg-green-600 text-white rounded-lg">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                          </svg>
-                        </a>
-                      )}
+                <p className="flex-1 text-xs font-bold text-gray-900 dark:text-white text-left">
+                  Farmacia de turno — {turno.fecha}
+                </p>
+                <svg
+                  className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform ${turnoExpanded ? "rotate-180" : ""}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Panel expandido */}
+              {turnoExpanded && (
+                <div className="mt-1 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-green-200 dark:border-green-800 p-3">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Solo recetas y medicamentos de emergencia · 8h a 8h</p>
+                  {turno.farmacias.length > 0 ? (
+                    <div className="space-y-1.5">
+                      {turno.farmacias.map(f => (
+                        <div key={f.id} className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 rounded-xl px-3 py-2">
+                          <div>
+                            <p className="text-sm font-bold text-green-800 dark:text-green-400">{f.nombre}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{f.direccion}</p>
+                          </div>
+                          {f.telefono && (
+                            <a href={`tel:${f.telefono}`} className="ml-2 flex-shrink-0 p-1.5 bg-green-600 text-white rounded-lg">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                              </svg>
+                            </a>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 italic text-center py-1">No se encontro farmacia de turno para hoy</p>
+                  )}
                 </div>
-              ) : (
-                <p className="text-xs text-gray-400 dark:text-gray-500 italic text-center py-1">No se encontró farmacia de turno para hoy</p>
               )}
             </div>
           )}

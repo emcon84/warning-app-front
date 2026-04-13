@@ -291,16 +291,21 @@ export default function ProfileClient({ pro, slug }: Props) {
           </div>
         </div>
 
+        </div>{/* fin bloque fijo */}
+
+        {/* BLOQUE SCROLLEABLE: descripcion + fotos + opiniones */}
+        <div className="flex-1 overflow-y-auto px-4 pb-2">
+
         {/* Descripción */}
         {pro.descripcion && (
-          <div className={`mb-6 p-4 rounded-2xl border ${cardBg}`}>
+          <div className={`mb-4 p-4 rounded-2xl border ${cardBg}`}>
             <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>{pro.descripcion}</p>
           </div>
         )}
 
         {/* Fotos de trabajos */}
         {pro.fotos && pro.fotos.length > 0 && (
-          <div className="mb-3">
+          <div className="mb-4">
             <p className={`text-sm font-medium mb-2 ${textSec}`}>Trabajos realizados</p>
             <div className="grid grid-cols-3 gap-2">
               {pro.fotos.map((url, i) => (
@@ -312,10 +317,6 @@ export default function ProfileClient({ pro, slug }: Props) {
           </div>
         )}
 
-        </div>{/* fin bloque fijo */}
-
-        {/* BLOQUE SCROLLEABLE: opiniones */}
-        <div className="flex-1 overflow-y-auto px-4 pb-2">
         {/* Sección Opiniones */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-4">
@@ -447,7 +448,7 @@ export default function ProfileClient({ pro, slug }: Props) {
         </div>{/* fin bloque scrolleable */}
 
         {/* BLOQUE FIJO: botones de acción */}
-        <div className={`flex-shrink-0 px-4 pt-2 pb-4 md:pb-4 pb-20 border-t ${bottomBar}`}>
+        <div className={`flex-shrink-0 px-4 pt-2 pb-20 md:pb-4 border-t ${bottomBar}`}>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
