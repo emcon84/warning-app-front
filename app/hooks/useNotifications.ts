@@ -98,9 +98,9 @@ export function useNotifications() {
         return true;
       }
       throw new Error(`Server error: ${response.status}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("[push] Error al suscribirse:", error);
-      return false;
+      throw error;
     }
   };
 

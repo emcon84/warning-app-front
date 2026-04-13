@@ -43,8 +43,8 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       if (permission === "granted") {
-        const ok = await subscribeToPush();
-        showFeedback(ok ? "ok" : "err", ok ? "Notificaciones activadas" : "Error al suscribirse");
+        await subscribeToPush();
+        showFeedback("ok", "Notificaciones activadas");
       } else if (permission === "default") {
         localStorage.removeItem("notificationPromptSeen");
         const ok = await requestPermission();
@@ -52,6 +52,9 @@ export default function SettingsPage() {
       } else {
         showFeedback("err", "El permiso está bloqueado. Habilitalo desde la configuración del browser.");
       }
+    } catch (err: any) {
+      const msg = err?.message || err?.toString() || "Error desconocido";
+      showFeedback("err", `Error: ${msg}`);
     } finally {
       setLoading(false);
     }
