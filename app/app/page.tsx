@@ -451,7 +451,7 @@ function HomeContent() {
 
           {/* Hint "tocá para agregar" — solo en vista médicos */}
           {mapView === "doctors" && !relocatingDoctorId && (
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-sm border border-green-200 text-green-700 px-4 py-2 rounded-full shadow text-xs font-semibold flex items-center gap-1.5 pointer-events-none">
+            <div className="absolute bottom-20 md:bottom-6 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-sm border border-green-200 text-green-700 px-4 py-2 rounded-full shadow text-xs font-semibold flex items-center gap-1.5 pointer-events-none">
               <Stethoscope className="w-3.5 h-3.5" />
               Tocá el mapa para agregar un médico
             </div>
@@ -514,7 +514,7 @@ function HomeContent() {
             <button
               data-tour="filter-btn"
               onClick={() => setShowFilterSheet(true)}
-              className={`absolute top-3 left-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
+              className={`absolute top-3 right-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
                 selectedSpecialties.length > 0
                   ? "bg-green-500 text-white"
                   : "bg-white text-gray-700 border border-gray-300"
