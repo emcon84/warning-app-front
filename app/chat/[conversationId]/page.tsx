@@ -329,7 +329,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     && conversation.Professional.whatsapp
     && messages.length > 0
     && messages[messages.length - 1].senderType === "client"
-    && Date.now() - new Date(messages[0].createdAt).getTime() > 30 * 60 * 1000;
+    && Date.now() - new Date(messages[0].createdAt).getTime() > 10 * 60 * 1000;
 
   return (
     <div className={`h-[100dvh] ${bg} ${textPrimary} flex flex-col`}>
