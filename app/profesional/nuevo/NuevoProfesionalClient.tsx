@@ -234,7 +234,7 @@ export default function NuevoProfesionalClient() {
     }
   }
 
-  const canGoStep2 = form.nombre && form.apellido && form.barrio;
+  const canGoStep2 = form.nombre && form.apellido && form.barrio && form.whatsapp;
   const canGoStep3 = form.oficios.length > 0;
   const canSubmit = form.descripcion.length >= 30;
 
@@ -316,7 +316,7 @@ export default function NuevoProfesionalClient() {
               </div>
 
               <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>WhatsApp <span className={textMuted}>(opcional)</span></label>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>WhatsApp</label>
                 <input
                   value={form.whatsapp}
                   onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}

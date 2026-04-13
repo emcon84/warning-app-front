@@ -34,7 +34,7 @@ function getLocalClientToken(): string | null {
 
 function MessageTicks({ read, isDark }: { read: boolean; isDark: boolean }) {
   if (read) {
-    return <span className="text-[10px] text-blue-400 ml-0.5 leading-none">✓✓</span>;
+    return <span className="text-[10px] text-green-500 ml-0.5 leading-none font-bold">✓✓</span>;
   }
   return <span className={`text-[10px] ml-0.5 leading-none ${isDark ? "text-gray-500" : "text-gray-400"}`}>✓</span>;
 }
@@ -71,6 +71,8 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   const [senderType, setSenderType] = useState<"client" | "professional" | null>(null);
   const [wsToken, setWsToken] = useState<string | null>(null);
   const [peerTyping, setPeerTyping] = useState(false);
+  const [showExitWarning, setShowExitWarning] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -138,6 +140,10 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
             if (prev.find((m) => m.id === msg.data.id)) return prev;
             return [...prev, msg.data];
           });
+          // Auto-marcar como leído si el mensaje es del otro lado y el chat está visible
+          if (msg.data.senderType !== senderTypeRef.current && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: "mark_read" }));
+          }
         } else if (msg.type === "typing") {
           if (msg.senderType !== senderTypeRef.current) {
             setPeerTyping(true);
@@ -168,6 +174,28 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [connectWS]);
+
+  // Guardar conversationId en localStorage para usuarios anónimos (para poder recuperarla)
+  useEffect(() => {
+    if (!isSignedIn && conversationId && conversation) {
+      localStorage.setItem("lastAnonChat", JSON.stringify({
+        id: conversationId,
+        professionalName: `${conversation.Professional.nombre} ${conversation.Professional.apellido}`,
+        officio: conversation.Professional.oficios[0] ?? "",
+      }));
+    }
+  }, [isSignedIn, conversationId, conversation]);
+
+  // Advertir antes de cerrar la pestaña (desktop)
+  useEffect(() => {
+    if (isSignedIn) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [isSignedIn]);
 
   // Cargar conversación
   useEffect(() => {
@@ -256,6 +284,22 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   }
 
   // Theme helpers
+  function handleBack() {
+    if (!isSignedIn) {
+      setShowExitWarning(true);
+    } else {
+      router.back();
+    }
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {}
+  }
+
   const bg       = isDark ? "bg-gray-950" : "bg-gray-50";
   const headerBg = isDark ? "bg-gray-950 border-gray-800" : "bg-white border-gray-200";
   const textPrimary = isDark ? "text-white" : "text-gray-900";
@@ -289,12 +333,54 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
+
+      {/* Modal advertencia salida anónimo */}
+      {showExitWarning && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4" onClick={() => setShowExitWarning(false)}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div
+            className={`relative rounded-2xl border p-6 max-w-sm w-full flex flex-col gap-4 ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto text-2xl ${isDark ? "bg-yellow-900/30 border border-yellow-700" : "bg-yellow-50 border border-yellow-200"}`}>
+              ⚠️
+            </div>
+            <div className="text-center">
+              <h3 className={`font-bold text-lg mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>Si salis, perdes el chat</h3>
+              <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                Como usuario anonimo no vas a poder volver a este chat. Guarda el link antes de salir.
+              </p>
+            </div>
+            <button
+              onClick={copyLink}
+              className={`w-full py-3 rounded-2xl font-semibold text-sm border transition-colors ${
+                isDark ? "bg-gray-800 text-white border-gray-700 hover:bg-gray-700" : "bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200"
+              }`}
+            >
+              {linkCopied ? "Link copiado!" : "Copiar link del chat"}
+            </button>
+            <button
+              onClick={() => { setShowExitWarning(false); router.back(); }}
+              className="w-full py-3 rounded-2xl bg-white text-gray-950 font-semibold text-sm hover:bg-gray-100 transition-colors"
+            >
+              Salir igual
+            </button>
+            <button
+              onClick={() => setShowExitWarning(false)}
+              className={`text-sm text-center transition-colors ${isDark ? "text-gray-500 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"}`}
+            >
+              Quedarme en el chat
+            </button>
+          </div>
+        </div>
+      )}
+
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
 
       {/* Header del chat */}
       <div className={`fixed top-14 left-0 right-0 z-40 border-b px-4 py-3 ${headerBg}`}>
         <div className="max-w-xl mx-auto flex items-center gap-3">
-          <button onClick={() => router.back()} className={`transition-colors ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"}`}>
+          <button onClick={handleBack} className={`transition-colors ${isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"}`}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
