@@ -21,26 +21,25 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("push", (event) => {
   let data = {};
-
   try {
     data = event.data ? event.data.json() : {};
   } catch {
-    data = { title: "Reportes Reconquista", body: event.data?.text() || "" };
+    data = {};
   }
 
   const title = data.title || "Reportes Reconquista";
-  const options = {
-    body: data.body || "",
-    icon: data.icon || "/icon-192x192.png",
-    badge: "/icon-192x192.png",
-    // soporta tanto { url } top-level como { data: { url } }
-    data: { url: data.url || data.data?.url || "/" },
-    vibrate: [200, 100, 200],
-    requireInteraction: false,
-    tag: data.tag || "rq-notification",
-  };
+  const body  = data.body  || "";
+  const url   = data.url   || data.data?.url || "/";
+  const tag   = data.tag   || "rq";
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon: "/icon-192x192.png",
+      data: { url },
+      tag,
+    })
+  );
 });
 
 // ── Notification click ────────────────────────────────────────────────────────
