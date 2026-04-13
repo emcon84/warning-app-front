@@ -196,7 +196,7 @@ export default function FarmaciaDetailModal({ isOpen, onClose, farmacia: initial
                 value={relocateAddress}
                 onChange={e => { setRelocateAddress(e.target.value); setRelocateResult(null); setRelocateError(null); }}
                 onKeyDown={e => e.key === "Enter" && handleRelocateGeocode()}
-                className="flex-1 text-sm border border-amber-300 dark:border-amber-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="flex-1 text-sm border border-amber-300 dark:border-amber-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
               <button
                 onClick={handleRelocateGeocode}

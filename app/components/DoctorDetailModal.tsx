@@ -390,7 +390,7 @@ export default function DoctorDetailModal({
                     value={relocateAddress}
                     onChange={(e) => { setRelocateAddress(e.target.value); setRelocateResult(null); setRelocateError(null); }}
                     placeholder="Ej: Belgrano 1234 o -29.1523, -59.6431"
-                    className="flex-1 text-sm border border-amber-300 dark:border-amber-600 rounded-lg px-2.5 py-1.5 bg-white dark:bg-gray-800"
+                    className="flex-1 text-sm border border-amber-300 dark:border-amber-600 rounded-lg px-2.5 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400"
                   />
                   <button
                     onClick={handleRelocateGeocode}
