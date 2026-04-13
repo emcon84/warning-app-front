@@ -5,11 +5,11 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Map, Stethoscope, Pill, ShoppingCart, Wrench } from "lucide-react";
 
 const ITEMS = [
-  { label: "Mapa",      Icon: Map,          href: "/app",           view: "reports"   },
+  { label: "Oficios",   Icon: Wrench,       href: "/profesionales", view: null        },
   { label: "Médicos",   Icon: Stethoscope,  href: "/app",           view: "doctors"   },
   { label: "Farmacias", Icon: Pill,         href: "/app",           view: "farmacias" },
   { label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",       view: null        },
-  { label: "Oficios",   Icon: Wrench,       href: "/profesionales", view: null        },
+  { label: "Mapa",      Icon: Map,          href: "/app",           view: "reports"   },
 ];
 
 const HIDDEN_PATHS = ["/", "/sign-in", "/sign-up", "/profesional/nuevo", "/profesional/editar"];

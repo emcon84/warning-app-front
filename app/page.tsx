@@ -237,13 +237,19 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/app"
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-blue-600/25"
+                href="/profesionales"
+                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-indigo-600/25"
               >
-                Abrir la app
+                Encontrá un profesional
                 <ChevronRight className="w-5 h-5" />
               </Link>
-              <p className="dark:text-gray-500 text-gray-500 text-sm">Gratis, sin registro para ver el mapa</p>
+              <Link
+                href="/app"
+                className="flex items-center gap-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold px-6 py-4 rounded-2xl text-base transition-colors"
+              >
+                Ver el mapa
+                <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
 
             {/* Stats visuales */}
