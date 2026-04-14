@@ -67,7 +67,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       }
 
       setState("success");
-      showFeedback(`✓ "${text.trim()}"`, true);
+      showFeedback(`Guardado: "${text.trim()}"`, true);
       onReportCreated(data.report);
     } catch {
       setState("error");
@@ -136,7 +136,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
   const isError = state === "error";
 
   return (
-    <div className="fixed bottom-28 right-3 flex flex-col items-end gap-2" style={{ zIndex: 950 }}>
+    <div className="fixed bottom-[9rem] right-4 flex flex-col items-end gap-2" style={{ zIndex: 950 }}>
       {showToast && feedback && (
         <div className={`
           max-w-[200px] px-3 py-2 rounded-xl text-xs font-medium shadow-lg
@@ -154,7 +154,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
         disabled={isProcessing}
         title={isListening ? "Tocá para enviar" : "Reportar por voz"}
         className={`
-          w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all select-none
+          w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all select-none
           ${isListening ? "bg-red-500 scale-110 ring-4 ring-red-300" : ""}
           ${isProcessing ? "bg-blue-500 cursor-not-allowed" : ""}
           ${isSuccess ? "bg-green-500" : ""}

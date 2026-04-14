@@ -693,16 +693,20 @@ function HomeContent() {
         />
       )}
 
-      {/* Botón crear reporte por voz */}
-      <VoiceReportButton
-        onReportCreated={(report) => setReports((prev) => [...prev, report])}
-      />
+      {/* Botón crear reporte por voz — solo en vista reportes */}
+      {mapView === "reports" && (
+        <VoiceReportButton
+          onReportCreated={(report) => setReports((prev) => [...prev, report])}
+        />
+      )}
 
       {/* Botón tema claro/oscuro */}
       <button
         onClick={toggleTheme}
         title={theme === "light" ? "Cambiar a tema oscuro" : "Cambiar a tema claro"}
-        className={`fixed bottom-44 right-4 z-[1000] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all hover:shadow-xl ${
+        className={`fixed right-4 z-[1000] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 ${
+          mapView === "reports" ? "bottom-[13rem]" : "bottom-36"
+        } ${
           theme === "dark"
             ? "bg-gray-800 border border-gray-600 text-yellow-300 hover:bg-gray-700"
             : "bg-white border border-gray-200 text-gray-600 hover:text-gray-900"

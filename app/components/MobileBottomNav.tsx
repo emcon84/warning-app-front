@@ -53,8 +53,7 @@ function Nav() {
       <div className="md:hidden fixed bottom-20 right-4 z-[1002] flex flex-col items-center gap-1.5">
         <button
           onClick={() => router.push("/chats")}
-          className="relative flex items-center justify-center rounded-full bg-blue-500 shadow-lg shadow-blue-500/40 active:scale-95 transition-transform"
-          style={{ width: 52, height: 52 }}
+          className="relative w-11 h-11 flex items-center justify-center rounded-full bg-blue-500 shadow-lg shadow-blue-500/40 active:scale-95 transition-transform"
           aria-label="Mis chats"
         >
           {/* Anillo radar */}
