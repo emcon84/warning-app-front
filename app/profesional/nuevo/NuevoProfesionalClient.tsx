@@ -130,6 +130,55 @@ export default function NuevoProfesionalClient() {
     experiencia: "",
   });
 
+  const [whatsappRaw, setWhatsappRaw] = useState("");
+
+  const [aiForm, setAiForm] = useState({ anios: "", zona: "" });
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  async function handleGenerarDescripcion() {
+    setAiLoading(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API}/api/ai/generate-description`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          oficios: form.oficios,
+          nombre: form.nombre,
+          barrio: form.barrio,
+          anios: aiForm.anios || undefined,
+          zona: aiForm.zona || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error("Error generando descripcion");
+      const data = await res.json();
+      setForm((f) => ({ ...f, descripcion: data.descripcion }));
+      setAiOpen(false);
+    } catch {
+      // silently fail — user can write manually
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
+  function handleWhatsappChange(raw: string) {
+    setWhatsappRaw(raw);
+    const digits = raw.replace(/\D/g, "");
+    if (!digits) { setForm((f) => ({ ...f, whatsapp: "" })); return; }
+    let formatted = digits;
+    if (digits.startsWith("549")) {
+      formatted = digits;
+    } else if (digits.startsWith("54")) {
+      formatted = "549" + digits.slice(2);
+    } else if (digits.startsWith("0")) {
+      formatted = "549" + digits.slice(1);
+    } else {
+      formatted = "549" + digits;
+    }
+    setForm((f) => ({ ...f, whatsapp: formatted }));
+  }
+
   useEffect(() => {
     const stored = localStorage.getItem("theme");
     setIsDark(stored !== "light");
@@ -234,7 +283,7 @@ export default function NuevoProfesionalClient() {
     }
   }
 
-  const canGoStep2 = form.nombre && form.apellido && form.barrio && form.whatsapp;
+  const canGoStep2 = form.nombre && form.apellido && form.barrio && form.whatsapp.length >= 11;
   const canGoStep3 = form.oficios.length > 0;
   const canSubmit = form.descripcion.length >= 30;
 
@@ -318,12 +367,23 @@ export default function NuevoProfesionalClient() {
               <div>
                 <label className={`text-xs mb-1.5 block ${textSec}`}>WhatsApp</label>
                 <input
-                  value={form.whatsapp}
-                  onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
-                  placeholder="5493482XXXXXX"
+                  value={whatsappRaw}
+                  onChange={(e) => handleWhatsappChange(e.target.value)}
+                  placeholder="Ej: 3482 123456"
+                  inputMode="numeric"
                   style={{ color: inputColor, backgroundColor: inputBg }}
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                 />
+                {form.whatsapp.length >= 11 && (
+                  <p className={`text-xs mt-1.5 ${isDark ? "text-green-400" : "text-green-600"}`}>
+                    Listo: wa.me/{form.whatsapp}
+                  </p>
+                )}
+                {whatsappRaw && form.whatsapp.length < 11 && (
+                  <p className={`text-xs mt-1.5 ${isDark ? "text-yellow-500" : "text-yellow-600"}`}>
+                    Numero incompleto.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -424,6 +484,61 @@ export default function NuevoProfesionalClient() {
                 />
                 {form.descripcion.length > 0 && form.descripcion.length < 30 && (
                   <p className="text-xs text-yellow-600 mt-1">Minimo 30 caracteres.</p>
+                )}
+
+                {/* Generar con IA */}
+                {!aiOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setAiOpen(true)}
+                    className={`mt-2 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl border transition-colors ${
+                      isDark
+                        ? "border-purple-800 text-purple-400 hover:bg-purple-900/30"
+                        : "border-purple-300 text-purple-600 hover:bg-purple-50"
+                    }`}
+                  >
+                    <span>✦</span> Generar con IA
+                  </button>
+                ) : (
+                  <div className={`mt-3 p-3 rounded-xl border ${isDark ? "border-purple-800 bg-purple-950/30" : "border-purple-200 bg-purple-50"}`}>
+                    <p className={`text-xs font-medium mb-2 ${isDark ? "text-purple-300" : "text-purple-700"}`}>
+                      Dos preguntas rapidas y la IA escribe el borrador
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      <input
+                        value={aiForm.anios}
+                        onChange={(e) => setAiForm((f) => ({ ...f, anios: e.target.value }))}
+                        placeholder="Años de experiencia (ej: 10)"
+                        inputMode="numeric"
+                        style={{ color: inputColor, backgroundColor: inputBg }}
+                        className={`w-full px-3 py-2 rounded-xl border text-sm focus:outline-none ${inputCls}`}
+                      />
+                      <input
+                        value={aiForm.zona}
+                        onChange={(e) => setAiForm((f) => ({ ...f, zona: e.target.value }))}
+                        placeholder="Zonas donde trabajas (ej: Centro, Barrio Norte)"
+                        style={{ color: inputColor, backgroundColor: inputBg }}
+                        className={`w-full px-3 py-2 rounded-xl border text-sm focus:outline-none ${inputCls}`}
+                      />
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        type="button"
+                        onClick={handleGenerarDescripcion}
+                        disabled={aiLoading}
+                        className="flex-1 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                      >
+                        {aiLoading ? "Generando..." : "Generar descripcion"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAiOpen(false)}
+                        className={`px-3 py-2 rounded-xl text-xs border transition-colors ${btnSecondary}`}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
 
