@@ -6,6 +6,7 @@ import ApiStatusBanner from "./components/ApiStatusBanner";
 import MobileBottomNav from "./components/MobileBottomNav";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWARedirect from "./components/PWARedirect";
+import PostLoginWizard from "./components/PostLoginWizard";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { esES } from "@clerk/localizations";
@@ -104,6 +105,7 @@ export default function RootLayout({
           <ApiStatusBanner />
           <PWARedirect />
           {children}
+          <PostLoginWizard />
           <MobileBottomNav />
           <NotificationPrompt />
           <PWAInstallPrompt />
