@@ -1,8 +1,10 @@
 {
+  "id": "com.reportesreconquista.app",
   "name": "Reportes Ciudadanos Reconquista",
   "short_name": "Reportes RQ",
   "description": "Sistema de reportes ciudadanos para Reconquista, Santa Fe",
   "start_url": "/profesionales",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#111827",
