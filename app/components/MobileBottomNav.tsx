@@ -2,15 +2,15 @@
 
 import { Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { MessageCircle, Stethoscope, Pill, ShoppingCart, Wrench } from "lucide-react";
+import { Map, Stethoscope, Pill, ShoppingCart, Wrench, MessageCircle } from "lucide-react";
 import { useChatUnread } from "../hooks/useChatUnread";
 
 const ITEMS = [
-  { label: "Oficios",   Icon: Wrench,         href: "/profesionales", view: null        },
-  { label: "Médicos",   Icon: Stethoscope,    href: "/app",           view: "doctors"   },
-  { label: "Farmacias", Icon: Pill,           href: "/app",           view: "farmacias" },
-  { label: "Ofertas",   Icon: ShoppingCart,   href: "/ofertas",       view: null        },
-  { label: "Chats",     Icon: MessageCircle,  href: "/chats",         view: null        },
+  { label: "Oficios",   Icon: Wrench,       href: "/profesionales", view: null        },
+  { label: "Médicos",   Icon: Stethoscope,  href: "/app",           view: "doctors"   },
+  { label: "Farmacias", Icon: Pill,         href: "/app",           view: "farmacias" },
+  { label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",       view: null        },
+  { label: "Mapa",      Icon: Map,          href: "/app",           view: "reports"   },
 ];
 
 const HIDDEN_PATHS = ["/", "/sign-in", "/sign-up", "/profesional/nuevo", "/profesional/editar"];
@@ -29,6 +29,7 @@ function Nav() {
   if (shouldHide) return null;
 
   const currentView = searchParams.get("view") || "reports";
+  const isChatsActive = pathname === "/chats";
 
   function handleClick(href: string, view: string | null) {
     if (view) {
@@ -47,41 +48,55 @@ function Nav() {
   }
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[1001] bg-gray-900/95 backdrop-blur-md border-t border-gray-800 safe-area-bottom">
-      <div className="flex items-center justify-around px-2 py-2">
-        {ITEMS.map(({ label, Icon, href, view }) => {
-          const active = isActive(href, view);
-          const showBadge = label === "Chats" && unread > 0;
-          return (
-            <button
-              key={label}
-              onClick={() => handleClick(href, view)}
-              className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors min-w-0 flex-1"
-            >
-              <div className="relative">
+    <>
+      {/* FAB de chats */}
+      <button
+        onClick={() => router.push("/chats")}
+        className={`md:hidden fixed bottom-20 right-4 z-[1002] w-13 h-13 rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 ${
+          isChatsActive
+            ? "bg-blue-500 shadow-blue-500/40"
+            : "bg-gray-800 border border-gray-700 shadow-black/40"
+        }`}
+        style={{ width: 52, height: 52 }}
+        aria-label="Mis chats"
+      >
+        <MessageCircle className={`w-5 h-5 ${isChatsActive ? "text-white" : "text-gray-300"}`} />
+        {unread > 0 && (
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center leading-none border-2 border-gray-950">
+            {unread > 9 ? "9+" : unread}
+          </span>
+        )}
+      </button>
+
+      {/* Bottom nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[1001] bg-gray-900/95 backdrop-blur-md border-t border-gray-800 safe-area-bottom">
+        <div className="flex items-center justify-around px-2 py-2">
+          {ITEMS.map(({ label, Icon, href, view }) => {
+            const active = isActive(href, view);
+            return (
+              <button
+                key={label}
+                onClick={() => handleClick(href, view)}
+                className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors min-w-0 flex-1"
+              >
                 <Icon
                   className={`w-5 h-5 flex-shrink-0 transition-colors ${
                     active ? "text-blue-400" : "text-gray-500"
                   }`}
                 />
-                {showBadge && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] px-0.5 rounded-full bg-blue-500 text-white text-[9px] font-bold flex items-center justify-center leading-none">
-                    {unread > 9 ? "9+" : unread}
-                  </span>
-                )}
-              </div>
-              <span
-                className={`text-[10px] font-medium leading-none transition-colors ${
-                  active ? "text-blue-400" : "text-gray-500"
-                }`}
-              >
-                {label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </nav>
+                <span
+                  className={`text-[10px] font-medium leading-none transition-colors ${
+                    active ? "text-blue-400" : "text-gray-500"
+                  }`}
+                >
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+    </>
   );
 }
 
