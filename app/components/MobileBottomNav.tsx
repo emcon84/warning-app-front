@@ -50,23 +50,24 @@ function Nav() {
   return (
     <>
       {/* FAB de chats */}
-      <button
-        onClick={() => router.push("/chats")}
-        className={`md:hidden fixed bottom-20 right-4 z-[1002] w-13 h-13 rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 ${
-          isChatsActive
-            ? "bg-blue-500 shadow-blue-500/40"
-            : "bg-gray-800 border border-gray-700 shadow-black/40"
-        }`}
-        style={{ width: 52, height: 52 }}
-        aria-label="Mis chats"
-      >
-        <MessageCircle className={`w-5 h-5 ${isChatsActive ? "text-white" : "text-gray-300"}`} />
-        {unread > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center leading-none border-2 border-gray-950">
-            {unread > 9 ? "9+" : unread}
-          </span>
-        )}
-      </button>
+      <div className="md:hidden fixed bottom-20 right-4 z-[1002] flex flex-col items-center gap-1.5">
+        <button
+          onClick={() => router.push("/chats")}
+          className="relative flex items-center justify-center rounded-full bg-blue-500 shadow-lg shadow-blue-500/40 active:scale-95 transition-transform"
+          style={{ width: 52, height: 52 }}
+          aria-label="Mis chats"
+        >
+          {/* Anillo radar */}
+          <span className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-40" />
+          <MessageCircle className="w-5 h-5 text-white relative z-10" />
+          {unread > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none border-2 border-gray-950 z-10">
+              {unread > 9 ? "9+" : unread}
+            </span>
+          )}
+        </button>
+        <span className="text-[10px] font-semibold text-blue-400 leading-none">Mis chats</span>
+      </div>
 
       {/* Bottom nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[1001] bg-gray-900/95 backdrop-blur-md border-t border-gray-800 safe-area-bottom">
