@@ -5,6 +5,7 @@ import NotificationPrompt from "./components/NotificationPrompt";
 import ApiStatusBanner from "./components/ApiStatusBanner";
 import MobileBottomNav from "./components/MobileBottomNav";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWARedirect from "./components/PWARedirect";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { esES } from "@clerk/localizations";
@@ -101,6 +102,7 @@ export default function RootLayout({
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} font-sans antialiased`}>
           <ApiStatusBanner />
+          <PWARedirect />
           {children}
           <MobileBottomNav />
           <NotificationPrompt />

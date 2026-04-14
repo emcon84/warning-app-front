@@ -459,7 +459,7 @@ export default function MiPerfilPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar mapView="profesionales" />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-12">
+      <div className="max-w-xl mx-auto px-4 pt-20 pb-28">
 
         {/* Card usuario */}
         <div className="flex items-center gap-4 p-5 rounded-2xl bg-gray-900 border border-gray-800 mb-6">
