@@ -382,69 +382,6 @@ export default function ProfileClient({ pro, slug }: Props) {
             </div>
           )}
 
-          {/* Formulario nueva opinión */}
-          {showForm && (
-            <form
-              onSubmit={handleSubmitReview}
-              className={`mb-5 p-4 rounded-2xl border flex flex-col gap-3 ${cardBg}`}
-            >
-              <div>
-                <p className={`text-xs mb-2 ${textSec}`}>Tu calificación</p>
-                <StarPicker value={formScore} onChange={setFormScore} />
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>Tu nombre <span className={textMuted}>(opcional)</span></label>
-                <input
-                  type="text"
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  placeholder="Vecino anónimo"
-                  maxLength={60}
-                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Comentario <span className={textMuted}>({formComment.length}/500)</span>
-                </label>
-                <textarea
-                  value={formComment}
-                  onChange={(e) => setFormComment(e.target.value.slice(0, 500))}
-                  placeholder="¿Cómo fue tu experiencia con este profesional?"
-                  rows={3}
-                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
-                />
-                {formComment.length > 0 && formComment.length < 10 && (
-                  <p className="text-xs text-yellow-600 mt-1">Mínimo 10 caracteres.</p>
-                )}
-              </div>
-
-              {submitError && (
-                <p className="text-xs text-red-400">{submitError}</p>
-              )}
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => { setShowForm(false); setSubmitError(""); }}
-                  className={`flex-1 py-2.5 rounded-xl text-sm transition-colors border ${secBtn}`}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={formScore === 0 || formComment.trim().length < 10 || submitting}
-                  className="flex-1 py-2.5 rounded-xl bg-white text-gray-950 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-                >
-                  {submitting ? "Enviando..." : "Publicar"}
-                </button>
-              </div>
-            </form>
-          )}
 
           {/* Lista de reviews */}
           {loadingReviews ? (
@@ -501,6 +438,76 @@ export default function ProfileClient({ pro, slug }: Props) {
           )}
         </div>
         </div>{/* fin bloque scrolleable */}
+
+        {/* Bottom sheet: formulario nueva opinión */}
+        {showForm && (
+          <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={() => { setShowForm(false); setSubmitError(""); }}>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <form
+              onSubmit={handleSubmitReview}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative flex flex-col gap-3 rounded-t-3xl border-t px-4 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
+            >
+              <div className={`w-10 h-1 rounded-full mx-auto mb-1 ${isDark ? "bg-gray-700" : "bg-gray-300"}`} />
+
+              <div>
+                <p className={`text-xs mb-2 ${textSec}`}>Tu calificación</p>
+                <StarPicker value={formScore} onChange={setFormScore} />
+              </div>
+
+              <div>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>Tu nombre <span className={textMuted}>(opcional)</span></label>
+                <input
+                  type="text"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  placeholder="Vecino anónimo"
+                  maxLength={60}
+                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
+                />
+              </div>
+
+              <div>
+                <label className={`text-xs mb-1.5 block ${textSec}`}>
+                  Comentario <span className={textMuted}>({formComment.length}/500)</span>
+                </label>
+                <textarea
+                  value={formComment}
+                  onChange={(e) => setFormComment(e.target.value.slice(0, 500))}
+                  placeholder="¿Cómo fue tu experiencia con este profesional?"
+                  rows={3}
+                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
+                />
+                {formComment.length > 0 && formComment.length < 10 && (
+                  <p className="text-xs text-yellow-600 mt-1">Mínimo 10 caracteres.</p>
+                )}
+              </div>
+
+              {submitError && (
+                <p className="text-xs text-red-400">{submitError}</p>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowForm(false); setSubmitError(""); }}
+                  className={`flex-1 py-2.5 rounded-xl text-sm transition-colors border ${secBtn}`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={formScore === 0 || formComment.trim().length < 10 || submitting}
+                  className="flex-1 py-2.5 rounded-xl bg-white text-gray-950 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+                >
+                  {submitting ? "Enviando..." : "Publicar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
         {/* BLOQUE FIJO: botones de acción */}
         <div className={`fixed bottom-16 left-0 right-0 z-40 px-4 pt-3 pb-3 border-t md:static md:bottom-auto md:left-auto md:right-auto md:z-auto md:flex-shrink-0 md:pt-2 md:pb-4 ${bottomBar}`}>

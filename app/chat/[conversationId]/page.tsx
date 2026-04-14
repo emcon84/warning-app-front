@@ -332,9 +332,11 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   const isCompleted = conversation.status === "completed";
   const isAgreed = conversation.status === "agreed";
 
+  const professionalEverResponded = messages.some(m => m.senderType === "professional");
   const shouldShowWhatsApp = senderType === "client"
     && conversation.Professional.whatsapp
     && messages.length > 0
+    && !professionalEverResponded
     && messages[messages.length - 1].senderType === "client"
     && now - new Date(messages[0].createdAt).getTime() > 10 * 60 * 1000;
 
