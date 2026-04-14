@@ -20,7 +20,7 @@ function NuevoChat() {
   const params = useSearchParams();
   const professionalId = params.get("professionalId");
 
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const { getToken, userId } = useAuth();
 
   const [isDark, setIsDark] = useState(true);
