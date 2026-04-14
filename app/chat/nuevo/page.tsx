@@ -57,10 +57,14 @@ function NuevoChat() {
       let clientToken: string;
       let authHeaders: Record<string, string> = {};
 
+      let clientName: string | undefined;
       if (isSignedIn && userId) {
         clientToken = userId;
         const token = await getToken();
         if (token) authHeaders = { Authorization: `Bearer ${token}` };
+        // Nombre del usuario logueado
+        const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim();
+        if (fullName) clientName = fullName;
       } else {
         clientToken = getOrCreateAnonymousToken();
       }
@@ -68,7 +72,7 @@ function NuevoChat() {
       const res = await fetch(`${API}/api/conversations`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({ professionalId, clientToken, firstMessage: message.trim() }),
+        body: JSON.stringify({ professionalId, clientToken, firstMessage: message.trim(), clientName }),
       });
       if (!res.ok) {
         const d = await res.json();

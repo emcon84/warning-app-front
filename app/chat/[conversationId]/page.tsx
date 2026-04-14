@@ -23,6 +23,7 @@ interface Conversation {
   id: string;
   status: "open" | "agreed" | "completed";
   clientToken: string;
+  clientName?: string;
   professionalId: string;
   Professional: { nombre: string; apellido: string; oficios: string[]; foto?: string; slug: string; whatsapp?: string };
   Message: Message[];
@@ -402,8 +403,19 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className={`font-semibold text-sm leading-tight ${textPrimary}`}>{pro.nombre} {pro.apellido}</p>
-            <p className={`text-xs capitalize ${textSec}`}>{pro.oficios[0]}</p>
+            {senderType === "professional" ? (
+              <>
+                <p className={`font-semibold text-sm leading-tight ${textPrimary}`}>
+                  {conversation.clientName || "Cliente anónimo"}
+                </p>
+                <p className={`text-xs ${textSec}`}>Consulta vía Reportes Reconquista</p>
+              </>
+            ) : (
+              <>
+                <p className={`font-semibold text-sm leading-tight ${textPrimary}`}>{pro.nombre} {pro.apellido}</p>
+                <p className={`text-xs capitalize ${textSec}`}>{pro.oficios[0]}</p>
+              </>
+            )}
           </div>
 
           <div
