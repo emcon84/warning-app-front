@@ -411,8 +411,21 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
                 <>
                   <p className={`text-sm font-medium mb-5 ${labelColor}`}>Profesionales destacados</p>
                   {featured.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 sm:gap-6">
-                      {featured.map((pro) => <FeaturedCard key={pro.id} pro={pro} dark={isDark} />)}
+                    <div className="overflow-hidden -mx-4">
+                      <div
+                        className="flex animate-marquee"
+                        style={{
+                          gap: "1.5rem",
+                          paddingLeft: "1rem",
+                          animationDuration: `${Math.max(featured.length * 4, 16)}s`,
+                        }}
+                      >
+                        {[...featured, ...featured].map((pro, i) => (
+                          <div key={`${pro.id}-${i}`} className="flex-shrink-0 w-20">
+                            <FeaturedCard pro={pro} dark={isDark} />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12 text-center">

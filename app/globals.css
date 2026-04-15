@@ -122,3 +122,16 @@ input::placeholder, textarea::placeholder {
 .dark .leaflet-popup-close-button:hover {
   color: #f3f4f6 !important;
 }
+
+/* ── Marquee carousel ─────────────────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee linear infinite;
+  will-change: transform;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
