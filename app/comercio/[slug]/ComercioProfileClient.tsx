@@ -139,22 +139,10 @@ export default function ComercioProfileClient({ comercio }: Props) {
         </div>
       )}
 
-      {/* WhatsApp fijo mobile */}
-      <a
-        href={waUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 left-4 right-4 z-10 sm:hidden flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm text-white shadow-lg shadow-black/40 transition-opacity hover:opacity-90"
-        style={{ backgroundColor: "#25D366" }}
-      >
-        <WaIcon />
-        Contactar por WhatsApp
-      </a>
-
-      <div className="flex-1 max-w-xl mx-auto w-full pb-24 sm:pb-8">
+      <div className="flex-1 max-w-xl mx-auto w-full pb-28">
 
         {/* ── Hero ──────────────────────────────────────────────────── */}
-        <div className="relative h-56 sm:h-64 w-full overflow-hidden">
+        <div className="relative h-48 sm:h-56 w-full overflow-hidden">
           {comercio.foto ? (
             <img
               src={photoUrl(comercio.foto)}
@@ -169,8 +157,8 @@ export default function ComercioProfileClient({ comercio }: Props) {
             </div>
           )}
 
-          {/* Gradiente bottom-to-top */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          {/* Gradiente bottom-to-top suave */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
           {/* Volver */}
           <button
@@ -182,45 +170,45 @@ export default function ComercioProfileClient({ comercio }: Props) {
             </svg>
             Volver
           </button>
-
-          {/* Info sobre el gradiente */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <h1 className="text-2xl font-black text-white leading-tight">{comercio.nombre}</h1>
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
-                {comercio.rubro}
-              </span>
-              {comercio.barrio && (
-                <span className="flex items-center gap-1 text-xs text-white/70">
-                  <MapPin className="w-3 h-3" />
-                  {comercio.barrio}, Reconquista
-                </span>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* ── Info card ─────────────────────────────────────────────── */}
-        <div className={`mx-4 rounded-2xl border ${cardBg} -mt-0 overflow-visible`}>
-          {/* Avatar superpuesto */}
+        <div className={`mx-4 rounded-2xl border ${cardBg} overflow-visible -mt-4`}>
+          {/* Avatar + nombre en la misma fila, avatar sobresale del hero */}
           <div className="relative px-5 pt-0">
-            <div className={`absolute -top-10 left-5 w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}>
-              {comercio.foto ? (
-                <img
-                  src={photoUrl(comercio.foto)}
-                  alt={comercio.nombre}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className={`w-full h-full flex items-center justify-center text-3xl font-bold ${textMuted}`}>
-                  {comercio.nombre[0].toUpperCase()}
+            <div className="flex items-end gap-3 -mt-10 mb-4">
+              <div className={`w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}>
+                {comercio.foto ? (
+                  <img
+                    src={photoUrl(comercio.foto)}
+                    alt={comercio.nombre}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className={`w-full h-full flex items-center justify-center text-3xl font-bold ${textMuted}`}>
+                    {comercio.nombre[0].toUpperCase()}
+                  </div>
+                )}
+              </div>
+              {/* Nombre y badge a la derecha del avatar, alineados al bottom */}
+              <div className="pb-1 min-w-0">
+                <h1 className={`text-lg font-black leading-tight truncate ${textPrimary}`}>{comercio.nombre}</h1>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
+                    {comercio.rubro}
+                  </span>
+                  {comercio.barrio && (
+                    <span className={`flex items-center gap-1 text-xs ${textMuted}`}>
+                      <MapPin className="w-3 h-3" />
+                      {comercio.barrio}
+                    </span>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
-          {/* Padding top para que el contenido no quede debajo del avatar */}
-          <div className="px-5 pt-12 pb-5">
+          <div className="px-5 pb-5">
             {/* Info en row */}
             <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
               {comercio.direccion && (
@@ -250,12 +238,12 @@ export default function ComercioProfileClient({ comercio }: Props) {
               </div>
             )}
 
-            {/* Boton WhatsApp inline (visible en sm+) */}
+            {/* Boton WhatsApp — siempre inline, no fixed */}
             <a
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 hidden sm:flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
+              className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
               style={{ backgroundColor: "#25D366" }}
             >
               <WaIcon />
