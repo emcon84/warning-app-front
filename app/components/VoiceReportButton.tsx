@@ -92,7 +92,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       stream.getTracks().forEach((t) => t.stop());
     } catch {
       setState("error");
-      showFeedback("Micrófono bloqueado. En Ajustes del teléfono → Apps → [esta app] → Permisos → habilitá Micrófono.", true);
+      showFeedback("Micrófono bloqueado. Abrí Chrome → Configuración → Configuración de sitios → Micrófono → permitir este sitio.", true);
       return;
     }
 
