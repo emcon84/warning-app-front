@@ -52,7 +52,7 @@ function HomeContent() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
@@ -130,14 +130,11 @@ function HomeContent() {
     }
   };
 
-  const loadReports = async (showLoader = true) => {
+  const loadReports = async () => {
     const MAX_RETRIES = 2;
     const RETRY_DELAY = 4_000;
 
-    if (showLoader) {
-      setIsLoading(true);
-      setError(null);
-    }
+    setError(null);
 
     let lastErr: unknown;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -145,7 +142,6 @@ function HomeContent() {
         const data = await getReports();
         setReports(data);
         setError(null);
-        if (showLoader) setIsLoading(false);
         return;
       } catch (err) {
         lastErr = err;
@@ -157,10 +153,9 @@ function HomeContent() {
 
     console.error("Error loading reports after retries:", lastErr);
     setError("No se pudieron cargar los reportes. Reintentando en breve...");
-    if (showLoader) setIsLoading(false);
 
     // Auto-retry en 30s sin bloquear
-    setTimeout(() => loadReports(false), 30_000);
+    setTimeout(loadReports, 30_000);
   };
 
   const handleMapClick = (lat: number, lng: number) => {
@@ -379,18 +374,6 @@ function HomeContent() {
   const filteredDoctors = doctors
     .filter((d) => selectedSpecialties.length === 0 || selectedSpecialties.includes(d.especialidad))
     .filter((d) => !filterIapos || d.iapos);
-
-  // Mostrar estado de carga
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando reportes...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen overflow-hidden dark:bg-gray-950">
