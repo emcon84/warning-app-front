@@ -48,6 +48,7 @@ function Step4Notificaciones({
   onFinish: () => void;
 }) {
   const [activating, setActivating] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const textSec = isDark ? "text-gray-400" : "text-gray-500";
   const btnSecondary = isDark
@@ -55,19 +56,20 @@ function Step4Notificaciones({
     : "bg-gray-100 text-gray-600 hover:bg-gray-200";
 
   useEffect(() => {
-    if (permission === "granted") {
-      const t = setTimeout(onFinish, 1200);
+    if (success || permission === "granted") {
+      const t = setTimeout(onFinish, 1500);
       return () => clearTimeout(t);
     }
-  }, [permission, onFinish]);
+  }, [success, permission, onFinish]);
 
   async function handleActivar() {
     setActivating(true);
-    await requestPermission();
+    const granted = await requestPermission();
     setActivating(false);
+    if (granted) setSuccess(true);
   }
 
-  if (permission === "granted") {
+  if (success || permission === "granted") {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4">
         <div className={`w-16 h-16 rounded-full border flex items-center justify-center ${

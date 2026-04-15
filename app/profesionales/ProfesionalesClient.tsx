@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Professional } from "../types";
+import { Professional, Comercio } from "../types";
 import Navbar from "../components/Navbar";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -181,16 +181,56 @@ function ResultCard({ pro, dark, favIds, onToggleFav }: {
   );
 }
 
+function ComercioResultCard({ comercio, dark }: { comercio: Comercio; dark: boolean }) {
+  return (
+    <Link href={`/comercio/${comercio.slug}`}>
+      <div className={`flex items-center gap-4 p-5 rounded-2xl border transition-all cursor-pointer ${
+        dark
+          ? "bg-gray-900 border-gray-800 hover:border-gray-600 hover:bg-gray-800"
+          : "bg-white border-gray-100 hover:border-gray-300 shadow-sm hover:shadow-md"
+      }`}>
+        <div className={`w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow`}>
+          {comercio.foto
+            ? <img src={comercio.foto} alt={comercio.nombre} className="w-full h-full object-cover" />
+            : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-700 to-amber-900 text-2xl font-bold text-white">{comercio.nombre[0].toUpperCase()}</div>
+          }
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`font-semibold ${dark ? "text-white" : "text-gray-900"}`}>{comercio.nombre}</p>
+            <span className={`text-xs px-2 py-0.5 rounded-full border ${dark ? "bg-amber-900/40 text-amber-400 border-amber-800" : "bg-amber-50 text-amber-600 border-amber-200"}`}>
+              Comercio
+            </span>
+          </div>
+          <p className={`text-sm mt-0.5 ${dark ? "text-gray-400" : "text-gray-500"}`}>{comercio.rubro}</p>
+          <p className={`text-xs mt-0.5 ${dark ? "text-gray-500" : "text-gray-400"}`}>{comercio.barrio}</p>
+        </div>
+        <svg className={`w-5 h-5 flex-shrink-0 ${dark ? "text-gray-600" : "text-gray-300"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </Link>
+  );
+}
+
 export default function ProfesionalesClient({ professionals, featured }: Props) {
   const [query, setQuery] = useState("");
   const [isDark, setIsDark] = useState(true);
   const [favIds, setFavIds] = useState<Set<string>>(new Set());
+  const [comercios, setComercios] = useState<Comercio[]>([]);
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     setIsDark(saved ? saved === "dark" : true);
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API}/api/comercios`)
+      .then((r) => r.json())
+      .then((data: Comercio[]) => setComercios(data))
+      .catch(() => {});
   }, []);
 
   // Carga favoritos UNA sola vez cuando el usuario está autenticado
@@ -221,20 +261,31 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
     localStorage.setItem("theme", next ? "dark" : "light");
   }
 
-  const results = useMemo(() => {
+  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  const proResults = useMemo(() => {
     if (!query.trim()) return [];
-    const q = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    return professionals.filter((p) => {
-      const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      return (
-        norm(`${p.nombre} ${p.apellido}`).includes(q) ||
-        norm(p.oficios.join(" ")).includes(q) ||
-        norm(p.barrio).includes(q) ||
-        norm(p.descripcion ?? "").includes(q)
-      );
-    });
+    const q = norm(query);
+    return professionals.filter((p) =>
+      norm(`${p.nombre} ${p.apellido}`).includes(q) ||
+      norm(p.oficios.join(" ")).includes(q) ||
+      norm(p.barrio).includes(q) ||
+      norm(p.descripcion ?? "").includes(q)
+    );
   }, [query, professionals]);
 
+  const comercioResults = useMemo(() => {
+    if (!query.trim()) return [];
+    const q = norm(query);
+    return comercios.filter((c) =>
+      norm(c.nombre).includes(q) ||
+      norm(c.rubro).includes(q) ||
+      norm(c.barrio).includes(q) ||
+      norm(c.descripcion ?? "").includes(q)
+    );
+  }, [query, comercios]);
+
+  const totalResults = proResults.length + comercioResults.length;
   const showResults = query.trim().length > 0;
 
   const bg = isDark ? "bg-gray-950" : "bg-gray-50";
@@ -314,7 +365,7 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar plomero, electricista, etc."
+                placeholder="Buscar plomero, comercio, electricista..."
                 style={{ color: inputColor, backgroundColor: isDark ? "#111827" : "#ffffff" }}
                 className={`w-full pl-12 pr-10 py-4 rounded-2xl border text-sm focus:outline-none transition-colors ${inputBg}`}
               />
@@ -339,12 +390,13 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
               {showResults && (
                 <>
                   <p className={`text-sm mb-5 ${labelColor}`}>
-                    {results.length > 0
-                      ? `${results.length} resultado${results.length !== 1 ? "s" : ""} para "${query}"`
+                    {totalResults > 0
+                      ? `${totalResults} resultado${totalResults !== 1 ? "s" : ""} para "${query}"`
                       : `Sin resultados para "${query}"`}
                   </p>
                   <div className="flex flex-col gap-3">
-                    {results.map((pro) => <ResultCard key={pro.id} pro={pro} dark={isDark} favIds={favIds} onToggleFav={handleToggleFav} />)}
+                    {proResults.map((pro) => <ResultCard key={pro.id} pro={pro} dark={isDark} favIds={favIds} onToggleFav={handleToggleFav} />)}
+                    {comercioResults.map((c) => <ComercioResultCard key={c.id} comercio={c} dark={isDark} />)}
                   </div>
                 </>
               )}
