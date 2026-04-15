@@ -383,7 +383,7 @@ function HomeContent() {
           <WifiOff className="w-4 h-4 shrink-0 text-red-400" />
           <p className="text-xs flex-1 leading-snug">{error}</p>
           <button
-            onClick={() => loadReports(false)}
+            onClick={() => loadReports()}
             className="text-xs text-blue-400 hover:text-blue-300 shrink-0 font-medium"
           >
             Reintentar
