@@ -79,6 +79,22 @@ input::placeholder, textarea::placeholder {
   animation: scale-in 0.2s ease-out;
 }
 
+/* Animación para transiciones entre steps de wizards */
+@keyframes step-enter {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-step-enter {
+  animation: step-enter 0.22s ease-out;
+}
+
 .custom-marker:hover {
   z-index: 1000 !important;
 }

@@ -222,12 +222,15 @@ export default function NuevoComercioClient() {
           zona: aiExtra.zona || undefined,
         }),
       });
-      if (!res.ok) throw new Error("Error generando descripcion");
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Error generando descripcion");
+      }
       const data = await res.json();
       setForm((f) => ({ ...f, descripcion: data.descripcion }));
       setAiOpen(false);
-    } catch {
-      // silently fail
+    } catch (e: any) {
+      setError(e.message || "No se pudo generar la descripcion. Intenta de nuevo.");
     } finally {
       setAiLoading(false);
     }
@@ -322,7 +325,7 @@ export default function NuevoComercioClient() {
 
         {/* ── Step 1: Datos del comercio ─────────────────────────────── */}
         {step === 1 && (
-          <div>
+          <div key={1} className="animate-step-enter">
             <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Tu comercio</h1>
             <p className={`text-sm mb-6 ${textSec}`}>Los datos principales que van a ver tus clientes.</p>
 
@@ -412,7 +415,7 @@ export default function NuevoComercioClient() {
 
         {/* ── Step 2: Descripcion e info ─────────────────────────────── */}
         {step === 2 && (
-          <div>
+          <div key={2} className="animate-step-enter">
             <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Info del local</h1>
             <p className={`text-sm mb-6 ${textSec}`}>Donde estan y como los encontran los clientes.</p>
 
@@ -526,7 +529,7 @@ export default function NuevoComercioClient() {
 
         {/* ── Step 3: Fotos ──────────────────────────────────────────── */}
         {step === 3 && (
-          <div>
+          <div key={3} className="animate-step-enter">
             <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Fotos del local</h1>
             <p className={`text-sm mb-6 ${textSec}`}>
               Subí fotos de tu local, productos o servicios. Los clientes confian mas en los comercios con buenas fotos.
