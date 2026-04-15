@@ -33,11 +33,25 @@ function getLocalClientToken(): string | null {
   return localStorage.getItem("clientToken");
 }
 
-function MessageTicks({ read, isDark }: { read: boolean; isDark: boolean }) {
+function MessageTicks({ read, onDark }: { read: boolean; onDark: boolean }) {
+  // Ticks SVG: simple check path, dos superpuestos para doble tick
+  const color = read
+    ? onDark ? "#a5b4fc" : "#22c55e"   // indigo-300 sobre azul / green-500 sobre blanco
+    : onDark ? "#818cf8" : "#9ca3af";  // indigo-400 (opaco) / gray-400
+
   if (read) {
-    return <span className="text-[10px] text-green-500 ml-0.5 leading-none font-bold">✓✓</span>;
+    return (
+      <svg width="18" height="11" viewBox="0 0 18 11" fill="none" className="ml-0.5 flex-shrink-0">
+        <path d="M1 5.5L4.5 9L10 3" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M6 5.5L9.5 9L17 1" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    );
   }
-  return <span className={`text-[10px] ml-0.5 leading-none ${isDark ? "text-gray-500" : "text-gray-400"}`}>✓</span>;
+  return (
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" className="ml-0.5 flex-shrink-0">
+      <path d="M1 5.5L4.5 9L10 1" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
 }
 
 function TypingBubble({ isDark }: { isDark: boolean }) {
@@ -489,16 +503,24 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
                 <div
                   className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                     isMine
-                      ? "bg-white text-gray-950 rounded-br-sm"
-                      : isDark ? "bg-gray-800 text-gray-100 rounded-bl-sm" : "bg-gray-200 text-gray-800 rounded-bl-sm"
+                      ? isDark
+                        ? "bg-indigo-600 text-white rounded-br-sm"
+                        : "bg-white text-gray-950 rounded-br-sm shadow-sm border border-gray-100"
+                      : isDark
+                        ? "bg-gray-800 text-gray-100 rounded-bl-sm"
+                        : "bg-gray-200 text-gray-800 rounded-bl-sm"
                   }`}
                 >
                   <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                   <div className={`flex items-center gap-0.5 mt-1 ${isMine ? "justify-end" : "justify-start"}`}>
-                    <p className={`text-xs ${isMine ? "text-gray-500" : isDark ? "text-gray-500" : "text-gray-400"}`}>
+                    <p className={`text-xs ${
+                      isMine
+                        ? isDark ? "text-indigo-200" : "text-gray-400"
+                        : isDark ? "text-gray-500" : "text-gray-400"
+                    }`}>
                       {new Date(msg.createdAt).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
                     </p>
-                    {isMine && <MessageTicks read={msg.read} isDark={isDark} />}
+                    {isMine && <MessageTicks read={msg.read} onDark={isDark} />}
                   </div>
                 </div>
               </div>
