@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
-import { MapPin, Phone, MessageCircle, Bell } from "lucide-react";
+import { MapPin, Phone, MessageCircle, Bell, Store } from "lucide-react";
 import { useNotifications } from "../hooks/useNotifications";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -38,6 +38,18 @@ interface ProfessionalProfile {
   foto?: string;
   oficios: string[];
   slug: string;
+}
+
+interface ComercioProfile {
+  id: string;
+  nombre: string;
+  rubro: string;
+  slug: string;
+  barrio: string;
+  direccion?: string;
+  horario?: string;
+  foto?: string;
+  activo: boolean;
 }
 
 const STATUS_MAP: Record<string, { label: string; dot: string }> = {
@@ -382,6 +394,42 @@ function ProfessionalProfileSection({
   );
 }
 
+function ComercioProfileSection({ profile }: { profile: ComercioProfile }) {
+  return (
+    <div className="rounded-2xl bg-gray-900 border border-gray-800 mb-6 overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+        <div className="flex items-center gap-2">
+          <Store className="w-4 h-4 text-amber-400" />
+          <span className="font-semibold text-sm text-white">Mi comercio</span>
+        </div>
+        <Link
+          href={`/comercio/${profile.slug}`}
+          className="text-xs text-amber-400 hover:text-amber-300 transition-colors"
+        >
+          Ver perfil publico
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-4 px-5 py-4">
+        <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-700 bg-gray-800 flex items-center justify-center font-bold text-gray-300 text-xl">
+          {profile.foto
+            ? <img src={`${API}${profile.foto}`} alt={profile.nombre} className="w-full h-full object-cover" />
+            : profile.nombre[0].toUpperCase()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-white">{profile.nombre}</p>
+          <span className="inline-block text-xs px-2 py-0.5 rounded-full border mt-0.5 bg-amber-900/40 text-amber-400 border-amber-800">
+            {profile.rubro}
+          </span>
+          <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+            <MapPin className="w-3 h-3" />{profile.barrio}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MiPerfilPage() {
   const router = useRouter();
   const { user, isLoaded } = useUser();
@@ -392,6 +440,8 @@ export default function MiPerfilPage() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [professionalProfile, setProfessionalProfile] = useState<ProfessionalProfile | null>(null);
   const [hasProfessionalProfile, setHasProfessionalProfile] = useState<boolean | null>(null);
+  const [comercioProfile, setComercioProfile] = useState<ComercioProfile | null>(null);
+  const [hasComercioProfile, setHasComercioProfile] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -406,10 +456,11 @@ export default function MiPerfilPage() {
       const token = await getToken();
       const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
-      const [proConvsRes, favRes, meRes] = await Promise.all([
+      const [proConvsRes, favRes, meRes, meComercioRes] = await Promise.all([
         fetch(`${API}/api/conversations/professional`, { headers: authHeaders }),
         fetch(`${API}/api/favorites`, { headers: authHeaders }),
         fetch(`${API}/api/professionals/me`, { headers: authHeaders }),
+        fetch(`${API}/api/comercios/me`, { headers: authHeaders }),
       ]);
 
       const proConvs: Conversation[] = proConvsRes.ok ? await proConvsRes.json() : [];
@@ -422,6 +473,15 @@ export default function MiPerfilPage() {
       } else {
         setProfessionalProfile(null);
         setHasProfessionalProfile(false);
+      }
+
+      if (meComercioRes.ok) {
+        const comData: ComercioProfile = await meComercioRes.json();
+        setComercioProfile(comData);
+        setHasComercioProfile(true);
+      } else {
+        setComercioProfile(null);
+        setHasComercioProfile(false);
       }
 
       // Chats como cliente (identificado por userId de Clerk)
@@ -482,7 +542,7 @@ export default function MiPerfilPage() {
           </div>
         </div>
 
-        {/* Sección perfil profesional (solo si tiene perfil) */}
+        {/* Sección perfil profesional */}
         {hasProfessionalProfile === true && professionalProfile && (
           <>
             <ProfessionalProfileSection
@@ -493,8 +553,13 @@ export default function MiPerfilPage() {
           </>
         )}
 
-        {/* CTA: crear perfil profesional */}
-        {hasProfessionalProfile === false && (
+        {/* Sección perfil de comercio */}
+        {hasComercioProfile === true && comercioProfile && (
+          <ComercioProfileSection profile={comercioProfile} />
+        )}
+
+        {/* CTA: crear perfil profesional (solo si no tiene ni profesional ni comercio) */}
+        {hasProfessionalProfile === false && hasComercioProfile === false && (
           <Link href="/profesional/nuevo">
             <div className="flex items-center gap-3 p-4 rounded-2xl bg-indigo-900/30 border border-indigo-700/50 hover:border-indigo-600 transition-colors cursor-pointer mb-6">
               <div className="w-10 h-10 rounded-xl bg-indigo-800/50 flex items-center justify-center flex-shrink-0">

@@ -46,10 +46,34 @@ const RUBRO_COLORS_LIGHT: Record<string, string> = {
   "Otro":               "bg-gray-100 text-gray-600 border-gray-300",
 };
 
+// Colores de fondo para gradiente cuando no hay foto
+const RUBRO_GRADIENT: Record<string, string> = {
+  "Almacén/Despensa":   "from-amber-950 to-amber-800",
+  "Restaurante/Comida": "from-orange-950 to-orange-800",
+  "Indumentaria":       "from-pink-950 to-pink-800",
+  "Calzado":            "from-rose-950 to-rose-800",
+  "Electrónica":        "from-blue-950 to-blue-800",
+  "Ferretería":         "from-zinc-900 to-zinc-700",
+  "Farmacia":           "from-green-950 to-green-800",
+  "Peluquería/Estética":"from-purple-950 to-purple-800",
+  "Librería/Papelería": "from-cyan-950 to-cyan-800",
+  "Veterinaria":        "from-teal-950 to-teal-800",
+  "Deportes":           "from-lime-950 to-lime-800",
+  "Mueblería":          "from-yellow-950 to-yellow-800",
+  "Joyería/Relojería":  "from-yellow-950 to-yellow-800",
+  "Otro":               "from-gray-900 to-gray-700",
+};
+
 function photoUrl(url: string): string {
   if (!url) return url;
   return url.startsWith("/uploads/") ? `${API}${url}` : url;
 }
+
+const WaIcon = () => (
+  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+  </svg>
+);
 
 export default function ComercioProfileClient({ comercio }: Props) {
   const router = useRouter();
@@ -78,10 +102,17 @@ export default function ComercioProfileClient({ comercio }: Props) {
     ? (RUBRO_COLORS[comercio.rubro] || RUBRO_COLORS["Otro"])
     : (RUBRO_COLORS_LIGHT[comercio.rubro] || RUBRO_COLORS_LIGHT["Otro"]);
 
+  const heroGradient = RUBRO_GRADIENT[comercio.rubro] || RUBRO_GRADIENT["Otro"];
+
   const waText = encodeURIComponent("Hola, te contacto desde Reportes Reconquista");
   const waUrl  = `https://wa.me/${comercio.whatsapp}?text=${waText}`;
 
   const activeOffers = (comercio.offers || []).filter((o) => o.activa);
+
+  // Galeria: si no hay fotos adicionales pero hay foto principal, mostrarla
+  const galeriaFotos = comercio.fotos && comercio.fotos.length > 0
+    ? comercio.fotos
+    : (comercio.foto ? [comercio.foto] : []);
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
@@ -108,24 +139,72 @@ export default function ComercioProfileClient({ comercio }: Props) {
         </div>
       )}
 
-      <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-20 pb-24">
+      {/* WhatsApp fijo mobile */}
+      <a
+        href={waUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 left-4 right-4 z-10 sm:hidden flex items-center justify-center gap-2 py-3.5 rounded-2xl font-semibold text-sm text-white shadow-lg shadow-black/40 transition-opacity hover:opacity-90"
+        style={{ backgroundColor: "#25D366" }}
+      >
+        <WaIcon />
+        Contactar por WhatsApp
+      </a>
 
-        {/* Volver */}
-        <button
-          onClick={() => router.back()}
-          className={`flex items-center gap-1.5 text-sm mb-5 transition-colors ${textSec}`}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Volver
-        </button>
+      <div className="flex-1 max-w-xl mx-auto w-full pb-24 sm:pb-8">
 
-        {/* ── Header ─────────────────────────────────────────────────── */}
-        <div className={`p-5 rounded-2xl border mb-4 ${cardBg}`}>
-          <div className="flex items-start gap-4">
-            {/* Logo / avatar */}
-            <div className={`w-20 h-20 rounded-full flex-shrink-0 overflow-hidden border-2 ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-100"}`}>
+        {/* ── Hero ──────────────────────────────────────────────────── */}
+        <div className="relative h-56 sm:h-64 w-full overflow-hidden">
+          {comercio.foto ? (
+            <img
+              src={photoUrl(comercio.foto)}
+              alt={comercio.nombre}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className={`w-full h-full bg-gradient-to-br ${heroGradient} flex items-center justify-center`}>
+              <span className="text-7xl font-black text-white/20 select-none">
+                {comercio.rubro.split("/")[0].slice(0, 2).toUpperCase()}
+              </span>
+            </div>
+          )}
+
+          {/* Gradiente bottom-to-top */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+          {/* Volver */}
+          <button
+            onClick={() => router.back()}
+            className="absolute top-14 left-4 flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver
+          </button>
+
+          {/* Info sobre el gradiente */}
+          <div className="absolute bottom-4 left-4 right-4">
+            <h1 className="text-2xl font-black text-white leading-tight">{comercio.nombre}</h1>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
+                {comercio.rubro}
+              </span>
+              {comercio.barrio && (
+                <span className="flex items-center gap-1 text-xs text-white/70">
+                  <MapPin className="w-3 h-3" />
+                  {comercio.barrio}, Reconquista
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Info card ─────────────────────────────────────────────── */}
+        <div className={`mx-4 rounded-2xl border ${cardBg} -mt-0 overflow-visible`}>
+          {/* Avatar superpuesto */}
+          <div className="relative px-5 pt-0">
+            <div className={`absolute -top-10 left-5 w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}>
               {comercio.foto ? (
                 <img
                   src={photoUrl(comercio.foto)}
@@ -138,78 +217,71 @@ export default function ComercioProfileClient({ comercio }: Props) {
                 </div>
               )}
             </div>
-
-            <div className="flex-1 min-w-0">
-              <h1 className={`text-xl font-bold leading-tight ${textPrimary}`}>{comercio.nombre}</h1>
-              <span className={`inline-block mt-1.5 text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
-                {comercio.rubro}
-              </span>
-
-              <div className="flex flex-col gap-1 mt-3">
-                <div className="flex items-center gap-2">
-                  <MapPin className={`w-3.5 h-3.5 flex-shrink-0 ${textMuted}`} />
-                  <span className={`text-sm ${textSec}`}>{comercio.barrio}, Reconquista</span>
-                </div>
-                {comercio.direccion && (
-                  <div className="flex items-center gap-2">
-                    <MapPin className={`w-3.5 h-3.5 flex-shrink-0 ${textMuted}`} />
-                    <span className={`text-sm ${textSec}`}>{comercio.direccion}</span>
-                  </div>
-                )}
-                {comercio.horario && (
-                  <div className="flex items-start gap-2">
-                    <Clock className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${textMuted}`} />
-                    <span className={`text-sm ${textSec}`}>{comercio.horario}</span>
-                  </div>
-                )}
-                {comercio.telefono && (
-                  <div className="flex items-center gap-2">
-                    <Phone className={`w-3.5 h-3.5 flex-shrink-0 ${textMuted}`} />
-                    <span className={`text-sm ${textSec}`}>{comercio.telefono}</span>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
-          {/* Descripcion */}
-          {comercio.descripcion && (
-            <p className={`mt-4 text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-              {comercio.descripcion}
-            </p>
-          )}
+          {/* Padding top para que el contenido no quede debajo del avatar */}
+          <div className="px-5 pt-12 pb-5">
+            {/* Info en row */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
+              {comercio.direccion && (
+                <span className={`flex items-center gap-1.5 ${textSec}`}>
+                  <MapPin className={`w-3.5 h-3.5 flex-shrink-0 ${textMuted}`} />
+                  {comercio.direccion}
+                </span>
+              )}
+              {comercio.horario && (
+                <span className={`flex items-center gap-1.5 ${textSec}`}>
+                  <Clock className={`w-3.5 h-3.5 flex-shrink-0 ${textMuted}`} />
+                  {comercio.horario}
+                </span>
+              )}
+              {comercio.telefono && (
+                <span className={`flex items-center gap-1.5 ${textSec}`}>
+                  <Phone className={`w-3.5 h-3.5 flex-shrink-0 ${textMuted}`} />
+                  {comercio.telefono}
+                </span>
+              )}
+            </div>
 
-          {/* Boton WhatsApp */}
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm text-white transition-colors"
-            style={{ backgroundColor: "#25D366" }}
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-            </svg>
-            Contactar por WhatsApp
-          </a>
+            {/* Descripcion */}
+            {comercio.descripcion && (
+              <div className={`mt-4 px-3 py-3 rounded-xl text-sm leading-relaxed ${isDark ? "bg-gray-800/60 text-gray-300" : "bg-gray-50 text-gray-700"}`}>
+                {comercio.descripcion}
+              </div>
+            )}
+
+            {/* Boton WhatsApp inline (visible en sm+) */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 hidden sm:flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "#25D366" }}
+            >
+              <WaIcon />
+              Contactar por WhatsApp
+            </a>
+          </div>
         </div>
 
         {/* ── Galeria ─────────────────────────────────────────────────── */}
-        {comercio.fotos && comercio.fotos.length > 0 && (
-          <div className="mb-4">
-            <p className={`text-sm font-medium mb-2 ${textSec}`}>Fotos del local</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {comercio.fotos.map((url, i) => (
+        {galeriaFotos.length > 0 && (
+          <div className="mx-4 mt-4">
+            <p className={`text-xs font-semibold uppercase tracking-wider mb-2.5 ${textMuted}`}>
+              Fotos del local
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {galeriaFotos.map((url, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => setLightboxSrc(photoUrl(url))}
-                  className={`aspect-square rounded-xl overflow-hidden border focus:outline-none ${isDark ? "border-gray-800" : "border-gray-200"}`}
+                  className={`aspect-square rounded-xl overflow-hidden border focus:outline-none group ${isDark ? "border-gray-800" : "border-gray-200"}`}
                 >
                   <img
                     src={photoUrl(url)}
                     alt={`Foto ${i + 1}`}
-                    className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                    className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
                   />
                 </button>
               ))}
@@ -218,11 +290,15 @@ export default function ComercioProfileClient({ comercio }: Props) {
         )}
 
         {/* ── Ofertas ─────────────────────────────────────────────────── */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-              Ofertas activas{activeOffers.length > 0 ? ` (${activeOffers.length})` : ""}
+        <div className="mx-4 mt-4 mb-4">
+          <div className="mb-3">
+            <p className={`text-base font-bold ${textPrimary}`}>
+              Ofertas activas
+              {activeOffers.length > 0 && (
+                <span className={`ml-2 text-sm font-normal ${textMuted}`}>({activeOffers.length})</span>
+              )}
             </p>
+            <p className={`text-xs mt-0.5 ${textMuted}`}>Productos y promociones disponibles ahora</p>
           </div>
 
           {activeOffers.length === 0 ? (
@@ -287,9 +363,9 @@ function OfertaCard({
   return (
     <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
       <div className="flex gap-0">
-        {/* Foto de la oferta */}
+        {/* Foto de la oferta - 1/3 del card */}
         {offer.foto && (
-          <div className="w-28 h-28 flex-shrink-0">
+          <div className="w-1/3 min-h-[120px] flex-shrink-0">
             <img
               src={photoUrl(offer.foto)}
               alt={offer.titulo}
@@ -298,17 +374,17 @@ function OfertaCard({
           </div>
         )}
 
-        {/* Datos */}
-        <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
+        {/* Datos - 2/3 o full si no hay foto */}
+        <div className={`flex-1 p-4 flex flex-col justify-between min-w-0 ${offer.foto ? "" : "w-full"}`}>
           <div>
-            <p className={`font-semibold text-sm leading-snug ${textPrimary}`}>{offer.titulo}</p>
+            <p className={`font-bold text-sm leading-snug ${textPrimary}`}>{offer.titulo}</p>
             {offer.descripcion && (
-              <p className={`text-xs mt-1 leading-relaxed ${textSec}`}>{offer.descripcion}</p>
+              <p className={`text-xs mt-1.5 leading-relaxed ${textSec}`}>{offer.descripcion}</p>
             )}
 
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
               {offer.precio && (
-                <span className={`text-base font-bold px-2.5 py-0.5 rounded-xl border ${
+                <span className={`text-lg font-black px-3 py-1 rounded-xl border ${
                   isDark
                     ? "bg-yellow-400/10 text-yellow-300 border-yellow-700"
                     : "bg-yellow-50 text-yellow-700 border-yellow-300"
@@ -328,7 +404,7 @@ function OfertaCard({
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-white transition-colors"
+            className="mt-3 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-white transition-opacity hover:opacity-90"
             style={{ backgroundColor: "#25D366" }}
           >
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
