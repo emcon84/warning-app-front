@@ -17,7 +17,7 @@ import FloatingBottomNav from "../components/FloatingBottomNav";
 import VoiceReportButton from "../components/VoiceReportButton";
 import ReportsTicker from "../components/ReportsTicker";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "../utils/api";
-import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon } from "lucide-react";
+import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon, WifiOff } from "lucide-react";
 import WelcomeTutorial from "../components/WelcomeTutorial";
 import { useNotifications } from "../hooks/useNotifications";
 import { getCategoryLabel } from "../utils/categoryHelpers";
@@ -130,20 +130,37 @@ function HomeContent() {
     }
   };
 
-  const loadReports = async () => {
-    try {
+  const loadReports = async (showLoader = true) => {
+    const MAX_RETRIES = 2;
+    const RETRY_DELAY = 4_000;
+
+    if (showLoader) {
       setIsLoading(true);
       setError(null);
-      const data = await getReports();
-      setReports(data);
-    } catch (err) {
-      console.error("Error loading reports:", err);
-      setError(
-        "Error al cargar los reportes. Asegurate de que la API esté corriendo.",
-      );
-    } finally {
-      setIsLoading(false);
     }
+
+    let lastErr: unknown;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const data = await getReports();
+        setReports(data);
+        setError(null);
+        if (showLoader) setIsLoading(false);
+        return;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < MAX_RETRIES) {
+          await new Promise((r) => setTimeout(r, RETRY_DELAY));
+        }
+      }
+    }
+
+    console.error("Error loading reports after retries:", lastErr);
+    setError("No se pudieron cargar los reportes. Reintentando en breve...");
+    if (showLoader) setIsLoading(false);
+
+    // Auto-retry en 30s sin bloquear
+    setTimeout(() => loadReports(false), 30_000);
   };
 
   const handleMapClick = (lat: number, lng: number) => {
@@ -377,22 +394,17 @@ function HomeContent() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden dark:bg-gray-950">
-      {/* Mensaje de error si la API no está disponible */}
+      {/* Toast de error — pequeño, no bloquea el mapa */}
       {error && (
-        <div className="absolute top-20 right-4 z-[1000] bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-md">
-          <div className="flex items-start">
-            <AlertTriangle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Error de conexión</p>
-              <p className="text-sm">{error}</p>
-              <button
-                onClick={loadReports}
-                className="mt-2 text-sm underline hover:no-underline"
-              >
-                Reintentar
-              </button>
-            </div>
-          </div>
+        <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-[1000] bg-gray-900/90 backdrop-blur-sm text-white px-4 py-2.5 rounded-2xl shadow-lg flex items-center gap-2.5 max-w-[320px] w-[calc(100%-2rem)]">
+          <WifiOff className="w-4 h-4 shrink-0 text-red-400" />
+          <p className="text-xs flex-1 leading-snug">{error}</p>
+          <button
+            onClick={() => loadReports(false)}
+            className="text-xs text-blue-400 hover:text-blue-300 shrink-0 font-medium"
+          >
+            Reintentar
+          </button>
         </div>
       )}
 
