@@ -349,10 +349,10 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
                       }
                 }
               >
-                Oficios &amp; Servicios
+                Oficios &amp; Comercios
               </h1>
               <p className={`text-sm mb-6 text-center ${labelColor}`}>
-                Plomeros, electricistas, gasistas y mas, cerca tuyo.
+                Profesionales, comercios y servicios cerca tuyo.
               </p>
             </div>
 
