@@ -88,11 +88,15 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTypingSentRef = useRef(0);
+  const getTokenRef = useRef(getToken);
+  const isSignedInRef = useRef(isSignedIn);
 
   // Sincronizar refs con estado
   useEffect(() => { conversationRef.current = conversation; }, [conversation]);
   useEffect(() => { wsTokenRef.current = wsToken; }, [wsToken]);
   useEffect(() => { senderTypeRef.current = senderType; }, [senderType]);
+  useEffect(() => { getTokenRef.current = getToken; }, [getToken]);
+  useEffect(() => { isSignedInRef.current = isSignedIn; }, [isSignedIn]);
 
   // Tema
   useEffect(() => {
@@ -106,13 +110,24 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   }, []);
 
   // Función de conexión WebSocket (estable, lee estado via refs)
-  const connectWS = useCallback(() => {
+  const connectWS = useCallback(async () => {
     if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
 
     const conv = conversationRef.current;
-    const token = wsTokenRef.current;
     const sender = senderTypeRef.current;
-    if (!conv || !token || !sender) return;
+    if (!conv || !sender) return;
+
+    // Refrescar token de Clerk en cada reconexión (expiran ~1 min)
+    let token = wsTokenRef.current;
+    if (isSignedInRef.current) {
+      const fresh = await getTokenRef.current();
+      if (fresh) {
+        token = fresh;
+        wsTokenRef.current = fresh;
+      }
+    }
+
+    if (!token) return;
 
     if (wsRef.current && wsRef.current.readyState < 2) {
       manualCloseRef.current = true;

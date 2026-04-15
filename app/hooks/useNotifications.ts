@@ -45,14 +45,25 @@ export function useNotifications() {
     if (isSupported) {
       navigator.serviceWorker
         .register("/sw-custom.js")
-        .then((reg) => {
-          console.log("Service Worker registrado:", reg);
+        .then(async (reg) => {
           setRegistration(reg);
 
-          // Verificar si ya está suscrito
-          reg.pushManager.getSubscription().then((sub) => {
-            setIsSubscribed(sub !== null);
-          });
+          const sub = await reg.pushManager.getSubscription();
+          setIsSubscribed(sub !== null);
+
+          // Si ya tiene suscripción activa, re-registrarla en el servidor.
+          // Esto actualiza silenciosamente el endpoint cuando el browser lo rota.
+          if (sub) {
+            const token = await getToken().catch(() => null);
+            fetch(`${API_URL}/api/push/subscribe`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify(sub.toJSON()),
+            }).catch(() => {});
+          }
         })
         .catch((error) => {
           console.error("Error al registrar Service Worker:", error);
