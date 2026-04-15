@@ -150,3 +150,35 @@ export interface PublicReview {
   comment: string;
   createdAt: string;
 }
+
+// ─── Comercios ───────────────────────────────────────────────────────────────
+
+export interface ComercioOffer {
+  id: string;
+  comercioId: string;
+  titulo: string;
+  descripcion?: string | null;
+  precio?: string | null;
+  foto?: string | null;
+  validaHasta?: string | null;
+  activa: boolean;
+  createdAt: string;
+}
+
+export interface Comercio {
+  id: string;
+  nombre: string;
+  slug: string;
+  rubro: string;
+  barrio: string;
+  direccion?: string | null;
+  horario?: string | null;
+  whatsapp: string;
+  telefono?: string | null;
+  descripcion?: string | null;
+  foto?: string | null;
+  fotos?: string[];
+  activo: boolean;
+  createdAt: string;
+  offers?: ComercioOffer[];
+}
