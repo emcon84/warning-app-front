@@ -101,13 +101,18 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
     };
 
     recognition.onerror = (e: any) => {
-      if (e.error === "no-speech") {
-        setState("error");
-        showFeedback("No se escuchó nada. Intentá de nuevo.", true);
-      } else {
-        setState("error");
-        showFeedback("Error al escuchar. Intentá de nuevo.", true);
-      }
+      setState("error");
+      const messages: Record<string, string> = {
+        "no-speech":          "No se escuchó nada. Intentá de nuevo.",
+        "not-allowed":        "Permiso de micrófono denegado. Habilitalo en Ajustes del sitio.",
+        "audio-capture":      "No se encontró micrófono en el dispositivo.",
+        "network":            "Error de red. La API de voz requiere conexión.",
+        "service-not-allowed":"Servicio de voz no disponible en este navegador.",
+        "aborted":            "Escucha cancelada.",
+      };
+      const msg = messages[e.error] || `Error: ${e.error || "desconocido"}`;
+      showFeedback(msg, true);
+      console.error("[voice] SpeechRecognition error:", e.error, e);
     };
 
     recognition.onend = () => {
