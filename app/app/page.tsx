@@ -75,11 +75,7 @@ function HomeContent() {
   const [relocatingFarmaciaId, setRelocatingFarmaciaId] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
-      const saved = (localStorage.getItem("map_theme") as "light" | "dark") || "light";
-      // Aplicar antes del primer render para evitar flash
-      if (saved === "dark") document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
-      return saved;
+      return (localStorage.getItem("map_theme") as "light" | "dark") || "light";
     }
     return "light";
   });

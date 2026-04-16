@@ -100,6 +100,8 @@ export default function RootLayout({
         <head>
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/icon-192x192.png" />
+          {/* Previene flash de modo claro: aplica .dark antes de que React hidrate */}
+          <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('map_theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();` }} />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} font-sans antialiased`}>
           <ApiStatusBanner />
