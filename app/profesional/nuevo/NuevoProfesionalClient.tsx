@@ -374,7 +374,7 @@ export default function NuevoProfesionalClient() {
     <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
       <Navbar sidebarDisabled />
 
-      <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-32 pb-12">
+      <div className="flex-1 max-w-xl mx-auto w-full px-4 mt-24 mb-12">
         {/* Progress */}
         <div className="flex items-center gap-2 mb-8">
           {[1, 2, 3, 4].map((s) => (
