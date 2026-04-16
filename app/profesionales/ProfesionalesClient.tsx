@@ -313,6 +313,13 @@ function InfiniteCarousel<T extends { id: string }>({
   );
 }
 
+const CATEGORIAS_OFICIOS = [
+  "Plomero", "Electricista", "Albañil", "Pintor", "Gasista",
+  "Jardinero", "Herrero", "Carpintero", "Cerrajero", "Techista",
+  "Soldador", "Fumigador", "Limpieza", "Flete", "Climatización",
+  "Mecánico", "Pinchazos", "Yesero", "Instalador",
+];
+
 function OficiosCategoryGrid({
   professionals,
   dark,
@@ -322,38 +329,74 @@ function OficiosCategoryGrid({
   dark: boolean;
   onSelect: (o: string) => void;
 }) {
-  const uniqueOficios = useMemo(() => {
-    const counts: Record<string, number> = {};
-    professionals.forEach((p) =>
-      p.oficios.forEach((o) => {
-        counts[o] = (counts[o] ?? 0) + 1;
-      }),
-    );
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([o]) => o);
+  const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  // Oficios personalizados de profesionales tipo "oficio" que no están en la lista predefinida
+  const customOficios = useMemo(() => {
+    const predefinedNorm = new Set(CATEGORIAS_OFICIOS.map((c) => norm(c)));
+    const custom = new Set<string>();
+    professionals
+      .filter((p) => p.tipo === "oficio" || p.tipo == null)
+      .forEach((p) =>
+        (p.oficios ?? []).forEach((o) => {
+          const oNorm = norm(o);
+          const alreadyCovered = [...predefinedNorm].some(
+            (pre) => oNorm.includes(pre) || pre.includes(oNorm)
+          );
+          if (!alreadyCovered) custom.add(o);
+        })
+      );
+    return [...custom].sort();
   }, [professionals]);
 
-  if (uniqueOficios.length === 0)
-    return (
-      <div className="text-center py-8">
-        <p className={`text-sm ${dark ? "text-gray-500" : "text-gray-400"}`}>
-          Aun no hay oficios registrados.
-        </p>
-      </div>
-    );
+  const allCategories = useMemo(
+    () => [...CATEGORIAS_OFICIOS, ...customOficios],
+    [customOficios]
+  );
+
+  const counts = useMemo(() => {
+    const map: Record<string, number> = {};
+    allCategories.forEach((cat) => {
+      const catNorm = norm(cat);
+      map[cat] = professionals.filter((p) =>
+        (p.oficios ?? []).some((o) => norm(o).includes(catNorm) || catNorm.includes(norm(o)))
+      ).length;
+    });
+    return map;
+  }, [professionals, allCategories]);
 
   return (
     <div className="flex flex-wrap gap-2">
-      {uniqueOficios.map((o) => (
-        <button
-          key={o}
-          onClick={() => onSelect(o)}
-          className={`px-3 py-1.5 rounded-full text-sm font-medium capitalize transition-all ${dark ? "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700" : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"}`}
-        >
-          {o}
-        </button>
-      ))}
+      {allCategories.map((cat) => {
+        const count = counts[cat] ?? 0;
+        const isCustom = !CATEGORIAS_OFICIOS.includes(cat);
+        return (
+          <button
+            key={cat}
+            onClick={() => onSelect(cat)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+              count > 0
+                ? dark
+                  ? "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700"
+                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"
+                : dark
+                  ? "bg-gray-900 text-gray-600 border border-gray-800 hover:border-gray-700"
+                  : "bg-gray-50 text-gray-400 border border-gray-100 hover:border-gray-200"
+            }`}
+          >
+            {cat}
+            {count > 0 && (
+              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                isCustom
+                  ? dark ? "bg-blue-900/50 text-blue-400" : "bg-blue-100 text-blue-600"
+                  : dark ? "bg-purple-900/50 text-purple-400" : "bg-purple-100 text-purple-600"
+              }`}>
+                {count}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

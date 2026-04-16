@@ -25,21 +25,24 @@ const BARRIOS = [
 ];
 
 const OFICIOS_SUGERIDOS = [
-  "Plomería",
-  "Electricidad",
-  "Albañilería",
-  "Pintura",
+  "Plomero",
+  "Electricista",
+  "Albañil",
+  "Pintor",
   "Gasista",
-  "Jardinería",
-  "Herrería",
-  "Carpintería",
+  "Jardinero",
+  "Herrero",
+  "Carpintero",
   "Climatización",
-  "Cerrajería",
-  "Techado",
-  "Soldadura",
-  "Fumigación",
+  "Cerrajero",
+  "Techista",
+  "Soldador",
+  "Fumigador",
   "Limpieza",
-  "Fletes",
+  "Flete",
+  "Mecánico",
+  "Yesero",
+  "Instalador",
 ];
 
 const PROFESIONES_SUGERIDAS = [
