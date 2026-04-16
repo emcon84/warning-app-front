@@ -130,13 +130,13 @@ export default function NuevoEmpleadoClient() {
     return (
       <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
         <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] pt-16 px-6 text-center gap-6">
           <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isDark ? "bg-blue-900/40 border border-blue-700" : "bg-blue-50 border border-blue-200"}`}>
             <User className={`w-8 h-8 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
           </div>
           <div>
             <h1 className={`text-xl font-bold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>Inicia sesion para continuar</h1>
-            <p className={`text-sm ${textSec}`}>Necesitas una cuenta para publicar tu perfil de empleado.</p>
+            <p className={`text-sm ${textSec}`}>Necesitas una cuenta para subir tu CV.</p>
           </div>
           <SignInButton mode="modal">
             <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-colors">
@@ -153,7 +153,7 @@ export default function NuevoEmpleadoClient() {
     return (
       <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
         <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] pt-16 px-6 text-center gap-6">
           <div className={`w-20 h-20 rounded-full flex items-center justify-center ${isDark ? "bg-green-900/40 border border-green-700" : "bg-green-50 border border-green-200"}`}>
             <CheckCircle className={`w-10 h-10 ${isDark ? "text-green-400" : "text-green-600"}`} />
           </div>

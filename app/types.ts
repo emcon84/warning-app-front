@@ -116,12 +116,14 @@ export interface Offer {
 }
 
 // ─── Profesionales de Oficio ─────────────────────────────────────────────────
+export type ProfessionalType = "profesion" | "oficio";
 
 export interface Professional {
   id: string;
   nombre: string;
   apellido: string;
   slug: string;
+  tipo?: ProfessionalType | null;
   oficios: string[];
   barrio: string;
   foto?: string | null;
@@ -166,6 +168,30 @@ export interface Empleado {
   disponible: boolean;
   activo: boolean;
   createdAt: string;
+}
+
+// ─── Vacantes ────────────────────────────────────────────────────────────────
+
+export interface Vacante {
+  id: string;
+  comercioId: string;
+  titulo: string;
+  descripcion: string;
+  habilidades: string[];
+  barrio?: string | null;
+  horario?: string | null;
+  salario?: string | null;
+  modalidad?: string | null;
+  activa: boolean;
+  createdAt: string;
+  comercio: {
+    nombre: string;
+    slug: string;
+    foto?: string | null;
+    rubro: string;
+    barrio?: string;
+    whatsapp?: string;
+  };
 }
 
 // ─── Comercios ───────────────────────────────────────────────────────────────

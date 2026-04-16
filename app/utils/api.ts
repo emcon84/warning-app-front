@@ -1,4 +1,4 @@
-import { Report, ReportCategory, Doctor, Supermarket, Offer, Empleado } from "../types";
+import { Report, ReportCategory, Doctor, Supermarket, Offer, Empleado, Vacante } from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -541,6 +541,102 @@ export async function iniciarConversacionEmpleado(slug: string, data: {
 }
 
 // ─── FIN EMPLEADOS ────────────────────────────────────────────────────────────
+
+// ─── VACANTES ────────────────────────────────────────────────────────────────
+
+export async function getVacantes(filters?: { barrio?: string; habilidad?: string }): Promise<Vacante[]> {
+  const params = new URLSearchParams();
+  if (filters?.barrio) params.append("barrio", filters.barrio);
+  if (filters?.habilidad) params.append("habilidad", filters.habilidad);
+  const url = `${API_BASE_URL}/api/vacantes${params.toString() ? `?${params}` : ""}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Error al obtener vacantes");
+  return res.json();
+}
+
+export async function getVacante(id: string): Promise<Vacante> {
+  const res = await fetch(`${API_BASE_URL}/api/vacantes/${id}`);
+  if (!res.ok) throw new Error("Vacante no encontrada");
+  return res.json();
+}
+
+export async function getMisVacantes(token: string): Promise<Vacante[]> {
+  const res = await fetch(`${API_BASE_URL}/api/vacantes/mis`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Error al obtener vacantes");
+  return res.json();
+}
+
+export async function createVacante(data: {
+  titulo: string;
+  descripcion: string;
+  habilidades: string[];
+  barrio?: string;
+  horario?: string;
+  salario?: string;
+  modalidad?: string;
+}, token: string): Promise<Vacante> {
+  const res = await fetch(`${API_BASE_URL}/api/vacantes`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error al crear vacante");
+  }
+  return res.json();
+}
+
+export async function updateVacante(id: string, data: Partial<{
+  titulo: string;
+  descripcion: string;
+  habilidades: string[];
+  barrio: string;
+  horario: string;
+  salario: string;
+  modalidad: string;
+  activa: boolean;
+}>, token: string): Promise<Vacante> {
+  const res = await fetch(`${API_BASE_URL}/api/vacantes/${id}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error al actualizar vacante");
+  }
+  return res.json();
+}
+
+export async function deleteVacante(id: string, token: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/vacantes/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Error al eliminar vacante");
+}
+
+export async function postularseVacante(id: string, data: {
+  clientToken: string;
+  clientName?: string;
+  mensaje: string;
+}) {
+  const res = await fetch(`${API_BASE_URL}/api/vacantes/${id}/conversaciones`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error al postularse");
+  }
+  return res.json();
+}
+
+// ─── FIN VACANTES ─────────────────────────────────────────────────────────────
 
 // Obtener estadísticas
 export async function getStats() {

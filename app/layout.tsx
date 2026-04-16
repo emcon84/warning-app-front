@@ -96,7 +96,7 @@ export default function RootLayout({
         otpCodeFieldInput: { color: "#f9fafb", backgroundColor: "#1f2937", borderColor: "#4f46e5" },
       },
     }}>
-      <html lang="es">
+      <html lang="es" suppressHydrationWarning>
         <head>
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/icon-192x192.png" />

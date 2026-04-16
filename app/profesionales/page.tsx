@@ -28,6 +28,5 @@ async function getProfessionals(): Promise<Professional[]> {
 
 export default async function ProfesionalesPage() {
   const professionals = await getProfessionals();
-  const featured = professionals.slice(0, 6);
-  return <ProfesionalesClient professionals={professionals} featured={featured} />;
+  return <ProfesionalesClient professionals={professionals} />;
 }
