@@ -24,14 +24,14 @@ export interface ReportFilters {
 
 // Obtener todos los reportes con filtros opcionales
 export async function getReports(filters?: ReportFilters): Promise<Report[]> {
-  try {
-    const params = new URLSearchParams();
-    if (filters?.category) params.append("category", filters.category);
-    if (filters?.barrio) params.append("barrio", filters.barrio);
-    if (filters?.startDate) params.append("startDate", filters.startDate);
-    if (filters?.endDate) params.append("endDate", filters.endDate);
+  const params = new URLSearchParams();
+  if (filters?.category) params.append("category", filters.category);
+  if (filters?.barrio) params.append("barrio", filters.barrio);
+  if (filters?.startDate) params.append("startDate", filters.startDate);
+  if (filters?.endDate) params.append("endDate", filters.endDate);
+  const url = `${API_BASE_URL}/api/reports${params.toString() ? `?${params}` : ""}`;
 
-    const url = `${API_BASE_URL}/api/reports${params.toString() ? `?${params}` : ""}`;
+  try {
     const response = await fetch(url);
 
     if (!response.ok) {
