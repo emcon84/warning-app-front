@@ -412,20 +412,28 @@ export default function ProfesionalesClient({ professionals, featured }: Props) 
                   <p className={`text-sm font-medium mb-5 ${labelColor}`}>Profesionales destacados</p>
                   {featured.length > 0 ? (
                     <div className="overflow-hidden -mx-4">
-                      <div
-                        className="flex animate-marquee"
-                        style={{
-                          gap: "1.5rem",
-                          paddingLeft: "1rem",
-                          animationDuration: `${Math.max(featured.length * 4, 16)}s`,
-                        }}
-                      >
-                        {[...featured, ...featured].map((pro, i) => (
-                          <div key={`${pro.id}-${i}`} className="flex-shrink-0 w-20">
-                            <FeaturedCard pro={pro} dark={isDark} />
+                      {(() => {
+                        // Cada item ocupa ~96px (w-20=80px + gap 1.5rem≈16px aprox promedio)
+                        // Necesitamos que cada mitad sea > 1600px para cubrir cualquier desktop
+                        const itemSlot = 96;
+                        const copiesPerHalf = Math.max(3, Math.ceil(1600 / (featured.length * itemSlot)));
+                        const totalCopies = copiesPerHalf * 2;
+                        const items = Array.from({ length: totalCopies * featured.length }, (_, i) => featured[i % featured.length]);
+                        const halfWidthPx = copiesPerHalf * featured.length * itemSlot;
+                        const duration = Math.round(halfWidthPx / 50); // 50px/s
+                        return (
+                          <div
+                            className="flex animate-marquee"
+                            style={{ gap: "1rem", animationDuration: `${duration}s` }}
+                          >
+                            {items.map((pro, i) => (
+                              <div key={`${pro.id}-${i}`} className="flex-shrink-0 w-20">
+                                <FeaturedCard pro={pro} dark={isDark} />
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })()}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12 text-center">
