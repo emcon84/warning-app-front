@@ -378,10 +378,10 @@ function OficiosCategoryGrid({
               count > 0
                 ? dark
                   ? "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"
+                  : "bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300"
                 : dark
                   ? "bg-gray-900 text-gray-600 border border-gray-800 hover:border-gray-700"
-                  : "bg-gray-50 text-gray-400 border border-gray-100 hover:border-gray-200"
+                  : "bg-gray-50 text-gray-400 border border-gray-200 hover:border-gray-300"
             }`}
           >
             {cat}
