@@ -79,7 +79,7 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
   const inputClass = "w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm";
 
   return (
-    <div className="fixed inset-0 z-[900] bg-gray-50 dark:bg-gray-950 flex flex-col" style={{ top: 60 }}>
+    <div className="fixed inset-0 z-[900] bg-gray-50 dark:bg-gray-950 flex flex-col" style={{ top: 52 }}>
       {/* Header */}
       <div className="flex-shrink-0 flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950">
         <div>

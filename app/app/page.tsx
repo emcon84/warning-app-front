@@ -385,7 +385,7 @@ function HomeContent() {
       </div>
 
       {/* Contenedor principal con navbar */}
-      <div className="flex flex-1 overflow-hidden mt-[60px]">
+      <div className="flex flex-1 overflow-hidden mt-[52px]">
         {/* Overlay para cerrar sidebar - solo mobile */}
         {isSidebarOpen && (
           <div
