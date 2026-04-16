@@ -953,23 +953,23 @@ export default function ProfesionalesClient({ professionals }: Props) {
     {
       key: "comercios",
       label: "Comercios",
-      color: "text-amber-400",
-      activeBg: "bg-amber-900/60",
-      activeBorder: "border-amber-700",
+      color: isDark ? "text-amber-400" : "text-amber-700",
+      activeBg: isDark ? "bg-amber-900/60" : "bg-amber-100",
+      activeBorder: isDark ? "border-amber-700" : "border-amber-400",
     },
     {
       key: "oficios",
       label: "Oficios",
-      color: "text-purple-400",
-      activeBg: "bg-purple-900/60",
-      activeBorder: "border-purple-700",
+      color: isDark ? "text-purple-400" : "text-purple-700",
+      activeBg: isDark ? "bg-purple-900/60" : "bg-purple-100",
+      activeBorder: isDark ? "border-purple-700" : "border-purple-400",
     },
     {
       key: "empleados",
       label: "Empleos",
-      color: "text-emerald-400",
-      activeBg: "bg-emerald-900/60",
-      activeBorder: "border-emerald-700",
+      color: isDark ? "text-emerald-400" : "text-emerald-700",
+      activeBg: isDark ? "bg-emerald-900/60" : "bg-emerald-100",
+      activeBorder: isDark ? "border-emerald-700" : "border-emerald-400",
     },
   ];
 
@@ -1167,7 +1167,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
                   color: inputColor,
                   backgroundColor: isDark ? "#111827" : "#ffffff",
                 }}
-                className={`w-full pl-12 pr-10 py-4 rounded-2xl border text-sm focus:outline-none transition-colors ${inputBg}`}
+                className={`w-full pl-12 pr-10 py-4 rounded-2xl border text-sm focus:outline-none transition-colors placeholder:text-gray-400 ${inputBg}`}
               />
               {query && (
                 <button
