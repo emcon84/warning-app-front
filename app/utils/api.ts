@@ -35,13 +35,13 @@ export async function getReports(filters?: ReportFilters): Promise<Report[]> {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status} — ${url}`);
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
 
     return await response.json();
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    throw new Error(`${msg} | url: ${url}`);
+    console.error("Error fetching reports:", error);
+    throw error;
   }
 }
 
