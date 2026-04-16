@@ -22,6 +22,7 @@ import WelcomeTutorial from "../components/WelcomeTutorial";
 import { useNotifications } from "../hooks/useNotifications";
 import { getCategoryLabel } from "../utils/categoryHelpers";
 import { trackSection } from "../utils/tracking";
+import { useTheme } from "../contexts/ThemeContext";
 
 // Cargar el mapa dinámicamente para evitar errores de SSR
 const MapComponent = dynamic(() => import("../components/Map"), {
@@ -73,28 +74,8 @@ function HomeContent() {
   const [selectedFarmacia, setSelectedFarmacia] = useState<Farmacia | null>(null);
   const [isFarmaciaDetailOpen, setIsFarmaciaDetailOpen] = useState(false);
   const [relocatingFarmaciaId, setRelocatingFarmaciaId] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("map_theme") as "light" | "dark") || "light";
-    }
-    return "light";
-  });
-
-  const toggleTheme = () => {
-    setTheme(prev => {
-      const next = prev === "light" ? "dark" : "light";
-      localStorage.setItem("map_theme", next);
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
+  const { isDark: theme_isDark } = useTheme();
+  const theme = theme_isDark ? "dark" : "light";
 
   const { showNotification, permission } = useNotifications();
 
@@ -695,20 +676,6 @@ function HomeContent() {
         />
       )}
 
-      {/* Botón tema claro/oscuro */}
-      <button
-        onClick={toggleTheme}
-        title={theme === "light" ? "Cambiar a tema oscuro" : "Cambiar a tema claro"}
-        className={`fixed right-4 z-[1000] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all active:scale-95 ${
-          mapView === "reports" ? "bottom-[13rem]" : "bottom-36"
-        } ${
-          theme === "dark"
-            ? "bg-gray-800 border border-gray-600 text-yellow-300 hover:bg-gray-700"
-            : "bg-white border border-gray-200 text-gray-600 hover:text-gray-900"
-        }`}
-      >
-        {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
 
       {/* Tutorial de bienvenida */}
       <WelcomeTutorial />

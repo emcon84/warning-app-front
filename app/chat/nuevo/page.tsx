@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -23,22 +24,11 @@ function NuevoChat() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { getToken, userId } = useAuth();
 
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [professional, setProfessional] = useState<{ nombre: string; apellido: string; oficios: string[]; foto?: string } | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    setIsDark(stored !== "light");
-
-    function onStorage(e: StorageEvent) {
-      if (e.key === "theme") setIsDark(e.newValue !== "light");
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
 
   useEffect(() => {
     if (!professionalId) return;

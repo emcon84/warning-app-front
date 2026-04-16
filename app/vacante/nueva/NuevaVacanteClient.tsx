@@ -12,6 +12,7 @@ import {
   Building2,
 } from "lucide-react";
 import Navbar from "../../components/Navbar";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -66,7 +67,7 @@ export default function NuevaVacanteClient() {
   const { isSignedIn, isLoaded } = useUser();
   const { getToken } = useAuth();
 
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,11 +87,6 @@ export default function NuevaVacanteClient() {
   const [modalidad, setModalidad] = useState("");
 
   const [createdId, setCreatedId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    setIsDark(saved ? saved === "dark" : true);
-  }, []);
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) {

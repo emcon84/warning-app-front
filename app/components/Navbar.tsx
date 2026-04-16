@@ -1,10 +1,11 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, X, Settings } from "lucide-react";
+import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, X, Settings, Sun, Moon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SignInButton, UserButton, useUser, useAuth } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -50,6 +51,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
   const router = useRouter();
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [unreadCount, setUnreadCount] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [unreadConversations, setUnreadConversations] = useState<UnreadConversation[]>([]);
@@ -283,6 +285,15 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               </button>
             </SignInButton>
           )}
+
+          {/* Toggle de tema — siempre visible */}
+          <button
+            onClick={toggleTheme}
+            aria-label="Alternar tema"
+            className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </div>
 
       </div>

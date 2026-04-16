@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Comercio, ComercioOffer } from "../../types";
 import Navbar from "../../components/Navbar";
+import { useTheme } from "../../contexts/ThemeContext";
 import { MapPin, Clock, Phone, X } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -77,19 +78,8 @@ const WaIcon = () => (
 
 export default function ComercioProfileClient({ comercio }: Props) {
   const router = useRouter();
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    setIsDark(stored !== "light");
-
-    function onStorage(e: StorageEvent) {
-      if (e.key === "theme") setIsDark(e.newValue !== "light");
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
 
   const bg          = isDark ? "bg-gray-950" : "bg-gray-50";
   const textPrimary = isDark ? "text-white" : "text-gray-900";

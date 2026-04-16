@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
 import { CheckCircle, User, Briefcase, MapPin } from "lucide-react";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -51,7 +52,7 @@ export default function NuevoEmpleadoClient() {
   const { isSignedIn, isLoaded } = useUser();
   const { getToken } = useAuth();
 
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,11 +74,6 @@ export default function NuevoEmpleadoClient() {
   const [disponible, setDisponible] = useState(true);
 
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    setIsDark(saved ? saved === "dark" : true);
-  }, []);
 
   const bg = isDark ? "bg-gray-950" : "bg-gray-50";
   const cardBg = isDark

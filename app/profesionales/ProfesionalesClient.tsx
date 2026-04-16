@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Professional, Comercio, Empleado, Vacante } from "../types";
 import Navbar from "../components/Navbar";
+import { useTheme } from "../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -762,13 +763,7 @@ function VacanteResultCard({
 
 export default function ProfesionalesClient({ professionals }: Props) {
   const [query, setQuery] = useState("");
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("theme");
-      return saved ? saved === "dark" : true;
-    }
-    return true;
-  });
+  const { isDark } = useTheme();
   const [activePill, setActivePill] = useState<Pill>("profesionales");
   const [empleoTab, setEmpleoTab] = useState<EmpleoTab>("cvs");
   const [favIds, setFavIds] = useState<Set<string>>(() => {
@@ -844,12 +839,6 @@ export default function ProfesionalesClient({ professionals }: Props) {
       }
       return next;
     });
-  }
-
-  function toggleTheme() {
-    const next = !isDark;
-    setIsDark(next);
-    localStorage.setItem("theme", next ? "dark" : "light");
   }
 
   const professionalProfiles = useMemo(
@@ -994,42 +983,6 @@ export default function ProfesionalesClient({ professionals }: Props) {
         mapView="profesionales"
       />
 
-      {/* Toggle tema */}
-      <button
-        onClick={toggleTheme}
-        className={`fixed top-3 right-20 z-1003 p-2 rounded-full transition-colors ${isDark ? "bg-gray-800 text-gray-300 hover:bg-gray-700" : "bg-white text-gray-600 hover:bg-gray-100 shadow"}`}
-        title={isDark ? "Modo claro" : "Modo oscuro"}
-      >
-        {isDark ? (
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"
-            />
-          </svg>
-        ) : (
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-            />
-          </svg>
-        )}
-      </button>
 
       <div className="flex-1 flex flex-col">
         <div

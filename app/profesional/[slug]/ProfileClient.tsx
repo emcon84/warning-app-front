@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { ProfessionalDetail, PublicReview } from "../../types";
 import Navbar from "../../components/Navbar";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -61,12 +62,7 @@ export default function ProfileClient({ pro, slug }: Props) {
   const { getToken } = useAuth();
   const [copied, setCopied] = useState(false);
   const profileUrl = `${SITE_URL}/profesional/${pro.slug}`;
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    setIsDark(saved ? saved === "dark" : true);
-  }, []);
+  const { isDark } = useTheme();
 
   // Favorito
   const [isFav, setIsFav] = useState(false);

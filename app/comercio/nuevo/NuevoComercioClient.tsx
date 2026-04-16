@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
 import { Bell, CheckCircle, X } from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -129,7 +130,7 @@ export default function NuevoComercioClient() {
   const { getToken } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
 
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -162,17 +163,6 @@ export default function NuevoComercioClient() {
   const mainPhotoRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
-  // Theme
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    setIsDark(stored !== "light");
-
-    function onStorage(e: StorageEvent) {
-      if (e.key === "theme") setIsDark(e.newValue !== "light");
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
 
   const bg           = isDark ? "bg-gray-950" : "bg-gray-50";
   const textPrimary  = isDark ? "text-white" : "text-gray-900";

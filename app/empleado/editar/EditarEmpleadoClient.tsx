@@ -6,6 +6,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { CheckCircle, User } from "lucide-react";
 import { Empleado } from "../../types";
 import Navbar from "../../components/Navbar";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -51,7 +52,7 @@ export default function EditarEmpleadoClient() {
   const { isSignedIn, isLoaded } = useUser();
   const { getToken } = useAuth();
 
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,11 +69,6 @@ export default function EditarEmpleadoClient() {
   const [habilidadInput, setHabilidadInput] = useState("");
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    setIsDark(saved ? saved === "dark" : true);
-  }, []);
 
   useEffect(() => {
     if (!isLoaded) return;

@@ -5,25 +5,16 @@ import { useRouter } from "next/navigation";
 import { Bell, BellOff, CheckCircle, XCircle, AlertCircle, ChevronLeft, RefreshCw } from "lucide-react";
 import { useNotifications } from "../hooks/useNotifications";
 import Navbar from "../components/Navbar";
+import { useTheme } from "../contexts/ThemeContext";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { permission, isSupported, isSubscribed, requestPermission, subscribeToPush, unsubscribeFromPush } = useNotifications();
 
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [swVersion, setSwVersion] = useState<string | null>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    setIsDark(stored !== "light");
-    function onStorage(e: StorageEvent) {
-      if (e.key === "theme") setIsDark(e.newValue !== "light");
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {

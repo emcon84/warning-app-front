@@ -7,6 +7,7 @@ import { MapPin, Clock, Banknote, Briefcase, ArrowLeft, CheckCircle, Phone, Mess
 import { Vacante } from "../../types";
 import Navbar from "../../components/Navbar";
 import ShareButton from "../../components/ShareButton";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -118,14 +119,9 @@ function PostularModal({ vacante, isDark, onClose, onSent }: PostularModalProps)
 
 export default function VacanteDetailClient({ vacante }: { vacante: Vacante }) {
   const router = useRouter();
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [showModal, setShowModal] = useState(false);
   const [sentConvId, setSentConvId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    setIsDark(saved ? saved === "dark" : true);
-  }, []);
 
   const bg = isDark ? "bg-gray-950" : "bg-gray-50";
   const cardBg = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200 shadow-sm";

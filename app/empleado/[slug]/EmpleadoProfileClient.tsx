@@ -7,6 +7,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { MessageCircle, Phone, MapPin, CheckCircle, ArrowLeft, Pencil } from "lucide-react";
 import { Empleado } from "../../types";
 import Navbar from "../../components/Navbar";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -121,15 +122,10 @@ export default function EmpleadoProfileClient({ empleado, slug }: { empleado: Em
   const router = useRouter();
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
-  const [isDark, setIsDark] = useState(true);
+  const { isDark } = useTheme();
   const [showModal, setShowModal] = useState(false);
   const [sentConvId, setSentConvId] = useState<string | null>(null);
   const [isOwner, setIsOwner] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    setIsDark(saved ? saved === "dark" : true);
-  }, []);
 
   useEffect(() => {
     if (!isLoaded || !user) return;
