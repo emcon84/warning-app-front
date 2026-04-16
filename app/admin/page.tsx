@@ -41,7 +41,17 @@ interface Review {
   professional: { nombre: string; apellido: string; slug: string };
 }
 
-type Tab = "professionals" | "reports" | "reviews";
+interface Comercio {
+  id: string;
+  nombre: string;
+  rubro: string;
+  slug: string;
+  barrio: string;
+  activo: boolean;
+  createdAt: string;
+}
+
+type Tab = "professionals" | "reports" | "reviews" | "comercios";
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
@@ -52,6 +62,7 @@ export default function AdminPage() {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [comercios, setComercios] = useState<Comercio[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -69,14 +80,16 @@ export default function AdminPage() {
     try {
       const token = await getToken();
       const headers = { Authorization: `Bearer ${token}` };
-      const [proRes, repRes, revRes] = await Promise.all([
+      const [proRes, repRes, revRes, comRes] = await Promise.all([
         fetch(`${API}/api/admin/professionals`, { headers }),
         fetch(`${API}/api/admin/reports`, { headers }),
         fetch(`${API}/api/admin/reviews`, { headers }),
+        fetch(`${API}/api/admin/comercios`, { headers }),
       ]);
       if (proRes.ok) setProfessionals(await proRes.json());
       if (repRes.ok) setReports(await repRes.json());
       if (revRes.ok) setReviews(await revRes.json());
+      if (comRes.ok) setComercios(await comRes.json());
     } finally {
       setLoading(false);
     }
@@ -106,6 +119,18 @@ export default function AdminPage() {
     setDeletingId(null);
   }
 
+  async function deleteComerco(id: string) {
+    if (!confirm("¿Seguro que querés eliminar este comercio? Se van a borrar también sus ofertas y vacantes.")) return;
+    setDeletingId(id);
+    const token = await getToken();
+    const res = await fetch(`${API}/api/admin/comercios/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) setComercios(prev => prev.filter(c => c.id !== id));
+    setDeletingId(null);
+  }
+
   async function deleteReview(id: string) {
     if (!confirm("¿Eliminar esta reseña?")) return;
     setDeletingId(id);
@@ -132,6 +157,7 @@ export default function AdminPage() {
     professionals: `Profesionales (${professionals.length})`,
     reports: `Reportes (${reports.length})`,
     reviews: `Reseñas (${reviews.length})`,
+    comercios: `Comercios (${comercios.length})`,
   };
 
   return (
@@ -146,7 +172,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-          {(["professionals", "reports", "reviews"] as Tab[]).map((t) => (
+          {(["professionals", "comercios", "reports", "reviews"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -223,6 +249,37 @@ export default function AdminPage() {
                   className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-900/60 text-xs font-medium transition-colors disabled:opacity-40"
                 >
                   {deletingId === rep.id ? "..." : "Eliminar"}
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : tab === "comercios" ? (
+          <div className="flex flex-col gap-2">
+            {comercios.length === 0 && (
+              <p className="text-sm text-gray-600 text-center py-8">No hay comercios.</p>
+            )}
+            {comercios.map(com => (
+              <div key={com.id} className="flex items-center gap-3 p-4 rounded-2xl bg-gray-900 border border-gray-800">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Link href={`/comercio/${com.slug}`} className="font-semibold text-sm text-white hover:underline">
+                      {com.nombre}
+                    </Link>
+                    {!com.activo && (
+                      <span className="text-xs bg-red-900/40 text-red-400 border border-red-800 px-1.5 py-0.5 rounded-full">Inactivo</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400">{com.rubro} · {com.barrio}</p>
+                  <p className="text-xs text-gray-600 mt-0.5">
+                    {new Date(com.createdAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => deleteComerco(com.id)}
+                  disabled={deletingId === com.id}
+                  className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-900/60 text-xs font-medium transition-colors disabled:opacity-40"
+                >
+                  {deletingId === com.id ? "..." : "Eliminar"}
                 </button>
               </div>
             ))}
