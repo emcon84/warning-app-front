@@ -151,8 +151,9 @@ function HomeContent() {
       }
     }
 
+    const errMsg = lastErr instanceof Error ? lastErr.message : String(lastErr);
     console.error("Error loading reports after retries:", lastErr);
-    setError("No se pudieron cargar los reportes. Reintentando en breve...");
+    setError(`[DEBUG] ${errMsg}`);
 
     // Auto-retry en 30s sin bloquear
     setTimeout(loadReports, 30_000);

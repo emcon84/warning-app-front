@@ -35,7 +35,7 @@ export async function getReports(filters?: ReportFilters): Promise<Report[]> {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`Error al obtener reportes: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status} ${response.statusText} — ${url}`);
     }
 
     return await response.json();
