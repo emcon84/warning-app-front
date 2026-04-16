@@ -277,6 +277,8 @@ function FeaturedVacanteCard({
   );
 }
 
+const CAROUSEL_MIN_ITEMS = 6;
+
 function InfiniteCarousel<T extends { id: string }>({
   items,
   renderCard,
@@ -285,9 +287,25 @@ function InfiniteCarousel<T extends { id: string }>({
   renderCard: (item: T) => React.ReactNode;
 }) {
   if (items.length === 0) return null;
+
+  // Con pocos items, fila estática sin animación
+  if (items.length < CAROUSEL_MIN_ITEMS) {
+    return (
+      <div className="overflow-x-auto -mx-4 px-4">
+        <div className="flex gap-4 pb-1">
+          {items.map((item) => (
+            <div key={item.id} className="shrink-0 w-20">
+              {renderCard(item)}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   const itemSlot = 96;
   const copiesPerHalf = Math.max(
-    3,
+    2,
     Math.ceil(1600 / (items.length * itemSlot)),
   );
   const totalCopies = copiesPerHalf * 2;
