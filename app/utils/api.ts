@@ -42,6 +42,7 @@ export async function getReports(filters?: ReportFilters): Promise<Report[]> {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     throw new Error(`${msg} | url: ${url}`);
+  }
 }
 
 // Obtener un reporte específico
