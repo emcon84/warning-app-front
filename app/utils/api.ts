@@ -1,4 +1,4 @@
-import { Report, ReportCategory, Doctor, Supermarket, Offer } from "../types";
+import { Report, ReportCategory, Doctor, Supermarket, Offer, Empleado } from "../types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -470,6 +470,77 @@ export async function deleteSupermarket(id: string): Promise<void> {
 }
 
 // ─── FIN SUPERMARKETS & OFERTAS ──────────────────────────────────────────────
+
+// ─── EMPLEADOS ───────────────────────────────────────────────────────────────
+
+export async function getEmpleados(filters?: { barrio?: string; habilidad?: string }): Promise<Empleado[]> {
+  const params = new URLSearchParams();
+  if (filters?.barrio) params.append("barrio", filters.barrio);
+  if (filters?.habilidad) params.append("habilidad", filters.habilidad);
+  const url = `${API_BASE_URL}/api/empleados${params.toString() ? `?${params}` : ""}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Error al obtener empleados");
+  return res.json();
+}
+
+export async function getEmpleado(slug: string): Promise<Empleado> {
+  const res = await fetch(`${API_BASE_URL}/api/empleados/${slug}`);
+  if (!res.ok) throw new Error("Empleado no encontrado");
+  return res.json();
+}
+
+export async function getEmpleadoMe(token: string): Promise<Empleado> {
+  const res = await fetch(`${API_BASE_URL}/api/empleados/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("No tenés un perfil de empleado");
+  return res.json();
+}
+
+export async function createEmpleado(data: FormData, token: string): Promise<Empleado> {
+  const res = await fetch(`${API_BASE_URL}/api/empleados`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: data,
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error al crear perfil");
+  }
+  return res.json();
+}
+
+export async function updateEmpleado(data: FormData, token: string): Promise<Empleado> {
+  const res = await fetch(`${API_BASE_URL}/api/empleados/me`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: data,
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error al actualizar perfil");
+  }
+  return res.json();
+}
+
+export async function iniciarConversacionEmpleado(slug: string, data: {
+  clientToken: string;
+  clientName?: string;
+  mensaje: string;
+}) {
+  const res = await fetch(`${API_BASE_URL}/api/empleados/${slug}/conversaciones`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Error al iniciar conversación");
+  }
+  return res.json();
+}
+
+// ─── FIN EMPLEADOS ────────────────────────────────────────────────────────────
 
 // Obtener estadísticas
 export async function getStats() {
