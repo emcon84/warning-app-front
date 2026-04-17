@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const LIMIT = 20;
 
 interface Conversation {
   id: string;
@@ -14,7 +14,14 @@ interface Conversation {
   createdAt: string;
   updatedAt: string;
   Professional: { nombre: string; apellido: string; oficios: string[]; foto?: string; slug: string };
-  Message: { content: string; senderType: string; read: boolean; createdAt: string }[];
+  Message?: { content: string; senderType: string; read: boolean; createdAt: string }[];
+  _unreadCount?: number;
+}
+
+interface PagedResponse {
+  items: Conversation[];
+  hasMore: boolean;
+  nextCursor: string | null;
 }
 
 const STATUS_MAP: Record<string, { label: string; dot: string }> = {
@@ -40,9 +47,12 @@ function ConvCard({ conv, myRole }: { conv: Conversation; myRole: "client" | "pr
   const pro = conv.Professional;
   const lastMsg = conv.Message?.[conv.Message.length - 1];
   const { label, dot } = STATUS_MAP[conv.status] ?? STATUS_MAP.open;
-  const unread = conv.Message.filter(
-    (m) => m.senderType !== myRole && !m.read
-  ).length;
+
+  // Usar _unreadCount del API (precomputado) o calcular desde Message como fallback
+  const unread =
+    conv._unreadCount !== undefined
+      ? conv._unreadCount
+      : (conv.Message ?? []).filter((m) => m.senderType !== myRole && !m.read).length;
 
   return (
     <Link href={`/chat/${conv.id}`}>
@@ -85,74 +95,213 @@ function ConvCard({ conv, myRole }: { conv: Conversation; myRole: "client" | "pr
   );
 }
 
+// ── Helpers para parsear respuesta (maneja tanto array como objeto paginado) ──
+
+function parsePagedResponse(data: unknown): PagedResponse {
+  if (Array.isArray(data)) {
+    return { items: data as Conversation[], hasMore: false, nextCursor: null };
+  }
+  const d = data as PagedResponse;
+  return { items: d.items ?? [], hasMore: d.hasMore ?? false, nextCursor: d.nextCursor ?? null };
+}
+
+function mergeConvs(existing: Conversation[], incoming: Conversation[]): Conversation[] {
+  const seen = new Set(existing.map((c) => c.id));
+  const merged = [...existing];
+  for (const c of incoming) {
+    if (!seen.has(c.id)) {
+      seen.add(c.id);
+      merged.push(c);
+    }
+  }
+  return merged.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+}
+
+// ── Page ─────────────────────────────────────────────────────────────────────
+
 export default function ChatsPage() {
-  const router = useRouter();
   const { isLoaded, isSignedIn, getToken, userId } = useAuth();
 
-  const [convs, setConvs] = useState<Conversation[]>([]);
-  const [myRole, setMyRole] = useState<"client" | "professional">("client");
-  const [loading, setLoading] = useState(true);
-  const [isAnon, setIsAnon] = useState(false);
+  const [convs, setConvs]               = useState<Conversation[]>([]);
+  const [myRole, setMyRole]             = useState<"client" | "professional">("client");
+  const [loading, setLoading]           = useState(true);
+  const [loadingMore, setLoadingMore]   = useState(false);
+  const [isAnon, setIsAnon]             = useState(false);
 
-  useEffect(() => {
+  // Cursors para paginación
+  const proCursorRef    = useRef<string | null>(null);
+  const clientCursorRef = useRef<string | null>(null);
+  const proHasMoreRef   = useRef(false);
+  const clientHasMoreRef = useRef(false);
+
+  // Sentinel para IntersectionObserver
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Ref para saber si ya se hizo la carga inicial (evitar doble fetch en StrictMode)
+  const loadedRef = useRef(false);
+
+  // ── Carga inicial ──────────────────────────────────────────────────────────
+
+  const loadConvs = useCallback(async () => {
     if (!isLoaded) return;
-    loadConvs();
-  }, [isLoaded, isSignedIn]);
 
-  async function loadConvs() {
     setLoading(true);
+    proCursorRef.current    = null;
+    clientCursorRef.current = null;
+    proHasMoreRef.current   = false;
+    clientHasMoreRef.current = false;
+
     try {
-      const all: Conversation[] = [];
-      const seen = new Set<string>();
+      let merged: Conversation[] = [];
 
       if (isSignedIn) {
         const token = await getToken();
         const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
         const [proRes, clientRes] = await Promise.all([
-          fetch(`${API}/api/conversations/professional`, { headers: authHeaders }),
-          userId ? fetch(`${API}/api/conversations/client/${userId}`) : Promise.resolve(null),
+          fetch(`${API}/api/conversations/professional?limit=${LIMIT}`, { headers: authHeaders }),
+          userId ? fetch(`${API}/api/conversations/client/${userId}?limit=${LIMIT}`) : Promise.resolve(null),
         ]);
 
         if (proRes.ok) {
-          const proConvs: Conversation[] = await proRes.json();
-          proConvs.forEach((c) => { if (!seen.has(c.id)) { seen.add(c.id); all.push(c); } });
+          const paged = parsePagedResponse(await proRes.json());
+          proHasMoreRef.current  = paged.hasMore;
+          proCursorRef.current   = paged.nextCursor;
+          merged = mergeConvs(merged, paged.items);
         }
         if (clientRes?.ok) {
-          const clientConvs: Conversation[] = await clientRes.json();
-          clientConvs.forEach((c) => { if (!seen.has(c.id)) { seen.add(c.id); all.push(c); } });
+          const paged = parsePagedResponse(await clientRes.json());
+          clientHasMoreRef.current  = paged.hasMore;
+          clientCursorRef.current   = paged.nextCursor;
+          merged = mergeConvs(merged, paged.items);
         }
 
-        // Determinar rol principal: si tiene convs como profesional, es profesional
-        const hasProConvs = all.some((c) => {
-          // las convs profesionales tienen el usuario como Professional
-          return true; // se detecta si el endpoint de professional devolvio algo
-        });
-        setMyRole("client"); // por defecto cliente; el badge por conv es correcto igual
+        setMyRole("client");
       } else {
         // Anónimo
-        const clientToken = localStorage.getItem("clientToken");
-        if (!clientToken) {
-          setIsAnon(true);
-          setLoading(false);
-          return;
-        }
+        const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
         setIsAnon(true);
-        const res = await fetch(`${API}/api/conversations/client/${clientToken}`);
-        if (res.ok) {
-          const data: Conversation[] = await res.json();
-          data.forEach((c) => all.push(c));
+
+        if (clientToken) {
+          const res = await fetch(`${API}/api/conversations/client/${clientToken}?limit=${LIMIT}`);
+          if (res.ok) {
+            const paged = parsePagedResponse(await res.json());
+            clientHasMoreRef.current  = paged.hasMore;
+            clientCursorRef.current   = paged.nextCursor;
+            merged = mergeConvs(merged, paged.items);
+          }
         }
         setMyRole("client");
       }
 
-      all.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-      setConvs(all);
+      setConvs(merged);
     } finally {
       setLoading(false);
     }
-  }
+  }, [isLoaded, isSignedIn, userId, getToken]);
 
+  // ── Cargar más (infinite scroll) ──────────────────────────────────────────
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || (!proHasMoreRef.current && !clientHasMoreRef.current)) return;
+
+    setLoadingMore(true);
+    try {
+      let incoming: Conversation[] = [];
+
+      if (isSignedIn) {
+        const token = await getToken();
+        const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
+        const fetches: Promise<void>[] = [];
+
+        if (proHasMoreRef.current && proCursorRef.current) {
+          fetches.push(
+            fetch(`${API}/api/conversations/professional?limit=${LIMIT}&cursor=${proCursorRef.current}`, { headers: authHeaders })
+              .then((r) => r.ok ? r.json() : null)
+              .then((data) => {
+                if (!data) return;
+                const paged = parsePagedResponse(data);
+                proHasMoreRef.current = paged.hasMore;
+                proCursorRef.current  = paged.nextCursor;
+                incoming = [...incoming, ...paged.items];
+              })
+          );
+        }
+
+        if (clientHasMoreRef.current && clientCursorRef.current && userId) {
+          fetches.push(
+            fetch(`${API}/api/conversations/client/${userId}?limit=${LIMIT}&cursor=${clientCursorRef.current}`)
+              .then((r) => r.ok ? r.json() : null)
+              .then((data) => {
+                if (!data) return;
+                const paged = parsePagedResponse(data);
+                clientHasMoreRef.current = paged.hasMore;
+                clientCursorRef.current  = paged.nextCursor;
+                incoming = [...incoming, ...paged.items];
+              })
+          );
+        }
+
+        await Promise.all(fetches);
+      } else {
+        const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
+        if (clientToken && clientHasMoreRef.current && clientCursorRef.current) {
+          const res = await fetch(`${API}/api/conversations/client/${clientToken}?limit=${LIMIT}&cursor=${clientCursorRef.current}`);
+          if (res.ok) {
+            const paged = parsePagedResponse(await res.json());
+            clientHasMoreRef.current = paged.hasMore;
+            clientCursorRef.current  = paged.nextCursor;
+            incoming = paged.items;
+          }
+        }
+      }
+
+      if (incoming.length > 0) {
+        setConvs((prev) => mergeConvs(prev, incoming));
+      }
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [isSignedIn, userId, getToken, loadingMore]);
+
+  // ── Efectos ────────────────────────────────────────────────────────────────
+
+  // Carga inicial cuando Clerk termina de cargar
+  useEffect(() => {
+    if (!isLoaded) return;
+    loadConvs();
+  }, [isLoaded, isSignedIn]);
+
+  // Re-fetch inmediato al volver a la pestaña (limpia badges de no leídos)
+  useEffect(() => {
+    if (!isLoaded) return;
+    const onVisible = () => {
+      if (!document.hidden) loadConvs();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [isLoaded, loadConvs]);
+
+  // IntersectionObserver — activa loadMore cuando el sentinel entra en viewport
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) loadMore();
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+
+  const hasMore = proHasMoreRef.current || clientHasMoreRef.current;
   const activeConvs = convs.filter((c) => c.status !== "completed");
   const closedConvs = convs.filter((c) => c.status === "completed");
 
@@ -231,6 +380,17 @@ export default function ChatsPage() {
                 <div className="flex flex-col gap-2">
                   {closedConvs.map((c) => <ConvCard key={c.id} conv={c} myRole={myRole} />)}
                 </div>
+              </div>
+            )}
+
+            {/* Sentinel para infinite scroll */}
+            <div ref={sentinelRef} className="h-4" />
+
+            {loadingMore && (
+              <div className="flex flex-col gap-3">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-16 rounded-2xl bg-gray-900 border border-gray-800 animate-pulse" />
+                ))}
               </div>
             )}
           </div>

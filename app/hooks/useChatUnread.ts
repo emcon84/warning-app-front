@@ -67,7 +67,15 @@ export function useChatUnread() {
 
     fetchCount();
     const interval = setInterval(fetchCount, POLL_MS);
-    return () => clearInterval(interval);
+
+    // Re-fetch inmediato cuando el usuario vuelve a la pestaña/app
+    const onVisible = () => { if (!document.hidden) fetchCount(); };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [isLoaded, isSignedIn, userId]);
 
   return count;
