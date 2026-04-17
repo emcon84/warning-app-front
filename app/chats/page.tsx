@@ -161,7 +161,7 @@ export default function ChatsPage() {
       <Navbar mapView="profesionales" />
 
       <div className="max-w-xl mx-auto px-4 pt-20 pb-28">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-lg font-bold text-white">Mis chats</h1>
           <Link
             href="/profesionales"
@@ -170,6 +170,22 @@ export default function ChatsPage() {
             + Nuevo chat
           </Link>
         </div>
+
+        {isAnon && (
+          <div className="mb-5 flex items-start gap-3 bg-amber-950/40 border border-amber-800/50 rounded-2xl px-4 py-3">
+            <span className="text-amber-400 text-lg leading-none mt-0.5">⚠️</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-amber-300 mb-0.5">Estás chateando sin cuenta</p>
+              <p className="text-xs text-amber-400/80 leading-snug">
+                Tus chats solo están guardados en este dispositivo. Si lo perdés o limpiás el navegador, los perdés para siempre.{" "}
+                <Link href="/sign-in" className="underline font-semibold text-amber-300 hover:text-amber-200">
+                  Creá una cuenta gratis
+                </Link>{" "}
+                para tenerlos siempre a mano.
+              </p>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex flex-col gap-3">

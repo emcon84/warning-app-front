@@ -5,6 +5,24 @@ import { useAuth } from "@clerk/nextjs";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
+function getClientToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("clientToken");
+}
+
+async function sendSubscriptionToServer(sub: PushSubscription, token: string | null) {
+  const clientToken = getClientToken();
+  const res = await fetch(`${API_URL}/api/push/subscribe`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ ...sub.toJSON(), clientToken }),
+  });
+  if (!res.ok) throw new Error(`Server error: ${res.status}`);
+}
+
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -19,7 +37,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function useNotifications() {
-  const { getToken } = useAuth();
+  const { getToken, isSignedIn } = useAuth();
   const [permission, setPermission] = useState<NotificationPermission>(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
       return Notification.permission;
@@ -52,24 +70,21 @@ export function useNotifications() {
         const sub = await reg.pushManager.getSubscription();
         setIsSubscribed(sub !== null);
 
-        // Si ya tiene suscripción activa, re-registrarla en el servidor.
-        // Esto actualiza silenciosamente el endpoint cuando el browser lo rota.
+        // Re-registrar la suscripción en el servidor.
+        // Esto actualiza el endpoint si lo rotó el browser Y asocia el clerkUserId
+        // correcto cuando el usuario acaba de loguearse.
         if (sub) {
           const token = await getToken().catch(() => null);
-          fetch(`${API_URL}/api/push/subscribe`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify(sub.toJSON()),
-          }).catch(() => {});
+          sendSubscriptionToServer(sub, token).catch(() => {});
         }
       })
       .catch((error) => {
         console.error("Error al obtener Service Worker:", error);
       });
-  }, [isSupported]);
+  // isSignedIn como dependencia: cuando el usuario se loguea, re-registra
+  // la suscripción con su clerkUserId real (antes podía estar guardada como null)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSupported, isSignedIn]);
 
   const subscribeToPush = async () => {
     try {
@@ -94,20 +109,9 @@ export function useNotifications() {
 
       // Enviar la suscripción al servidor (con auth si está logueado)
       const token = await getToken().catch(() => null);
-      const response = await fetch(`${API_URL}/api/push/subscribe`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(subscription.toJSON()),
-      });
-
-      if (response.ok) {
-        setIsSubscribed(true);
-        return true;
-      }
-      throw new Error(`Server error: ${response.status}`);
+      await sendSubscriptionToServer(subscription, token);
+      setIsSubscribed(true);
+      return true;
     } catch (error: any) {
       console.error("[push] Error al suscribirse:", error);
       throw error;
