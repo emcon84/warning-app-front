@@ -6,6 +6,12 @@ import ProfileClient from "./ProfileClient";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
+function resolveImage(foto?: string | null): string {
+  if (!foto) return `${SITE_URL}/icon-512x512.png`;
+  if (foto.startsWith("/uploads/")) return `${API}${foto}`;
+  return foto;
+}
+
 async function getProfessional(slug: string): Promise<ProfessionalDetail | null> {
   try {
     const res = await fetch(`${API}/api/professionals/${slug}`, { cache: "no-store" });
@@ -44,7 +50,7 @@ export async function generateMetadata({
     }`;
   const description = truncate(rawDescription, 155);
 
-  const image = pro.foto || `${SITE_URL}/icon-512x512.png`;
+  const image = resolveImage(pro.foto);
   const canonicalUrl = `${SITE_URL}/profesional/${slug}`;
 
   return {

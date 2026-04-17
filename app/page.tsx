@@ -13,6 +13,7 @@ import {
   Users,
   Bell,
   CheckCircle,
+  Store,
 } from "lucide-react";
 import LandingThemeToggle from "./components/LandingThemeToggle";
 
@@ -74,6 +75,7 @@ const jsonLd = {
         "Directorio de médicos IAPOS y PAMI",
         "Farmacias de turno en tiempo real",
         "Directorio de profesionales y oficios con chat",
+        "Vidriera digital de comercios locales",
         "Ofertas de supermercados locales",
         "Notificaciones push",
         "PWA instalable",
@@ -210,6 +212,14 @@ const features = [
     bg: "bg-indigo-500/10 border-indigo-500/20",
   },
   {
+    icon: Store,
+    title: "Comercios locales",
+    description:
+      "Registrá tu negocio en Reconquista y llegá a más clientes. Vidriera digital gratuita con foto, descripción, dirección y contacto directo por WhatsApp.",
+    color: "text-pink-400",
+    bg: "bg-pink-500/10 border-pink-500/20",
+  },
+  {
     icon: ShoppingCart,
     title: "Ofertas de supermercados",
     description:
@@ -307,7 +317,7 @@ export default function LandingPage() {
 
             <p className="dark:text-gray-400 text-gray-600 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
               Reportá baches e inundaciones, encontrá médicos IAPOS y PAMI,
-              consultá las farmacias de turno, contratá profesionales y seguí las
+              consultá farmacias de turno, contratá profesionales, descubrí comercios locales y seguí las
               ofertas de supermercados. Todo para los vecinos de{" "}
               <strong className="dark:text-gray-200 text-gray-800">Reconquista, Santa Fe</strong>.
             </p>
@@ -464,6 +474,68 @@ export default function LandingPage() {
                     </span>
                   ))}
                   <span className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm px-3 py-1.5 rounded-full">
+                    y muchos más...
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Comercios highlight */}
+        <section className="dark:bg-gray-900 bg-gray-50 dark:border-gray-800 border-gray-200 border-y py-20">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex flex-col md:flex-row gap-10 items-center">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                    <Store className="w-5 h-5 text-pink-400" />
+                  </div>
+                  <span className="text-pink-400 font-semibold text-sm">Vidriera digital gratuita</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 dark:text-white text-gray-900">
+                  Registrá tu comercio en{" "}
+                  <span className="text-pink-400">Reconquista</span>
+                </h2>
+                <p className="dark:text-gray-400 text-gray-600 text-lg leading-relaxed mb-6">
+                  Tiendas, restaurantes, peluquerías, ferreterías y cualquier negocio local puede tener
+                  su vidriera digital gratuita. Foto, descripción, dirección y contacto directo con tus clientes.
+                </p>
+                <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 text-sm">
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  Gratis, sin comisiones
+                </div>
+                <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 text-sm mt-2">
+                  <MessageCircle className="w-4 h-4 text-pink-400" />
+                  Contacto directo por WhatsApp
+                </div>
+                <div className="flex items-center gap-2 dark:text-gray-400 text-gray-600 text-sm mt-2">
+                  <Bell className="w-4 h-4 text-yellow-400" />
+                  Publicá ofertas y vacantes de empleo
+                </div>
+                <Link
+                  href="/comercio/nuevo"
+                  className="inline-flex items-center gap-2 mt-8 bg-pink-500 hover:bg-pink-400 text-white font-bold px-6 py-3 rounded-xl transition-colors"
+                >
+                  Registrar mi comercio
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="flex-shrink-0 w-full md:w-64">
+                <p className="text-xs font-semibold dark:text-gray-500 text-gray-500 uppercase tracking-widest mb-3">
+                  Tipos de comercios
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {["Tiendas", "Restaurantes", "Peluquerías", "Ferreterías", "Farmacias", "Kioscos", "Panaderías", "Talleres"].map((tipo) => (
+                    <span
+                      key={tipo}
+                      className="dark:bg-gray-800 bg-white dark:border-gray-700 border border-gray-200 dark:text-gray-300 text-gray-700 text-sm px-3 py-1.5 rounded-full"
+                    >
+                      {tipo}
+                    </span>
+                  ))}
+                  <span className="bg-pink-500/10 border border-pink-500/20 text-pink-400 text-sm px-3 py-1.5 rounded-full">
                     y muchos más...
                   </span>
                 </div>

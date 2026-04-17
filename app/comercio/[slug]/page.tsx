@@ -6,6 +6,13 @@ import ComercioProfileClient from "./ComercioProfileClient";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
+/** Convierte rutas relativas de uploads a URLs absolutas para OG tags */
+function resolveImage(foto?: string | null): string {
+  if (!foto) return `${SITE_URL}/icon-512x512.png`;
+  if (foto.startsWith("/uploads/")) return `${API}${foto}`;
+  return foto;
+}
+
 async function getComercio(slug: string): Promise<Comercio | null> {
   try {
     const res = await fetch(`${API}/api/comercios/${slug}`, { cache: "no-store" });
@@ -38,13 +45,21 @@ export async function generateMetadata({
     comercio.descripcion ||
     `${comercio.rubro} en ${comercio.barrio}, Reconquista.${comercio.direccion ? ` ${comercio.direccion}.` : ""} Registrado en Reportes Reconquista.`;
   const description = truncate(rawDescription, 155);
-  const image = comercio.foto || `${SITE_URL}/icon-512x512.png`;
+  const image = resolveImage(comercio.foto);
   const canonicalUrl = `${SITE_URL}/comercio/${slug}`;
 
   return {
     title,
     description,
-    keywords: [comercio.nombre, comercio.rubro, comercio.barrio, "Reconquista", "Santa Fe"],
+    keywords: [
+      comercio.nombre,
+      comercio.rubro,
+      comercio.barrio,
+      "Reconquista",
+      "Santa Fe",
+      `${comercio.rubro} Reconquista`,
+      `comercios Reconquista`,
+    ],
     alternates: { canonical: canonicalUrl },
     openGraph: {
       title,
@@ -52,10 +67,18 @@ export async function generateMetadata({
       type: "website",
       siteName: "Reportes Reconquista",
       url: canonicalUrl,
-      images: [{ url: image, width: 400, height: 400, alt: comercio.nombre }],
+      locale: "es_AR",
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: `${comercio.nombre} — ${comercio.rubro} en Reconquista`,
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
       images: [image],
