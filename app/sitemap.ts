@@ -5,8 +5,14 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 interface SlugItem {
   slug: string;
-  updatedAt: string;
+  updatedAt?: string | null;
   activo?: boolean;
+}
+
+function safeDate(val: string | null | undefined): Date {
+  if (!val) return new Date();
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? new Date() : d;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -46,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((p) => p.activo !== false)
           .map((p): MetadataRoute.Sitemap[number] => ({
             url: `${BASE_URL}/profesional/${p.slug}`,
-            lastModified: new Date(p.updatedAt),
+            lastModified: safeDate(p.updatedAt),
             changeFrequency: "weekly",
             priority: 0.7,
           }))
