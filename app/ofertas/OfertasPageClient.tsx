@@ -6,6 +6,7 @@ import { ShoppingCart, Plus, X, Trash2 } from "lucide-react";
 import { Supermarket } from "../types";
 import { getSupermarkets, createSupermarket, deleteSupermarket } from "../utils/api";
 import Navbar from "../components/Navbar";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface Props {
   initialSupermarkets: Supermarket[];
@@ -14,6 +15,7 @@ interface Props {
 const inputClass = "w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm";
 
 export default function OfertasPageClient({ initialSupermarkets }: Props) {
+  const { isDark } = useTheme();
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>(initialSupermarkets);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newName, setNewName] = useState("");
@@ -53,13 +55,15 @@ export default function OfertasPageClient({ initialSupermarkets }: Props) {
     }
   };
 
+  const subheaderBg = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen" style={{ backgroundColor: isDark ? '#030712' : '#f9fafb' }}>
       <Navbar mapView="ofertas" />
 
       {/* Subheader con acción */}
-      <div className="fixed top-14 left-0 right-0 z-40 bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between">
-        <p className="text-sm font-semibold text-white">Ofertas del día</p>
+      <div className={`fixed top-14 left-0 right-0 z-40 border-b px-4 py-2 flex items-center justify-between ${subheaderBg}`}>
+        <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Ofertas del día</p>
         <button
           onClick={() => setIsAddOpen(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-colors"
