@@ -40,7 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# PWA files (sw.js es manual, no auto-generado — se trackea en git)
+# PWA files — generados por @ducanh2912/next-pwa durante el build
+**/public/sw.js
+**/public/swe-worker-*.js
 **/public/workbox-*.js
 **/public/worker-*.js
 **/public/sw.js.map
