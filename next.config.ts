@@ -13,6 +13,15 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "reportesreconquista.com",
+        pathname: "/uploads/**",
+      },
+    ],
+  },
   async redirects() {
     return [
       {

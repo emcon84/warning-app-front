@@ -8,8 +8,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquist
 
 function resolveImage(foto?: string | null): string {
   if (!foto) return `${SITE_URL}/icon-512x512.png`;
-  if (foto.startsWith("/uploads/")) return `${API}${foto}`;
-  return foto;
+  const absolute = foto.startsWith("/uploads/") ? `${SITE_URL}${foto}` : foto;
+  return `${SITE_URL}/_next/image?url=${encodeURIComponent(absolute)}&w=1200&q=85`;
 }
 
 async function getProfessional(slug: string): Promise<ProfessionalDetail | null> {

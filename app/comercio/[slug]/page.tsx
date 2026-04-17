@@ -6,11 +6,16 @@ import ComercioProfileClient from "./ComercioProfileClient";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
-/** Convierte rutas relativas de uploads a URLs absolutas para OG tags */
+/**
+ * Resuelve la URL de imagen para og:image.
+ * WhatsApp/Twitter no soportan AVIF — se pasa por /_next/image
+ * que convierte a JPEG/WebP según el cliente (crawlers reciben JPEG).
+ */
 function resolveImage(foto?: string | null): string {
   if (!foto) return `${SITE_URL}/icon-512x512.png`;
-  if (foto.startsWith("/uploads/")) return `${API}${foto}`;
-  return foto;
+  const absolute = foto.startsWith("/uploads/") ? `${SITE_URL}${foto}` : foto;
+  // Convertir a JPEG via Next.js image optimizer para compatibilidad con crawlers
+  return `${SITE_URL}/_next/image?url=${encodeURIComponent(absolute)}&w=1200&q=85`;
 }
 
 async function getComercio(slug: string): Promise<Comercio | null> {
