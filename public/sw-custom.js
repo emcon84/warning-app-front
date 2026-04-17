@@ -36,8 +36,11 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(title, {
       body,
       icon: "/icon-192x192.png",
+      badge: "/icon-192x192.png",
       data: { url },
       tag,
+      vibrate: [200, 100, 200],
+      requireInteraction: false,
     })
   );
 });
