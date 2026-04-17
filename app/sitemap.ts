@@ -67,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((e) => e.activo !== false)
           .map((e): MetadataRoute.Sitemap[number] => ({
             url: `${BASE_URL}/empleado/${e.slug}`,
-            lastModified: new Date(e.updatedAt),
+            lastModified: safeDate(e.updatedAt),
             changeFrequency: "weekly",
             priority: 0.6,
           }))
@@ -82,7 +82,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .filter((c) => c.activo !== false)
           .map((c): MetadataRoute.Sitemap[number] => ({
             url: `${BASE_URL}/comercio/${c.slug}`,
-            lastModified: new Date(c.updatedAt),
+            lastModified: safeDate(c.updatedAt),
             changeFrequency: "weekly",
             priority: 0.6,
           }))
