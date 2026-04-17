@@ -3,10 +3,10 @@ import { MetadataRoute } from "next";
 const BASE_URL = "https://reportesreconquista.com";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-interface ProfessionalSlug {
+interface SlugItem {
   slug: string;
   updatedAt: string;
-  activo: boolean;
+  activo?: boolean;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -29,29 +29,60 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    {
+      url: `${BASE_URL}/app`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.7,
+    },
   ];
 
-  let dynamicRoutes: MetadataRoute.Sitemap = [];
+  const [profRoutes, empleadoRoutes, comercioRoutes] = await Promise.all([
+    // Profesionales
+    fetch(`${API}/api/professionals`, { next: { revalidate: 3600 } })
+      .then((r) => r.ok ? r.json() : [])
+      .then((items: SlugItem[]) =>
+        items
+          .filter((p) => p.activo !== false)
+          .map((p): MetadataRoute.Sitemap[number] => ({
+            url: `${BASE_URL}/profesional/${p.slug}`,
+            lastModified: new Date(p.updatedAt),
+            changeFrequency: "weekly",
+            priority: 0.7,
+          }))
+      )
+      .catch(() => [] as MetadataRoute.Sitemap),
 
-  try {
-    const res = await fetch(`${API}/api/professionals`, {
-      next: { revalidate: 3600 },
-    });
+    // Empleados/CVs
+    fetch(`${API}/api/empleados`, { next: { revalidate: 3600 } })
+      .then((r) => r.ok ? r.json() : [])
+      .then((items: SlugItem[]) =>
+        items
+          .filter((e) => e.activo !== false)
+          .map((e): MetadataRoute.Sitemap[number] => ({
+            url: `${BASE_URL}/empleado/${e.slug}`,
+            lastModified: new Date(e.updatedAt),
+            changeFrequency: "weekly",
+            priority: 0.6,
+          }))
+      )
+      .catch(() => [] as MetadataRoute.Sitemap),
 
-    if (res.ok) {
-      const professionals: ProfessionalSlug[] = await res.json();
-      dynamicRoutes = professionals
-        .filter((p) => p.activo)
-        .map((p) => ({
-          url: `${BASE_URL}/profesional/${p.slug}`,
-          lastModified: new Date(p.updatedAt),
-          changeFrequency: "weekly" as const,
-          priority: 0.7,
-        }));
-    }
-  } catch {
-    // Si la API no responde en build time, no bloqueamos el sitemap
-  }
+    // Comercios
+    fetch(`${API}/api/comercios`, { next: { revalidate: 3600 } })
+      .then((r) => r.ok ? r.json() : [])
+      .then((items: SlugItem[]) =>
+        items
+          .filter((c) => c.activo !== false)
+          .map((c): MetadataRoute.Sitemap[number] => ({
+            url: `${BASE_URL}/comercio/${c.slug}`,
+            lastModified: new Date(c.updatedAt),
+            changeFrequency: "weekly",
+            priority: 0.6,
+          }))
+      )
+      .catch(() => [] as MetadataRoute.Sitemap),
+  ]);
 
-  return [...staticRoutes, ...dynamicRoutes];
+  return [...staticRoutes, ...profRoutes, ...empleadoRoutes, ...comercioRoutes];
 }

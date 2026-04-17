@@ -96,6 +96,83 @@ const jsonLd = {
         name: "Reconquista",
       },
     },
+    {
+      "@type": "FAQPage",
+      "@id": "https://reportesreconquista.com/#faq",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "¿Dónde encontrar plomeros en Reconquista?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "En Reportes Reconquista podés encontrar plomeros en Reconquista, Santa Fe. El directorio en reportesreconquista.com/profesionales lista plomeros con perfil verificado, zona de trabajo y contacto directo por chat.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "¿Dónde encontrar electricistas en Reconquista?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "El directorio de profesionales de Reportes Reconquista (reportesreconquista.com/profesionales) incluye electricistas matriculados en Reconquista, Santa Fe. Podés contactarlos por chat directamente desde la app.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "¿Cuál farmacia está de turno hoy en Reconquista?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Podés ver la farmacia de turno hoy en Reconquista en la sección Farmacias de la app Reportes Reconquista. La información se actualiza diariamente con dirección y teléfono.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "¿Cómo encontrar médicos IAPOS en Reconquista?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Reportes Reconquista tiene un directorio completo de médicos IAPOS en Reconquista, Santa Fe, con especialidad, dirección y ubicación en el mapa. También incluye médicos PAMI y otras obras sociales.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "¿Cómo reportar un bache o problema urbano en Reconquista?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Desde la app Reportes Reconquista (reportesreconquista.com/app) podés marcar en el mapa el bache, inundación, alumbrado roto o pastizal. El reporte queda geolocalizadoy visible para vecinos y el municipio.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "¿Hay albañiles en Reconquista Santa Fe?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Sí. En reportesreconquista.com/profesionales encontrás albañiles, pintores, gasistas, cerrajeros y más oficios en Reconquista, Santa Fe. Podés contactar directamente al profesional por chat sin intermediarios.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "¿Dónde ver ofertas de supermercados en Reconquista?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Las ofertas y promociones de los supermercados de Reconquista están disponibles en reportesreconquista.com/ofertas. La comunidad actualiza las promociones de los principales supermercados locales.",
+          },
+        },
+      ],
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://reportesreconquista.com/#oficios",
+      name: "Profesionales y oficios en Reconquista",
+      description: "Directorio de profesionales de oficio en Reconquista, Santa Fe",
+      url: "https://reportesreconquista.com/profesionales",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Plomeros en Reconquista", url: "https://reportesreconquista.com/profesionales" },
+        { "@type": "ListItem", position: 2, name: "Electricistas en Reconquista", url: "https://reportesreconquista.com/profesionales" },
+        { "@type": "ListItem", position: 3, name: "Albañiles en Reconquista", url: "https://reportesreconquista.com/profesionales" },
+        { "@type": "ListItem", position: 4, name: "Pintores en Reconquista", url: "https://reportesreconquista.com/profesionales" },
+        { "@type": "ListItem", position: 5, name: "Gasistas en Reconquista", url: "https://reportesreconquista.com/profesionales" },
+        { "@type": "ListItem", position: 6, name: "Cerrajeros en Reconquista", url: "https://reportesreconquista.com/profesionales" },
+      ],
+    },
   ],
 };
 

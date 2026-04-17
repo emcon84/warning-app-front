@@ -29,9 +29,12 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Reportes Ciudadanos - Reconquista",
+  title: {
+    default: "Reportes Reconquista | App ciudadana de Reconquista, Santa Fe",
+    template: "%s | Reportes Reconquista",
+  },
   description:
-    "Sistema de reportes ciudadanos para Reconquista, Santa Fe. Reportá problemas de basura, alumbrado, baches y pastizales.",
+    "La plataforma ciudadana de Reconquista, Santa Fe. Encontrá plomeros, electricistas y profesionales; médicos IAPOS y PAMI; farmacias de turno; ofertas de supermercados. Reportá baches e inundaciones.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -43,14 +46,17 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Reportes Ciudadanos Reconquista",
-    title: "Reportes Ciudadanos - Reconquista",
-    description: "Sistema de reportes ciudadanos para Reconquista, Santa Fe",
+    siteName: "Reportes Reconquista",
+    title: "Reportes Reconquista | App ciudadana de Reconquista, Santa Fe",
+    description:
+      "Plomeros, electricistas, médicos IAPOS/PAMI, farmacias de turno y ofertas de supermercados en Reconquista, Santa Fe.",
+    locale: "es_AR",
   },
   twitter: {
-    card: "summary",
-    title: "Reportes Ciudadanos - Reconquista",
-    description: "Sistema de reportes ciudadanos para Reconquista, Santa Fe",
+    card: "summary_large_image",
+    title: "Reportes Reconquista | App ciudadana de Reconquista, Santa Fe",
+    description:
+      "Plomeros, electricistas, médicos IAPOS/PAMI, farmacias de turno y ofertas de supermercados en Reconquista, Santa Fe.",
   },
   themeColor: "#111827",
 };

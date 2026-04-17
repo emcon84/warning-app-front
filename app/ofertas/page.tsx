@@ -5,13 +5,32 @@ import OfertasPageClient from "./OfertasPageClient";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export const metadata: Metadata = {
-  title: "Ofertas de supermercados - Reconquista",
-  description: "Encontrá las mejores ofertas de los supermercados de Reconquista, Santa Fe. Actualizadas por la comunidad.",
+  title: "Ofertas de Supermercados en Reconquista, Santa Fe",
+  description:
+    "Las mejores ofertas y promociones de los supermercados de Reconquista, Santa Fe. Actualizadas por la comunidad de vecinos. Ahorrá en tus compras del día a día.",
+  keywords: [
+    "ofertas supermercados Reconquista",
+    "promociones Reconquista",
+    "supermercados Reconquista",
+    "ofertas Reconquista Santa Fe",
+    "precios Reconquista",
+  ],
+  alternates: {
+    canonical: "https://reportesreconquista.com/ofertas",
+  },
   openGraph: {
-    title: "Ofertas de supermercados - Reconquista",
-    description: "Encontrá las mejores ofertas de los supermercados de Reconquista, Santa Fe.",
+    title: "Ofertas de Supermercados en Reconquista, Santa Fe",
+    description:
+      "Las mejores ofertas y promociones de los supermercados de Reconquista, Santa Fe. Actualizadas por la comunidad.",
     type: "website",
+    url: "https://reportesreconquista.com/ofertas",
     siteName: "Reportes Reconquista",
+    locale: "es_AR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ofertas de Supermercados en Reconquista, Santa Fe",
+    description: "Las mejores ofertas de los supermercados de Reconquista actualizadas por la comunidad.",
   },
 };
 
