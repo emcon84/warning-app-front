@@ -66,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         items
           .filter((e) => e.activo !== false)
           .map((e): MetadataRoute.Sitemap[number] => ({
-            url: `${BASE_URL}/empleado/${e.slug}`,
+            url: `${BASE_URL}/empleo/${e.slug}`,
             lastModified: safeDate(e.updatedAt),
             changeFrequency: "weekly",
             priority: 0.6,

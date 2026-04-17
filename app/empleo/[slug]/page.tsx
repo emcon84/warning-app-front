@@ -36,7 +36,7 @@ export async function generateMetadata({
     `${empleado.habilidades.join(", ")} en ${empleado.barrio ?? "Reconquista"}, Santa Fe.`;
   const description = truncate(rawDescription, 155);
   const image = empleado.foto || `${SITE_URL}/icon-512x512.png`;
-  const canonicalUrl = `${SITE_URL}/empleado/${slug}`;
+  const canonicalUrl = `${SITE_URL}/empleo/${slug}`;
 
   return {
     title,

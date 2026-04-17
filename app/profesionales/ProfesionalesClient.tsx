@@ -202,7 +202,7 @@ function FeaturedEmpleadoCard({
   dark: boolean;
 }) {
   return (
-    <Link href={`/empleado/${empleado.slug}`} className="block">
+    <Link href={`/empleo/${empleado.slug}`} className="block">
       <div className="flex flex-col items-center gap-2 cursor-pointer group w-full">
         <div
           className={`w-16 h-16 rounded-full overflow-hidden shrink-0 ring-2 transition-all duration-200 ${dark ? "ring-gray-800 group-hover:ring-blue-700" : "ring-gray-200 group-hover:ring-blue-400 shadow-md"}`}
@@ -634,7 +634,7 @@ function EmpleadoResultCard({
   dark: boolean;
 }) {
   return (
-    <Link href={`/empleado/${empleado.slug}`}>
+    <Link href={`/empleo/${empleado.slug}`}>
       <div
         className={`flex items-center gap-4 p-5 rounded-2xl border transition-all cursor-pointer ${dark ? "bg-gray-900 border-gray-800 hover:border-gray-600 hover:bg-gray-800" : "bg-white border-gray-100 hover:border-gray-300 shadow-sm hover:shadow-md"}`}
       >
@@ -1294,7 +1294,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
                           CVs disponibles
                         </p>
                         <Link
-                          href="/empleado/nuevo"
+                          href="/empleo/nuevo"
                           className={`text-xs font-medium ${isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"}`}
                         >
                           Subir mi CV
@@ -1313,7 +1313,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
                         >
                           Aun no hay CVs publicados.{" "}
                           <Link
-                            href="/empleado/nuevo"
+                            href="/empleo/nuevo"
                             className="text-blue-400 hover:underline"
                           >
                             Publicar el tuyo

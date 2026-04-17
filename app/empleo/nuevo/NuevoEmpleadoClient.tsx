@@ -214,7 +214,7 @@ export default function NuevoEmpleadoClient() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <button
-              onClick={() => router.push(`/empleado/${createdSlug}`)}
+              onClick={() => router.push(`/empleo/${createdSlug}`)}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition-colors"
             >
               Ver mi perfil

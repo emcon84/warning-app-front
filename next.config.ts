@@ -13,6 +13,15 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/empleado/:path*",
+        destination: "/empleo/:path*",
+        permanent: true, // 301 — mantiene SEO juice
+      },
+    ];
+  },
   async headers() {
     return [
       {

@@ -83,7 +83,7 @@ export default function EditarEmpleadoClient() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
-          router.push("/empleado/nuevo");
+          router.push("/empleo/nuevo");
           return;
         }
         const data: Empleado = await res.json();
@@ -97,7 +97,7 @@ export default function EditarEmpleadoClient() {
         setHabilidades(data.habilidades);
         if (data.foto) setFotoPreview(data.foto);
       } catch {
-        router.push("/empleado/nuevo");
+        router.push("/empleo/nuevo");
       } finally {
         setLoading(false);
       }
@@ -157,7 +157,7 @@ export default function EditarEmpleadoClient() {
       }
       const updated: Empleado = await res.json();
       setSaved(true);
-      setTimeout(() => router.push(`/empleado/${updated.slug}`), 1500);
+      setTimeout(() => router.push(`/empleo/${updated.slug}`), 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error inesperado");
     } finally {
