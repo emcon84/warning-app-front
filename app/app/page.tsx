@@ -357,7 +357,7 @@ function HomeContent() {
     .filter((d) => !filterIapos || d.iapos);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden dark:bg-gray-950">
+    <div className={`flex flex-col h-screen overflow-hidden ${theme_isDark ? "bg-gray-950" : "bg-gray-50"}`}>
       {/* Toast de error — pequeño, no bloquea el mapa */}
       {error && (
         <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-[1000] bg-gray-900/90 backdrop-blur-sm text-white px-4 py-2.5 rounded-2xl shadow-lg flex items-center gap-2.5 max-w-[320px] w-[calc(100%-2rem)]">

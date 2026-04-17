@@ -82,9 +82,9 @@ export default function OfertasView({ isVisible }: OfertasViewProps) {
   const inputClass = `w-full px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm ${isDark ? "border border-gray-600 bg-gray-800 text-white placeholder:text-gray-500" : "border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400"}`;
 
   return (
-    <div className={`fixed inset-0 z-[900] flex flex-col ${bg}`} style={{ top: 52 }}>
+    <div className="fixed inset-0 z-[900] flex flex-col" style={{ top: 52, backgroundColor: isDark ? '#030712' : '#f9fafb' }}>
       {/* Header */}
-      <div className={`flex-shrink-0 flex items-center justify-between px-4 pt-4 pb-3 border-b ${bg} ${isDark ? "border-gray-800" : "border-gray-200"}`}>
+      <div className={`flex-shrink-0 flex items-center justify-between px-4 pt-4 pb-3 border-b ${isDark ? "border-gray-800" : "border-gray-200"}`} style={{ backgroundColor: isDark ? '#111827' : '#ffffff' }}>
         <div>
           <h2 className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Ofertas del día</h2>
           <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>Reconquista</p>

@@ -64,9 +64,9 @@ export default function SupermarketOffersModal({ supermarket, onClose }: Superma
 
   return (
     <>
-      <div className={`fixed inset-0 z-[1100] flex flex-col ${bg}`} style={{ top: 52 }}>
+      <div className="fixed inset-0 z-[1100] flex flex-col" style={{ top: 52, backgroundColor: isDark ? '#030712' : '#f9fafb' }}>
         {/* Header */}
-        <div className={`flex-shrink-0 flex items-center justify-between px-4 py-3 border-b ${isDark ? "border-gray-800 bg-gray-900" : "border-gray-200 bg-white"}`}>
+        <div className={`flex-shrink-0 flex items-center justify-between px-4 py-3 border-b ${isDark ? "border-gray-800" : "border-gray-200"}`} style={{ backgroundColor: isDark ? '#111827' : '#ffffff' }}>
           <div className="flex items-center gap-3">
             <div className={`w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
               {supermarket.logo ? (
