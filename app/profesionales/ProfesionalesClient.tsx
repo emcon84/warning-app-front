@@ -979,7 +979,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
 
   return (
     <div
-      className={`min-h-screen pb-24 md:pb-0 ${bg} transition-colors duration-300 flex flex-col`}
+      className={`min-h-screen pb-40 md:pb-0 ${bg} transition-colors duration-300 flex flex-col`}
     >
       <Navbar
         totalReports={0}

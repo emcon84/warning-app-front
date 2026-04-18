@@ -199,7 +199,7 @@ export default function EditarEmpleadoClient() {
   }
 
   return (
-    <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+    <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
       <Navbar
         totalReports={0}
         onMenuClick={() => {}}

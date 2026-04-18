@@ -164,7 +164,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar mapView="profesionales" />
 
-      <div className="max-w-3xl mx-auto px-4 pt-20 pb-12">
+      <div className="max-w-3xl mx-auto px-4 pt-20 pb-40">
         <div className="mb-6">
           <h1 className="text-xl font-bold text-white">Panel de administración</h1>
           <p className="text-sm text-gray-500 mt-0.5">Moderación de contenido</p>

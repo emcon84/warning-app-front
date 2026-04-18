@@ -152,7 +152,7 @@ export default function EmpleadoProfileClient({ empleado, slug }: { empleado: Em
   }
 
   return (
-    <div className={`min-h-screen pb-24 md:pb-0 ${bg}`}>
+    <div className={`min-h-screen pb-40 md:pb-0 ${bg}`}>
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
       {showModal && (
         <ContactModal

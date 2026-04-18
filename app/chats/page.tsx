@@ -309,7 +309,7 @@ export default function ChatsPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar mapView="profesionales" />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-28">
+      <div className="max-w-xl mx-auto px-4 pt-20 pb-40">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-lg font-bold text-white">Mis chats</h1>
           <Link

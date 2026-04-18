@@ -177,7 +177,7 @@ export default function NuevaVacanteClient() {
 
   if (!isSignedIn) {
     return (
-      <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+      <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
         <Navbar
           totalReports={0}
           onMenuClick={() => {}}
@@ -214,7 +214,7 @@ export default function NuevaVacanteClient() {
 
   if (!hasComercio) {
     return (
-      <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+      <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
         <Navbar
           totalReports={0}
           onMenuClick={() => {}}
@@ -262,7 +262,7 @@ export default function NuevaVacanteClient() {
   // Paso 3 — exito
   if (step === 3 && createdId) {
     return (
-      <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+      <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
         <Navbar
           totalReports={0}
           onMenuClick={() => {}}
@@ -312,7 +312,7 @@ export default function NuevaVacanteClient() {
   ];
 
   return (
-    <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+    <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
       <Navbar
         totalReports={0}
         onMenuClick={() => {}}

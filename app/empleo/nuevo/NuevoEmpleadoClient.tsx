@@ -149,7 +149,7 @@ export default function NuevoEmpleadoClient() {
 
   if (!isSignedIn) {
     return (
-      <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+      <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
         <Navbar
           totalReports={0}
           onMenuClick={() => {}}
@@ -187,7 +187,7 @@ export default function NuevoEmpleadoClient() {
   // Paso 4 — exito
   if (step === 4 && createdSlug) {
     return (
-      <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+      <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
         <Navbar
           totalReports={0}
           onMenuClick={() => {}}
@@ -238,7 +238,7 @@ export default function NuevoEmpleadoClient() {
   ];
 
   return (
-    <div className={`min-h-screen ${bg} pb-24 md:pb-0`}>
+    <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
       <Navbar
         totalReports={0}
         onMenuClick={() => {}}

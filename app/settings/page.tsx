@@ -99,7 +99,7 @@ export default function SettingsPage() {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar sidebarDisabled mapView="profesionales" />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-10">
+      <div className="max-w-xl mx-auto px-4 pt-20 pb-40">
 
         {/* Header */}
         <button

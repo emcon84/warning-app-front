@@ -400,7 +400,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         />
       )}
 
-      <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-20 pb-10">
+      <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-20 pb-40">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

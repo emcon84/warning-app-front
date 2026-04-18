@@ -135,7 +135,7 @@ export default function VacanteDetailClient({ vacante }: { vacante: Vacante }) {
   ].filter(Boolean) as { icon: React.ElementType; label: string }[];
 
   return (
-    <div className={`min-h-screen pb-24 md:pb-0 ${bg}`}>
+    <div className={`min-h-screen pb-40 md:pb-0 ${bg}`}>
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
       {showModal && (
         <PostularModal

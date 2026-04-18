@@ -130,7 +130,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
         </div>
       )}
 
-      <div className="flex-1 max-w-xl mx-auto w-full pb-28">
+      <div className="flex-1 max-w-xl mx-auto w-full pb-40">
 
         {/* ── Hero ──────────────────────────────────────────────────── */}
         <div className="relative h-48 sm:h-56 w-full overflow-hidden">
