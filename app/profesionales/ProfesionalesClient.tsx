@@ -10,6 +10,11 @@ import { useTheme } from "../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
+function comercioPhotoUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url.startsWith("/uploads/") ? `${API}${url}` : url;
+}
+
 type Pill = "profesionales" | "comercios" | "oficios" | "empleados";
 type EmpleoTab = "cvs" | "vacantes";
 
@@ -172,7 +177,7 @@ function FeaturedComercioCard({
           className={`w-16 h-16 rounded-full overflow-hidden shrink-0 ring-2 transition-all duration-200 ${dark ? "ring-gray-800 group-hover:ring-amber-700" : "ring-gray-200 group-hover:ring-amber-400 shadow-md"}`}
         >
           <Avatar
-            foto={comercio.foto}
+            foto={comercioPhotoUrl(comercio.foto)}
             nombre={comercio.nombre}
             gradient="from-amber-700 to-amber-900"
           />
@@ -570,9 +575,9 @@ function ComercioResultCard({
         className={`flex items-center gap-4 p-5 rounded-2xl border transition-all cursor-pointer ${dark ? "bg-gray-900 border-gray-800 hover:border-gray-600 hover:bg-gray-800" : "bg-white border-gray-100 hover:border-gray-300 shadow-sm hover:shadow-md"}`}
       >
         <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow">
-          {comercio.foto ? (
+          {comercioPhotoUrl(comercio.foto) ? (
             <Image
-              src={comercio.foto}
+              src={comercioPhotoUrl(comercio.foto)!}
               alt={comercio.nombre}
               className="w-full h-full object-cover"
               width={64}
