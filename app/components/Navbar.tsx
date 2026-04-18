@@ -176,6 +176,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
             const { label, Icon } = VIEW_CONFIG[view];
             const handleClick = () => {
               if (view === "ofertas") return router.push("/ofertas");
+              if (view === "doctors") return router.push("/medicos");
               if (onMapViewChange) return onMapViewChange(view);
               router.push(`/app?view=${view}`);
             };

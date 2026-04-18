@@ -6,7 +6,7 @@ import { Map, Stethoscope, Pill, ShoppingCart, Wrench } from "lucide-react";
 
 const ITEMS = [
   { label: "Oficios",   Icon: Wrench,       href: "/profesionales", view: null        },
-  { label: "Médicos",   Icon: Stethoscope,  href: "/app",           view: "doctors"   },
+  { label: "Médicos",   Icon: Stethoscope,  href: "/medicos",       view: null        },
   { label: "Farmacias", Icon: Pill,         href: "/app",           view: "farmacias" },
   { label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",       view: null        },
   { label: "Mapa",      Icon: Map,          href: "/app",           view: "reports"   },
