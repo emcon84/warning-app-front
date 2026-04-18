@@ -506,7 +506,7 @@ export default function ProfileClient({ pro, slug }: Props) {
         )}
 
         {/* BLOQUE FIJO: botones de acción */}
-        <div className={`fixed bottom-16 left-0 right-0 z-40 px-4 pt-3 pb-3 border-t md:static md:bottom-auto md:left-auto md:right-auto md:z-auto md:flex-shrink-0 md:pt-2 md:pb-4 ${bottomBar}`}>
+        <div className={`fixed bottom-16 left-0 right-0 z-40 pl-4 pr-20 md:px-4 pt-3 pb-3 border-t md:static md:bottom-auto md:left-auto md:right-auto md:z-auto md:flex-shrink-0 md:pt-2 md:pb-4 ${bottomBar}`}>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
