@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { SignInButton, useUser } from "@clerk/nextjs";
@@ -247,14 +247,14 @@ export default function NuevoEmpleadoClient() {
       />
       <div className="max-w-lg mx-auto px-4 py-8 mt-24">
         {/* Stepper */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center mb-8">
           {steps.map((s, idx) => {
             const Icon = s.icon;
             const done = step > s.num;
             const active = step === s.num;
             return (
-              <div key={s.num} className="flex items-center flex-1">
-                <div className="flex flex-col items-center gap-1">
+              <Fragment key={s.num}>
+                <div className="flex flex-col items-center gap-1 flex-shrink-0">
                   <div
                     className={`w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all ${
                       done
@@ -287,7 +287,7 @@ export default function NuevoEmpleadoClient() {
                     className={`flex-1 h-0.5 mx-2 ${step > s.num ? "bg-blue-600" : isDark ? "bg-gray-800" : "bg-gray-200"}`}
                   />
                 )}
-              </div>
+              </Fragment>
             );
           })}
         </div>

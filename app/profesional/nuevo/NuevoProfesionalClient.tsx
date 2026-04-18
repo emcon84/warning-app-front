@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
@@ -369,9 +369,9 @@ export default function NuevoProfesionalClient() {
 
       <div className="flex-1 max-w-xl mx-auto w-full px-4 mt-24 mb-12">
         {/* Progress */}
-        <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center mb-8">
           {[1, 2, 3, 4].map((s) => (
-            <div key={s} className="flex items-center gap-2 flex-1">
+            <Fragment key={s}>
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
                   s < step
@@ -387,10 +387,10 @@ export default function NuevoProfesionalClient() {
               </div>
               {s < 4 && (
                 <div
-                  className={`h-px flex-1 transition-colors ${s < step ? "bg-green-500" : stepLine}`}
+                  className={`h-px flex-1 mx-2 transition-colors ${s < step ? "bg-green-500" : stepLine}`}
                 />
               )}
-            </div>
+            </Fragment>
           ))}
         </div>
 

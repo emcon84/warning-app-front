@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
@@ -315,9 +315,9 @@ export default function NuevoComercioClient() {
       <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-24 pb-40">
 
         {/* Progress */}
-        <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center mb-8">
           {[1, 2, 3, 4].map((s) => (
-            <div key={s} className="flex items-center gap-2 flex-1">
+            <Fragment key={s}>
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
                 s < step  ? "bg-green-500 text-white" :
                 s === step ? (isDark ? "bg-white text-gray-900" : "bg-gray-900 text-white") :
@@ -325,8 +325,8 @@ export default function NuevoComercioClient() {
               }`}>
                 {s < step ? "✓" : s}
               </div>
-              {s < 4 && <div className={`h-px flex-1 transition-colors ${s < step ? "bg-green-500" : stepLine}`} />}
-            </div>
+              {s < 4 && <div className={`h-px flex-1 mx-2 transition-colors ${s < step ? "bg-green-500" : stepLine}`} />}
+            </Fragment>
           ))}
         </div>
 
