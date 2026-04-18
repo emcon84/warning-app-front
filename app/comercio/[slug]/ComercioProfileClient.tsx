@@ -197,7 +197,8 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
         <div className={`mx-4 rounded-2xl border ${cardBg} overflow-visible -mt-4`}>
           {/* Avatar + nombre en la misma fila, avatar sobresale del hero */}
           <div className="relative px-5 pt-0">
-            <div className="flex items-end gap-3 -mt-10 mb-4">
+            {/* Fila avatar + nombre */}
+            <div className="flex items-end gap-3 -mt-10 mb-2">
               <div className={`w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}>
                 {(comercio.logo || comercio.foto) ? (
                   <img
@@ -211,21 +212,21 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                   </div>
                 )}
               </div>
-              {/* Nombre y badge a la derecha del avatar, alineados al bottom */}
               <div className="pb-1 min-w-0">
                 <h1 className={`text-lg font-black leading-tight truncate ${textPrimary}`}>{comercio.nombre}</h1>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
-                    {comercio.rubro}
-                  </span>
-                  {comercio.barrio && (
-                    <span className={`flex items-center gap-1 text-xs ${textMuted}`}>
-                      <MapPin className="w-3 h-3" />
-                      {comercio.barrio}
-                    </span>
-                  )}
-                </div>
               </div>
+            </div>
+            {/* Pills separadas — con espacio propio, lejos del hero */}
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
+                {comercio.rubro}
+              </span>
+              {comercio.barrio && (
+                <span className={`flex items-center gap-1 text-xs ${textMuted}`}>
+                  <MapPin className="w-3 h-3" />
+                  {comercio.barrio}
+                </span>
+              )}
             </div>
           </div>
 
