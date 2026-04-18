@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Doctor } from "../types";
 import Navbar from "../components/Navbar";
@@ -23,6 +23,10 @@ export default function MedicosClient({ doctors }: Props) {
   const [search, setSearch] = useState("");
   const [selectedEspecialidad, setSelectedEspecialidad] = useState<string | null>(null);
   const [selectedOS, setSelectedOS] = useState<string | null>(null);
+
+  const PAGE_SIZE = 20;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const bg         = isDark ? "bg-gray-950" : "bg-gray-50";
   const textPrimary = isDark ? "text-white" : "text-gray-900";
@@ -63,6 +67,28 @@ export default function MedicosClient({ doctors }: Props) {
       return true;
     });
   }, [doctors, selectedEspecialidad, selectedOS, search]);
+
+  // Reset paginación cuando cambian los filtros
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedEspecialidad, selectedOS, search]);
+
+  // IntersectionObserver para cargar más
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filtered.length));
+  }, [filtered.length]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMore(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const visibleDoctors = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
 
   function clearFilters() {
     setSelectedEspecialidad(null);
@@ -161,7 +187,7 @@ export default function MedicosClient({ doctors }: Props) {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {filtered.map((doctor) => (
+            {visibleDoctors.map((doctor) => (
               <button
                 key={doctor.id}
                 onClick={() => router.push(`/medico/${doctor.id}`)}
@@ -239,6 +265,20 @@ export default function MedicosClient({ doctors }: Props) {
               </button>
             ))}
           </div>
+        )}
+
+        {/* Sentinel + loader */}
+        {hasMore && (
+          <div ref={sentinelRef} className="flex justify-center py-6">
+            <div className={`w-6 h-6 rounded-full border-2 border-t-transparent animate-spin ${
+              isDark ? "border-gray-600" : "border-gray-300"
+            }`} />
+          </div>
+        )}
+        {!hasMore && filtered.length > PAGE_SIZE && (
+          <p className={`text-center text-xs py-4 ${textMuted}`}>
+            {filtered.length} medicos en total
+          </p>
         )}
       </div>
     </div>
