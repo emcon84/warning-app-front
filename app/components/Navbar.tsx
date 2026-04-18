@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, X, Settings, Sun, Moon } from "lucide-react";
+import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SignInButton, UserButton, useUser, useAuth } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -269,6 +269,15 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
                   </div>
                 )}
               </div>
+
+              {/* Mis chats */}
+              <button
+                onClick={() => router.push("/chats")}
+                className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors"
+                aria-label="Mis chats"
+              >
+                <MessageCircle className="w-5 h-5 text-gray-300" />
+              </button>
 
               {/* UserButton sin badge */}
               <UserButton>
