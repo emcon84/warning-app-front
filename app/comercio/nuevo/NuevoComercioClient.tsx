@@ -275,6 +275,10 @@ export default function NuevoComercioClient() {
       });
 
       if (!res.ok) {
+        if (res.status === 409) {
+          router.replace("/comercio/gestionar");
+          return;
+        }
         const data = await res.json();
         throw new Error(data.error || "Error al crear el comercio");
       }
