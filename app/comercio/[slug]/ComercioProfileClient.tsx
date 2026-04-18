@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { Comercio, ComercioOffer } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
-import { MapPin, Clock, Phone, X } from "lucide-react";
+import { MapPin, Clock, Phone, X, Pencil } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 interface Props {
   comercio: Comercio;
+  isOwner?: boolean;
 }
 
 const RUBRO_COLORS: Record<string, string> = {
@@ -76,7 +77,7 @@ const WaIcon = () => (
   </svg>
 );
 
-export default function ComercioProfileClient({ comercio }: Props) {
+export default function ComercioProfileClient({ comercio, isOwner }: Props) {
   const router = useRouter();
   const { isDark } = useTheme();
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
@@ -239,6 +240,20 @@ export default function ComercioProfileClient({ comercio }: Props) {
               <WaIcon />
               Contactar por WhatsApp
             </a>
+
+            {isOwner && (
+              <button
+                onClick={() => router.push("/comercio/gestionar")}
+                className={`mt-2 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm border transition-colors ${
+                  isDark
+                    ? "border-gray-700 text-gray-300 hover:bg-gray-800"
+                    : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <Pencil className="w-4 h-4" />
+                Gestionar mi comercio
+              </button>
+            )}
           </div>
         </div>
 

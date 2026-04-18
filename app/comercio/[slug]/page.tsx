@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import { Comercio } from "../../types";
 import ComercioProfileClient from "./ComercioProfileClient";
 
@@ -111,13 +112,33 @@ function buildJsonLd(comercio: Comercio, slug: string) {
   };
 }
 
+async function checkIsOwner(slug: string): Promise<boolean> {
+  try {
+    const { getToken } = await auth();
+    const token = await getToken();
+    if (!token) return false;
+    const res = await fetch(`${API}/api/comercios/me`, {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return false;
+    const mine = await res.json();
+    return mine.slug === slug;
+  } catch {
+    return false;
+  }
+}
+
 export default async function ComercioPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const comercio = await getComercio(slug);
+  const [comercio, isOwner] = await Promise.all([
+    getComercio(slug),
+    checkIsOwner(slug),
+  ]);
   if (!comercio) notFound();
 
   const jsonLd = buildJsonLd(comercio, slug);
@@ -128,7 +149,7 @@ export default async function ComercioPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ComercioProfileClient comercio={comercio} />
+      <ComercioProfileClient comercio={comercio} isOwner={isOwner} />
     </>
   );
 }
