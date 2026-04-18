@@ -699,13 +699,13 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               </p>
             )}
 
-            {(newMainFile || galleryFiles.length > 0) && (
+            {(newLogoFile || newMainFile || galleryFiles.length > 0) && (
               <button
                 onClick={handleSaveFotos}
                 disabled={savingFotos}
                 className="w-full py-3 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors disabled:opacity-40"
               >
-                {savingFotos ? "Subiendo..." : `Subir ${newMainFile && galleryFiles.length > 0 ? "fotos" : newMainFile ? "foto principal" : `${galleryFiles.length} foto${galleryFiles.length > 1 ? "s" : ""}`}`}
+                {savingFotos ? "Subiendo..." : "Guardar fotos"}
               </button>
             )}
           </div>
