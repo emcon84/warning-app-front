@@ -11,6 +11,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 const BARRIOS = [
+  "Reconquista (toda la ciudad)",
   "Centro", "Barrio Norte", "Barrio Sur", "Barrio Oeste", "Villa del Parque",
   "Las Lomas", "Parque Industrial", "Barrio Newbery", "Villa Ocampo",
   "Los Lapachos", "San Cayetano", "Otro",
@@ -22,14 +23,24 @@ const RUBROS = [
   "Indumentaria",
   "Calzado",
   "Electrónica",
+  "Tecnología/Informática",
   "Ferretería",
+  "Materiales/Construcción",
   "Farmacia",
+  "Salud/Bienestar",
   "Peluquería/Estética",
   "Librería/Papelería",
   "Veterinaria",
   "Deportes",
   "Mueblería",
   "Joyería/Relojería",
+  "Automotriz/Mecánica",
+  "Inmobiliaria",
+  "Seguros/Finanzas",
+  "Educación/Clases",
+  "Fotografía/Arte",
+  "Contaduría/Administración",
+  "Agro/Cerealista",
   "Otro",
 ];
 
