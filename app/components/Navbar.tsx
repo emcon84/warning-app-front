@@ -151,12 +151,12 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     <nav className="fixed top-0 left-0 right-0 z-[1002] bg-gray-900 text-white shadow-lg">
       <div className="flex items-center gap-2 px-3 py-2">
 
-        {/* Hamburguesa — solo si hay sidebar */}
-        {onMenuClick && (
+        {/* Hamburguesa — solo si hay sidebar y no está deshabilitado */}
+        {onMenuClick && !sidebarDisabled && (
           <button
-            onClick={sidebarDisabled ? undefined : onMenuClick}
+            onClick={onMenuClick}
             data-tour="sidebar-toggle"
-            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${sidebarDisabled ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-800"}`}
+            className="p-2 rounded-lg transition-colors flex-shrink-0 hover:bg-gray-800"
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
