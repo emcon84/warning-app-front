@@ -98,7 +98,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
   const waText = encodeURIComponent("Hola, te contacto desde Reportes Reconquista");
   const waUrl  = `https://wa.me/${comercio.whatsapp}?text=${waText}`;
 
-  const activeOffers = (comercio.offers || []).filter((o) => o.activa);
+  const activeOffers = comercio.offers || [];
 
   // Galeria: si no hay fotos adicionales pero hay foto principal, mostrarla
   const galeriaFotos = comercio.fotos && comercio.fotos.length > 0
