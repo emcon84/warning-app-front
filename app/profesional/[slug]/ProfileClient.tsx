@@ -510,7 +510,11 @@ export default function ProfileClient({ pro, slug }: Props) {
         <div className="flex flex-col gap-2">
           <button
             onClick={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
-            className="w-full py-3.5 rounded-2xl bg-white text-gray-950 font-semibold text-sm hover:bg-gray-100 transition-colors"
+            className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-colors ${
+              isDark
+                ? "bg-white text-gray-950 hover:bg-gray-100"
+                : "bg-gray-900 text-white hover:bg-gray-800"
+            }`}
           >
             Contactar
           </button>
