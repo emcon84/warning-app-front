@@ -220,6 +220,7 @@ export interface Comercio {
   telefono?: string | null;
   descripcion?: string | null;
   foto?: string | null;
+  logo?: string | null;
   fotos?: string[];
   activo: boolean;
   createdAt: string;

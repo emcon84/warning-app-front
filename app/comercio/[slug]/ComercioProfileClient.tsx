@@ -199,9 +199,9 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           <div className="relative px-5 pt-0">
             <div className="flex items-end gap-3 -mt-10 mb-4">
               <div className={`w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}>
-                {comercio.foto ? (
+                {(comercio.logo || comercio.foto) ? (
                   <img
-                    src={photoUrl(comercio.foto)}
+                    src={photoUrl((comercio.logo || comercio.foto)!)}
                     alt={comercio.nombre}
                     className="w-full h-full object-cover"
                   />

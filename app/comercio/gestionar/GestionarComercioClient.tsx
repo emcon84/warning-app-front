@@ -250,12 +250,15 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const [datosError, setDatosError] = useState("");
 
   // Fotos
+  const [newLogoFile, setNewLogoFile] = useState<File | null>(null);
+  const [newLogoPreview, setNewLogoPreview] = useState<string | null>(null);
   const [newMainFile, setNewMainFile] = useState<File | null>(null);
   const [newMainPreview, setNewMainPreview] = useState<string | null>(null);
   const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [savingFotos, setSavingFotos] = useState(false);
   const [fotosError, setFotosError] = useState("");
+  const logoRef = useRef<HTMLInputElement>(null);
   const mainPhotoRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
@@ -309,12 +312,13 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
 
   // ── Guardar fotos ──────────────────────────────────────────────────────────
   async function handleSaveFotos() {
-    if (!newMainFile && galleryFiles.length === 0) return;
+    if (!newLogoFile && !newMainFile && galleryFiles.length === 0) return;
     setSavingFotos(true);
     setFotosError("");
     try {
       const token = await getToken();
       const fd = new FormData();
+      if (newLogoFile) fd.append("logo", newLogoFile);
       if (newMainFile) fd.append("photo", newMainFile);
       galleryFiles.forEach((f, i) => fd.append(`photo${i}`, f));
 
@@ -329,6 +333,8 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       }
       const updated = await res.json();
       setComercio((prev) => ({ ...prev, ...updated }));
+      setNewLogoFile(null);
+      setNewLogoPreview(null);
       setNewMainFile(null);
       setNewMainPreview(null);
       setGalleryFiles([]);
@@ -523,19 +529,20 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         {tab === "fotos" && (
           <div className="flex flex-col gap-4">
 
-            {/* Foto principal */}
+            {/* Logo del comercio */}
             <div className={`rounded-2xl border p-5 ${cardBg}`}>
-              <p className={`text-sm font-semibold mb-4 ${textPri}`}>Foto principal / logo</p>
+              <p className={`text-sm font-semibold mb-1 ${textPri}`}>Logo del comercio</p>
+              <p className={`text-xs mb-4 ${textMuted}`}>Aparece como avatar circular en el perfil y en el listado</p>
               <div className="flex items-center gap-4">
                 <div
-                  onClick={() => mainPhotoRef.current?.click()}
+                  onClick={() => logoRef.current?.click()}
                   className="w-20 h-20 rounded-full overflow-hidden border-2 cursor-pointer flex-shrink-0 relative group"
                 >
-                  {newMainPreview ? (
-                    <img src={newMainPreview} alt="preview" className="w-full h-full object-cover" />
-                  ) : photoUrl(comercio.foto) ? (
+                  {newLogoPreview ? (
+                    <img src={newLogoPreview} alt="logo preview" className="w-full h-full object-cover" />
+                  ) : photoUrl(comercio.logo || comercio.foto) ? (
                     <Image
-                      src={photoUrl(comercio.foto)!}
+                      src={photoUrl(comercio.logo || comercio.foto)!}
                       alt={comercio.nombre}
                       width={80} height={80}
                       className="w-full h-full object-cover"
@@ -550,29 +557,57 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                   </div>
                 </div>
                 <div>
-                  <p className={`text-sm font-medium ${textPri}`}>{newMainPreview ? "Nueva foto seleccionada" : "Foto actual"}</p>
-                  <p className={`text-xs mt-1 ${textMuted}`}>Clic para cambiar · circular, 400x400px</p>
-                  {newMainPreview && (
-                    <button
-                      onClick={() => { setNewMainFile(null); setNewMainPreview(null); }}
-                      className={`text-xs mt-1 ${isDark ? "text-red-400" : "text-red-500"}`}
-                    >
+                  <p className={`text-sm font-medium ${textPri}`}>{newLogoPreview ? "Nuevo logo seleccionado" : "Logo actual"}</p>
+                  <p className={`text-xs mt-1 ${textMuted}`}>Clic para cambiar · cuadrado o circular, min 200x200px</p>
+                  {newLogoPreview && (
+                    <button onClick={() => { setNewLogoFile(null); setNewLogoPreview(null); }} className={`text-xs mt-1 ${isDark ? "text-red-400" : "text-red-500"}`}>
                       Descartar
                     </button>
                   )}
                 </div>
               </div>
-              <input
-                ref={mainPhotoRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (!f) return;
-                  setNewMainFile(f);
-                  setNewMainPreview(URL.createObjectURL(f));
-                }}
+              <input ref={logoRef} type="file" accept="image/*" className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setNewLogoFile(f); setNewLogoPreview(URL.createObjectURL(f)); }}
+              />
+            </div>
+
+            {/* Foto de portada */}
+            <div className={`rounded-2xl border p-5 ${cardBg}`}>
+              <p className={`text-sm font-semibold mb-1 ${textPri}`}>Foto de portada</p>
+              <p className={`text-xs mb-4 ${textMuted}`}>Imagen de fondo del hero en el perfil del comercio</p>
+              <div className="flex items-center gap-4">
+                <div
+                  onClick={() => mainPhotoRef.current?.click()}
+                  className={`w-32 h-20 rounded-xl overflow-hidden border-2 cursor-pointer flex-shrink-0 relative group ${isDark ? "border-gray-700" : "border-gray-200"}`}
+                >
+                  {newMainPreview ? (
+                    <img src={newMainPreview} alt="portada preview" className="w-full h-full object-cover" />
+                  ) : photoUrl(comercio.foto) ? (
+                    <Image
+                      src={photoUrl(comercio.foto)!}
+                      alt={comercio.nombre}
+                      width={128} height={80}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className={`w-full h-full flex items-center justify-center text-xs ${textMuted}`}>Sin portada</div>
+                  )}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Pencil className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <p className={`text-sm font-medium ${textPri}`}>{newMainPreview ? "Nueva portada seleccionada" : "Portada actual"}</p>
+                  <p className={`text-xs mt-1 ${textMuted}`}>Clic para cambiar · landscape, min 800x400px</p>
+                  {newMainPreview && (
+                    <button onClick={() => { setNewMainFile(null); setNewMainPreview(null); }} className={`text-xs mt-1 ${isDark ? "text-red-400" : "text-red-500"}`}>
+                      Descartar
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input ref={mainPhotoRef} type="file" accept="image/*" className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setNewMainFile(f); setNewMainPreview(URL.createObjectURL(f)); }}
               />
             </div>
 
