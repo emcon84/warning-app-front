@@ -255,8 +255,8 @@ export default function ProfileClient({ pro, slug }: Props) {
         </div>
       )}
 
-      {/* Contenido: flex col debajo del navbar */}
-      <div className="flex flex-col flex-1 overflow-hidden max-w-xl mx-auto w-full">
+      {/* Contenido: flex col debajo del navbar — pb-16 reserva espacio para la bottom nav */}
+      <div className="flex flex-col flex-1 overflow-hidden max-w-xl mx-auto w-full pb-16">
 
         {/* BLOQUE FIJO: header + descripción */}
         <div className="flex-shrink-0 px-4 pt-16 pb-3">
@@ -324,7 +324,7 @@ export default function ProfileClient({ pro, slug }: Props) {
         </div>{/* fin bloque fijo */}
 
         {/* BLOQUE SCROLLEABLE: descripcion + fotos + opiniones */}
-        <div className="flex-1 overflow-y-auto px-4 pb-2 md:pb-2" style={{ paddingBottom: "160px" }}>
+        <div className="flex-1 overflow-y-auto px-4 pb-6">
 
         {/* Descripción */}
         {pro.descripcion && (
@@ -505,8 +505,8 @@ export default function ProfileClient({ pro, slug }: Props) {
           </div>
         )}
 
-        {/* BLOQUE FIJO: botones de acción */}
-        <div className={`fixed bottom-16 left-0 right-0 z-40 pl-20 pr-4 md:px-4 pt-3 pb-3 border-t md:static md:bottom-auto md:left-auto md:right-auto md:z-auto md:flex-shrink-0 md:pt-2 md:pb-4 ${bottomBar}`}>
+        {/* Botones de acción: flex item natural, aparece arriba de la bottom nav gracias al pb-16 del padre */}
+        <div className={`flex-shrink-0 px-4 pt-3 pb-3 border-t ${bottomBar}`}>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
