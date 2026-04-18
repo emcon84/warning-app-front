@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         hostname: "reportesreconquista.com",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "pub-8320ee04bdb94df59332be35269b2a51.r2.dev",
+        pathname: "/**",
+      },
     ],
   },
   async redirects() {
