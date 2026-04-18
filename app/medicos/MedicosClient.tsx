@@ -106,33 +106,32 @@ export default function MedicosClient({ doctors }: Props) {
           )}
         </div>
 
-        {/* Filtro especialidad */}
-        <div className="mb-3">
-          <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${textMuted}`}>Especialidad</p>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {especialidades.map((esp) => (
-              <button
-                key={esp}
-                onClick={() => setSelectedEspecialidad(selectedEspecialidad === esp ? null : esp)}
-                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
-                  selectedEspecialidad === esp ? pillActive : pillInactive
-                }`}
-              >
-                {esp}
-              </button>
-            ))}
+        {/* Filtros en fila */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          {/* Especialidad — select dropdown */}
+          <div className="flex-1">
+            <select
+              value={selectedEspecialidad ?? ""}
+              onChange={(e) => setSelectedEspecialidad(e.target.value || null)}
+              className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors appearance-none ${inputCls}`}
+            >
+              <option value="">Todas las especialidades</option>
+              {especialidades.map((esp) => (
+                <option key={esp} value={esp}>{esp}</option>
+              ))}
+            </select>
           </div>
         </div>
 
-        {/* Filtro obra social */}
+        {/* Obra social — pills con wrap */}
         <div className="mb-5">
           <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${textMuted}`}>Obra Social</p>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex flex-wrap gap-2">
             {OBRAS_SOCIALES_COMUNES.map((os) => (
               <button
                 key={os}
                 onClick={() => setSelectedOS(selectedOS === os ? null : os)}
-                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
+                className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-colors ${
                   selectedOS === os ? pillActive : pillInactive
                 }`}
               >
