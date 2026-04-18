@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
+import { Trash2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -43,55 +44,106 @@ function ProAvatar({ foto, nombre }: { foto?: string; nombre: string }) {
   );
 }
 
-function ConvCard({ conv, myRole }: { conv: Conversation; myRole: "client" | "professional" }) {
+function ConvCard({
+  conv,
+  myRole,
+  onDelete,
+}: {
+  conv: Conversation;
+  myRole: "client" | "professional";
+  onDelete: (id: string) => void;
+}) {
   const pro = conv.Professional;
   const lastMsg = conv.Message?.[conv.Message.length - 1];
   const { label, dot } = STATUS_MAP[conv.status] ?? STATUS_MAP.open;
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  // Usar _unreadCount del API (precomputado) o calcular desde Message como fallback
   const unread =
     conv._unreadCount !== undefined
       ? conv._unreadCount
       : (conv.Message ?? []).filter((m) => m.senderType !== myRole && !m.read).length;
 
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirming) { setConfirming(true); return; }
+    setDeleting(true);
+    try {
+      const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
+      const params = clientToken ? `?clientToken=${clientToken}` : "";
+      await fetch(`${API}/api/conversations/${conv.id}${params}`, { method: "DELETE" });
+      onDelete(conv.id);
+    } finally {
+      setDeleting(false);
+      setConfirming(false);
+    }
+  }
+
+  if (confirming) {
+    return (
+      <div className="flex items-center gap-3 p-4 rounded-2xl bg-red-950/40 border border-red-800/60">
+        <p className="flex-1 text-sm text-red-300">Eliminar este chat?</p>
+        <button
+          onClick={handleDelete}
+          disabled={deleting}
+          className="px-3 py-1.5 rounded-xl bg-red-600 text-white text-xs font-semibold hover:bg-red-500 transition-colors disabled:opacity-50"
+        >
+          {deleting ? "..." : "Eliminar"}
+        </button>
+        <button
+          onClick={(e) => { e.preventDefault(); setConfirming(false); }}
+          className="px-3 py-1.5 rounded-xl bg-gray-800 text-gray-300 text-xs font-semibold hover:bg-gray-700 transition-colors"
+        >
+          Cancelar
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <Link href={`/chat/${conv.id}`}>
-      <div className="flex items-center gap-3 p-4 rounded-2xl bg-gray-900 border border-gray-800 hover:border-gray-600 hover:bg-gray-800/50 transition-all cursor-pointer">
-        <div className="relative">
-          <ProAvatar foto={pro?.foto} nombre={pro?.nombre ?? "?"} />
-          {unread > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-500 text-white text-[9px] font-bold flex items-center justify-center">
-              {unread > 9 ? "9+" : unread}
-            </span>
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <p className={`font-semibold text-sm truncate ${unread > 0 ? "text-white" : "text-gray-200"}`}>
-              {pro?.nombre} {pro?.apellido}
-            </p>
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <div className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-              <span className="text-xs text-gray-500">{label}</span>
-            </div>
+    <div className="relative group">
+      <Link href={`/chat/${conv.id}`}>
+        <div className="flex items-center gap-3 p-4 rounded-2xl bg-gray-900 border border-gray-800 hover:border-gray-600 hover:bg-gray-800/50 transition-all cursor-pointer pr-12">
+          <div className="relative">
+            <ProAvatar foto={pro?.foto} nombre={pro?.nombre ?? "?"} />
+            {unread > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-500 text-white text-[9px] font-bold flex items-center justify-center">
+                {unread > 9 ? "9+" : unread}
+              </span>
+            )}
           </div>
-          <p className="text-xs text-gray-500 capitalize truncate">{pro?.oficios?.[0]}</p>
-          {lastMsg && (
-            <p className={`text-xs truncate mt-0.5 ${unread > 0 ? "text-gray-300 font-medium" : "text-gray-600"}`}>
-              {lastMsg.senderType === myRole ? "Vos: " : ""}{lastMsg.content}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          <span className="text-xs text-gray-600">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <p className={`font-semibold text-sm truncate ${unread > 0 ? "text-white" : "text-gray-200"}`}>
+                {pro?.nombre} {pro?.apellido}
+              </p>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <div className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+                <span className="text-xs text-gray-500">{label}</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 capitalize truncate">{pro?.oficios?.[0]}</p>
+            {lastMsg && (
+              <p className={`text-xs truncate mt-0.5 ${unread > 0 ? "text-gray-300 font-medium" : "text-gray-600"}`}>
+                {lastMsg.senderType === myRole ? "Vos: " : ""}{lastMsg.content}
+              </p>
+            )}
+          </div>
+          <span className="text-xs text-gray-600 flex-shrink-0">
             {new Date(conv.updatedAt).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}
           </span>
         </div>
-      </div>
-    </Link>
+      </Link>
+      {/* Botón eliminar — fuera del Link */}
+      <button
+        onClick={handleDelete}
+        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl text-gray-600 hover:text-red-400 hover:bg-red-950/40 transition-colors"
+        aria-label="Eliminar chat"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
   );
 }
 
@@ -368,7 +420,7 @@ export default function ChatsPage() {
                   Activos ({activeConvs.length})
                 </p>
                 <div className="flex flex-col gap-2">
-                  {activeConvs.map((c) => <ConvCard key={c.id} conv={c} myRole={myRole} />)}
+                  {activeConvs.map((c) => <ConvCard key={c.id} conv={c} myRole={myRole} onDelete={(id) => setConvs((prev) => prev.filter((x) => x.id !== id))} />)}
                 </div>
               </div>
             )}
@@ -378,7 +430,7 @@ export default function ChatsPage() {
                   Finalizados ({closedConvs.length})
                 </p>
                 <div className="flex flex-col gap-2">
-                  {closedConvs.map((c) => <ConvCard key={c.id} conv={c} myRole={myRole} />)}
+                  {closedConvs.map((c) => <ConvCard key={c.id} conv={c} myRole={myRole} onDelete={(id) => setConvs((prev) => prev.filter((x) => x.id !== id))} />)}
                 </div>
               </div>
             )}
