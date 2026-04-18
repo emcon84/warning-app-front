@@ -382,7 +382,7 @@ function OfertaCard({
                     ? "bg-yellow-400/10 text-yellow-300 border-yellow-700"
                     : "bg-yellow-50 text-yellow-700 border-yellow-300"
                 }`}>
-                  {offer.precio}
+                  $ {Number(offer.precio).toLocaleString("es-AR")}
                 </span>
               )}
               {validaHasta && (
