@@ -231,7 +231,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 top-10 w-[min(320px,calc(100vw-1rem))] bg-gray-900 border border-gray-800 rounded-2xl shadow-xl z-50">
+                  <div className="fixed top-14 left-2 right-2 md:absolute md:top-10 md:left-auto md:right-0 md:w-80 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl z-50">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
                       <span className="text-sm font-semibold text-white">Mensajes</span>
