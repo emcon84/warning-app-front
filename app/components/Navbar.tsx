@@ -102,23 +102,17 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
       if (!res.ok) return;
       const data = await res.json();
 
+      // El endpoint devuelve { items, hasMore, nextCursor }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const unread: UnreadConversation[] = (data as any[])
-        .filter((conv) =>
-          Array.isArray(conv.Message) &&
-          conv.Message.some(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (msg: any) => msg.read === false && msg.senderType === "client"
-          )
-        )
+      const items: any[] = Array.isArray(data) ? data : (data.items ?? []);
+
+      const unread: UnreadConversation[] = items
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .filter((conv: any) => (conv._unreadCount ?? 0) > 0)
         .slice(0, 5)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((conv: any) => {
-          const unreadMessages = conv.Message.filter(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (msg: any) => msg.read === false && msg.senderType === "client"
-          );
-          const lastMsg = unreadMessages[unreadMessages.length - 1];
+          const lastMsg = Array.isArray(conv.Message) ? conv.Message[0] : null;
           const professional = conv.Professional ?? {};
           return {
             id: conv.id,
