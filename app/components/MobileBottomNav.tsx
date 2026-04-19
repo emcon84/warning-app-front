@@ -29,15 +29,15 @@ function Nav() {
   const shouldHide =
     HIDDEN_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
     pathname.startsWith("/chat/") ||
-    pathname.startsWith("/admin") ||
-    pathname === "/app" ||
-    pathname.startsWith("/app?") ||
-    pathname === "/ofertas" ||
-    pathname.startsWith("/ofertas/");
+    pathname.startsWith("/admin");
 
   if (shouldHide) return null;
 
   function isActive(href: string) {
+    if (href === "/mas") {
+      // Mas también está activo cuando estás en /app o /ofertas
+      return pathname === "/mas" || pathname === "/app" || pathname.startsWith("/ofertas");
+    }
     return pathname === href || pathname.startsWith(href + "/");
   }
 

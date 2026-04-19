@@ -7,20 +7,20 @@ import { Pill, ShoppingCart, Map, TriangleAlert, ChevronRight } from "lucide-rea
 
 const ITEMS = [
   {
+    label: "Ofertas",
+    description: "Descuentos y promociones de supermercados locales",
+    Icon: ShoppingCart,
+    href: "/ofertas",
+    color: "text-orange-500",
+    iconBg: "bg-orange-500/10",
+  },
+  {
     label: "Farmacias de turno",
     description: "Encontra la farmacia de guardia mas cercana",
     Icon: Pill,
     href: "/app?view=farmacias",
     color: "text-green-500",
     iconBg: "bg-green-500/10",
-  },
-  {
-    label: "Ofertas",
-    description: "Descuentos y promociones de supermercados",
-    Icon: ShoppingCart,
-    href: "/ofertas",
-    color: "text-orange-500",
-    iconBg: "bg-orange-500/10",
   },
   {
     label: "Mapa de reportes",
