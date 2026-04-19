@@ -13,7 +13,7 @@ export default function PWARedirect() {
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
     if (isStandalone) {
-      router.replace("/profesionales");
+      router.replace("/oficios");
     }
   }, [pathname, router]);
 
