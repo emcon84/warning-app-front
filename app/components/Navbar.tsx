@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
+import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SignInButton, UserButton, useUser, useAuth } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -196,15 +196,25 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
             );
           })}
           <button
-            onClick={() => router.push("/profesionales")}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
-              mapView === "profesionales"
-                ? "bg-green-500 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
+            onClick={() => router.push("/oficios")}
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 bg-gray-700 text-gray-300 hover:bg-gray-600"
           >
             <Wrench className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="hidden sm:inline">Oficios</span>
+          </button>
+          <button
+            onClick={() => router.push("/comercios")}
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 bg-gray-700 text-gray-300 hover:bg-gray-600"
+          >
+            <Store className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="hidden sm:inline">Comercios</span>
+          </button>
+          <button
+            onClick={() => router.push("/empleos")}
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 bg-gray-700 text-gray-300 hover:bg-gray-600"
+          >
+            <Briefcase className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="hidden sm:inline">Empleos</span>
           </button>
         </div>
 

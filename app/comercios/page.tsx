@@ -1,0 +1,23 @@
+import { Metadata } from "next";
+import ComerciosClient from "./ComerciosClient";
+import { Comercio } from "../types";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+export const metadata: Metadata = {
+  title: "Comercios en Reconquista",
+  description: "Encontra negocios locales, tiendas y servicios en Reconquista.",
+};
+
+async function getComerciosData(): Promise<Comercio[]> {
+  try {
+    const res = await fetch(`${API}/api/comercios`, { next: { revalidate: 300 } });
+    if (!res.ok) return [];
+    return res.json();
+  } catch { return []; }
+}
+
+export default async function ComerciosPage() {
+  const comercios = await getComerciosData();
+  return <ComerciosClient comercios={comercios} />;
+}
