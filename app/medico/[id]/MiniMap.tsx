@@ -3,15 +3,22 @@
 import { useEffect, useRef } from "react";
 
 interface Props {
-  lat: number;
-  lng: number;
+  lat?: number | null;
+  lng?: number | null;
   nombre: string;
   isDark: boolean;
+  editable?: boolean;
+  onPositionChange?: (lat: number, lng: number) => void;
 }
 
-export default function MiniMap({ lat, lng, nombre, isDark }: Props) {
+// Centro de Reconquista como fallback
+const DEFAULT_LAT = -29.145;
+const DEFAULT_LNG = -59.655;
+
+export default function MiniMap({ lat, lng, nombre, isDark, editable, onPositionChange }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -24,19 +31,21 @@ export default function MiniMap({ lat, lng, nombre, isDark }: Props) {
         document.head.appendChild(link);
       }
 
+      const centerLat = lat ?? DEFAULT_LAT;
+      const centerLng = lng ?? DEFAULT_LNG;
+
       const tile = isDark
         ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 
       const map = L.map(containerRef.current!, {
-        center: [lat, lng],
-        zoom: 16,
+        center: [centerLat, centerLng],
+        zoom: lat && lng ? 16 : 13,
         zoomControl: true,
         attributionControl: false,
-        // todo habilitado — el usuario puede hacer zoom y arrastrar
         dragging: true,
         scrollWheelZoom: true,
-        doubleClickZoom: true,
+        doubleClickZoom: !editable, // en editable, doble click no hace zoom
         touchZoom: true,
       });
 
@@ -45,9 +54,10 @@ export default function MiniMap({ lat, lng, nombre, isDark }: Props) {
       const icon = L.divIcon({
         html: `<div style="
           width:36px;height:36px;border-radius:50%;
-          background:#3b82f6;border:3px solid white;
+          background:${editable ? "#8b5cf6" : "#3b82f6"};border:3px solid white;
           box-shadow:0 2px 8px rgba(0,0,0,0.4);
           display:flex;align-items:center;justify-content:center;
+          cursor:${editable ? "grab" : "default"};
         ">
           <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
             <path d="M19 10c0 6-7 12-7 12S5 16 5 10a7 7 0 0 1 14 0z"/>
@@ -56,10 +66,38 @@ export default function MiniMap({ lat, lng, nombre, isDark }: Props) {
         </div>`,
         className: "",
         iconSize: [36, 36],
-        iconAnchor: [18, 18],
+        iconAnchor: [18, 36],
       });
 
-      L.marker([lat, lng], { icon }).addTo(map).bindPopup(`Dr/a. ${nombre}`);
+      if (lat && lng) {
+        const marker = L.marker([lat, lng], { icon, draggable: !!editable }).addTo(map);
+        if (!editable) marker.bindPopup(`Dr/a. ${nombre}`);
+        if (editable) {
+          marker.on("dragend", () => {
+            const pos = marker.getLatLng();
+            onPositionChange?.(pos.lat, pos.lng);
+          });
+        }
+        markerRef.current = marker;
+      }
+
+      // En modo edición: click en el mapa mueve el pin
+      if (editable) {
+        map.on("click", (e: any) => {
+          const { lat: newLat, lng: newLng } = e.latlng;
+          if (markerRef.current) {
+            markerRef.current.setLatLng([newLat, newLng]);
+          } else {
+            const m = L.marker([newLat, newLng], { icon, draggable: true }).addTo(map);
+            m.on("dragend", () => {
+              const pos = m.getLatLng();
+              onPositionChange?.(pos.lat, pos.lng);
+            });
+            markerRef.current = m;
+          }
+          onPositionChange?.(newLat, newLng);
+        });
+      }
 
       mapRef.current = map;
     });
@@ -68,9 +106,19 @@ export default function MiniMap({ lat, lng, nombre, isDark }: Props) {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
+        markerRef.current = null;
       }
     };
-  }, [lat, lng, nombre, isDark]);
+  }, []);
+
+  // Mover el pin externamente (desde geocoding o GPS)
+  useEffect(() => {
+    if (!mapRef.current || !markerRef.current) return;
+    if (lat && lng) {
+      markerRef.current.setLatLng([lat, lng]);
+      mapRef.current.setView([lat, lng], 16, { animate: true });
+    }
+  }, [lat, lng]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 }
