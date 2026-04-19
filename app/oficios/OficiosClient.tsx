@@ -58,7 +58,7 @@ export default function OficiosClient({ professionals }: Props) {
 
   const byTab = useMemo(() =>
     professionals.filter((p) =>
-      tab === "oficio" ? (p.tipo === "oficio" || p.tipo == null) : p.tipo === "profesion"
+      tab === "oficio" ? p.tipo === "oficio" : p.tipo === "profesion"
     ), [professionals, tab]
   );
 
