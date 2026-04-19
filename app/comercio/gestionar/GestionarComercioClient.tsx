@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -117,15 +117,15 @@ function OfertaModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4">
-      <div className={`w-full max-w-lg rounded-2xl ${bg} p-5 shadow-xl max-h-[90vh] overflow-y-auto`}>
-        <div className="flex items-center justify-between mb-5">
+      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 2rem)" }}>
+        <div className="flex items-center justify-between p-5 pb-0 flex-shrink-0">
           <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar oferta" : "Nueva oferta"}</h2>
           <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 overflow-y-auto p-5">
           <div>
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Titulo *</label>
             <input
@@ -226,21 +226,22 @@ function OfertaModal({
             </p>
           )}
 
-          <div className="flex gap-3 pt-1">
-            <button
-              onClick={onClose}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={loading || !titulo.trim()}
-              className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-40"
-            >
-              {loading ? "Guardando..." : editing ? "Guardar cambios" : "Publicar oferta"}
-            </button>
-          </div>
+        </div>
+
+        <div className={`flex gap-3 p-5 pt-3 flex-shrink-0 border-t ${isDark ? "border-gray-800" : "border-gray-100"}`}>
+          <button
+            onClick={onClose}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !titulo.trim()}
+            className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-40"
+          >
+            {loading ? "Guardando..." : editing ? "Guardar cambios" : "Publicar oferta"}
+          </button>
         </div>
       </div>
     </div>
@@ -253,7 +254,8 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const router = useRouter();
   const { getToken } = useAuth();
   const { isDark } = useTheme();
-  const [tab, setTab] = useState<Tab>("datos");
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState<Tab>((searchParams.get("tab") as Tab) ?? "datos");
   const [comercio, setComercio] = useState(initial);
   const [offers, setOffers] = useState<ComercioOffer[]>(initial.offers ?? []);
   const [showOfertaModal, setShowOfertaModal] = useState(false);

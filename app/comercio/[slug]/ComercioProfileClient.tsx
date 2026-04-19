@@ -345,6 +345,8 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                   comercioNombre={comercio.nombre}
                   comercioLogo={comercio.logo ?? undefined}
                   comercioSlug={comercio.slug}
+                  isOwner={isOwner}
+                  onEdit={() => router.push("/comercio/gestionar?tab=ofertas")}
                 />
               ))}
             </div>
@@ -381,6 +383,8 @@ function OfertaCard({
   comercioNombre: string;
   comercioLogo?: string;
   comercioSlug: string;
+  isOwner?: boolean;
+  onEdit?: () => void;
 }) {
   const [sharing, setSharing] = useState(false);
   const [sharePreview, setSharePreview] = useState<string | null>(null);
@@ -403,7 +407,7 @@ function OfertaCard({
         validaHasta: validaHastaStr,
         offerUrl: offerPageUrl,
       });
-      const res = await fetch(`/api/offer-story?${params}`);
+      const res = await fetch(`/share/offer?${params}`);
       if (!res.ok) throw new Error(`Error del servidor: ${res.status}`);
       const blob = await res.blob();
       const file = new File([blob], "oferta.png", { type: "image/png" });
@@ -482,6 +486,18 @@ function OfertaCard({
           </div>
 
           <div className="mt-3 flex gap-2">
+            {isOwner && onEdit && (
+              <button
+                onClick={onEdit}
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  isDark
+                    ? "bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200"
+                }`}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
             <a
               href={waUrl}
               target="_blank"
