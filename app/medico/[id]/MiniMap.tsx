@@ -17,7 +17,6 @@ export default function MiniMap({ lat, lng, nombre, isDark }: Props) {
     if (!containerRef.current || mapRef.current) return;
 
     import("leaflet").then((L) => {
-      // Leaflet CSS
       if (!document.querySelector('link[href*="leaflet"]')) {
         const link = document.createElement("link");
         link.rel = "stylesheet";
@@ -32,12 +31,13 @@ export default function MiniMap({ lat, lng, nombre, isDark }: Props) {
       const map = L.map(containerRef.current!, {
         center: [lat, lng],
         zoom: 16,
-        zoomControl: false,
+        zoomControl: true,
         attributionControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
+        // todo habilitado — el usuario puede hacer zoom y arrastrar
+        dragging: true,
+        scrollWheelZoom: true,
+        doubleClickZoom: true,
+        touchZoom: true,
       });
 
       L.tileLayer(tile, { maxZoom: 19 }).addTo(map);
