@@ -194,7 +194,7 @@ export default function NuevoProfesionalClient() {
     barrio: "",
     telefono: "",
     whatsapp: "",
-    tipo: "oficio" as "oficio" | "profesion",
+    tipo: "" as "oficio" | "profesion" | "",
     oficios: [] as string[],
     oficioCustom: "",
     descripcion: "",
@@ -333,7 +333,7 @@ export default function NuevoProfesionalClient() {
           barrio: form.barrio,
           telefono: form.telefono,
           whatsapp: form.whatsapp,
-          tipo: form.tipo,
+          tipo: form.tipo || "oficio",
           oficios: form.oficios.map((o) => o.toLowerCase()),
           descripcion: descripcionFinal,
         }),
@@ -356,12 +356,12 @@ export default function NuevoProfesionalClient() {
 
   const canGoStep2 =
     form.nombre && form.apellido && form.barrio && form.whatsapp.length >= 11;
-  const canGoStep3 = form.oficios.length > 0;
+  const canGoStep3 = form.tipo !== "" && form.oficios.length > 0;
   const canSubmit = form.descripcion.length >= 30;
   const categoriasSugeridas =
     form.tipo === "oficio" ? OFICIOS_SUGERIDOS : PROFESIONES_SUGERIDAS;
-  const tipoLabel = form.tipo === "oficio" ? "oficio" : "profesión";
-  const tipoLabelPlural = form.tipo === "oficio" ? "oficios" : "profesiones";
+  const tipoLabel = form.tipo === "profesion" ? "profesión" : "oficio";
+  const tipoLabelPlural = form.tipo === "profesion" ? "profesiones" : "oficios";
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
@@ -521,26 +521,10 @@ export default function NuevoProfesionalClient() {
               Tipo de perfil
             </h1>
             <p className={`text-sm mb-4 ${textSec}`}>
-              Elegí si ofrecés una profesión o un oficio, y después cargá hasta
-              3 categorías.
+              Primero elegí si ofrecés un oficio o una profesión.
             </p>
 
             <div className="flex gap-2 mb-5">
-              <button
-                onClick={() =>
-                  setForm((f) => ({
-                    ...f,
-                    tipo: "profesion",
-                    oficios: [],
-                    oficioCustom: "",
-                  }))
-                }
-                className={`flex-1 px-3 py-2 rounded-xl text-sm font-semibold border transition-colors ${
-                  form.tipo === "profesion" ? tagActive : tagInactive
-                }`}
-              >
-                Profesión
-              </button>
               <button
                 onClick={() =>
                   setForm((f) => ({
@@ -556,14 +540,37 @@ export default function NuevoProfesionalClient() {
               >
                 Oficio
               </button>
+              <button
+                onClick={() =>
+                  setForm((f) => ({
+                    ...f,
+                    tipo: "profesion",
+                    oficios: [],
+                    oficioCustom: "",
+                  }))
+                }
+                className={`flex-1 px-3 py-2 rounded-xl text-sm font-semibold border transition-colors ${
+                  form.tipo === "profesion" ? tagActive : tagInactive
+                }`}
+              >
+                Profesión
+              </button>
             </div>
 
-            <p className={`text-sm mb-6 ${textSec}`}>
-              Elegí hasta 3 {tipoLabelPlural}. Los clientes te van a encontrar
-              por estas categorías.
-            </p>
+            {form.tipo === "" && (
+              <p className={`text-sm text-center py-8 ${textMuted}`}>
+                Selecciona una opción para continuar.
+              </p>
+            )}
 
-            <div className="flex flex-wrap gap-2 mb-5">
+            {form.tipo !== "" && (
+              <>
+                <p className={`text-sm mb-4 ${textSec}`}>
+                  Elegí hasta 3 {tipoLabelPlural}. Los clientes te van a encontrar
+                  por estas categorías.
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-5">
               {categoriasSugeridas.map((o) => (
                 <button
                   key={o}
@@ -613,6 +620,8 @@ export default function NuevoProfesionalClient() {
                   </span>
                 ))}
               </div>
+            )}
+              </>
             )}
 
             <div className="flex gap-3 mt-8">

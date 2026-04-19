@@ -7,6 +7,19 @@ import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
 import { Wrench, GraduationCap, MapPin, Star, Search, X, ChevronRight, Plus } from "lucide-react";
 
+const TAGS_OFICIO = [
+  "plomero", "electricista", "albañil", "pintor", "gasista", "jardinero",
+  "herrero", "carpintero", "climatización", "cerrajero", "techista", "soldador",
+  "fumigador", "limpieza", "flete", "mecánico", "yesero", "instalador",
+];
+
+const TAGS_PROFESION = [
+  "desarrollador de software", "contador", "abogado", "arquitecto", "ingeniero",
+  "diseñador gráfico", "marketing digital", "administración", "docente",
+  "psicólogo", "community manager", "analista de datos", "traductor",
+  "consultor", "escribano",
+];
+
 interface Props { professionals: Professional[]; }
 
 const PAGE_SIZE = 20;
@@ -50,15 +63,18 @@ export default function OficiosClient({ professionals }: Props) {
   );
 
   const allTags = useMemo(() => {
-    const set = new Set<string>();
-    byTab.forEach((p) => p.oficios.forEach((o) => set.add(o)));
-    return [...set].sort();
-  }, [byTab]);
+    const predefined = tab === "oficio" ? TAGS_OFICIO : TAGS_PROFESION;
+    const fromData = new Set<string>();
+    byTab.forEach((p) => p.oficios.forEach((o) => fromData.add(o.toLowerCase())));
+    // predefined first, then any extra from data not already in the list
+    const extra = [...fromData].filter((t) => !predefined.includes(t)).sort();
+    return [...predefined, ...extra];
+  }, [byTab, tab]);
 
   const filtered = useMemo(() => {
     return byTab.filter((p) => {
       if (!p.disponible) return false;
-      if (selectedTag && !p.oficios.includes(selectedTag)) return false;
+      if (selectedTag && !p.oficios.map((o) => o.toLowerCase()).includes(selectedTag)) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
         return (
