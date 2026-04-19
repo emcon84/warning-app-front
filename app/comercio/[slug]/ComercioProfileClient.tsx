@@ -371,6 +371,8 @@ function OfertaCard({
   comercioNombre,
   comercioLogo,
   comercioSlug,
+  isOwner,
+  onEdit,
 }: {
   offer: ComercioOffer;
   whatsapp: string;
