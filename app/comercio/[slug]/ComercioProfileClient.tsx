@@ -368,6 +368,7 @@ function OfertaCard({
   textMuted,
   comercioNombre,
   comercioLogo,
+  comercioSlug,
 }: {
   offer: ComercioOffer;
   whatsapp: string;
