@@ -49,18 +49,25 @@ function OfertaModal({
   isDark,
   onClose,
   onSaved,
+  editing,
 }: {
   isDark: boolean;
   onClose: () => void;
   onSaved: (offer: ComercioOffer) => void;
+  editing?: ComercioOffer;
 }) {
   const { getToken } = useAuth();
-  const [titulo, setTitulo] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [precio, setPrecio] = useState("");
-  const [validaHasta, setValidaHasta] = useState("");
+  const [titulo, setTitulo] = useState(editing?.titulo ?? "");
+  const [descripcion, setDescripcion] = useState(editing?.descripcion ?? "");
+  const [precio, setPrecio] = useState(editing?.precio ?? "");
+  const [validaHasta, setValidaHasta] = useState(
+    editing?.validaHasta ? new Date(editing.validaHasta).toISOString().split("T")[0] : ""
+  );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(
+    editing?.foto ? photoUrl(editing.foto) : null
+  );
+  const [clearPhoto, setClearPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const photoRef = useRef<HTMLInputElement>(null);
@@ -83,15 +90,19 @@ function OfertaModal({
       if (precio.trim()) fd.append("precio", precio.trim());
       if (validaHasta) fd.append("validaHasta", validaHasta);
       if (photoFile) fd.append("photo", photoFile);
+      if (clearPhoto && !photoFile) fd.append("clearPhoto", "1");
 
-      const res = await fetch(`${API}/api/comercios/me/offers`, {
-        method: "POST",
+      const url = editing
+        ? `${API}/api/comercios/me/offers/${editing.id}`
+        : `${API}/api/comercios/me/offers`;
+      const res = await fetch(url, {
+        method: editing ? "PATCH" : "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
       if (!res.ok) {
         const d = await res.json();
-        throw new Error(d.error || "Error al crear la oferta");
+        throw new Error(d.error || "Error al guardar la oferta");
       }
       const offer = await res.json();
       onSaved(offer);
@@ -106,7 +117,7 @@ function OfertaModal({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4">
       <div className={`w-full max-w-lg rounded-2xl ${bg} p-5 shadow-xl max-h-[90vh] overflow-y-auto`}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>Nueva oferta</h2>
+          <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar oferta" : "Nueva oferta"}</h2>
           <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
             <X className="w-4 h-4" />
           </button>
@@ -175,7 +186,7 @@ function OfertaModal({
               {photoPreview && (
                 <button
                   type="button"
-                  onClick={() => { setPhotoFile(null); setPhotoPreview(null); }}
+                  onClick={() => { setPhotoFile(null); setPhotoPreview(null); setClearPhoto(true); }}
                   className={`text-xs ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500"}`}
                 >
                   Quitar foto
@@ -214,7 +225,7 @@ function OfertaModal({
               disabled={loading || !titulo.trim()}
               className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-40"
             >
-              {loading ? "Guardando..." : "Publicar oferta"}
+              {loading ? "Guardando..." : editing ? "Guardar cambios" : "Publicar oferta"}
             </button>
           </div>
         </div>
@@ -233,6 +244,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const [comercio, setComercio] = useState(initial);
   const [offers, setOffers] = useState<ComercioOffer[]>(initial.offers ?? []);
   const [showOfertaModal, setShowOfertaModal] = useState(false);
+  const [editingOffer, setEditingOffer] = useState<ComercioOffer | undefined>(undefined);
 
   // Datos form state
   const [form, setForm] = useState({
@@ -402,10 +414,16 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       {showOfertaModal && (
         <OfertaModal
           isDark={isDark}
-          onClose={() => setShowOfertaModal(false)}
+          editing={editingOffer}
+          onClose={() => { setShowOfertaModal(false); setEditingOffer(undefined); }}
           onSaved={(offer) => {
-            setOffers((prev) => [offer, ...prev]);
+            setOffers((prev) =>
+              editingOffer
+                ? prev.map((o) => (o.id === offer.id ? offer : o))
+                : [offer, ...prev]
+            );
             setShowOfertaModal(false);
+            setEditingOffer(undefined);
           }}
         />
       )}
@@ -739,6 +757,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                   textMuted={textMuted}
                   onToggle={() => handleToggleOffer(offer)}
                   onDelete={() => handleDeleteOffer(offer.id)}
+                  onEdit={() => { setEditingOffer(offer); setShowOfertaModal(true); }}
                 />
               ))
             )}
@@ -756,7 +775,7 @@ function inicial(val: string | null | undefined): string {
 }
 
 function OfertaRow({
-  offer, isDark, cardBg, textPri, textSec, textMuted, onToggle, onDelete,
+  offer, isDark, cardBg, textPri, textSec, textMuted, onToggle, onDelete, onEdit,
 }: {
   offer: ComercioOffer;
   isDark: boolean;
@@ -766,6 +785,7 @@ function OfertaRow({
   textMuted: string;
   onToggle: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -818,6 +838,13 @@ function OfertaRow({
                 ? <ToggleRight className="w-3.5 h-3.5 text-green-500" />
                 : <ToggleLeft className="w-3.5 h-3.5" />}
               {offer.activa ? "Desactivar" : "Activar"}
+            </button>
+
+            <button
+              onClick={onEdit}
+              className={`p-1.5 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-500 hover:text-blue-400 hover:border-blue-800" : "border-gray-200 text-gray-400 hover:text-blue-500 hover:border-blue-200"}`}
+            >
+              <Pencil className="w-3.5 h-3.5" />
             </button>
 
             {confirmDelete ? (
