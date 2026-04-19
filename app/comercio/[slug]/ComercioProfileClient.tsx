@@ -344,6 +344,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                   tagBg={tagBg}
                   comercioNombre={comercio.nombre}
                   comercioLogo={comercio.logo ?? undefined}
+                  comercioSlug={comercio.slug}
                 />
               ))}
             </div>
@@ -378,8 +379,10 @@ function OfertaCard({
   tagBg: string;
   comercioNombre: string;
   comercioLogo?: string;
+  comercioSlug: string;
 }) {
   const [sharing, setSharing] = useState(false);
+  const [sharePreview, setSharePreview] = useState<string | null>(null);
   const waText = encodeURIComponent(`Hola! Te consulto por la oferta: ${offer.titulo}`);
   const waUrl  = `https://wa.me/${whatsapp}?text=${waText}`;
 
@@ -389,6 +392,7 @@ function OfertaCard({
       const validaHastaStr = offer.validaHasta
         ? new Date(offer.validaHasta).toLocaleDateString("es-AR", { day: "numeric", month: "long" })
         : "";
+      const offerPageUrl = `${window.location.origin}/comercio/${comercioSlug}/oferta/${offer.id}`;
       const params = new URLSearchParams({
         titulo: offer.titulo,
         precio: offer.precio ?? "",
@@ -396,23 +400,23 @@ function OfertaCard({
         comercio: comercioNombre,
         logo: comercioLogo ? photoUrl(comercioLogo) : "",
         validaHasta: validaHastaStr,
+        offerUrl: offerPageUrl,
       });
       const res = await fetch(`/api/offer-story?${params}`);
-      if (!res.ok) throw new Error("No se pudo generar la imagen");
+      if (!res.ok) throw new Error(`Error del servidor: ${res.status}`);
       const blob = await res.blob();
       const file = new File([blob], "oferta.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: offer.titulo });
       } else {
+        // Fallback: mostrar preview para que el usuario guarde manualmente
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "oferta.png";
-        a.click();
-        URL.revokeObjectURL(url);
+        setSharePreview(url);
       }
     } catch (e: unknown) {
-      if (e instanceof Error && e.name !== "AbortError") console.error(e);
+      if (e instanceof Error && e.name !== "AbortError") {
+        alert(`No se pudo compartir: ${(e as Error).message}`);
+      }
     } finally {
       setSharing(false);
     }
@@ -427,6 +431,16 @@ function OfertaCard({
     : null;
 
   return (
+    <>
+    {sharePreview && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6" onClick={() => { URL.revokeObjectURL(sharePreview); setSharePreview(null); }}>
+        <div className="flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
+          <p className="text-white text-sm font-medium">Mantené presionada la imagen para guardarla</p>
+          <img src={sharePreview} alt="Story" className="max-h-[70vh] rounded-2xl" style={{ maxWidth: "calc(70vh * 9/16)" }} />
+          <button onClick={() => { URL.revokeObjectURL(sharePreview); setSharePreview(null); }} className="text-gray-400 text-xs">Cerrar</button>
+        </div>
+      </div>
+    )}
     <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
       <div className="flex gap-0">
         {/* Foto de la oferta - 1/3 del card */}
@@ -495,5 +509,6 @@ function OfertaCard({
         </div>
       </div>
     </div>
+    </>
   );
 }

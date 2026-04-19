@@ -59,6 +59,7 @@ function OfertaModal({
   const { getToken } = useAuth();
   const [titulo, setTitulo] = useState(editing?.titulo ?? "");
   const [descripcion, setDescripcion] = useState(editing?.descripcion ?? "");
+  const [terminos, setTerminos] = useState(editing?.terminos ?? "");
   const [precio, setPrecio] = useState(editing?.precio ?? "");
   const [validaHasta, setValidaHasta] = useState(
     editing?.validaHasta ? new Date(editing.validaHasta).toISOString().split("T")[0] : ""
@@ -87,6 +88,7 @@ function OfertaModal({
       const fd = new FormData();
       fd.append("titulo", titulo.trim());
       if (descripcion.trim()) fd.append("descripcion", descripcion.trim());
+      if (terminos.trim()) fd.append("terminos", terminos.trim());
       if (precio.trim()) fd.append("precio", precio.trim());
       if (validaHasta) fd.append("validaHasta", validaHasta);
       if (photoFile) fd.append("photo", photoFile);
@@ -138,8 +140,19 @@ function OfertaModal({
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Descripcion</label>
             <textarea
               value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value.slice(0, 300))}
+              onChange={(e) => setDescripcion(e.target.value.slice(0, 500))}
               placeholder="Mas detalles de la oferta..."
+              rows={3}
+              className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
+            />
+          </div>
+
+          <div>
+            <label className={`text-xs mb-1.5 block ${labelCls}`}>Términos y condiciones</label>
+            <textarea
+              value={terminos}
+              onChange={(e) => setTerminos(e.target.value.slice(0, 1000))}
+              placeholder="Ej: Válido solo para clientes nuevos. No acumulable con otras promociones..."
               rows={3}
               className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
             />

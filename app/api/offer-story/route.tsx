@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
   const comercioNombre = s.get("comercio") ?? "";
   const logo = s.get("logo") ?? "";
   const validaHasta = s.get("validaHasta") ?? "";
+  const offerUrl = s.get("offerUrl") ?? "";
 
   const [fotoData, logoData] = await Promise.all([
     foto ? toDataUrl(foto) : Promise.resolve(""),
@@ -171,16 +172,23 @@ export async function GET(req: NextRequest) {
           </div>
         )}
 
-        {/* Branding */}
+        {/* Branding + link */}
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             marginTop: "auto",
+            gap: "12px",
           }}
         >
-          <span style={{ color: "#1e293b", fontSize: "28px" }}>
+          {offerUrl && (
+            <span style={{ color: "#3b82f6", fontSize: "30px" }}>
+              {offerUrl.replace("https://", "")}
+            </span>
+          )}
+          <span style={{ color: "#1e293b", fontSize: "24px" }}>
             reportesreconquista.com
           </span>
         </div>

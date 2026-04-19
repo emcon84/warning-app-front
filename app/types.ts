@@ -201,6 +201,7 @@ export interface ComercioOffer {
   comercioId: string;
   titulo: string;
   descripcion?: string | null;
+  terminos?: string | null;
   precio?: string | null;
   foto?: string | null;
   validaHasta?: string | null;
