@@ -96,9 +96,11 @@ export async function GET(req: NextRequest) {
           </div>
 
           {/* CTA */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px", padding: "0 72px" }}>
             <span style={{ color: "#94a3b8", fontSize: "36px" }}>Contactalo en</span>
-            <span style={{ color: "#3b82f6", fontSize: "40px", fontWeight: 700 }}>{profileUrl}</span>
+            <div style={{ display: "flex", background: "rgba(59,130,246,0.12)", border: "2px solid rgba(59,130,246,0.25)", borderRadius: "24px", padding: "28px 48px", width: "100%" }}>
+              <span style={{ color: "#3b82f6", fontSize: "34px", fontWeight: 700, wordBreak: "break-all", textAlign: "center", width: "100%" }}>{profileUrl}</span>
+            </div>
           </div>
 
           {/* Footer */}
