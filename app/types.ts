@@ -213,6 +213,7 @@ export interface Producto {
   id: string;
   comercioId: string;
   nombre: string;
+  tipo: "producto" | "servicio";
   descripcion?: string | null;
   precio?: string | null;
   foto?: string | null;

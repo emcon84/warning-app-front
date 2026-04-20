@@ -263,6 +263,7 @@ function ProductoModal({
 }) {
   const { getToken } = useAuth();
   const [nombre, setNombre] = useState(editing?.nombre ?? "");
+  const [tipo, setTipo] = useState<"producto" | "servicio">(editing?.tipo ?? "producto");
   const [descripcion, setDescripcion] = useState(editing?.descripcion ?? "");
   const [precio, setPrecio] = useState(editing?.precio ?? "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -286,6 +287,7 @@ function ProductoModal({
       const token = await getToken();
       const fd = new FormData();
       fd.append("nombre", nombre.trim());
+      fd.append("tipo", tipo);
       if (descripcion.trim()) fd.append("descripcion", descripcion.trim());
       if (precio.trim()) fd.append("precio", precio.trim());
       if (photoFile) fd.append("photo", photoFile);
@@ -315,15 +317,34 @@ function ProductoModal({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4 pt-4 pb-24 sm:p-4">
       <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 7rem)" }}>
         <div className="flex items-center justify-between p-5 pb-0 flex-shrink-0">
-          <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar producto" : "Nuevo producto"}</h2>
+          <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? `Editar ${tipo}` : `Nuevo ${tipo}`}</h2>
           <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
             <X className="w-4 h-4" />
           </button>
         </div>
         <div className="flex flex-col gap-4 overflow-y-auto p-5">
           <div>
+            <label className={`text-xs mb-1.5 block ${labelCls}`}>Tipo *</label>
+            <div className={`flex rounded-xl border overflow-hidden ${isDark ? "border-gray-700" : "border-gray-200"}`}>
+              {(["producto", "servicio"] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTipo(t)}
+                  className={`flex-1 py-2.5 text-sm font-medium capitalize transition-colors ${
+                    tipo === t
+                      ? isDark ? "bg-white text-gray-900" : "bg-gray-900 text-white"
+                      : isDark ? "text-gray-400 hover:bg-gray-800" : "text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Nombre *</label>
-            <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej: Medialunas de manteca" className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`} />
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder={tipo === "servicio" ? "Ej: Desarrollo de aplicaciones web" : "Ej: Medialunas de manteca"} className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`} />
           </div>
           <div>
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Descripcion</label>
@@ -350,7 +371,7 @@ function ProductoModal({
         <div className={`flex gap-3 p-5 pt-3 flex-shrink-0 border-t ${isDark ? "border-gray-800" : "border-gray-100"}`}>
           <button onClick={onClose} className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>Cancelar</button>
           <button onClick={handleSubmit} disabled={loading || !nombre.trim()} className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-40">
-            {loading ? "Guardando..." : editing ? "Guardar cambios" : "Publicar producto"}
+            {loading ? "Guardando..." : editing ? "Guardar cambios" : `Publicar ${tipo}`}
           </button>
         </div>
       </div>
@@ -554,7 +575,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "datos",     label: "Datos",     icon: <Store className="w-4 h-4" /> },
     { id: "fotos",     label: "Fotos",     icon: <ImageIcon className="w-4 h-4" /> },
-    { id: "productos", label: "Productos", icon: <ShoppingBag className="w-4 h-4" /> },
+    { id: "productos", label: "Catálogo", icon: <ShoppingBag className="w-4 h-4" /> },
     { id: "ofertas",   label: "Ofertas",   icon: <Tag className="w-4 h-4" /> },
   ];
 
@@ -907,14 +928,14 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               onClick={() => setShowProductoModal(true)}
               className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-semibold text-sm bg-white text-gray-900 hover:bg-gray-100 transition-colors"
             >
-              <Plus className="w-4 h-4" /> Nuevo producto
+              <Plus className="w-4 h-4" /> Agregar al catálogo
             </button>
 
             {productos.length === 0 ? (
               <div className={`py-12 text-center rounded-2xl border ${cardBg}`}>
                 <ShoppingBag className={`w-8 h-8 mx-auto mb-3 ${textMuted}`} />
-                <p className={`text-sm ${textMuted}`}>No hay productos cargados aun.</p>
-                <p className={`text-xs mt-1 ${isDark ? "text-gray-700" : "text-gray-300"}`}>Crea tu primera producto con el boton de arriba.</p>
+                <p className={`text-sm ${textMuted}`}>No hay items en el catálogo aun.</p>
+                <p className={`text-xs mt-1 ${isDark ? "text-gray-700" : "text-gray-300"}`}>Agregá productos o servicios con el boton de arriba.</p>
               </div>
             ) : (
               productos.map((p) => (
@@ -1006,7 +1027,16 @@ function ProductoRow({
         )}
         <div className="flex-1 p-4 flex flex-col gap-1.5 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className={`font-bold text-sm leading-snug ${textPri}`}>{producto.nombre}</p>
+            <div className="flex flex-col gap-1 min-w-0">
+              <p className={`font-bold text-sm leading-snug ${textPri}`}>{producto.nombre}</p>
+              <span className={`text-xs px-2 py-0.5 rounded-full border self-start capitalize ${
+                producto.tipo === "servicio"
+                  ? isDark ? "bg-blue-900/40 text-blue-400 border-blue-800" : "bg-blue-100 text-blue-700 border-blue-300"
+                  : isDark ? "bg-amber-900/40 text-amber-400 border-amber-800" : "bg-amber-100 text-amber-700 border-amber-300"
+              }`}>
+                {producto.tipo ?? "producto"}
+              </span>
+            </div>
             <span className={`text-xs px-2 py-0.5 rounded-full border flex-shrink-0 ${
               producto.activo
                 ? isDark ? "bg-green-900/40 text-green-400 border-green-800" : "bg-green-100 text-green-700 border-green-300"

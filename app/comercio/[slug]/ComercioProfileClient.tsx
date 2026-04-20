@@ -352,7 +352,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className={`text-base font-bold ${textPrimary}`}>
-                  Nuestros productos
+                  Catálogo
                   {activeProductos.length > 0 && <span className={`ml-2 text-sm font-normal ${textMuted}`}>({activeProductos.length})</span>}
                 </p>
                 <p className={`text-xs mt-0.5 ${textMuted}`}>Consultá por precio o disponibilidad via WhatsApp</p>
@@ -367,7 +367,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
             {activeProductos.length === 0 ? (
               <div className={`py-8 text-center rounded-2xl border ${cardBg}`}>
                 <ShoppingBag className={`w-8 h-8 mx-auto mb-2 ${textMuted}`} />
-                <p className={`text-sm ${textMuted}`}>No hay productos cargados aun.</p>
+                <p className={`text-sm ${textMuted}`}>No hay items en el catálogo aun.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
@@ -452,8 +452,11 @@ function ProductoCard({
     ? producto.foto.startsWith("http") ? producto.foto : `${API}${producto.foto}`
     : null;
 
+  const esServicio = producto.tipo === "servicio";
   const waMsg = encodeURIComponent(
-    `Hola ${comercioNombre}! Me interesa el producto: *${producto.nombre}*${producto.precio ? ` (${producto.precio})` : ""}. ¿Tienen disponibilidad?`
+    esServicio
+      ? `Hola ${comercioNombre}! Me interesa el servicio: *${producto.nombre}*${producto.precio ? ` (${producto.precio})` : ""}. ¿Podemos hablar?`
+      : `Hola ${comercioNombre}! Me interesa el producto: *${producto.nombre}*${producto.precio ? ` (${producto.precio})` : ""}. ¿Tienen disponibilidad?`
   );
   const waUrl = `https://wa.me/${whatsapp}?text=${waMsg}`;
 
@@ -467,7 +470,16 @@ function ProductoCard({
         </div>
       )}
       <div className="p-3 flex flex-col gap-1 flex-1">
-        <p className={`text-xs font-bold leading-snug line-clamp-2 ${textPrimary}`}>{producto.nombre}</p>
+        <div className="flex items-start justify-between gap-1">
+          <p className={`text-xs font-bold leading-snug line-clamp-2 ${textPrimary}`}>{producto.nombre}</p>
+          <span className={`text-xs px-1.5 py-0.5 rounded-full border flex-shrink-0 capitalize ${
+            esServicio
+              ? isDark ? "bg-blue-900/40 text-blue-400 border-blue-800" : "bg-blue-100 text-blue-700 border-blue-300"
+              : isDark ? "bg-amber-900/40 text-amber-400 border-amber-800" : "bg-amber-100 text-amber-700 border-amber-300"
+          }`}>
+            {producto.tipo ?? "producto"}
+          </span>
+        </div>
         {producto.descripcion && <p className={`text-xs leading-snug line-clamp-2 ${textSec}`}>{producto.descripcion}</p>}
         {producto.precio && <p className={`text-sm font-black text-green-500 dark:text-green-400`}>{producto.precio}</p>}
         <a
@@ -477,7 +489,7 @@ function ProductoCard({
           className="mt-auto flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
         >
           <MessageCircle className="w-3.5 h-3.5" />
-          Consultar
+          {esServicio ? "Consultar servicio" : "Consultar"}
         </a>
       </div>
     </div>
