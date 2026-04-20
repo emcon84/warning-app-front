@@ -53,6 +53,7 @@ function ConvCard({
   myRole: "client" | "professional";
   onDelete: (id: string) => void;
 }) {
+  const { getToken, isSignedIn } = useAuth();
   const pro = conv.Professional;
   const lastMsg = conv.Message?.[conv.Message.length - 1];
   const { label, dot } = STATUS_MAP[conv.status] ?? STATUS_MAP.open;
@@ -72,7 +73,12 @@ function ConvCard({
     try {
       const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
       const params = clientToken ? `?clientToken=${clientToken}` : "";
-      const res = await fetch(`${API}/api/conversations/${conv.id}${params}`, { method: "DELETE" });
+      const headers: Record<string, string> = {};
+      if (isSignedIn) {
+        const token = await getToken();
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await fetch(`${API}/api/conversations/${conv.id}${params}`, { method: "DELETE", headers });
       if (res.ok) onDelete(conv.id);
     } finally {
       setDeleting(false);
