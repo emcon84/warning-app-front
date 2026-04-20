@@ -491,38 +491,40 @@ function OfertaCard({
     )}
 
     <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
-      {/* Foto arriba, full width */}
-      {offer.foto && (
-        <div className="w-full h-44 overflow-hidden">
-          <img
-            src={photoUrl(offer.foto)}
-            alt={offer.titulo}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-
-      {/* Contenido */}
-      <div className="p-4">
-        <p className={`font-bold text-sm leading-snug ${textPrimary}`}>{offer.titulo}</p>
-        {offer.descripcion && (
-          <p className={`text-xs mt-1.5 leading-relaxed line-clamp-2 ${textSec}`}>{offer.descripcion}</p>
+      <a href={`/comercio/${comercioSlug}/oferta/${offer.id}`} className="block">
+        {/* Foto arriba, full width */}
+        {offer.foto && (
+          <div className="w-full h-44 overflow-hidden">
+            <img
+              src={photoUrl(offer.foto)}
+              alt={offer.titulo}
+              className="w-full h-full object-cover"
+            />
+          </div>
         )}
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          {offer.precio && (
-            <span className={`text-lg font-black px-3 py-1 rounded-xl border ${
-              isDark
-                ? "bg-yellow-400/10 text-yellow-300 border-yellow-700"
-                : "bg-yellow-50 text-yellow-700 border-yellow-300"
-            }`}>
-              $ {Number(offer.precio).toLocaleString("es-AR")}
-            </span>
+
+        {/* Contenido */}
+        <div className="p-4">
+          <p className={`font-bold text-sm leading-snug ${textPrimary}`}>{offer.titulo}</p>
+          {offer.descripcion && (
+            <p className={`text-xs mt-1.5 leading-relaxed line-clamp-2 ${textSec}`}>{offer.descripcion}</p>
           )}
-          {validaHasta && (
-            <span className={`text-xs ${textMuted}`}>Hasta el {validaHasta}</span>
-          )}
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
+            {offer.precio && (
+              <span className={`text-lg font-black px-3 py-1 rounded-xl border ${
+                isDark
+                  ? "bg-yellow-400/10 text-yellow-300 border-yellow-700"
+                  : "bg-yellow-50 text-yellow-700 border-yellow-300"
+              }`}>
+                $ {Number(offer.precio).toLocaleString("es-AR")}
+              </span>
+            )}
+            {validaHasta && (
+              <span className={`text-xs ${textMuted}`}>Hasta el {validaHasta}</span>
+            )}
+          </div>
         </div>
-      </div>
+      </a>
 
       {/* Botones — full width, sin apretujarse */}
       <div className="px-4 pb-4 flex gap-2">

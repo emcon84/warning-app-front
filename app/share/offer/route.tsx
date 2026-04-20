@@ -184,12 +184,12 @@ export async function GET(req: NextRequest) {
           }}
         >
           {offerUrl && (
-            <span style={{ color: "#3b82f6", fontSize: "30px" }}>
+            <span style={{ color: "#60a5fa", fontSize: "30px", textAlign: "center" }}>
               {offerUrl.replace("https://", "")}
             </span>
           )}
-          <span style={{ color: "#1e293b", fontSize: "24px" }}>
-            reportesreconquista.com
+          <span style={{ color: "#475569", fontSize: "24px" }}>
+            Reportes Reconquista
           </span>
         </div>
       </div>
