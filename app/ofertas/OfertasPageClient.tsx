@@ -55,27 +55,21 @@ export default function OfertasPageClient({ initialSupermarkets }: Props) {
     }
   };
 
-  const subheaderBg = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
-
   return (
     <div className="min-h-screen" style={{ backgroundColor: isDark ? '#030712' : '#f9fafb' }}>
       <Navbar mapView="ofertas" />
 
-      {/* Subheader con acción */}
-      <div className={`fixed top-14 left-0 right-0 z-40 border-b px-4 py-2 flex items-center justify-between ${subheaderBg}`}>
-        <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Ofertas del día</p>
-        <button
-          onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">Agregar super</span>
-          <span className="sm:hidden">Agregar</span>
-        </button>
-      </div>
+      {/* FAB — agregar supermercado */}
+      <button
+        onClick={() => setIsAddOpen(true)}
+        className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg flex items-center justify-center transition-colors"
+        aria-label="Agregar supermercado"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
 
       {/* Grid */}
-      <div className="max-w-6xl mx-auto px-4 pt-28 pb-6">
+      <div className="max-w-6xl mx-auto px-4 pt-20 pb-6">
         {supermarkets.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 gap-3 text-gray-400 dark:text-gray-600">
             <ShoppingCart className="w-12 h-12" />

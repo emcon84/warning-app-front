@@ -59,42 +59,29 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push("/ofertas")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors text-sm font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-              {supermarket.logo ? (
-                <img src={supermarket.logo} alt={supermarket.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-sm font-bold text-gray-400 dark:text-gray-500">
-                  {supermarket.name.charAt(0).toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-gray-900 dark:text-white leading-none">{supermarket.name}</h1>
-              {supermarket.address && (
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{supermarket.address}</p>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* Header simplificado */}
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3 min-w-0">
         <button
-          onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold text-sm transition-colors"
+          onClick={() => router.push("/ofertas")}
+          className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors flex-shrink-0"
         >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">Agregar oferta</span>
-          <span className="sm:hidden">Agregar</span>
+          <ArrowLeft className="w-5 h-5" />
         </button>
+        <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+          {supermarket.logo ? (
+            <img src={supermarket.logo} alt={supermarket.name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-sm font-bold text-gray-400 dark:text-gray-500">
+              {supermarket.name.charAt(0).toUpperCase()}
+            </span>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-sm font-bold text-gray-900 dark:text-white truncate leading-none">{supermarket.name}</h1>
+          {supermarket.address && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">{supermarket.address}</p>
+          )}
+        </div>
       </div>
 
       {/* SEO: título visible para crawlers */}
@@ -181,6 +168,15 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
           </div>
         )}
       </div>
+
+      {/* FAB — agregar oferta */}
+      <button
+        onClick={() => setIsAddOpen(true)}
+        className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg flex items-center justify-center transition-colors"
+        aria-label="Agregar oferta"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
 
       {/* JSON-LD para SEO */}
       <script
