@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Comercio, ComercioOffer } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
-import { MapPin, Clock, Phone, X, Pencil, Share2 } from "lucide-react";
+import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -110,7 +110,7 @@ const WaIcon = () => (
 export default function ComercioProfileClient({ comercio, isOwner }: Props) {
   const router = useRouter();
   const { isDark } = useTheme();
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
   const bg          = isDark ? "bg-gray-950" : "bg-gray-50";
   const textPrimary = isDark ? "text-white" : "text-gray-900";
@@ -140,23 +140,55 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
       <Navbar sidebarDisabled />
 
       {/* Lightbox */}
-      {lightboxSrc && (
+      {lightboxIdx !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
-          onClick={() => setLightboxSrc(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+          onClick={() => setLightboxIdx(null)}
         >
+          {/* Cerrar */}
           <button
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
-            onClick={() => setLightboxSrc(null)}
+            className="absolute top-4 right-4 z-10 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors border border-white/20"
+            onClick={() => setLightboxIdx(null)}
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
+
+          {/* Flecha izquierda */}
+          {galeriaFotos.length > 1 && (
+            <button
+              className="absolute left-3 z-10 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors border border-white/20"
+              onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx - 1 + galeriaFotos.length) % galeriaFotos.length); }}
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Imagen */}
           <img
-            src={lightboxSrc}
+            src={photoUrl(galeriaFotos[lightboxIdx])}
             alt="Foto del comercio"
-            className="max-w-full max-h-[90vh] object-contain rounded-xl"
+            className="max-w-[85vw] max-h-[85vh] object-contain rounded-xl"
             onClick={(e) => e.stopPropagation()}
           />
+
+          {/* Flecha derecha */}
+          {galeriaFotos.length > 1 && (
+            <button
+              className="absolute right-3 z-10 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors border border-white/20"
+              onClick={(e) => { e.stopPropagation(); setLightboxIdx((lightboxIdx + 1) % galeriaFotos.length); }}
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Contador */}
+          {galeriaFotos.length > 1 && (
+            <div className="absolute bottom-6 left-0 right-0 flex justify-center">
+              <span className="text-white/70 text-sm bg-black/40 px-3 py-1 rounded-full">
+                {lightboxIdx + 1} / {galeriaFotos.length}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -299,7 +331,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                 <button
                   key={i}
                   type="button"
-                  onClick={() => setLightboxSrc(photoUrl(url))}
+                  onClick={() => setLightboxIdx(i)}
                   className={`aspect-square rounded-xl overflow-hidden border focus:outline-none group ${isDark ? "border-gray-800" : "border-gray-200"}`}
                 >
                   <img
@@ -391,6 +423,7 @@ function OfertaCard({
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [shareBlob, setShareBlob] = useState<Blob | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const waText = encodeURIComponent(`Hola! Te consulto por la oferta: ${offer.titulo}`);
   const waUrl  = `https://wa.me/${whatsapp}?text=${waText}`;
@@ -438,6 +471,15 @@ function OfertaCard({
     setShareModalOpen(false);
     setShareBlob(null);
     setShareError(null);
+    setCopied(false);
+  }
+
+  function copyLink() {
+    const url = `${window.location.origin}/comercio/${comercioSlug}/oferta/${offer.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   }
 
   const validaHasta = offer.validaHasta
@@ -484,6 +526,13 @@ function OfertaCard({
               <p className="text-gray-400 text-xs text-center">Mantené presionada la imagen para guardarla</p>
             )}
             {shareError && <p className="text-red-400 text-xs text-center">{shareError}</p>}
+            <button
+              onClick={copyLink}
+              className="w-full py-3 rounded-2xl text-sm font-semibold border border-gray-600 text-gray-300 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
+            >
+              {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? "Link copiado!" : "Copiar link de la oferta"}
+            </button>
             <button onClick={closeModal} className="text-gray-500 text-xs text-center py-1">Cerrar</button>
           </div>
         </div>

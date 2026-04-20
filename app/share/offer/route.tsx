@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
   const comercioNombre = s.get("comercio") ?? "";
   const logo = s.get("logo") ?? "";
   const validaHasta = s.get("validaHasta") ?? "";
-  const offerUrl = s.get("offerUrl") ?? "";
 
   const [fotoData, logoData] = await Promise.all([
     foto ? toDataUrl(foto) : Promise.resolve(""),
@@ -42,101 +41,132 @@ export async function GET(req: NextRequest) {
         style={{
           width: "1080px",
           height: "1920px",
-          background: "#0a0f1a",
+          background: "linear-gradient(160deg, #0a0f1a 0%, #0f172a 50%, #0a0f1a 100%)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          padding: "80px 72px",
           fontFamily: "system-ui, sans-serif",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "36px",
-            width: "100%",
-            marginBottom: "56px",
-          }}
-        >
+        {/* Fondo decorativo — círculos de color */}
+        <div style={{
+          position: "absolute",
+          top: "-200px",
+          right: "-200px",
+          width: "700px",
+          height: "700px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(234,179,8,0.12) 0%, transparent 70%)",
+          display: "flex",
+        }} />
+        <div style={{
+          position: "absolute",
+          bottom: "200px",
+          left: "-150px",
+          width: "500px",
+          height: "500px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)",
+          display: "flex",
+        }} />
+
+        {/* Banner SUPER OFERTA */}
+        <div style={{
+          width: "100%",
+          background: "linear-gradient(90deg, #ca8a04 0%, #eab308 50%, #ca8a04 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "36px 0",
+          position: "relative",
+        }}>
+          <span style={{
+            color: "#0a0f1a",
+            fontSize: "80px",
+            fontWeight: 900,
+            letterSpacing: "-1px",
+            textTransform: "uppercase",
+          }}>
+            ¡SUPER OFERTA!
+          </span>
+        </div>
+
+        {/* Header: logo + nombre comercio */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "32px",
+          width: "100%",
+          padding: "52px 72px 40px",
+        }}>
           {logoData ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoData}
-              width={120}
-              height={120}
-              style={{ borderRadius: "50%", objectFit: "cover" }}
+              width={110}
+              height={110}
+              style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(234,179,8,0.4)" }}
             />
           ) : (
-            <div
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: "50%",
-                background: "#1e293b",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 52,
-              }}
-            >
+            <div style={{
+              width: 110,
+              height: 110,
+              borderRadius: "50%",
+              background: "#1e293b",
+              border: "4px solid rgba(234,179,8,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 48,
+            }}>
               🏪
             </div>
           )}
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <span style={{ color: "#64748b", fontSize: "30px" }}>
-              Nueva oferta de
-            </span>
-            <span
-              style={{ color: "#f1f5f9", fontSize: "44px", fontWeight: 700 }}
-            >
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <span style={{ color: "#64748b", fontSize: "28px" }}>oferta de</span>
+            <span style={{ color: "#f1f5f9", fontSize: "48px", fontWeight: 800, lineHeight: 1.1 }}>
               {comercioNombre}
             </span>
           </div>
         </div>
 
-        {/* Offer title + date */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-            marginBottom: "52px",
-            gap: "16px",
-          }}
-        >
-          <span
-            style={{
-              color: "#ffffff",
-              fontSize: "64px",
-              fontWeight: 800,
-              lineHeight: 1.15,
-            }}
-          >
+        {/* Título de la oferta */}
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          padding: "0 72px 44px",
+          gap: "12px",
+        }}>
+          <span style={{
+            color: "#ffffff",
+            fontSize: "72px",
+            fontWeight: 800,
+            lineHeight: 1.1,
+          }}>
             {titulo}
           </span>
           {validaHasta && (
-            <span style={{ color: "#475569", fontSize: "34px" }}>
+            <span style={{ color: "#475569", fontSize: "32px" }}>
               Válida hasta {validaHasta}
             </span>
           )}
         </div>
 
-        {/* Product photo */}
-        <div
-          style={{
-            width: "100%",
-            flex: 1,
-            borderRadius: "40px",
-            overflow: "hidden",
-            marginBottom: "52px",
-            background: "#1e293b",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        {/* Foto del producto */}
+        <div style={{
+          width: "calc(100% - 144px)",
+          flex: 1,
+          borderRadius: "40px",
+          overflow: "hidden",
+          background: "#1e293b",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          border: "2px solid rgba(255,255,255,0.06)",
+        }}>
           {fotoData ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -144,53 +174,53 @@ export async function GET(req: NextRequest) {
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
-            <span style={{ color: "#334155", fontSize: "48px" }}>
-              Sin foto
-            </span>
+            <span style={{ color: "#334155", fontSize: "48px" }}>Sin foto</span>
           )}
         </div>
 
-        {/* Price */}
+        {/* Precio */}
         {precioFormateado && (
-          <div
-            style={{
-              background: "rgba(250, 204, 21, 0.08)",
-              border: "3px solid #854d0e",
-              borderRadius: "28px",
-              padding: "28px 72px",
-              marginBottom: "52px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span
-              style={{ color: "#fbbf24", fontSize: "108px", fontWeight: 900 }}
-            >
+          <div style={{
+            background: "linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(234,179,8,0.08) 100%)",
+            border: "3px solid rgba(234,179,8,0.5)",
+            borderRadius: "28px",
+            padding: "32px 80px",
+            margin: "44px 0 0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            <span style={{ color: "#fbbf24", fontSize: "120px", fontWeight: 900, lineHeight: 1 }}>
               {precioFormateado}
             </span>
           </div>
         )}
 
-        {/* Branding + link */}
-        <div
-          style={{
+        {/* Footer: branding */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "44px 0 52px",
+          gap: "16px",
+        }}>
+          <div style={{
+            width: "6px",
+            height: "6px",
+            borderRadius: "50%",
+            background: "#334155",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: "auto",
-            gap: "12px",
-          }}
-        >
-          {offerUrl && (
-            <span style={{ color: "#60a5fa", fontSize: "30px", textAlign: "center" }}>
-              {offerUrl.replace("https://", "")}
-            </span>
-          )}
-          <span style={{ color: "#475569", fontSize: "24px" }}>
-            Reportes Reconquista
+          }} />
+          <span style={{ color: "#475569", fontSize: "32px", fontWeight: 600, letterSpacing: "0.5px" }}>
+            reportesreconquista.com
           </span>
+          <div style={{
+            width: "6px",
+            height: "6px",
+            borderRadius: "50%",
+            background: "#334155",
+            display: "flex",
+          }} />
         </div>
       </div>
     ),
