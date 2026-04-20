@@ -504,13 +504,21 @@ export default function NuevoProfesionalClient() {
               </div>
             </div>
 
-            <button
-              onClick={() => setStep(2)}
-              disabled={!canGoStep2}
-              className="w-full mt-8 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-            >
-              Continuar
-            </button>
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => router.back()}
+                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => setStep(2)}
+                disabled={!canGoStep2}
+                className="flex-1 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+              >
+                Continuar
+              </button>
+            </div>
           </div>
         )}
 
