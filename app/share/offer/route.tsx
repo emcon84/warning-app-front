@@ -157,7 +157,7 @@ export async function GET(req: NextRequest) {
 
         {/* Foto del producto */}
         <div style={{
-          width: "calc(100% - 144px)",
+          width: "936px",
           flex: 1,
           borderRadius: "40px",
           overflow: "hidden",
