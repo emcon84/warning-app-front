@@ -72,8 +72,8 @@ function ConvCard({
     try {
       const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
       const params = clientToken ? `?clientToken=${clientToken}` : "";
-      await fetch(`${API}/api/conversations/${conv.id}${params}`, { method: "DELETE" });
-      onDelete(conv.id);
+      const res = await fetch(`${API}/api/conversations/${conv.id}${params}`, { method: "DELETE" });
+      if (res.ok) onDelete(conv.id);
     } finally {
       setDeleting(false);
       setConfirming(false);
