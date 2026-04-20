@@ -64,11 +64,14 @@ export async function GET(req: NextRequest) {
             </span>
           </div>
 
-          {/* Foto principal */}
+          {/* Foto principal / fallback logo */}
           <div style={{ width: "936px", height: "800px", borderRadius: "40px", overflow: "hidden", background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid rgba(255,255,255,0.06)", margin: "52px 0 0" }}>
             {fotoData ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : logoData ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoData} style={{ width: "360px", height: "360px", objectFit: "contain", borderRadius: "32px" }} />
             ) : (
               <span style={{ color: "#334155", fontSize: "80px" }}>🏪</span>
             )}

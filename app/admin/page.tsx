@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Instagram, X, Download } from "lucide-react";
+import { Instagram, X, Download, Copy, Check } from "lucide-react";
 import Navbar from "../components/Navbar";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -61,6 +61,7 @@ type ShareFormat = "story" | "feed";
 interface ShareTarget {
   type: "comercio" | "profesional";
   shareUrl: string;
+  profileUrl: string;
   label: string;
 }
 
@@ -91,6 +92,17 @@ async function downloadAndShare(imageUrl: string, filename: string) {
 
 function ShareModal({ target, onClose }: { target: ShareTarget; onClose: () => void }) {
   const [loading, setLoading] = useState<ShareFormat | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(target.profileUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* fallback: select text */
+    }
+  }
 
   async function handle(format: ShareFormat) {
     setLoading(format);
@@ -161,7 +173,17 @@ function ShareModal({ target, onClose }: { target: ShareTarget; onClose: () => v
           </button>
         </div>
 
-        <p className="text-[10px] text-gray-700 text-center mt-4 flex items-center justify-center gap-1">
+        <div className="mt-4 border-t border-gray-800 pt-4">
+          <button
+            onClick={copyLink}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-700 hover:border-gray-500 hover:bg-gray-800 transition-colors text-sm font-semibold text-gray-300"
+          >
+            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+            {copied ? "¡Link copiado!" : "Copiar link del perfil"}
+          </button>
+        </div>
+
+        <p className="text-[10px] text-gray-700 text-center mt-3 flex items-center justify-center gap-1">
           <Download className="w-3 h-3" />
           En desktop descarga la imagen. En mobile abre el selector del sistema.
         </p>
@@ -273,6 +295,7 @@ export default function AdminPage() {
     setShareTarget({
       type: "comercio",
       shareUrl: `/share/comercio?${params}`,
+      profileUrl: `https://reportesreconquista.com/comercio/${com.slug}`,
       label: com.nombre,
     });
   }
@@ -289,6 +312,7 @@ export default function AdminPage() {
     setShareTarget({
       type: "profesional",
       shareUrl: `/share/profesional?${params}`,
+      profileUrl: `https://reportesreconquista.com/profesional/${pro.slug}`,
       label: `${pro.nombre} ${pro.apellido}`,
     });
   }
