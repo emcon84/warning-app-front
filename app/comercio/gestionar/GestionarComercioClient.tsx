@@ -116,8 +116,8 @@ function OfertaModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4">
-      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 2rem)" }}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4 pt-4 pb-24 sm:p-4">
+      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 7rem)" }}>
         <div className="flex items-center justify-between p-5 pb-0 flex-shrink-0">
           <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar oferta" : "Nueva oferta"}</h2>
           <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
@@ -312,8 +312,8 @@ function ProductoModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4">
-      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 2rem)" }}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4 pt-4 pb-24 sm:p-4">
+      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 7rem)" }}>
         <div className="flex items-center justify-between p-5 pb-0 flex-shrink-0">
           <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar producto" : "Nuevo producto"}</h2>
           <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
@@ -617,12 +617,12 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         </div>
 
         {/* Tabs */}
-        <div className={`flex gap-1 p-1 rounded-2xl mb-6 ${isDark ? "bg-gray-900" : "bg-gray-100"}`}>
+        <div className={`flex gap-1 p-1 rounded-2xl mb-6 overflow-x-auto ${isDark ? "bg-gray-900" : "bg-gray-100"}`}>
           {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-sm font-semibold transition-colors ${
+              className={`flex-shrink-0 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl text-sm font-semibold transition-colors ${
                 tab === t.id
                   ? isDark ? "bg-white text-gray-900" : "bg-white text-gray-900 shadow-sm"
                   : isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"
