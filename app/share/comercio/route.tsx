@@ -1,0 +1,176 @@
+import { ImageResponse } from "next/og";
+import { NextRequest } from "next/server";
+
+export const runtime = "nodejs";
+
+async function toDataUrl(url: string): Promise<string> {
+  if (!url) return "";
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) return "";
+    const buf = await r.arrayBuffer();
+    const b64 = Buffer.from(buf).toString("base64");
+    const mime = r.headers.get("content-type") ?? "image/jpeg";
+    return `data:${mime};base64,${b64}`;
+  } catch {
+    return "";
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const s = req.nextUrl.searchParams;
+  const nombre = s.get("nombre") ?? "";
+  const rubro = s.get("rubro") ?? "";
+  const barrio = s.get("barrio") ?? "";
+  const slug = s.get("slug") ?? "";
+  const foto = s.get("foto") ?? "";
+  const logo = s.get("logo") ?? "";
+  const isStory = s.get("format") !== "feed";
+
+  const W = 1080;
+  const H = isStory ? 1920 : 1080;
+
+  const [fotoData, logoData] = await Promise.all([
+    foto ? toDataUrl(foto) : Promise.resolve(""),
+    logo ? toDataUrl(logo) : Promise.resolve(""),
+  ]);
+
+  const profileUrl = `reportesreconquista.com/comercio/${slug}`;
+
+  if (isStory) {
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: `${W}px`,
+            height: `${H}px`,
+            background: "linear-gradient(160deg, #0a0f1a 0%, #0f172a 50%, #0a0f1a 100%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            fontFamily: "system-ui, sans-serif",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {/* Decorative blobs */}
+          <div style={{ position: "absolute", top: "-200px", right: "-200px", width: "700px", height: "700px", borderRadius: "50%", background: "radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)", display: "flex" }} />
+          <div style={{ position: "absolute", bottom: "200px", left: "-150px", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", display: "flex" }} />
+
+          {/* Banner */}
+          <div style={{ width: "100%", background: "linear-gradient(90deg, #15803d 0%, #22c55e 50%, #15803d 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "36px 0" }}>
+            <span style={{ color: "#ffffff", fontSize: "72px", fontWeight: 900, letterSpacing: "-1px", textTransform: "uppercase" }}>
+              ¡NUEVO COMERCIO!
+            </span>
+          </div>
+
+          {/* Foto principal */}
+          <div style={{ width: "936px", height: "800px", borderRadius: "40px", overflow: "hidden", background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid rgba(255,255,255,0.06)", margin: "52px 0 0" }}>
+            {fotoData ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ color: "#334155", fontSize: "80px" }}>🏪</span>
+            )}
+          </div>
+
+          {/* Logo + nombre */}
+          <div style={{ display: "flex", alignItems: "center", gap: "32px", width: "100%", padding: "48px 72px 0" }}>
+            {logoData ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoData} width={100} height={100} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(34,197,94,0.5)" }} />
+            ) : (
+              <div style={{ width: 100, height: 100, borderRadius: "50%", background: "#1e293b", border: "4px solid rgba(34,197,94,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 44 }}>
+                🏪
+              </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <span style={{ color: "#f1f5f9", fontSize: "56px", fontWeight: 800, lineHeight: 1.1 }}>{nombre}</span>
+              <span style={{ color: "#64748b", fontSize: "32px" }}>{rubro}{barrio ? ` · ${barrio}` : ""}</span>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px" }}>
+            <span style={{ color: "#94a3b8", fontSize: "36px" }}>Ingresa a ver su perfil en</span>
+            <span style={{ color: "#22c55e", fontSize: "40px", fontWeight: 700 }}>{profileUrl}</span>
+          </div>
+
+          {/* Footer */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 0 52px", gap: "16px" }}>
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#334155", display: "flex" }} />
+            <span style={{ color: "#475569", fontSize: "32px", fontWeight: 600, letterSpacing: "0.5px" }}>reportesreconquista.com</span>
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#334155", display: "flex" }} />
+          </div>
+        </div>
+      ),
+      { width: W, height: H }
+    );
+  }
+
+  // Feed 1:1
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: `${W}px`,
+          height: `${H}px`,
+          background: "linear-gradient(160deg, #0a0f1a 0%, #0f172a 50%, #0a0f1a 100%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          fontFamily: "system-ui, sans-serif",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Decorative blobs */}
+        <div style={{ position: "absolute", top: "-150px", right: "-150px", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%)", display: "flex" }} />
+
+        {/* Banner */}
+        <div style={{ width: "100%", background: "linear-gradient(90deg, #15803d 0%, #22c55e 50%, #15803d 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "28px 0" }}>
+          <span style={{ color: "#ffffff", fontSize: "58px", fontWeight: 900, letterSpacing: "-1px", textTransform: "uppercase" }}>
+            ¡NUEVO COMERCIO!
+          </span>
+        </div>
+
+        {/* Content row */}
+        <div style={{ display: "flex", flex: 1, width: "100%", gap: "0" }}>
+          {/* Foto */}
+          <div style={{ width: "520px", height: "100%", background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            {fotoData ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ color: "#334155", fontSize: "80px" }}>🏪</span>
+            )}
+          </div>
+
+          {/* Info */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "52px 52px 40px", gap: "0" }}>
+            {logoData ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoData} width={90} height={90} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(34,197,94,0.5)", marginBottom: "28px" }} />
+            ) : (
+              <div style={{ width: 90, height: 90, borderRadius: "50%", background: "#1e293b", border: "4px solid rgba(34,197,94,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, marginBottom: "28px" }}>
+                🏪
+              </div>
+            )}
+            <span style={{ color: "#f1f5f9", fontSize: "48px", fontWeight: 800, lineHeight: 1.1, marginBottom: "12px" }}>{nombre}</span>
+            <span style={{ color: "#64748b", fontSize: "28px", marginBottom: "auto" }}>{rubro}</span>
+            {barrio ? <span style={{ color: "#475569", fontSize: "24px", marginBottom: "24px" }}>{barrio}</span> : null}
+            <span style={{ color: "#22c55e", fontSize: "24px", fontWeight: 600, marginTop: "auto" }}>{profileUrl}</span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 0", gap: "12px", background: "rgba(0,0,0,0.3)", width: "100%" }}>
+          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#334155", display: "flex" }} />
+          <span style={{ color: "#475569", fontSize: "26px", fontWeight: 600 }}>reportesreconquista.com</span>
+          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#334155", display: "flex" }} />
+        </div>
+      </div>
+    ),
+    { width: W, height: H }
+  );
+}
