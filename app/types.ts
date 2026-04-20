@@ -209,6 +209,17 @@ export interface ComercioOffer {
   createdAt: string;
 }
 
+export interface Producto {
+  id: string;
+  comercioId: string;
+  nombre: string;
+  descripcion?: string | null;
+  precio?: string | null;
+  foto?: string | null;
+  activo: boolean;
+  createdAt: string;
+}
+
 export interface Comercio {
   id: string;
   nombre: string;
@@ -226,4 +237,5 @@ export interface Comercio {
   activo: boolean;
   createdAt: string;
   offers?: ComercioOffer[];
+  productos?: Producto[];
 }

@@ -6,9 +6,9 @@ import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useTheme } from "../../contexts/ThemeContext";
 import Navbar from "../../components/Navbar";
-import { Comercio, ComercioOffer } from "../../types";
+import { Comercio, ComercioOffer, Producto } from "../../types";
 import {
-  Store, ImageIcon, Tag, ChevronRight,
+  Store, ImageIcon, Tag, ShoppingBag,
   Plus, Trash2, ToggleLeft, ToggleRight,
   X, Check, Pencil, ExternalLink,
 } from "lucide-react";
@@ -37,10 +37,10 @@ function photoUrl(url: string | null | undefined): string | null {
   return url.startsWith("/uploads/") ? `${API}${url}` : url;
 }
 
-type Tab = "datos" | "fotos" | "ofertas";
+type Tab = "datos" | "fotos" | "ofertas" | "productos";
 
 interface Props {
-  comercio: Comercio & { offers?: ComercioOffer[] };
+  comercio: Comercio & { offers?: ComercioOffer[]; productos?: Producto[] };
 }
 
 // ─── Oferta Form Modal ───────────────────────────────────────────────────────
@@ -248,6 +248,116 @@ function OfertaModal({
   );
 }
 
+// ─── Producto Form Modal ─────────────────────────────────────────────────────
+
+function ProductoModal({
+  isDark,
+  onClose,
+  onSaved,
+  editing,
+}: {
+  isDark: boolean;
+  onClose: () => void;
+  onSaved: (p: Producto) => void;
+  editing?: Producto;
+}) {
+  const { getToken } = useAuth();
+  const [nombre, setNombre] = useState(editing?.nombre ?? "");
+  const [descripcion, setDescripcion] = useState(editing?.descripcion ?? "");
+  const [precio, setPrecio] = useState(editing?.precio ?? "");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(editing?.foto ? photoUrl(editing.foto) : null);
+  const [clearPhoto, setClearPhoto] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const photoRef = useRef<HTMLInputElement>(null);
+
+  const bg = isDark ? "bg-gray-900" : "bg-white";
+  const inputCls = isDark
+    ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400";
+  const labelCls = isDark ? "text-gray-400" : "text-gray-500";
+
+  async function handleSubmit() {
+    if (!nombre.trim()) { setError("El nombre es obligatorio"); return; }
+    setLoading(true);
+    setError("");
+    try {
+      const token = await getToken();
+      const fd = new FormData();
+      fd.append("nombre", nombre.trim());
+      if (descripcion.trim()) fd.append("descripcion", descripcion.trim());
+      if (precio.trim()) fd.append("precio", precio.trim());
+      if (photoFile) fd.append("photo", photoFile);
+      if (clearPhoto && !photoFile) fd.append("clearPhoto", "1");
+
+      const url = editing
+        ? `${API}/api/comercios/me/productos/${editing.id}`
+        : `${API}/api/comercios/me/productos`;
+      const res = await fetch(url, {
+        method: editing ? "PATCH" : "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      if (!res.ok) {
+        const d = await res.json();
+        throw new Error(d.error || "Error al guardar");
+      }
+      onSaved(await res.json());
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-4">
+      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 2rem)" }}>
+        <div className="flex items-center justify-between p-5 pb-0 flex-shrink-0">
+          <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar producto" : "Nuevo producto"}</h2>
+          <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex flex-col gap-4 overflow-y-auto p-5">
+          <div>
+            <label className={`text-xs mb-1.5 block ${labelCls}`}>Nombre *</label>
+            <input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej: Medialunas de manteca" className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`} />
+          </div>
+          <div>
+            <label className={`text-xs mb-1.5 block ${labelCls}`}>Descripcion</label>
+            <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value.slice(0, 500))} placeholder="Ingredientes, características, detalles..." rows={3} className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`} />
+          </div>
+          <div>
+            <label className={`text-xs mb-1.5 block ${labelCls}`}>Precio</label>
+            <input value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Ej: $1.500" className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`} />
+          </div>
+          <div>
+            <label className={`text-xs mb-1.5 block ${labelCls}`}>Foto del producto</label>
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => photoRef.current?.click()} className={`w-16 h-16 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden transition-colors ${isDark ? "border-gray-700 hover:border-gray-500 bg-gray-800" : "border-gray-300 hover:border-gray-400 bg-gray-50"}`}>
+                {photoPreview ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" /> : <ImageIcon className={`w-5 h-5 ${isDark ? "text-gray-600" : "text-gray-400"}`} />}
+              </button>
+              {photoPreview && (
+                <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); setClearPhoto(true); }} className={`text-xs ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500"}`}>Quitar foto</button>
+              )}
+            </div>
+            <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setPhotoFile(f); setPhotoPreview(URL.createObjectURL(f)); }} />
+          </div>
+          {error && <p className={`text-sm px-3 py-2 rounded-xl border ${isDark ? "text-red-400 bg-red-900/20 border-red-800" : "text-red-600 bg-red-50 border-red-200"}`}>{error}</p>}
+        </div>
+        <div className={`flex gap-3 p-5 pt-3 flex-shrink-0 border-t ${isDark ? "border-gray-800" : "border-gray-100"}`}>
+          <button onClick={onClose} className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>Cancelar</button>
+          <button onClick={handleSubmit} disabled={loading || !nombre.trim()} className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-40">
+            {loading ? "Guardando..." : editing ? "Guardar cambios" : "Publicar producto"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function GestionarComercioClient({ comercio: initial }: Props) {
@@ -260,6 +370,9 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const [offers, setOffers] = useState<ComercioOffer[]>(initial.offers ?? []);
   const [showOfertaModal, setShowOfertaModal] = useState(false);
   const [editingOffer, setEditingOffer] = useState<ComercioOffer | undefined>(undefined);
+  const [productos, setProductos] = useState<Producto[]>(initial.productos ?? []);
+  const [showProductoModal, setShowProductoModal] = useState(false);
+  const [editingProducto, setEditingProducto] = useState<Producto | undefined>(undefined);
 
   // Datos form state
   const [form, setForm] = useState({
@@ -413,10 +526,36 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
     } catch {/* silent */}
   }
 
+  async function handleToggleProducto(p: Producto) {
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API}/api/comercios/me/productos/${p.id}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ activo: !p.activo }),
+      });
+      if (!res.ok) return;
+      const updated = await res.json();
+      setProductos((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+    } catch {/* silent */}
+  }
+
+  async function handleDeleteProducto(id: string) {
+    try {
+      const token = await getToken();
+      await fetch(`${API}/api/comercios/me/productos/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProductos((prev) => prev.filter((p) => p.id !== id));
+    } catch {/* silent */}
+  }
+
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "datos",   label: "Datos",   icon: <Store className="w-4 h-4" /> },
-    { id: "fotos",   label: "Fotos",   icon: <ImageIcon className="w-4 h-4" /> },
-    { id: "ofertas", label: "Ofertas", icon: <Tag className="w-4 h-4" /> },
+    { id: "datos",     label: "Datos",     icon: <Store className="w-4 h-4" /> },
+    { id: "fotos",     label: "Fotos",     icon: <ImageIcon className="w-4 h-4" /> },
+    { id: "productos", label: "Productos", icon: <ShoppingBag className="w-4 h-4" /> },
+    { id: "ofertas",   label: "Ofertas",   icon: <Tag className="w-4 h-4" /> },
   ];
 
   const existingFotos = comercio.fotos ?? [];
@@ -439,6 +578,23 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             );
             setShowOfertaModal(false);
             setEditingOffer(undefined);
+          }}
+        />
+      )}
+
+      {showProductoModal && (
+        <ProductoModal
+          isDark={isDark}
+          editing={editingProducto}
+          onClose={() => { setShowProductoModal(false); setEditingProducto(undefined); }}
+          onSaved={(p) => {
+            setProductos((prev) =>
+              editingProducto
+                ? prev.map((x) => (x.id === p.id ? p : x))
+                : [p, ...prev]
+            );
+            setShowProductoModal(false);
+            setEditingProducto(undefined);
           }}
         />
       )}
@@ -744,6 +900,41 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </div>
         )}
 
+        {/* ── Tab: Productos ─────────────────────────────────────────── */}
+        {tab === "productos" && (
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => setShowProductoModal(true)}
+              className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-semibold text-sm bg-white text-gray-900 hover:bg-gray-100 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Nuevo producto
+            </button>
+
+            {productos.length === 0 ? (
+              <div className={`py-12 text-center rounded-2xl border ${cardBg}`}>
+                <ShoppingBag className={`w-8 h-8 mx-auto mb-3 ${textMuted}`} />
+                <p className={`text-sm ${textMuted}`}>No hay productos cargados aun.</p>
+                <p className={`text-xs mt-1 ${isDark ? "text-gray-700" : "text-gray-300"}`}>Crea tu primera producto con el boton de arriba.</p>
+              </div>
+            ) : (
+              productos.map((p) => (
+                <ProductoRow
+                  key={p.id}
+                  producto={p}
+                  isDark={isDark}
+                  cardBg={cardBg}
+                  textPri={textPri}
+                  textSec={textSec}
+                  textMuted={textMuted}
+                  onToggle={() => handleToggleProducto(p)}
+                  onDelete={() => handleDeleteProducto(p.id)}
+                  onEdit={() => { setEditingProducto(p); setShowProductoModal(true); }}
+                />
+              ))
+            )}
+          </div>
+        )}
+
         {/* ── Tab: Ofertas ───────────────────────────────────────────── */}
         {tab === "ofertas" && (
           <div className="flex flex-col gap-3">
@@ -787,6 +978,68 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
 
 function inicial(val: string | null | undefined): string {
   return val ?? "";
+}
+
+function ProductoRow({
+  producto, isDark, cardBg, textPri, textSec, textMuted, onToggle, onDelete, onEdit,
+}: {
+  producto: Producto;
+  isDark: boolean;
+  cardBg: string;
+  textPri: string;
+  textSec: string;
+  textMuted: string;
+  onToggle: () => void;
+  onDelete: () => void;
+  onEdit: () => void;
+}) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const fotoResolved = photoUrl(producto.foto);
+
+  return (
+    <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
+      <div className="flex gap-0">
+        {fotoResolved && (
+          <div className="w-24 flex-shrink-0">
+            <img src={fotoResolved} alt={producto.nombre} className="w-full h-full object-cover" />
+          </div>
+        )}
+        <div className="flex-1 p-4 flex flex-col gap-1.5 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <p className={`font-bold text-sm leading-snug ${textPri}`}>{producto.nombre}</p>
+            <span className={`text-xs px-2 py-0.5 rounded-full border flex-shrink-0 ${
+              producto.activo
+                ? isDark ? "bg-green-900/40 text-green-400 border-green-800" : "bg-green-100 text-green-700 border-green-300"
+                : isDark ? "bg-gray-800 text-gray-500 border-gray-700" : "bg-gray-100 text-gray-400 border-gray-200"
+            }`}>
+              {producto.activo ? "Activo" : "Inactivo"}
+            </span>
+          </div>
+          {producto.descripcion && <p className={`text-xs leading-relaxed line-clamp-2 ${textSec}`}>{producto.descripcion}</p>}
+          {producto.precio && <span className={`text-sm font-black ${isDark ? "text-green-400" : "text-green-600"}`}>{producto.precio}</span>}
+          <div className="flex items-center gap-2 mt-1">
+            <button onClick={onToggle} className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+              {producto.activo ? <ToggleRight className="w-3.5 h-3.5 text-green-500" /> : <ToggleLeft className="w-3.5 h-3.5" />}
+              {producto.activo ? "Desactivar" : "Activar"}
+            </button>
+            <button onClick={onEdit} className={`p-1.5 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-500 hover:text-blue-400 hover:border-blue-800" : "border-gray-200 text-gray-400 hover:text-blue-500 hover:border-blue-200"}`}>
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+            {confirmDelete ? (
+              <div className="flex gap-1">
+                <button onClick={onDelete} className="text-xs px-2.5 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors">Confirmar</button>
+                <button onClick={() => setConfirmDelete(false)} className={`text-xs px-2.5 py-1 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}>Cancelar</button>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmDelete(true)} className={`p-1.5 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-500 hover:text-red-400 hover:border-red-800" : "border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200"}`}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function OfertaRow({

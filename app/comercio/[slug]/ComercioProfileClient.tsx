@@ -2,10 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Comercio, ComercioOffer } from "../../types";
+import { Comercio, ComercioOffer, Producto } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
-import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
+import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -129,6 +129,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
   const waUrl  = `https://wa.me/${comercio.whatsapp}?text=${waText}`;
 
   const activeOffers = comercio.offers || [];
+  const activeProductos = comercio.productos || [];
 
   // Galeria: si no hay fotos adicionales pero hay foto principal, mostrarla
   const galeriaFotos = comercio.fotos && comercio.fotos.length > 0
@@ -345,6 +346,49 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           </div>
         )}
 
+        {/* ── Productos ───────────────────────────────────────────────── */}
+        {(activeProductos.length > 0 || isOwner) && (
+          <div className="mx-4 mt-4 mb-2">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className={`text-base font-bold ${textPrimary}`}>
+                  Nuestros productos
+                  {activeProductos.length > 0 && <span className={`ml-2 text-sm font-normal ${textMuted}`}>({activeProductos.length})</span>}
+                </p>
+                <p className={`text-xs mt-0.5 ${textMuted}`}>Consultá por precio o disponibilidad via WhatsApp</p>
+              </div>
+              {isOwner && (
+                <button onClick={() => router.push("/comercio/gestionar?tab=productos")} className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}>
+                  <Pencil className="w-3 h-3" /> Gestionar
+                </button>
+              )}
+            </div>
+
+            {activeProductos.length === 0 ? (
+              <div className={`py-8 text-center rounded-2xl border ${cardBg}`}>
+                <ShoppingBag className={`w-8 h-8 mx-auto mb-2 ${textMuted}`} />
+                <p className={`text-sm ${textMuted}`}>No hay productos cargados aun.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {activeProductos.map((p) => (
+                  <ProductoCard
+                    key={p.id}
+                    producto={p}
+                    whatsapp={comercio.whatsapp}
+                    comercioNombre={comercio.nombre}
+                    isDark={isDark}
+                    cardBg={cardBg}
+                    textPrimary={textPrimary}
+                    textSec={textSec}
+                    textMuted={textMuted}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ── Ofertas ─────────────────────────────────────────────────── */}
         <div className="mx-4 mt-4 mb-4">
           <div className="mb-3">
@@ -385,6 +429,56 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           )}
         </div>
 
+      </div>
+    </div>
+  );
+}
+
+// ─── Producto Card ───────────────────────────────────────────────────────────
+
+function ProductoCard({
+  producto, whatsapp, comercioNombre, isDark, cardBg, textPrimary, textSec, textMuted,
+}: {
+  producto: Producto;
+  whatsapp: string;
+  comercioNombre: string;
+  isDark: boolean;
+  cardBg: string;
+  textPrimary: string;
+  textSec: string;
+  textMuted: string;
+}) {
+  const fotoResolved = producto.foto
+    ? producto.foto.startsWith("http") ? producto.foto : `${API}${producto.foto}`
+    : null;
+
+  const waMsg = encodeURIComponent(
+    `Hola ${comercioNombre}! Me interesa el producto: *${producto.nombre}*${producto.precio ? ` (${producto.precio})` : ""}. ¿Tienen disponibilidad?`
+  );
+  const waUrl = `https://wa.me/${whatsapp}?text=${waMsg}`;
+
+  return (
+    <div className={`rounded-2xl border overflow-hidden flex flex-col ${cardBg}`}>
+      {fotoResolved ? (
+        <img src={fotoResolved} alt={producto.nombre} className="w-full h-36 object-cover flex-shrink-0" />
+      ) : (
+        <div className={`w-full h-28 flex items-center justify-center flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+          <ShoppingBag className={`w-8 h-8 ${textMuted}`} />
+        </div>
+      )}
+      <div className="p-3 flex flex-col gap-1 flex-1">
+        <p className={`text-xs font-bold leading-snug line-clamp-2 ${textPrimary}`}>{producto.nombre}</p>
+        {producto.descripcion && <p className={`text-xs leading-snug line-clamp-2 ${textSec}`}>{producto.descripcion}</p>}
+        {producto.precio && <p className={`text-sm font-black text-green-500 dark:text-green-400`}>{producto.precio}</p>}
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-auto flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
+        >
+          <MessageCircle className="w-3.5 h-3.5" />
+          Consultar
+        </a>
       </div>
     </div>
   );
