@@ -138,7 +138,7 @@ function Step4Notificaciones({
 
 export default function NuevoComercioClient() {
   const router = useRouter();
-  const { getToken } = useAuth();
+  const { getToken, isSignedIn, isLoaded } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
 
   const { isDark } = useTheme();
@@ -307,6 +307,41 @@ export default function NuevoComercioClient() {
   const canGoStep2 = form.nombre.trim() && form.rubro && form.barrio && form.whatsapp.length >= 11;
   const canGoStep3 = true; // step 2 fields are optional-ish (direccion, horario required-ish but descripcion can be empty)
   const canSubmit  = !loading;
+
+  if (isLoaded && !isSignedIn) {
+    return (
+      <div className={`min-h-screen ${bg} flex flex-col`}>
+        <Navbar sidebarDisabled />
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className={`w-full max-w-sm rounded-2xl border p-8 flex flex-col items-center text-center gap-5 ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}>
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+              🏪
+            </div>
+            <div>
+              <h2 className={`text-lg font-bold mb-2 ${textPrimary}`}>Necesitás una cuenta</h2>
+              <p className={`text-sm leading-relaxed ${textSec}`}>
+                Para registrar tu comercio tenés que iniciar sesión primero. Es gratis y tarda menos de un minuto.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+              <button
+                onClick={() => router.push(`/sign-in?redirect_url=/comercio/nuevo`)}
+                className="w-full py-3 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors border border-gray-200"
+              >
+                Iniciar sesión
+              </button>
+              <button
+                onClick={() => router.back()}
+                className={`w-full py-3 rounded-2xl text-sm font-medium transition-colors ${isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                Volver
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
