@@ -173,36 +173,31 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
 
         {/* Pills de vista — ocultas en mobile, se muestran en el bottom nav */}
         <div className="hidden md:flex flex-1 items-center justify-center gap-1 overflow-x-auto" data-tour="view-pills">
-          {([
-            { key: "oficios",   label: "Oficios",   Icon: Wrench,       href: "/oficios",   active: () => pathname.startsWith("/oficios") || pathname.startsWith("/profesional") },
-            { key: "comercios", label: "Comercios", Icon: Store,        href: "/comercios", active: () => pathname.startsWith("/comercios") || pathname.startsWith("/comercio") },
-            { key: "ofertas",   label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",   active: () => pathname.startsWith("/ofertas") },
-            { key: "empleos",   label: "Empleos",   Icon: Briefcase,    href: "/empleos",   active: () => pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante") },
-            { key: "medicos",   label: "Médicos",   Icon: Stethoscope,  href: "/medicos",   active: () => pathname.startsWith("/medicos") || (pathname === "/app" && mapView === "doctors") },
-            { key: "farmacias", label: "Farmacias", Icon: Pill,         href: "/app?view=farmacias", active: () => pathname === "/app" && mapView === "farmacias", mapKey: "farmacias" as MapViewItem },
-            { key: "reportes",  label: "Reportes",  Icon: Megaphone,    href: "/app",       active: () => pathname === "/app" && mapView === "reports", mapKey: "reports" as MapViewItem },
-          ] as const).map(({ key, label, Icon, href, active, mapKey }) => {
-            const isActive = active();
-            const handleClick = () => {
-              if (mapKey && onMapViewChange && pathname === "/app") {
-                onMapViewChange(mapKey);
-              } else {
-                router.push(href);
-              }
-            };
-            return (
-              <button
-                key={key}
-                onClick={handleClick}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
-                  isActive ? "bg-green-500 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="hidden sm:inline">{label}</span>
-              </button>
-            );
-          })}
+          {(
+            [
+              { key: "oficios",   label: "Oficios",   Icon: Wrench,       href: "/oficios",            active: pathname.startsWith("/oficios") || pathname.startsWith("/profesional"),           mapKey: null },
+              { key: "comercios", label: "Comercios", Icon: Store,        href: "/comercios",           active: pathname.startsWith("/comercios") || pathname.startsWith("/comercio"),           mapKey: null },
+              { key: "ofertas",   label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",             active: pathname.startsWith("/ofertas"),                                                 mapKey: null },
+              { key: "empleos",   label: "Empleos",   Icon: Briefcase,    href: "/empleos",             active: pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante"), mapKey: null },
+              { key: "medicos",   label: "Médicos",   Icon: Stethoscope,  href: "/medicos",             active: pathname.startsWith("/medicos") || (pathname === "/app" && mapView === "doctors"), mapKey: null },
+              { key: "farmacias", label: "Farmacias", Icon: Pill,         href: "/app?view=farmacias",  active: pathname === "/app" && mapView === "farmacias",                                   mapKey: "farmacias" as MapViewItem | null },
+              { key: "reportes",  label: "Reportes",  Icon: Megaphone,    href: "/app",                 active: pathname === "/app" && mapView === "reports",                                    mapKey: "reports" as MapViewItem | null },
+            ] as { key: string; label: string; Icon: ComponentType<{ className?: string }>; href: string; active: boolean; mapKey: MapViewItem | null }[]
+          ).map(({ key, label, Icon, href, active, mapKey }) => (
+            <button
+              key={key}
+              onClick={() => {
+                if (mapKey && onMapViewChange && pathname === "/app") onMapViewChange(mapKey);
+                else router.push(href);
+              }}
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
+                active ? "bg-green-500 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="hidden sm:inline">{label}</span>
+            </button>
+          ))}
         </div>
 
         {/* Auth */}
