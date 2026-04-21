@@ -52,6 +52,7 @@ interface Comercio {
   foto?: string | null;
   logo?: string | null;
   activo: boolean;
+  isPremium: boolean;
   createdAt: string;
 }
 
@@ -259,6 +260,16 @@ export default function AdminPage() {
     setDeletingId(null);
   }
 
+  async function togglePremium(com: Comercio) {
+    const token = await getToken();
+    const res = await fetch(`${API}/api/admin/comercios/${com.id}/premium`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ isPremium: !com.isPremium }),
+    });
+    if (res.ok) setComercios(prev => prev.map(c => c.id === com.id ? { ...c, isPremium: !com.isPremium } : c));
+  }
+
   async function deleteComerco(id: string) {
     if (!confirm("¿Seguro que querés eliminar este comercio? Se van a borrar también sus ofertas y vacantes.")) return;
     setDeletingId(id);
@@ -458,6 +469,16 @@ export default function AdminPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => togglePremium(com)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border ${
+                      com.isPremium
+                        ? "bg-yellow-900/30 text-yellow-400 border-yellow-800/50 hover:bg-yellow-900/60"
+                        : "bg-gray-800 text-gray-500 border-gray-700 hover:bg-gray-700"
+                    }`}
+                  >
+                    {com.isPremium ? "★ Premium" : "Free"}
+                  </button>
                   <button
                     onClick={() => openShareComercio(com)}
                     className="px-3 py-1.5 rounded-xl bg-green-900/30 text-green-400 border border-green-800/50 hover:bg-green-900/60 text-xs font-medium transition-colors flex items-center gap-1.5"

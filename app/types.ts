@@ -236,6 +236,7 @@ export interface Comercio {
   logo?: string | null;
   fotos?: string[];
   activo: boolean;
+  isPremium?: boolean;
   createdAt: string;
   offers?: ComercioOffer[];
   productos?: Producto[];
