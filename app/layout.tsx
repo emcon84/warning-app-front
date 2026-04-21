@@ -58,7 +58,6 @@ export const metadata: Metadata = {
     description:
       "Plomeros, electricistas, médicos IAPOS/PAMI, farmacias de turno y ofertas de supermercados en Reconquista, Santa Fe.",
   },
-  themeColor: "#111827",
 };
 
 export const viewport: Viewport = {
@@ -67,6 +66,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   interactiveWidget: "resizes-content",
+  themeColor: "#111827",
 };
 
 export default function RootLayout({

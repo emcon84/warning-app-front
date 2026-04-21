@@ -8,10 +8,11 @@ import { useTheme } from "../../contexts/ThemeContext";
 import Navbar from "../../components/Navbar";
 import { Comercio, ComercioOffer, Producto } from "../../types";
 import {
-  Store, ImageIcon, Tag, ShoppingBag,
+  Store, ImageIcon, Tag, ShoppingBag, QrCode,
   Plus, Trash2, ToggleLeft, ToggleRight,
   X, Check, Pencil, ExternalLink,
 } from "lucide-react";
+import KitDigitalizacion from "./KitDigitalizacion";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -37,7 +38,7 @@ function photoUrl(url: string | null | undefined): string | null {
   return url.startsWith("/uploads/") ? `${API}${url}` : url;
 }
 
-type Tab = "datos" | "fotos" | "ofertas" | "productos";
+type Tab = "datos" | "fotos" | "ofertas" | "productos" | "kit";
 
 interface Props {
   comercio: Comercio & { offers?: ComercioOffer[]; productos?: Producto[] };
@@ -575,8 +576,9 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "datos",     label: "Datos",     icon: <Store className="w-4 h-4" /> },
     { id: "fotos",     label: "Fotos",     icon: <ImageIcon className="w-4 h-4" /> },
-    { id: "productos", label: "Catálogo", icon: <ShoppingBag className="w-4 h-4" /> },
+    { id: "productos", label: "Catálogo",  icon: <ShoppingBag className="w-4 h-4" /> },
     { id: "ofertas",   label: "Ofertas",   icon: <Tag className="w-4 h-4" /> },
+    { id: "kit",       label: "Mi Kit",    icon: <QrCode className="w-4 h-4" /> },
   ];
 
   const existingFotos = comercio.fotos ?? [];
@@ -969,6 +971,18 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               ))
             )}
           </div>
+        )}
+
+        {/* ── Tab: Kit ───────────────────────────────────────────────── */}
+        {tab === "kit" && (
+          <KitDigitalizacion
+            comercio={comercio}
+            isDark={isDark}
+            cardBg={cardBg}
+            textPri={textPri}
+            textSec={textSec}
+            textMuted={textMuted}
+          />
         )}
 
         {/* ── Tab: Ofertas ───────────────────────────────────────────── */}
