@@ -283,7 +283,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2">
               <LandingThemeToggle />
               <Link
-                href="/app"
+                href="/oficios"
                 className="flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition-colors sm:text-sm sm:px-4 sm:py-2 sm:gap-1.5"
               >
                 Abrir app
@@ -452,7 +452,7 @@ export default function LandingPage() {
                   Notificaciones de respuesta
                 </div>
                 <Link
-                  href="/app"
+                  href="/oficios"
                   className="inline-flex items-center gap-2 mt-8 bg-indigo-500 hover:bg-indigo-400 text-white font-bold px-6 py-3 rounded-xl transition-colors"
                 >
                   Explorar profesionales
@@ -560,7 +560,7 @@ export default function LandingPage() {
               contratar profesionales de confianza.
             </p>
             <Link
-              href="/app"
+              href="/oficios"
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all hover:shadow-lg hover:shadow-blue-600/25"
             >
               Abrir Reportes Reconquista
@@ -582,7 +582,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="flex items-center gap-6 text-sm dark:text-gray-500 text-gray-500">
-              <Link href="/app" className="dark:hover:text-gray-300 hover:text-gray-700 transition-colors">
+              <Link href="/oficios" className="dark:hover:text-gray-300 hover:text-gray-700 transition-colors">
                 Abrir la app
               </Link>
               <Link href="/profesionales" className="dark:hover:text-gray-300 hover:text-gray-700 transition-colors">
