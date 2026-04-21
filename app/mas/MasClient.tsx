@@ -3,16 +3,16 @@
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
-import { Pill, ShoppingCart, Map, TriangleAlert, ChevronRight } from "lucide-react";
+import { Pill, Stethoscope, Map, TriangleAlert, ChevronRight } from "lucide-react";
 
 const ITEMS = [
   {
-    label: "Ofertas",
-    description: "Descuentos y promociones de supermercados locales",
-    Icon: ShoppingCart,
-    href: "/ofertas",
-    color: "text-orange-500",
-    iconBg: "bg-orange-500/10",
+    label: "Médicos",
+    description: "Encontra médicos y especialistas en Reconquista",
+    Icon: Stethoscope,
+    href: "/medicos",
+    color: "text-sky-500",
+    iconBg: "bg-sky-500/10",
   },
   {
     label: "Farmacias de turno",
