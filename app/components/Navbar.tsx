@@ -2,7 +2,7 @@
 
 import type { ComponentType } from "react";
 import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { SignInButton, UserButton, useUser, useAuth } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
@@ -49,6 +49,7 @@ function formatTime(dateStr: string): string {
 
 export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChange, sidebarDisabled }: NavbarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const { isDark, toggleTheme } = useTheme();
@@ -164,7 +165,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
           src="/icon.svg"
           className="w-7 h-7 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           alt="Reportes RQ"
-          onClick={() => router.push("/app")}
+          onClick={() => router.push("/")}
         />
 
         {/* Spacer mobile — empuja auth a la derecha cuando las pills están ocultas */}
@@ -172,22 +173,29 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
 
         {/* Pills de vista — ocultas en mobile, se muestran en el bottom nav */}
         <div className="hidden md:flex flex-1 items-center justify-center gap-1 overflow-x-auto" data-tour="view-pills">
-          {(["doctors", "reports", "farmacias", "ofertas"] as MapViewItem[]).map((view) => {
-            const { label, Icon } = VIEW_CONFIG[view];
+          {([
+            { key: "oficios",   label: "Oficios",   Icon: Wrench,       href: "/oficios",   active: () => pathname.startsWith("/oficios") || pathname.startsWith("/profesional") },
+            { key: "comercios", label: "Comercios", Icon: Store,        href: "/comercios", active: () => pathname.startsWith("/comercios") || pathname.startsWith("/comercio") },
+            { key: "ofertas",   label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",   active: () => pathname.startsWith("/ofertas") },
+            { key: "empleos",   label: "Empleos",   Icon: Briefcase,    href: "/empleos",   active: () => pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante") },
+            { key: "medicos",   label: "Médicos",   Icon: Stethoscope,  href: "/medicos",   active: () => pathname.startsWith("/medicos") || (pathname === "/app" && mapView === "doctors") },
+            { key: "farmacias", label: "Farmacias", Icon: Pill,         href: "/app?view=farmacias", active: () => pathname === "/app" && mapView === "farmacias", mapKey: "farmacias" as MapViewItem },
+            { key: "reportes",  label: "Reportes",  Icon: Megaphone,    href: "/app",       active: () => pathname === "/app" && mapView === "reports", mapKey: "reports" as MapViewItem },
+          ] as const).map(({ key, label, Icon, href, active, mapKey }) => {
+            const isActive = active();
             const handleClick = () => {
-              if (view === "ofertas") return router.push("/ofertas");
-              if (view === "doctors") return router.push("/medicos");
-              if (onMapViewChange) return onMapViewChange(view);
-              router.push(`/app?view=${view}`);
+              if (mapKey && onMapViewChange && pathname === "/app") {
+                onMapViewChange(mapKey);
+              } else {
+                router.push(href);
+              }
             };
             return (
               <button
-                key={view}
+                key={key}
                 onClick={handleClick}
                 className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
-                  mapView === view
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  isActive ? "bg-green-500 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -195,27 +203,6 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               </button>
             );
           })}
-          <button
-            onClick={() => router.push("/oficios")}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 bg-gray-700 text-gray-300 hover:bg-gray-600"
-          >
-            <Wrench className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="hidden sm:inline">Oficios</span>
-          </button>
-          <button
-            onClick={() => router.push("/comercios")}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 bg-gray-700 text-gray-300 hover:bg-gray-600"
-          >
-            <Store className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="hidden sm:inline">Comercios</span>
-          </button>
-          <button
-            onClick={() => router.push("/empleos")}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 bg-gray-700 text-gray-300 hover:bg-gray-600"
-          >
-            <Briefcase className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="hidden sm:inline">Empleos</span>
-          </button>
         </div>
 
         {/* Auth */}
