@@ -26,42 +26,42 @@ const BENEFICIOS = [
     icon: Smartphone,
     title: "Vidriera digital gratis",
     desc: "Tu perfil online con foto, descripcion, horario y toda la info de tu negocio. Sin costos de hosting ni diseno.",
-    color: "text-blue-400",
+    color: "text-blue-600 dark:text-blue-400",
     bg: "bg-blue-500/10 border-blue-500/20",
   },
   {
     icon: Package,
     title: "Catalogo de productos",
     desc: "Sube tus productos con foto, descripcion y precio. Tus clientes ven tu stock actualizado desde el celular.",
-    color: "text-amber-400",
+    color: "text-amber-600 dark:text-amber-400",
     bg: "bg-amber-500/10 border-amber-500/20",
   },
   {
     icon: MessageCircle,
     title: "Contacto directo por WhatsApp",
     desc: "Un boton de WhatsApp en tu perfil para que los clientes te escriban directamente. Sin intermediarios.",
-    color: "text-green-400",
+    color: "text-green-600 dark:text-green-400",
     bg: "bg-green-500/10 border-green-500/20",
   },
   {
     icon: QrCode,
     title: "Kit QR para tu vidriera",
     desc: "Descarga un cartel A5 con QR listo para imprimir. Pegalo en la vidriera y tus clientes escanean para ver tu catalogo.",
-    color: "text-purple-400",
+    color: "text-purple-600 dark:text-purple-400",
     bg: "bg-purple-500/10 border-purple-500/20",
   },
   {
     icon: Users,
     title: "Comunidad de Reconquista",
     desc: "Llega a cientos de vecinos de Reconquista que usan la app a diario para encontrar comercios locales.",
-    color: "text-cyan-400",
+    color: "text-cyan-600 dark:text-cyan-400",
     bg: "bg-cyan-500/10 border-cyan-500/20",
   },
   {
     icon: BarChart3,
     title: "Destacados y visibilidad",
     desc: "Los comercios mas activos aparecen primero en los destacados. El plan premium te garantiza el primer lugar.",
-    color: "text-orange-400",
+    color: "text-orange-600 dark:text-orange-400",
     bg: "bg-orange-500/10 border-orange-500/20",
   },
 ];
@@ -86,15 +86,15 @@ const STEPS = [
 
 export default function ParaComerciosPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white">
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-800/60 bg-gray-950/80 backdrop-blur-md">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-200/60 dark:border-gray-800/60 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.svg" alt="Logo" className="w-8 h-8 rounded-xl" />
-            <span className="font-black text-white text-sm hidden sm:block">Reportes Reconquista</span>
+            <span className="font-black text-gray-900 dark:text-white text-sm hidden sm:block">Reportes Reconquista</span>
           </Link>
           <div className="flex items-center gap-3">
             <LandingThemeToggle />
@@ -110,19 +110,19 @@ export default function ParaComerciosPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(245,158,11,0.08)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(245,158,11,0.06)_0%,_transparent_60%)]" />
         <div className="max-w-6xl mx-auto px-4 py-16 lg:py-24 flex flex-col lg:flex-row items-center gap-14 lg:gap-20">
 
           {/* Text */}
           <div className="flex-1 max-w-lg text-center lg:text-left">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 mb-5">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 mb-5">
               Para comerciantes de Reconquista
             </span>
-            <h1 className="text-4xl sm:text-5xl font-black text-white leading-[1.1] mb-5 tracking-tight">
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white leading-[1.1] mb-5 tracking-tight">
               Tu negocio,{" "}
-              <span className="text-amber-400">visible para toda la ciudad</span>
+              <span className="text-amber-500 dark:text-amber-400">visible para toda la ciudad</span>
             </h1>
-            <p className="text-gray-400 text-lg leading-relaxed mb-8">
+            <p className="text-gray-500 dark:text-gray-400 text-lg leading-relaxed mb-8">
               Registra tu comercio en minutos y tene tu vidriera digital gratuita. Catalogo de productos, contacto por WhatsApp y un cartel QR listo para imprimir.
             </p>
             <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
@@ -135,15 +135,15 @@ export default function ParaComerciosPage() {
               </Link>
               <Link
                 href="/comercios"
-                className="inline-flex items-center gap-2 px-7 py-4 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white font-semibold rounded-2xl transition-colors text-sm"
+                className="inline-flex items-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-2xl transition-colors text-sm"
               >
                 Ver directorio
               </Link>
             </div>
-            <p className="text-xs text-gray-600 mt-4">100% gratuito para empezar. Sin tarjeta de credito.</p>
+            <p className="text-xs text-gray-400 dark:text-gray-600 mt-4">100% gratuito para empezar. Sin tarjeta de credito.</p>
           </div>
 
-          {/* Mockup vidriera */}
+          {/* Mockup vidriera — stays dark (phone screen) */}
           <div className="relative shrink-0 order-first lg:order-last">
             <div className="absolute -inset-8 bg-amber-500/8 rounded-full blur-3xl" />
             <div className="relative w-64 rounded-[44px] border-[3px] border-gray-700 bg-gray-900 overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.7)]">
@@ -229,7 +229,7 @@ export default function ParaComerciosPage() {
       </section>
 
       {/* Stats */}
-      <section className="border-y border-gray-800/60 bg-gray-900/30">
+      <section className="border-y border-gray-200/60 dark:border-gray-800/60 bg-gray-50 dark:bg-gray-900/30">
         <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-3 gap-4 text-center">
           {[
             { value: "500+", label: "Vecinos en la app" },
@@ -237,7 +237,7 @@ export default function ParaComerciosPage() {
             { value: "5 min", label: "Para registrarte" },
           ].map((s, i) => (
             <div key={i}>
-              <p className="text-3xl sm:text-4xl font-black text-amber-400">{s.value}</p>
+              <p className="text-3xl sm:text-4xl font-black text-amber-500 dark:text-amber-400">{s.value}</p>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">{s.label}</p>
             </div>
           ))}
@@ -247,9 +247,9 @@ export default function ParaComerciosPage() {
       {/* Beneficios */}
       <section className="max-w-6xl mx-auto px-4 py-20">
         <div className="text-center mb-12">
-          <p className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-3">Por que registrarte</p>
-          <h2 className="text-3xl sm:text-4xl font-black text-white">Todo lo que tenes gratis</h2>
-          <p className="text-gray-400 mt-4 max-w-xl mx-auto">Sin costos ocultos, sin contratos. Registras tu comercio y ya estas online.</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3">Por que registrarte</p>
+          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">Todo lo que tenes gratis</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-4 max-w-xl mx-auto">Sin costos ocultos, sin contratos. Registras tu comercio y ya estas online.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {BENEFICIOS.map((b) => (
@@ -257,29 +257,29 @@ export default function ParaComerciosPage() {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${b.bg}`}>
                 <b.icon className={`w-5 h-5 ${b.color}`} />
               </div>
-              <h3 className="font-bold text-white mb-2 text-sm">{b.title}</h3>
-              <p className="text-gray-400 text-xs leading-relaxed">{b.desc}</p>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-sm">{b.title}</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">{b.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Pasos */}
-      <section className="border-t border-gray-800/60 bg-gray-900/20">
+      <section className="border-t border-gray-200/60 dark:border-gray-800/60 bg-gray-50 dark:bg-gray-900/20">
         <div className="max-w-3xl mx-auto px-4 py-20">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-black text-white">Como empezar</h2>
-            <p className="text-gray-400 mt-4">Tres pasos y ya estas en el directorio digital de Reconquista.</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">Como empezar</h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-4">Tres pasos y ya estas en el directorio digital de Reconquista.</p>
           </div>
           <div className="space-y-4">
             {STEPS.map((s) => (
-              <div key={s.n} className="flex items-start gap-5 p-6 bg-gray-900 border border-gray-800 rounded-2xl">
+              <div key={s.n} className="flex items-start gap-5 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0">
-                  <span className="text-amber-400 font-black text-sm">{s.n}</span>
+                  <span className="text-amber-500 dark:text-amber-400 font-black text-sm">{s.n}</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-white mb-1">{s.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{s.desc}</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-1">{s.title}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{s.desc}</p>
                 </div>
               </div>
             ))}
@@ -289,8 +289,8 @@ export default function ParaComerciosPage() {
 
       {/* CTA final */}
       <section className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">Listo para sumarte?</h2>
-        <p className="text-gray-400 mb-8 max-w-md mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-4">Listo para sumarte?</h2>
+        <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto">
           Cientos de vecinos de Reconquista usan la app todos los dias. Tu negocio tiene que estar ahi.
         </p>
         <Link
@@ -300,21 +300,21 @@ export default function ParaComerciosPage() {
           Registrar mi comercio gratis
           <ChevronRight className="w-5 h-5" />
         </Link>
-        <p className="text-xs text-gray-600 mt-4">Sin tarjeta de credito. Sin contratos. 100% gratuito.</p>
+        <p className="text-xs text-gray-400 dark:text-gray-600 mt-4">Sin tarjeta de credito. Sin contratos. 100% gratuito.</p>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800/60">
+      <footer className="border-t border-gray-200/60 dark:border-gray-800/60">
         <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icon.svg" alt="Logo" className="w-7 h-7 rounded-xl" />
-            <span className="text-sm font-bold text-gray-400">Reportes Reconquista</span>
+            <span className="text-sm font-bold text-gray-500 dark:text-gray-400">Reportes Reconquista</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">Home</Link>
-            <Link href="/comercios" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">Ver comercios</Link>
-            <Link href="/comercio/nuevo" className="text-xs text-amber-500 hover:text-amber-400 transition-colors font-semibold">Registrarme</Link>
+            <Link href="/" className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Home</Link>
+            <Link href="/comercios" className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Ver comercios</Link>
+            <Link href="/comercio/nuevo" className="text-xs text-amber-600 dark:text-amber-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors font-semibold">Registrarme</Link>
           </div>
         </div>
       </footer>

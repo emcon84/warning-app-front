@@ -6,10 +6,10 @@ import {
   AlertTriangle, Wrench, GraduationCap, Store, Stethoscope,
   Pill, Star, MapPin, Phone, Wifi, Battery, Tag,
   ChevronLeft, ChevronRight, Clock, MessageCircle, Package,
-  ShoppingCart, CheckCircle,
+  ShoppingCart,
 } from "lucide-react";
 
-// ─── Phone frame primitives ───────────────────────────────────
+// ─── Phone frame (always dark — es una pantalla) ──────────────
 
 function StatusBar() {
   return (
@@ -35,22 +35,18 @@ function PhoneFrame({ children, glow }: { children: React.ReactNode; glow: strin
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full blur-3xl opacity-25"
         style={{ background: glow, transition: "background 0.7s ease" }}
       />
-      <div className="relative h-full rounded-[40px] border-[3px] border-gray-700 bg-gray-900 overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.6)]">
+      <div className="relative h-full rounded-[40px] border-[3px] border-gray-700 bg-gray-900 overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[52px] h-[16px] bg-black rounded-b-2xl z-20" />
         <div className="h-full flex flex-col">
-          <div className="pt-5">
-            <StatusBar />
-          </div>
-          <div className="flex-1 overflow-hidden">
-            {children}
-          </div>
+          <div className="pt-5"><StatusBar /></div>
+          <div className="flex-1 overflow-hidden">{children}</div>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Slide mockups ────────────────────────────────────────────
+// ─── Mockups ──────────────────────────────────────────────────
 
 function ReportesMockup() {
   const items = [
@@ -184,7 +180,7 @@ function ComerciosMockup() {
             <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-black" style={{ background: `${f.color}25`, color: f.color }}>
               {f.name[0]}
             </div>
-            <span className="text-[7px] text-gray-500 text-center leading-tight line-clamp-2">{f.name.split(" ")[0]}</span>
+            <span className="text-[7px] text-gray-500 text-center leading-tight">{f.name.split(" ")[0]}</span>
           </div>
         ))}
       </div>
@@ -200,9 +196,7 @@ function ComerciosMockup() {
               <p className="text-amber-400 text-[8px]">{c.rubro}</p>
             </div>
           </div>
-          {c.premium && (
-            <span className="text-[7px] bg-amber-500 text-white rounded px-1.5 py-0.5 font-bold shrink-0">PRO</span>
-          )}
+          {c.premium && <span className="text-[7px] bg-amber-500 text-white rounded px-1.5 py-0.5 font-bold shrink-0">PRO</span>}
         </div>
       ))}
     </div>
@@ -219,9 +213,7 @@ function MedicosMockup() {
     <div className="px-3 py-2">
       <div className="flex gap-1.5 mb-3">
         {["IAPOS", "PAMI", "Todas"].map((pill, i) => (
-          <div key={i} className={`px-2.5 py-1 rounded-full text-[8px] font-semibold ${
-            i === 0 ? "bg-cyan-500/20 text-cyan-400" : "bg-gray-800 text-gray-500"
-          }`}>
+          <div key={i} className={`px-2.5 py-1 rounded-full text-[8px] font-semibold ${i === 0 ? "bg-cyan-500/20 text-cyan-400" : "bg-gray-800 text-gray-500"}`}>
             {pill}
           </div>
         ))}
@@ -235,9 +227,7 @@ function MedicosMockup() {
             <p className="text-white text-[9px] font-semibold">{d.name}</p>
             <p className="text-cyan-400 text-[8px]">{d.spec}</p>
           </div>
-          <span className={`text-[7px] px-1.5 py-0.5 rounded-full font-semibold shrink-0 ${
-            d.os === "IAPOS" ? "bg-blue-500/20 text-blue-400" : "bg-emerald-500/20 text-emerald-400"
-          }`}>{d.os}</span>
+          <span className={`text-[7px] px-1.5 py-0.5 rounded-full font-semibold shrink-0 ${d.os === "IAPOS" ? "bg-blue-500/20 text-blue-400" : "bg-emerald-500/20 text-emerald-400"}`}>{d.os}</span>
         </div>
       ))}
     </div>
@@ -248,7 +238,7 @@ function FarmaciasMockup() {
   return (
     <div className="px-3 py-2">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-2 h-2 rounded-full bg-green-400" style={{ animation: "pulse 2s infinite" }} />
+        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
         <span className="text-green-400 text-[9px] font-semibold">Turno activo ahora</span>
       </div>
       <div className="bg-gray-800/80 rounded-xl p-3 mb-2">
@@ -262,18 +252,9 @@ function FarmaciasMockup() {
           </div>
         </div>
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <MapPin className="w-2.5 h-2.5 text-gray-500 shrink-0" />
-            <span className="text-gray-400 text-[8px]">Av. Iriondo 1234, Centro</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Phone className="w-2.5 h-2.5 text-gray-500 shrink-0" />
-            <span className="text-gray-400 text-[8px]">0482-12345</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-2.5 h-2.5 text-gray-500 shrink-0" />
-            <span className="text-gray-400 text-[8px]">Hasta las 8:00 hs</span>
-          </div>
+          <div className="flex items-center gap-1.5"><MapPin className="w-2.5 h-2.5 text-gray-500 shrink-0" /><span className="text-gray-400 text-[8px]">Av. Iriondo 1234, Centro</span></div>
+          <div className="flex items-center gap-1.5"><Phone className="w-2.5 h-2.5 text-gray-500 shrink-0" /><span className="text-gray-400 text-[8px]">0482-12345</span></div>
+          <div className="flex items-center gap-1.5"><Clock className="w-2.5 h-2.5 text-gray-500 shrink-0" /><span className="text-gray-400 text-[8px]">Hasta las 8:00 hs</span></div>
         </div>
       </div>
       <div className="bg-gray-800/40 rounded-xl p-2 border border-gray-700/50">
@@ -287,7 +268,7 @@ function OfertasMockup() {
   const ofertas = [
     { super: "Vital", producto: "Aceite girasol 1.5L", precio: "$2.490", tag: "20% OFF" },
     { super: "Jumbo", producto: "Yerba mate 1kg", precio: "$3.200", tag: "2x1" },
-    { super: "Carrefour", producto: "Leche entera 1L x6", precio: "$4.890", tag: "-15%" },
+    { super: "Carrefour", producto: "Leche entera x6", precio: "$4.890", tag: "-15%" },
   ];
   return (
     <div className="px-3 py-2">
@@ -314,7 +295,7 @@ function OfertasMockup() {
   );
 }
 
-// ─── Slide config ─────────────────────────────────────────────
+// ─── Slides config ─────────────────────────────────────────────
 
 type Slide = {
   id: string;
@@ -330,90 +311,13 @@ type Slide = {
 };
 
 const SLIDES: Slide[] = [
-  {
-    id: "reportes",
-    badge: "Reportes ciudadanos",
-    badgeCls: "bg-orange-500/15 text-orange-400 border-orange-500/30",
-    headline: "Mantenete informado",
-    headlineSuffix: "de tu barrio",
-    accentCls: "text-orange-400",
-    sub: "Reporta situaciones en la via publica de Reconquista. Los vecinos y el municipio lo ven en tiempo real.",
-    cta: { label: "Ver reportes", href: "/app" },
-    glow: "#f97316",
-    dotActiveCls: "bg-orange-400",
-  },
-  {
-    id: "oficios",
-    badge: "Oficios",
-    badgeCls: "bg-purple-500/15 text-purple-400 border-purple-500/30",
-    headline: "El profesional que necesitas,",
-    headlineSuffix: "en tu ciudad",
-    accentCls: "text-purple-400",
-    sub: "Plomeros, electricistas, albaniles y mas oficios de Reconquista. Perfil verificado, contacto directo.",
-    cta: { label: "Ver oficios", href: "/oficios" },
-    glow: "#a855f7",
-    dotActiveCls: "bg-purple-400",
-  },
-  {
-    id: "profesionales",
-    badge: "Profesionales",
-    badgeCls: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-    headline: "Contadores, abogados y mas,",
-    headlineSuffix: "sin intermediarios",
-    accentCls: "text-blue-400",
-    sub: "Directorio de profesionales de Reconquista con contacto directo por chat. Sin comisiones.",
-    cta: { label: "Ver profesionales", href: "/oficios" },
-    glow: "#3b82f6",
-    dotActiveCls: "bg-blue-400",
-  },
-  {
-    id: "comercios",
-    badge: "Comercios locales",
-    badgeCls: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-    headline: "Los negocios de Reconquista",
-    headlineSuffix: "en tu bolsillo",
-    accentCls: "text-amber-400",
-    sub: "Encontra comercios locales, sus productos y ofertas. Contacto directo por WhatsApp.",
-    cta: { label: "Ver comercios", href: "/comercios" },
-    glow: "#f59e0b",
-    dotActiveCls: "bg-amber-400",
-  },
-  {
-    id: "medicos",
-    badge: "Medicos IAPOS y PAMI",
-    badgeCls: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
-    headline: "Tu medico de cabecera",
-    headlineSuffix: "a un toque",
-    accentCls: "text-cyan-400",
-    sub: "Directorio completo de medicos en Reconquista con especialidad, obra social y ubicacion.",
-    cta: { label: "Ver medicos", href: "/medicos" },
-    glow: "#06b6d4",
-    dotActiveCls: "bg-cyan-400",
-  },
-  {
-    id: "farmacias",
-    badge: "Farmacias de turno",
-    badgeCls: "bg-green-500/15 text-green-400 border-green-500/30",
-    headline: "Que farmacia esta",
-    headlineSuffix: "de turno hoy",
-    accentCls: "text-green-400",
-    sub: "Sabe en segundos que farmacia de Reconquista esta disponible. Informacion actualizada diariamente.",
-    cta: { label: "Ver farmacias", href: "/farmacias" },
-    glow: "#22c55e",
-    dotActiveCls: "bg-green-400",
-  },
-  {
-    id: "ofertas",
-    badge: "Ofertas de supermercados",
-    badgeCls: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-    headline: "Las mejores ofertas",
-    headlineSuffix: "de Reconquista",
-    accentCls: "text-yellow-400",
-    sub: "Ofertas y promociones de los supermercados de Reconquista en un solo lugar. Ahorras en tus compras.",
-    cta: { label: "Ver ofertas", href: "/ofertas" },
-    glow: "#eab308",
-    dotActiveCls: "bg-yellow-400",
-  },
+  { id: "reportes", badge: "Reportes ciudadanos", badgeCls: "bg-orange-500/15 text-orange-500 dark:text-orange-400 border-orange-500/30", headline: "Mantenete informado", headlineSuffix: "de tu barrio", accentCls: "text-orange-500 dark:text-orange-400", sub: "Reporta situaciones en la via publica de Reconquista. Los vecinos y el municipio lo ven en tiempo real.", cta: { label: "Ver reportes", href: "/app" }, glow: "#f97316", dotActiveCls: "bg-orange-500 dark:bg-orange-400" },
+  { id: "oficios", badge: "Oficios", badgeCls: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30", headline: "El profesional que necesitas,", headlineSuffix: "en tu ciudad", accentCls: "text-purple-600 dark:text-purple-400", sub: "Plomeros, electricistas, albaniles y mas oficios de Reconquista. Perfil verificado y contacto directo.", cta: { label: "Ver oficios", href: "/oficios" }, glow: "#a855f7", dotActiveCls: "bg-purple-600 dark:bg-purple-400" },
+  { id: "profesionales", badge: "Profesionales", badgeCls: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30", headline: "Contadores, abogados y mas,", headlineSuffix: "sin intermediarios", accentCls: "text-blue-600 dark:text-blue-400", sub: "Directorio de profesionales de Reconquista con contacto directo por chat. Sin comisiones.", cta: { label: "Ver profesionales", href: "/oficios" }, glow: "#3b82f6", dotActiveCls: "bg-blue-600 dark:bg-blue-400" },
+  { id: "comercios", badge: "Comercios locales", badgeCls: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30", headline: "Los negocios de Reconquista", headlineSuffix: "en tu bolsillo", accentCls: "text-amber-600 dark:text-amber-400", sub: "Encontra comercios locales, sus productos y ofertas. Contacto directo por WhatsApp.", cta: { label: "Ver comercios", href: "/comercios" }, glow: "#f59e0b", dotActiveCls: "bg-amber-600 dark:bg-amber-400" },
+  { id: "medicos", badge: "Medicos IAPOS y PAMI", badgeCls: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30", headline: "Tu medico de cabecera", headlineSuffix: "a un toque", accentCls: "text-cyan-600 dark:text-cyan-400", sub: "Directorio completo de medicos en Reconquista con especialidad, obra social y ubicacion.", cta: { label: "Ver medicos", href: "/medicos" }, glow: "#06b6d4", dotActiveCls: "bg-cyan-600 dark:bg-cyan-400" },
+  { id: "farmacias", badge: "Farmacias de turno", badgeCls: "bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30", headline: "Que farmacia esta", headlineSuffix: "de turno hoy", accentCls: "text-green-600 dark:text-green-400", sub: "Sabe en segundos que farmacia de Reconquista esta disponible. Informacion actualizada diariamente.", cta: { label: "Ver farmacias", href: "/farmacias" }, glow: "#22c55e", dotActiveCls: "bg-green-600 dark:bg-green-400" },
+  { id: "ofertas", badge: "Ofertas de supermercados", badgeCls: "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 border-yellow-500/30", headline: "Las mejores ofertas", headlineSuffix: "de Reconquista", accentCls: "text-yellow-600 dark:text-yellow-400", sub: "Ofertas y promociones de los supermercados de Reconquista en un solo lugar. Ahorra en tus compras.", cta: { label: "Ver ofertas", href: "/ofertas" }, glow: "#eab308", dotActiveCls: "bg-yellow-600 dark:bg-yellow-400" },
 ];
 
 function getMockup(id: string) {
@@ -429,21 +333,17 @@ function getMockup(id: string) {
   }
 }
 
-// ─── Main component ───────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────
 
 export default function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [visible, setVisible] = useState(true);
   const [paused, setPaused] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const touchStartX = useRef(0);
 
   const goTo = useCallback((idx: number) => {
     setVisible(false);
-    setTimeout(() => {
-      setCurrent(idx);
-      setVisible(true);
-    }, 220);
+    setTimeout(() => { setCurrent(idx); setVisible(true); }, 220);
   }, []);
 
   const next = useCallback(() => goTo((current + 1) % SLIDES.length), [current, goTo]);
@@ -451,17 +351,9 @@ export default function HeroCarousel() {
 
   useEffect(() => {
     if (paused) return;
-    intervalRef.current = setInterval(next, 5000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    const id = setInterval(next, 5000);
+    return () => clearInterval(id);
   }, [next, paused]);
-
-  function handleTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
-  }
-  function handleTouchEnd(e: React.TouchEvent) {
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
-  }
 
   const slide = SLIDES[current];
   const fadeStyle = { opacity: visible ? 1 : 0, transition: "opacity 0.22s ease" };
@@ -471,60 +363,40 @@ export default function HeroCarousel() {
       className="relative flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 py-16 lg:py-24 px-4"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+      onTouchEnd={(e) => { const d = touchStartX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 50) d > 0 ? next() : prev(); }}
     >
       {/* Text */}
       <div className="flex-1 max-w-lg text-center lg:text-left order-2 lg:order-1" style={fadeStyle}>
         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border mb-5 ${slide.badgeCls}`}>
           {slide.badge}
         </span>
-        <h1 className="text-4xl sm:text-5xl font-black text-white leading-[1.1] mb-5 tracking-tight">
+        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white leading-[1.1] mb-5 tracking-tight">
           {slide.headline}{" "}
           <span className={slide.accentCls}>{slide.headlineSuffix}</span>
         </h1>
-        <p className="text-gray-400 text-lg leading-relaxed mb-8">
+        <p className="text-gray-500 dark:text-gray-400 text-lg leading-relaxed mb-8">
           {slide.sub}
         </p>
         <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
-          <Link
-            href={slide.cta.href}
-            className="inline-flex items-center gap-2 px-7 py-3.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold rounded-2xl transition-colors text-sm"
-          >
+          <Link href={slide.cta.href} className="inline-flex items-center gap-2 px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-colors text-sm">
             {slide.cta.label}
           </Link>
-          <Link
-            href="/app"
-            className="inline-flex items-center gap-2 px-7 py-3.5 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-white font-semibold rounded-2xl transition-colors text-sm"
-          >
+          <Link href="/app" className="inline-flex items-center gap-2 px-7 py-3.5 border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-2xl transition-colors text-sm">
             Abrir la app
           </Link>
         </div>
         {/* Dots + arrows */}
         <div className="flex items-center gap-3 mt-10 justify-center lg:justify-start">
-          <button
-            onClick={prev}
-            className="w-8 h-8 rounded-full border border-gray-700 hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 hover:text-white"
-          >
+          <button onClick={prev} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-1.5">
             {SLIDES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                className={`rounded-full transition-all duration-300 ${
-                  i === current
-                    ? `w-6 h-2 ${slide.dotActiveCls}`
-                    : "w-2 h-2 bg-gray-700 hover:bg-gray-500"
-                }`}
-              />
+              <button key={i} onClick={() => goTo(i)} className={`rounded-full transition-all duration-300 ${i === current ? `w-6 h-2 ${slide.dotActiveCls}` : "w-2 h-2 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-500"}`} />
             ))}
           </div>
-          <button
-            onClick={next}
-            className="w-8 h-8 rounded-full border border-gray-700 hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 hover:text-white"
-          >
+          <button onClick={next} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -532,9 +404,7 @@ export default function HeroCarousel() {
 
       {/* Phone */}
       <div className="order-1 lg:order-2 shrink-0" style={fadeStyle}>
-        <PhoneFrame glow={slide.glow}>
-          {getMockup(slide.id)}
-        </PhoneFrame>
+        <PhoneFrame glow={slide.glow}>{getMockup(slide.id)}</PhoneFrame>
       </div>
     </div>
   );

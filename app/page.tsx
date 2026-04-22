@@ -130,7 +130,7 @@ const FEATURES = [
     icon: AlertTriangle,
     title: "Reportes ciudadanos",
     description: "Reporta baches, inundaciones, alumbrado roto y situaciones urbanas. Quedan geolocalizados y visibles para todos los vecinos.",
-    color: "text-orange-400",
+    color: "text-orange-500 dark:text-orange-400",
     bg: "bg-orange-500/10 border-orange-500/20",
     href: "/app",
   },
@@ -138,7 +138,7 @@ const FEATURES = [
     icon: Stethoscope,
     title: "Medicos IAPOS y PAMI",
     description: "Directorio completo de medicos en Reconquista con especialidad, obra social y ubicacion en el mapa.",
-    color: "text-cyan-400",
+    color: "text-cyan-600 dark:text-cyan-400",
     bg: "bg-cyan-500/10 border-cyan-500/20",
     href: "/medicos",
   },
@@ -146,7 +146,7 @@ const FEATURES = [
     icon: Pill,
     title: "Farmacias de turno",
     description: "Sabe cuál farmacia esta de turno hoy en Reconquista. Actualizado diariamente con direccion y telefono.",
-    color: "text-green-400",
+    color: "text-green-600 dark:text-green-400",
     bg: "bg-green-500/10 border-green-500/20",
     href: "/farmacias",
   },
@@ -154,7 +154,7 @@ const FEATURES = [
     icon: Wrench,
     title: "Oficios y Profesionales",
     description: "Plomeros, electricistas, albaniles, contadores, abogados y mas. Contacto directo por chat en tiempo real.",
-    color: "text-purple-400",
+    color: "text-purple-600 dark:text-purple-400",
     bg: "bg-purple-500/10 border-purple-500/20",
     href: "/oficios",
   },
@@ -162,7 +162,7 @@ const FEATURES = [
     icon: Store,
     title: "Comercios locales",
     description: "El directorio de negocios de Reconquista. Encontra lo que necesitas y contacta directamente por WhatsApp.",
-    color: "text-amber-400",
+    color: "text-amber-600 dark:text-amber-400",
     bg: "bg-amber-500/10 border-amber-500/20",
     href: "/comercios",
   },
@@ -170,7 +170,7 @@ const FEATURES = [
     icon: ShoppingCart,
     title: "Ofertas de supermercados",
     description: "Las mejores ofertas y promociones de los supermercados de Reconquista actualizadas por la comunidad.",
-    color: "text-yellow-400",
+    color: "text-yellow-600 dark:text-yellow-400",
     bg: "bg-yellow-500/10 border-yellow-500/20",
     href: "/ofertas",
   },
@@ -206,15 +206,15 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-white">
 
         {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-800/60 bg-gray-950/80 backdrop-blur-md">
+        <header className="fixed top-0 left-0 right-0 z-50 border-b border-gray-200/60 dark:border-gray-800/60 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icon.svg" alt="Logo" className="w-8 h-8 rounded-xl" />
-              <span className="font-black text-white text-sm hidden sm:block">Reportes Reconquista</span>
+              <span className="font-black text-gray-900 dark:text-white text-sm hidden sm:block">Reportes Reconquista</span>
             </Link>
             <div className="flex items-center gap-3">
               <LandingThemeToggle />
@@ -231,14 +231,14 @@ export default function Home() {
 
         {/* Hero */}
         <section className="relative overflow-hidden pt-16">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(99,102,241,0.08)_0%,_transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(99,102,241,0.06)_0%,_transparent_60%)]" />
           <div className="max-w-6xl mx-auto">
             <HeroCarousel />
           </div>
         </section>
 
         {/* Stats */}
-        <section className="border-y border-gray-800/60 bg-gray-900/30">
+        <section className="border-y border-gray-200/60 dark:border-gray-800/60 bg-gray-50 dark:bg-gray-900/30">
           <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-3 gap-4 sm:gap-8 text-center">
             {[
               { value: "500+", label: "Vecinos activos" },
@@ -246,7 +246,7 @@ export default function Home() {
               { value: "80+", label: "Profesionales" },
             ].map((s, i) => (
               <div key={i}>
-                <p className="text-3xl sm:text-4xl font-black text-white">{s.value}</p>
+                <p className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">{s.value}</p>
                 <p className="text-xs sm:text-sm text-gray-500 mt-1">{s.label}</p>
               </div>
             ))}
@@ -256,9 +256,9 @@ export default function Home() {
         {/* Features */}
         <section className="max-w-6xl mx-auto px-4 py-20">
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-3">Todo en un solo lugar</p>
-            <h2 className="text-3xl sm:text-4xl font-black text-white">La app que Reconquista necesitaba</h2>
-            <p className="text-gray-400 mt-4 max-w-xl mx-auto">Seis herramientas esenciales para el dia a dia de los vecinos de Reconquista, Santa Fe.</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-3">Todo en un solo lugar</p>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">La app que Reconquista necesitaba</h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-4 max-w-xl mx-auto">Seis herramientas esenciales para el dia a dia de los vecinos de Reconquista, Santa Fe.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {FEATURES.map((f) => (
@@ -270,8 +270,8 @@ export default function Home() {
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${f.bg}`}>
                   <f.icon className={`w-5 h-5 ${f.color}`} />
                 </div>
-                <h3 className="font-bold text-white mb-2 text-sm">{f.title}</h3>
-                <p className="text-gray-400 text-xs leading-relaxed">{f.description}</p>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-sm">{f.title}</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">{f.description}</p>
                 <ChevronRight className={`w-4 h-4 ${f.color} absolute bottom-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity`} />
               </Link>
             ))}
@@ -279,19 +279,19 @@ export default function Home() {
         </section>
 
         {/* Commerce CTA */}
-        <section className="border-t border-gray-800/60 bg-gradient-to-br from-amber-950/30 to-gray-950">
+        <section className="border-t border-gray-200/60 dark:border-gray-800/60 bg-gradient-to-br from-amber-50 dark:from-amber-950/30 to-white dark:to-gray-950">
           <div className="max-w-6xl mx-auto px-4 py-20">
             <div className="flex flex-col lg:flex-row items-center gap-12">
               {/* Text */}
               <div className="flex-1 max-w-lg">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 mb-5">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 mb-5">
                   Para comerciantes
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-5">
+                <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white leading-tight mb-5">
                   Tu negocio visible para{" "}
-                  <span className="text-amber-400">toda la ciudad</span>
+                  <span className="text-amber-500 dark:text-amber-400">toda la ciudad</span>
                 </h2>
-                <p className="text-gray-400 leading-relaxed mb-6">
+                <p className="text-gray-500 dark:text-gray-400 leading-relaxed mb-6">
                   Registra tu comercio en minutos y tene tu vidriera digital gratuita. Foto, descripcion, catalogo de productos, horario y contacto directo por WhatsApp.
                 </p>
                 <ul className="space-y-2 mb-8">
@@ -301,9 +301,9 @@ export default function Home() {
                     "Aparece en el directorio de comercios de Reconquista",
                     "Kit de QR imprimible para tu vidriera",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
                       <div className="w-4 h-4 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
                       </div>
                       {item}
                     </li>
@@ -318,18 +318,17 @@ export default function Home() {
                   </Link>
                   <Link
                     href="/para-comercios"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-amber-500/40 text-amber-400 hover:border-amber-400 font-semibold rounded-2xl transition-colors text-sm"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:border-amber-500 font-semibold rounded-2xl transition-colors text-sm"
                   >
                     Saber mas
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
-              {/* Mini mockup vidriera */}
+              {/* Mini mockup vidriera — stays dark (phone screen) */}
               <div className="relative shrink-0">
                 <div className="absolute inset-0 bg-amber-500/10 rounded-3xl blur-3xl" />
                 <div className="relative w-72 bg-gray-900 border border-gray-700 rounded-3xl overflow-hidden shadow-2xl">
-                  {/* Header comercio */}
                   <div className="h-24 bg-gradient-to-br from-amber-900/60 to-gray-900 flex items-end p-4">
                     <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 flex items-center justify-center">
                       <Store className="w-7 h-7 text-amber-400" />
@@ -340,7 +339,6 @@ export default function Home() {
                     <p className="text-amber-400 text-xs mt-0.5">Ferreteria · Centro</p>
                     <p className="text-gray-500 text-xs mt-2 leading-relaxed">Todo en herramientas, materiales y accesorios para tu hogar y obra.</p>
                   </div>
-                  {/* Productos */}
                   <div className="px-4 pb-4">
                     <p className="text-gray-500 text-[10px] font-semibold uppercase tracking-wide mb-2">Catalogo</p>
                     <div className="grid grid-cols-3 gap-2">
@@ -383,33 +381,53 @@ export default function Home() {
         {/* FAQ */}
         <section className="max-w-3xl mx-auto px-4 py-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-white">Preguntas frecuentes</h2>
+            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">Preguntas frecuentes</h2>
           </div>
           <div className="space-y-3">
             {FAQ.map((item, i) => (
               <details
                 key={i}
-                className="group bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden"
+                className="group bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden"
               >
-                <summary className="flex items-center justify-between p-5 cursor-pointer list-none text-sm font-semibold text-white">
+                <summary className="flex items-center justify-between p-5 cursor-pointer list-none text-sm font-semibold text-gray-900 dark:text-white">
                   {item.q}
-                  <ChevronRight className="w-4 h-4 text-gray-500 shrink-0 group-open:rotate-90 transition-transform" />
+                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0 group-open:rotate-90 transition-transform" />
                 </summary>
-                <p className="px-5 pb-5 text-sm text-gray-400 leading-relaxed">{item.a}</p>
+                <p className="px-5 pb-5 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.a}</p>
               </details>
             ))}
           </div>
         </section>
 
+        {/* Sobre la app — contenido SEO */}
+        <section className="border-t border-gray-200/60 dark:border-gray-800/60 bg-gray-50 dark:bg-gray-900/20">
+          <div className="max-w-3xl mx-auto px-4 py-16">
+            <h2 className="text-xl font-black text-gray-900 dark:text-white mb-6">
+              ¿Qué es Reportes Reconquista?
+            </h2>
+            <div className="space-y-4 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p>
+                Reportes Reconquista es la plataforma ciudadana de Reconquista, Santa Fe, Argentina. Permite a los vecinos reportar problemas en la via publica como baches, inundaciones, alumbrado roto y pastizales, geolocalizados en el mapa para que toda la comunidad y el municipio puedan verlos en tiempo real.
+              </p>
+              <p>
+                Ademas del modulo de reportes, la app incluye un directorio completo de medicos IAPOS, PAMI y otras obras sociales en Reconquista; informacion actualizada diariamente sobre farmacias de turno con direccion y telefono; un directorio de profesionales y oficios como plomeros, electricistas, gasistas, pintores y albaniles con contacto directo por chat; y un directorio de comercios locales con vidriera digital, catalogo de productos y contacto directo por WhatsApp.
+              </p>
+              <p>
+                Reportes Reconquista tambien agrega las ofertas de los supermercados de Reconquista actualizadas por la comunidad, funciona como PWA instalable en Android e iOS sin necesidad de descargar nada, y envia notificaciones push para mantenerte al tanto de lo que pasa en tu ciudad. Completamente gratuita para los vecinos y para los comerciantes que quieran registrar su negocio.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Footer */}
-        <footer className="border-t border-gray-800/60">
+        <footer className="border-t border-gray-200/60 dark:border-gray-800/60">
           <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icon.svg" alt="Logo" className="w-7 h-7 rounded-xl" />
-              <span className="text-sm font-bold text-gray-400">Reportes Reconquista</span>
+              <span className="text-sm font-bold text-gray-500 dark:text-gray-400">Reportes Reconquista</span>
             </div>
-            <p className="text-xs text-gray-600 text-center">
+            <p className="text-xs text-gray-400 dark:text-gray-600 text-center">
               Hecho con amor para los vecinos de Reconquista, Santa Fe, Argentina.
             </p>
             <div className="flex items-center gap-4">
@@ -419,7 +437,7 @@ export default function Home() {
                 { label: "Comercios", href: "/comercios" },
                 { label: "Farmacias", href: "/farmacias" },
               ].map((l) => (
-                <Link key={l.label} href={l.href} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                <Link key={l.label} href={l.href} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                   {l.label}
                 </Link>
               ))}
