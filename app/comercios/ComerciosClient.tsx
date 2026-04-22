@@ -109,18 +109,25 @@ export default function ComerciosClient({ comercios }: Props) {
                       href={`/comercio/${comercio.slug}`}
                       className="flex flex-col items-center gap-1.5 w-20 group"
                     >
-                      <div className={`w-14 h-14 rounded-full overflow-hidden ring-2 transition-all ${
-                        isDark
-                          ? "ring-gray-800 group-hover:ring-amber-800"
-                          : "ring-gray-200 group-hover:ring-amber-300 shadow-sm"
-                      }`}>
-                        {photo ? (
-                          <img src={photo} alt={comercio.nombre} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
-                            isDark ? "bg-amber-900/40 text-amber-500" : "bg-amber-50 text-amber-600"
-                          }`}>
-                            {comercio.nombre[0].toUpperCase()}
+                      <div className="relative">
+                        <div className={`w-14 h-14 rounded-full overflow-hidden ring-2 transition-all ${
+                          isDark
+                            ? comercio.isPremium ? "ring-amber-600 group-hover:ring-amber-400" : "ring-gray-800 group-hover:ring-amber-800"
+                            : comercio.isPremium ? "ring-amber-400 group-hover:ring-amber-500 shadow-md" : "ring-gray-200 group-hover:ring-amber-300 shadow-sm"
+                        }`}>
+                          {photo ? (
+                            <img src={photo} alt={comercio.nombre} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
+                              isDark ? "bg-amber-900/40 text-amber-500" : "bg-amber-50 text-amber-600"
+                            }`}>
+                              {comercio.nombre[0].toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        {comercio.isPremium && (
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center ring-2 ring-offset-0 ring-transparent">
+                            <span className="text-[8px] font-black text-white leading-none">P</span>
                           </div>
                         )}
                       </div>
