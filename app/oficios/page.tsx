@@ -6,15 +6,18 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export const metadata: Metadata = {
   title: "Oficios y Profesionales en Reconquista",
-  description: "Encontra plomeros, electricistas, albañiles, abogados y mas profesionales en Reconquista.",
+  description:
+    "Encontra plomeros, electricistas, albañiles, abogados y mas profesionales en Reconquista.",
 };
 
 async function getProfessionals(): Promise<Professional[]> {
   try {
-    const res = await fetch(`${API}/api/professionals`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API}/api/professionals`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 export default async function OficiosPage() {
