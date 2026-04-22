@@ -389,7 +389,7 @@ export default function NuevoProfesionalClient() {
     }
   }
 
-  const canGoStep2 = form.nombre && form.apellido && form.whatsapp.length >= 11;
+  const canGoStep2 = form.nombre && form.apellido && form.whatsapp.length >= 6;
   const canGoStep3 = form.tipo !== "" && form.oficios.length > 0;
   const canSubmit = form.descripcion.length >= 30;
   const categoriasSugeridas =
@@ -502,14 +502,14 @@ export default function NuevoProfesionalClient() {
                   style={{ color: inputColor, backgroundColor: inputBg }}
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                 />
-                {form.whatsapp.length >= 11 && (
+                {form.whatsapp.length >= 6 && (
                   <p
                     className={`text-xs mt-1.5 ${isDark ? "text-green-400" : "text-green-600"}`}
                   >
                     Listo: wa.me/{form.whatsapp}
                   </p>
                 )}
-                {whatsappRaw && form.whatsapp.length < 11 && (
+                {whatsappRaw && form.whatsapp.length < 6 && (
                   <p
                     className={`text-xs mt-1.5 ${isDark ? "text-yellow-500" : "text-yellow-600"}`}
                   >
