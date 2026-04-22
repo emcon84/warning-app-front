@@ -10,21 +10,6 @@ import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const BARRIOS = [
-  "Centro",
-  "Barrio Norte",
-  "Barrio Sur",
-  "Barrio Oeste",
-  "Villa del Parque",
-  "Las Lomas",
-  "Parque Industrial",
-  "Barrio Newbery",
-  "Villa Ocampo",
-  "Los Lapachos",
-  "San Cayetano",
-  "Otro",
-];
-
 const OFICIOS_SUGERIDOS = [
   "Plomero",
   "Electricista",
@@ -78,6 +63,7 @@ function Step4Notificaciones({
   onFinish: () => void;
 }) {
   const [activating, setActivating] = useState(false);
+  const [status, setStatus] = useState<"idle" | "denied" | "error">("idle");
 
   const textSec = isDark ? "text-gray-400" : "text-gray-500";
   const btnSecondary = isDark
@@ -93,8 +79,27 @@ function Step4Notificaciones({
 
   async function handleActivar() {
     setActivating(true);
-    await requestPermission();
-    setActivating(false);
+    setStatus("idle");
+    try {
+      const success = await requestPermission();
+      if (!success) {
+        setStatus("denied");
+        // Si el usuario deniega el permiso, mostramos mensaje y permitimos continuar
+        setTimeout(() => {
+          onFinish();
+        }, 2000);
+      }
+      // Si es exitoso, el useEffect se encargará de redirigir automáticamente
+    } catch (error) {
+      console.error("Error al activar notificaciones:", error);
+      setStatus("error");
+      // En caso de error, permitimos continuar después de un tiempo
+      setTimeout(() => {
+        onFinish();
+      }, 2000);
+    } finally {
+      setActivating(false);
+    }
   }
 
   if (permission === "granted") {
@@ -156,6 +161,40 @@ function Step4Notificaciones({
         </p>
       )}
 
+      {/* Feedback para permiso denegado */}
+      {status === "denied" && (
+        <div
+          className={`text-center p-4 rounded-xl mb-4 ${
+            isDark
+              ? "bg-yellow-900/30 border border-yellow-800"
+              : "bg-yellow-50 border border-yellow-200"
+          }`}
+        >
+          <p
+            className={`text-sm ${isDark ? "text-yellow-400" : "text-yellow-700"}`}
+          >
+            Las notificaciones fueron denegadas. Podrás activarlas luego desde
+            tu perfil.
+          </p>
+        </div>
+      )}
+
+      {/* Feedback para error */}
+      {status === "error" && (
+        <div
+          className={`text-center p-4 rounded-xl mb-4 ${
+            isDark
+              ? "bg-red-900/30 border border-red-800"
+              : "bg-red-50 border border-red-200"
+          }`}
+        >
+          <p className={`text-sm ${isDark ? "text-red-400" : "text-red-700"}`}>
+            Hubo un error al activar las notificaciones. Podrás intentarlo luego
+            desde tu perfil.
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col gap-3">
         {isSupported && (
           <button
@@ -191,7 +230,6 @@ export default function NuevoProfesionalClient() {
   const [form, setForm] = useState({
     nombre: "",
     apellido: "",
-    barrio: "",
     telefono: "",
     whatsapp: "",
     tipo: "" as "oficio" | "profesion" | "",
@@ -211,7 +249,9 @@ export default function NuevoProfesionalClient() {
     setAiLoading(true);
     try {
       const token = await getToken();
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
       if (token) headers["Authorization"] = `Bearer ${token}`;
       const res = await fetch(`${API}/api/ai/generate-description`, {
         method: "POST",
@@ -219,7 +259,6 @@ export default function NuevoProfesionalClient() {
         body: JSON.stringify({
           oficios: form.oficios,
           nombre: form.nombre,
-          barrio: form.barrio,
           anios: aiForm.anios || undefined,
           zona: aiForm.zona || undefined,
         }),
@@ -327,7 +366,6 @@ export default function NuevoProfesionalClient() {
         body: JSON.stringify({
           nombre: form.nombre,
           apellido: form.apellido,
-          barrio: form.barrio,
           telefono: form.telefono,
           whatsapp: form.whatsapp,
           tipo: form.tipo || "oficio",
@@ -351,8 +389,7 @@ export default function NuevoProfesionalClient() {
     }
   }
 
-  const canGoStep2 =
-    form.nombre && form.apellido && form.barrio && form.whatsapp.length >= 11;
+  const canGoStep2 = form.nombre && form.apellido && form.whatsapp.length >= 11;
   const canGoStep3 = form.tipo !== "" && form.oficios.length > 0;
   const canSubmit = form.descripcion.length >= 30;
   const categoriasSugeridas =
@@ -431,27 +468,6 @@ export default function NuevoProfesionalClient() {
                     className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Barrio donde trabajas
-                </label>
-                <select
-                  value={form.barrio}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, barrio: e.target.value }))
-                  }
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                >
-                  <option value="">Selecciona un barrio</option>
-                  {BARRIOS.map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                </select>
               </div>
 
               <div>
@@ -573,61 +589,61 @@ export default function NuevoProfesionalClient() {
             {form.tipo !== "" && (
               <>
                 <p className={`text-sm mb-4 ${textSec}`}>
-                  Elegí hasta 3 {tipoLabelPlural}. Los clientes te van a encontrar
-                  por estas categorías.
+                  Elegí hasta 3 {tipoLabelPlural}. Los clientes te van a
+                  encontrar por estas categorías.
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-5">
-              {categoriasSugeridas.map((o) => (
-                <button
-                  key={o}
-                  onClick={() => toggleOficio(o)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                    form.oficios.includes(o) ? tagActive : tagInactive
-                  }`}
-                >
-                  {o}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex gap-2">
-              <input
-                value={form.oficioCustom}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, oficioCustom: e.target.value }))
-                }
-                onKeyDown={(e) => e.key === "Enter" && addCustomOficio()}
-                placeholder={`Otra ${tipoLabel}... (Enter para agregar)`}
-                style={{ color: inputColor, backgroundColor: inputBg }}
-                className={`flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${customInput}`}
-              />
-              <button
-                onClick={addCustomOficio}
-                className={`px-4 py-2.5 rounded-xl text-sm border transition-colors ${addBtn}`}
-              >
-                Agregar
-              </button>
-            </div>
-
-            {form.oficios.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {form.oficios.map((o) => (
-                  <span
-                    key={o}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm ${selectedTag}`}
-                  >
-                    {o}
+                  {categoriasSugeridas.map((o) => (
                     <button
+                      key={o}
                       onClick={() => toggleOficio(o)}
-                      className="hover:opacity-70"
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                        form.oficios.includes(o) ? tagActive : tagInactive
+                      }`}
                     >
-                      ✕
+                      {o}
                     </button>
-                  </span>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    value={form.oficioCustom}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, oficioCustom: e.target.value }))
+                    }
+                    onKeyDown={(e) => e.key === "Enter" && addCustomOficio()}
+                    placeholder={`Otra ${tipoLabel}... (Enter para agregar)`}
+                    style={{ color: inputColor, backgroundColor: inputBg }}
+                    className={`flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${customInput}`}
+                  />
+                  <button
+                    onClick={addCustomOficio}
+                    className={`px-4 py-2.5 rounded-xl text-sm border transition-colors ${addBtn}`}
+                  >
+                    Agregar
+                  </button>
+                </div>
+
+                {form.oficios.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {form.oficios.map((o) => (
+                      <span
+                        key={o}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm ${selectedTag}`}
+                      >
+                        {o}
+                        <button
+                          onClick={() => toggleOficio(o)}
+                          className="hover:opacity-70"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
@@ -681,11 +697,12 @@ export default function NuevoProfesionalClient() {
                   style={{ color: inputColor, backgroundColor: inputBg }}
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
                 />
-                {form.descripcion.length > 0 && form.descripcion.length < 30 && (
-                  <p className="text-xs text-yellow-600 mt-1">
-                    Faltan {30 - form.descripcion.length} caracteres más.
-                  </p>
-                )}
+                {form.descripcion.length > 0 &&
+                  form.descripcion.length < 30 && (
+                    <p className="text-xs text-yellow-600 mt-1">
+                      Faltan {30 - form.descripcion.length} caracteres más.
+                    </p>
+                  )}
 
                 {/* Generar con IA */}
                 {!aiOpen ? (
@@ -801,13 +818,21 @@ export default function NuevoProfesionalClient() {
         {/* Step 4 — Notificaciones */}
         {step === 4 && (
           <>
-            <div className={`mb-6 p-4 rounded-2xl flex items-center gap-3 ${isDark ? "bg-green-900/30 border border-green-800" : "bg-green-50 border border-green-200"}`}>
-              <CheckCircle className={`w-5 h-5 shrink-0 ${isDark ? "text-green-400" : "text-green-600"}`} />
+            <div
+              className={`mb-6 p-4 rounded-2xl flex items-center gap-3 ${isDark ? "bg-green-900/30 border border-green-800" : "bg-green-50 border border-green-200"}`}
+            >
+              <CheckCircle
+                className={`w-5 h-5 shrink-0 ${isDark ? "text-green-400" : "text-green-600"}`}
+              />
               <div>
-                <p className={`text-sm font-semibold ${isDark ? "text-green-400" : "text-green-700"}`}>
+                <p
+                  className={`text-sm font-semibold ${isDark ? "text-green-400" : "text-green-700"}`}
+                >
                   ¡Perfil publicado!
                 </p>
-                <p className={`text-xs mt-0.5 ${isDark ? "text-green-600" : "text-green-600"}`}>
+                <p
+                  className={`text-xs mt-0.5 ${isDark ? "text-green-600" : "text-green-600"}`}
+                >
                   Ya estás visible para clientes en Reconquista.
                 </p>
               </div>
