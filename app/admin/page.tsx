@@ -629,8 +629,7 @@ https://reportesreconquista.com/comercio/nuevo`
                   <div className="flex gap-2">
                     <button
                       onClick={generateOutreach}
-                      disabled={outreachLoading}
-                      className="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors disabled:opacity-40"
+                      className="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
                       title="Regenerar"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
