@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
+import { useState, useMemo, useEffect, useRef, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Comercio } from "../types";
@@ -10,7 +10,7 @@ import { Store, MapPin, Search, X, ChevronRight, Plus, Tag } from "lucide-react"
 
 interface Props { comercios: Comercio[] }
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 5;
 
 export default function ComerciosClient({ comercios }: Props) {
   const router = useRouter();
@@ -63,20 +63,20 @@ export default function ComerciosClient({ comercios }: Props) {
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedRubro, search]);
 
-  const loadMore = useCallback(() => {
-    setVisibleCount((v) => Math.min(v + PAGE_SIZE, filtered.length));
-  }, [filtered.length]);
-
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      (entries) => { if (entries[0].isIntersecting) loadMore(); },
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((v) => Math.min(v + PAGE_SIZE, filtered.length));
+        }
+      },
       { threshold: 0.1 }
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [loadMore]);
+  }, [filtered.length]);
 
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;

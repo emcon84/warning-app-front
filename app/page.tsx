@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   AlertTriangle, Stethoscope, Pill, Wrench, Store,
-  ShoppingCart, ChevronRight, Star, MessageCircle, QrCode, Package,
+  ShoppingCart, ChevronRight, Star, MessageCircle, QrCode, Package, Check, X as XIcon,
 } from "lucide-react";
 import LandingThemeToggle from "./components/LandingThemeToggle";
 import HeroCarousel from "./components/HeroCarousel";
@@ -375,6 +375,82 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Ventajas vs Instagram */}
+        <section className="max-w-6xl mx-auto px-4 py-20">
+          <div className="text-center mb-14">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 mb-5">
+              Para dueños de comercio
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white leading-tight">
+              ¿Por qué no alcanza con Instagram?
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 mt-4 max-w-2xl mx-auto text-sm leading-relaxed">
+              Las redes sociales son para que te vean. Reportes Reconquista es para que te encuentren cuando alguien necesita exactamente lo que vos vendes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 p-6 bg-gray-50 dark:bg-gray-900/50">
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">Solo con Instagram</p>
+              <ul className="space-y-4">
+                {[
+                  "El algoritmo decide quién te ve, y a veces no te ve nadie",
+                  "Nadie busca \"ferretería en Reconquista\" en Instagram",
+                  "Las publicaciones desaparecen del feed en horas",
+                  "Para contactarte: DM, esperar, dar el número, ahí recién WhatsApp",
+                  "Tu catálogo son fotos desordenadas mezcladas con todo lo demás",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="w-5 h-5 rounded-full bg-red-500/15 flex items-center justify-center shrink-0 mt-0.5">
+                      <XIcon className="w-3 h-3 text-red-500" />
+                    </div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-blue-500/25 p-6 bg-blue-500/5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mb-6">Con Reportes Reconquista</p>
+              <ul className="space-y-4">
+                {[
+                  "Aparecés cuando alguien busca lo que vos vendés, sin depender de ningún algoritmo",
+                  "Tu perfil está visible 24/7 en el directorio local de Reconquista",
+                  "Botón de WhatsApp directo desde tu perfil, un toque y ya están hablando con vos",
+                  "Catálogo organizado con fotos y precios, siempre actualizado y siempre visible",
+                  "QR imprimible para la vidriera: del local a tu perfil digital en segundos",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-blue-50 dark:from-blue-950/30 to-amber-50 dark:to-amber-950/20 p-8 sm:p-12 text-center">
+            <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white leading-snug">
+              En Instagram la gente{" "}
+              <span className="text-purple-600 dark:text-purple-400">pasa el tiempo</span>.<br />
+              En Reportes Reconquista la gente{" "}
+              <span className="text-blue-600 dark:text-blue-400">busca lo que necesita</span>.
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 max-w-lg mx-auto leading-relaxed">
+              Quien llega a tu perfil en la app ya está buscando un comercio como el tuyo. Esa intención de compra no existe en ninguna red social.
+            </p>
+            <Link
+              href="/comercio/nuevo"
+              className="inline-flex items-center gap-2 mt-8 px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-sm transition-colors"
+            >
+              Registrar mi comercio gratis
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
         </section>
 
