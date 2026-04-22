@@ -208,6 +208,7 @@ export default function AdminPage() {
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
 
   // Outreach state
+  const [outreachDestinatario, setOutreachDestinatario] = useState<"comercio" | "profesional">("comercio");
   const [outreachTipo, setOutreachTipo] = useState<"visita" | "registro">("visita");
   const [outreachNombre, setOutreachNombre] = useState("");
   const [outreachRubro, setOutreachRubro] = useState("");
@@ -354,9 +355,10 @@ export default function AdminPage() {
 
     const saludo = contacto ? `Hola ${contacto}!` : "Hola!";
 
-    if (outreachTipo === "visita") {
-      const rubros = rubro ? `que buscan ${rubro.toLowerCase()}` : "que buscan un comercio local";
-      setOutreachMensaje(
+    if (outreachDestinatario === "comercio") {
+      if (outreachTipo === "visita") {
+        const rubros = rubro ? `que buscan ${rubro.toLowerCase()}` : "que buscan un comercio local";
+        setOutreachMensaje(
 `${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
 
 Es una herramienta para que los vecinos de Reconquista ${rubros} te encuentren a vos: perfil con fotos, catálogo y WhatsApp directo. 100% gratis.
@@ -366,10 +368,10 @@ En las próximas semanas vamos a tener el apoyo de empresas como Elías Yapur y 
 ¿Te viene bien que esta semana pase por el local a mostrártela en persona?
 
 https://reportesreconquista.com`
-      );
-    } else {
-      const rubroStr = rubro ? ` Si alguien en Reconquista busca ${rubro.toLowerCase()}, aparecés vos.` : "";
-      setOutreachMensaje(
+        );
+      } else {
+        const rubroStr = rubro ? ` Si alguien en Reconquista busca ${rubro.toLowerCase()}, aparecés vos.` : "";
+        setOutreachMensaje(
 `${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
 
 Estamos armando el directorio digital de comercios locales y me gustaría invitarte a registrar ${nombre}. En dos minutos cargás tu perfil con foto, descripción, catálogo de productos con precios y un botón de WhatsApp directo para que los clientes te contacten sin vueltas.
@@ -379,7 +381,34 @@ La diferencia con Instagram es clave: acá la gente no "pasa el tiempo", sino qu
 Además te damos un QR imprimible para la vidriera. Todo gratis, el registro tarda menos de 5 minutos:
 
 https://reportesreconquista.com/comercio/nuevo`
-      );
+        );
+      }
+    } else {
+      const oficioStr = rubro ? ` Los vecinos que buscan ${rubro.toLowerCase()} en Reconquista te pueden encontrar a vos.` : "";
+      const oficioNec = rubro ? ` Si alguien en Reconquista necesita ${rubro.toLowerCase()}, aparecés vos.` : "";
+      if (outreachTipo === "visita") {
+        setOutreachMensaje(
+`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
+
+Estamos armando el directorio de profesionales de oficio de la ciudad y me gustaría mostrarte la plataforma.${oficioStr} Ver tu perfil y contactarte directo por chat, sin algoritmo, sin tener que publicar todos los días.
+
+Los profesionales que se registren ahora van a quedar primeros en el listado antes de que la plataforma crezca.
+
+¿Te viene bien que esta semana pase a mostrártela en persona?
+
+https://reportesreconquista.com`
+        );
+      } else {
+        setOutreachMensaje(
+`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
+
+Estamos armando el directorio de profesionales de la ciudad y me gustaría invitarte a registrarte como ${nombre}. En dos minutos cargás tu perfil con tu oficio, zona de trabajo y un chat directo para que los clientes te encuentren a vos.${oficioNec} Sin depender del algoritmo.
+
+El registro es gratuito y tarda menos de 5 minutos:
+
+https://reportesreconquista.com/profesional/nuevo`
+        );
+      }
     }
   }
 
@@ -557,6 +586,26 @@ https://reportesreconquista.com/comercio/nuevo`
                 <p className="text-sm font-bold text-white">Generador de mensajes de captacion</p>
               </div>
 
+              {/* Switch destinatario */}
+              <div className="flex rounded-xl bg-gray-800 p-1 mb-3">
+                <button
+                  onClick={() => { setOutreachDestinatario("comercio"); setOutreachMensaje(""); }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    outreachDestinatario === "comercio" ? "bg-amber-600 text-white" : "text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  Comercio
+                </button>
+                <button
+                  onClick={() => { setOutreachDestinatario("profesional"); setOutreachMensaje(""); }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    outreachDestinatario === "profesional" ? "bg-purple-600 text-white" : "text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  Profesional
+                </button>
+              </div>
+
               {/* Switch tipo */}
               <div className="flex rounded-xl bg-gray-800 p-1 mb-5">
                 <button
@@ -579,26 +628,30 @@ https://reportesreconquista.com/comercio/nuevo`
 
               <p className="text-xs text-gray-500 mb-5">
                 {outreachTipo === "visita"
-                  ? "Para cerrar una visita presencial al local."
-                  : "Para cuando quieren registrarse solos desde el link."}
+                  ? outreachDestinatario === "comercio" ? "Para cerrar una visita presencial al local." : "Para cerrar una visita con el profesional."
+                  : outreachDestinatario === "comercio" ? "Para cuando quieren registrarse solos desde el link." : "Para que se registren solos como profesional."}
               </p>
 
               <div className="flex flex-col gap-3">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1.5 block">Nombre del comercio *</label>
+                  <label className="text-xs text-gray-500 mb-1.5 block">
+                    {outreachDestinatario === "comercio" ? "Nombre del comercio" : "Nombre / apellido"} *
+                  </label>
                   <input
                     value={outreachNombre}
                     onChange={e => setOutreachNombre(e.target.value)}
-                    placeholder="Ej: Fiambrería Don Luis"
+                    placeholder={outreachDestinatario === "comercio" ? "Ej: Fiambrería Don Luis" : "Ej: Juan García"}
                     className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-gray-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1.5 block">Rubro <span className="text-gray-700">(opcional)</span></label>
+                  <label className="text-xs text-gray-500 mb-1.5 block">
+                    {outreachDestinatario === "comercio" ? "Rubro" : "Oficio"} <span className="text-gray-700">(opcional)</span>
+                  </label>
                   <input
                     value={outreachRubro}
                     onChange={e => setOutreachRubro(e.target.value)}
-                    placeholder="Ej: Almacén, Peluquería, Ferretería..."
+                    placeholder={outreachDestinatario === "comercio" ? "Ej: Almacén, Peluquería, Ferretería..." : "Ej: Plomero, Electricista, Pintor..."}
                     className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-gray-500"
                   />
                 </div>
