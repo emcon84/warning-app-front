@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
           {/* Banner */}
           <div style={{ width: "100%", background: "linear-gradient(90deg, #1d4ed8 0%, #3b82f6 50%, #1d4ed8 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "36px 0" }}>
             <span style={{ color: "#ffffff", fontSize: "72px", fontWeight: 900, letterSpacing: "-1px", textTransform: "uppercase" }}>
-              ¡NUEVO EN OFICIOS!
+              ¡NUEVO PROFESIONAL!
             </span>
           </div>
 
@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
         {/* Banner */}
         <div style={{ width: "100%", background: "linear-gradient(90deg, #1d4ed8 0%, #3b82f6 50%, #1d4ed8 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "28px 0" }}>
           <span style={{ color: "#ffffff", fontSize: "56px", fontWeight: 900, letterSpacing: "-1px", textTransform: "uppercase" }}>
-            ¡NUEVO EN OFICIOS!
+            ¡NUEVO PROFESIONAL!
           </span>
         </div>
 
