@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Professional } from "../types";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
@@ -88,6 +89,11 @@ export default function OficiosClient({ professionals }: Props) {
     });
   }, [byTab, selectedTag, search]);
 
+  const featured = useMemo(
+    () => byTab.filter((p) => p.disponible).slice(0, 8),
+    [byTab]
+  );
+
   useEffect(() => { setVisibleCount(PAGE_SIZE); setSelectedTag(null); setSearch(""); }, [tab]);
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedTag, search]);
 
@@ -141,6 +147,57 @@ export default function OficiosClient({ professionals }: Props) {
             </button>
           ))}
         </div>
+
+        {/* Destacados */}
+        {!search.trim() && !selectedTag && featured.length > 0 && (
+          <div className="mb-6">
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
+              Destacados
+            </p>
+            <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
+              <div className="flex gap-4 pb-1" style={{ width: "max-content" }}>
+                {featured.map((pro) => {
+                  const photo = photoUrl(pro.foto);
+                  return (
+                    <Link
+                      key={pro.id}
+                      href={`/profesional/${pro.slug}`}
+                      className="flex flex-col items-center gap-1.5 w-20 group"
+                    >
+                      <div className={`w-14 h-14 rounded-full overflow-hidden ring-2 transition-all ${
+                        isDark
+                          ? "ring-gray-800 group-hover:ring-gray-600"
+                          : "ring-gray-200 group-hover:ring-gray-400 shadow-sm"
+                      }`}>
+                        {photo ? (
+                          <img src={photo} alt={pro.nombre} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
+                            isDark ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"
+                          }`}>
+                            {pro.nombre[0].toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <p className={`text-xs font-semibold truncate w-full text-center ${textPrimary}`}>
+                        {pro.nombre}
+                      </p>
+                      <p className={`text-[10px] capitalize truncate w-full text-center ${textMuted}`}>
+                        {pro.oficios[0]}
+                      </p>
+                      {pro.ratingCount > 0 && (
+                        <div className="flex items-center gap-0.5">
+                          <Star className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />
+                          <span className="text-[10px] text-yellow-400">{pro.ratingAvg.toFixed(1)}</span>
+                        </div>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Header */}
         <div className="mb-4">

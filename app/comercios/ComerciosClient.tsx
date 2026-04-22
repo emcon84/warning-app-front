@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Comercio } from "../types";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
@@ -31,6 +32,11 @@ export default function ComerciosClient({ comercios }: Props) {
   const pillInactive = isDark
     ? "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-500"
     : "bg-white border-gray-200 text-gray-600 hover:border-gray-400";
+
+  const featured = useMemo(
+    () => comercios.filter((c) => c.activo).slice(0, 8),
+    [comercios]
+  );
 
   const rubros = useMemo(() => {
     const set = new Set<string>();
@@ -86,6 +92,51 @@ export default function ComerciosClient({ comercios }: Props) {
       <Navbar sidebarDisabled />
 
       <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
+
+        {/* Destacados */}
+        {!search.trim() && !selectedRubro && featured.length > 0 && (
+          <div className="mb-6 mt-2">
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
+              Destacados
+            </p>
+            <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
+              <div className="flex gap-4 pb-1" style={{ width: "max-content" }}>
+                {featured.map((comercio) => {
+                  const photo = photoUrl(comercio.logo || comercio.foto);
+                  return (
+                    <Link
+                      key={comercio.id}
+                      href={`/comercio/${comercio.slug}`}
+                      className="flex flex-col items-center gap-1.5 w-20 group"
+                    >
+                      <div className={`w-14 h-14 rounded-full overflow-hidden ring-2 transition-all ${
+                        isDark
+                          ? "ring-gray-800 group-hover:ring-amber-800"
+                          : "ring-gray-200 group-hover:ring-amber-300 shadow-sm"
+                      }`}>
+                        {photo ? (
+                          <img src={photo} alt={comercio.nombre} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
+                            isDark ? "bg-amber-900/40 text-amber-500" : "bg-amber-50 text-amber-600"
+                          }`}>
+                            {comercio.nombre[0].toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <p className={`text-xs font-semibold truncate w-full text-center ${textPrimary}`}>
+                        {comercio.nombre}
+                      </p>
+                      <p className={`text-[10px] capitalize truncate w-full text-center ${textMuted}`}>
+                        {comercio.rubro}
+                      </p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Header */}
         <div className="mb-4 mt-2">
