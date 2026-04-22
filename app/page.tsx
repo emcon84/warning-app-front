@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   AlertTriangle, Stethoscope, Pill, Wrench, Store,
-  ShoppingCart, ChevronRight, Users, MapPin, Bell,
-  Star, MessageCircle, QrCode,
+  ShoppingCart, ChevronRight, Star, MessageCircle, QrCode, Package,
 } from "lucide-react";
 import LandingThemeToggle from "./components/LandingThemeToggle";
 import HeroCarousel from "./components/HeroCarousel";
