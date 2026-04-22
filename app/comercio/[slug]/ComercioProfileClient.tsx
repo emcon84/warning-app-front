@@ -254,6 +254,11 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
               <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
                 {comercio.rubro}
               </span>
+              {comercio.isFounder && (
+                <span className="flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full border font-semibold bg-blue-500/10 border-blue-500/30 text-blue-400">
+                  ★ Comercio Fundador
+                </span>
+              )}
               {comercio.barrio && (
                 <span className={`flex items-center gap-1 text-xs ${textMuted}`}>
                   <MapPin className="w-3 h-3" />

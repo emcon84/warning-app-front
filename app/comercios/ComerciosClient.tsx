@@ -130,6 +130,11 @@ export default function ComerciosClient({ comercios }: Props) {
                             <span className="text-[8px] font-black text-white leading-none">P</span>
                           </div>
                         )}
+                        {!comercio.isPremium && comercio.isFounder && (
+                          <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center ring-2 ring-offset-0 ring-transparent" title="Comercio Fundador">
+                            <span className="text-[8px] font-black text-white leading-none">★</span>
+                          </div>
+                        )}
                       </div>
                       <p className={`text-xs font-semibold truncate w-full text-center ${textPrimary}`}>
                         {comercio.nombre}

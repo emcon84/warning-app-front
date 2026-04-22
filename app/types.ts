@@ -237,6 +237,7 @@ export interface Comercio {
   fotos?: string[];
   activo: boolean;
   isPremium?: boolean;
+  isFounder?: boolean;
   createdAt: string;
   offers?: ComercioOffer[];
   productos?: Producto[];
