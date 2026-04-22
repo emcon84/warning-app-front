@@ -539,9 +539,9 @@ export default function AdminPage() {
             <div className="p-5 rounded-2xl bg-gray-900 border border-gray-800">
               <div className="flex items-center gap-2 mb-4">
                 <MessageSquare className="w-4 h-4 text-blue-400" />
-                <p className="text-sm font-bold text-white">Generador de mensajes de WhatsApp</p>
+                <p className="text-sm font-bold text-white">Generador de mensajes de captacion</p>
               </div>
-              <p className="text-xs text-gray-500 mb-5">Completá los datos del comercio y te genero un mensaje personalizado para copiar y pegar.</p>
+              <p className="text-xs text-gray-500 mb-5">Completa los datos del comercio y te genero un mensaje personalizado para enviar por WhatsApp o Instagram.</p>
 
               <div className="flex flex-col gap-3">
                 <div>
