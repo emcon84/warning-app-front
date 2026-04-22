@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
 import { Bell, CheckCircle } from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
@@ -180,6 +180,7 @@ function Step4Notificaciones({
 export default function NuevoProfesionalClient() {
   const router = useRouter();
   const { getToken } = useAuth();
+  const { isLoaded, isSignedIn } = useUser();
   const { permission, isSupported, requestPermission } = useNotifications();
 
   const { isDark } = useTheme();
@@ -363,6 +364,44 @@ export default function NuevoProfesionalClient() {
   const tipoLabel = form.tipo === "profesion" ? "profesión" : "oficio";
   const tipoLabelPlural = form.tipo === "profesion" ? "profesiones" : "oficios";
 
+  if (!isLoaded) {
+    return (
+      <div className={`min-h-screen ${bg} flex items-center justify-center`}>
+        <div className="w-6 h-6 border-2 border-gray-700 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col items-center justify-center px-6 gap-6`}>
+        <div className="text-center max-w-xs">
+          <div className={`w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center ${isDark ? "bg-gray-900 border border-gray-800" : "bg-gray-100"}`}>
+            <span className="text-2xl">🔧</span>
+          </div>
+          <h2 className={`text-xl font-bold mb-2 ${textPrimary}`}>Primero creá tu cuenta</h2>
+          <p className={`text-sm leading-relaxed ${textSec}`}>
+            Para publicar tu perfil profesional necesitás una cuenta. Es gratis y tarda menos de un minuto.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <button
+            onClick={() => router.push(`/sign-up?redirect_url=/profesional/nuevo`)}
+            className="w-full py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors"
+          >
+            Crear cuenta gratis
+          </button>
+          <button
+            onClick={() => router.push(`/sign-in?redirect_url=/profesional/nuevo`)}
+            className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
+          >
+            Ya tengo cuenta
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
       <Navbar sidebarDisabled />
@@ -459,7 +498,7 @@ export default function NuevoProfesionalClient() {
 
               <div>
                 <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Telefono
+                  Teléfono <span className={textMuted}>(opcional)</span>
                 </label>
                 <input
                   value={form.telefono}
@@ -467,6 +506,8 @@ export default function NuevoProfesionalClient() {
                     setForm((f) => ({ ...f, telefono: e.target.value }))
                   }
                   placeholder="03482-XXXXXX"
+                  type="tel"
+                  inputMode="numeric"
                   style={{ color: inputColor, backgroundColor: inputBg }}
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
                 />
@@ -498,7 +539,7 @@ export default function NuevoProfesionalClient() {
                   <p
                     className={`text-xs mt-1.5 ${isDark ? "text-yellow-500" : "text-yellow-600"}`}
                   >
-                    Numero incompleto.
+                    Número incompleto.
                   </p>
                 )}
               </div>
@@ -599,7 +640,7 @@ export default function NuevoProfesionalClient() {
                   setForm((f) => ({ ...f, oficioCustom: e.target.value }))
                 }
                 onKeyDown={(e) => e.key === "Enter" && addCustomOficio()}
-                placeholder={`Otra ${tipoLabel}...`}
+                placeholder={`Otra ${tipoLabel}... (Enter para agregar)`}
                 style={{ color: inputColor, backgroundColor: inputBg }}
                 className={`flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${customInput}`}
               />
@@ -664,9 +705,9 @@ export default function NuevoProfesionalClient() {
             <div className="flex flex-col gap-4">
               <div>
                 <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Descripcion{" "}
+                  Descripción{" "}
                   <span className={textMuted}>
-                    ({form.descripcion.length}/500)
+                    ({form.descripcion.length}/500, mínimo 30)
                   </span>
                 </label>
                 <textarea
@@ -677,17 +718,16 @@ export default function NuevoProfesionalClient() {
                       descripcion: e.target.value.slice(0, 500),
                     }))
                   }
-                  placeholder="Conta que haces, como trabajas, en que zonas atendes. Cuanto mas claro, mejor."
+                  placeholder="Contá qué hacés, cómo trabajás, en qué zonas atendés. Cuanto más claro, mejor."
                   rows={5}
                   style={{ color: inputColor, backgroundColor: inputBg }}
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
                 />
-                {form.descripcion.length > 0 &&
-                  form.descripcion.length < 30 && (
-                    <p className="text-xs text-yellow-600 mt-1">
-                      Minimo 30 caracteres.
-                    </p>
-                  )}
+                {form.descripcion.length > 0 && form.descripcion.length < 30 && (
+                  <p className="text-xs text-yellow-600 mt-1">
+                    Faltan {30 - form.descripcion.length} caracteres más.
+                  </p>
+                )}
 
                 {/* Generar con IA */}
                 {!aiOpen ? (
@@ -755,7 +795,7 @@ export default function NuevoProfesionalClient() {
 
               <div>
                 <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Anos de experiencia y trabajos destacados{" "}
+                  Años de experiencia y trabajos destacados{" "}
                   <span className={textMuted}>(opcional)</span>
                 </label>
                 <textarea
@@ -766,7 +806,7 @@ export default function NuevoProfesionalClient() {
                       experiencia: e.target.value.slice(0, 300),
                     }))
                   }
-                  placeholder="Ej: 10 anos trabajando en Reconquista. Hice la instalacion electrica del Colegio X, el barrio Y..."
+                  placeholder="Ej: 10 años trabajando en Reconquista. Hice la instalación eléctrica del Colegio X, el barrio Y..."
                   rows={3}
                   style={{ color: inputColor, backgroundColor: inputBg }}
                   className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
@@ -802,13 +842,26 @@ export default function NuevoProfesionalClient() {
 
         {/* Step 4 — Notificaciones */}
         {step === 4 && (
-          <Step4Notificaciones
-            isDark={isDark}
-            permission={permission}
-            isSupported={isSupported}
-            requestPermission={requestPermission}
-            onFinish={() => router.push(`/profesional/${createdSlug}`)}
-          />
+          <>
+            <div className={`mb-6 p-4 rounded-2xl flex items-center gap-3 ${isDark ? "bg-green-900/30 border border-green-800" : "bg-green-50 border border-green-200"}`}>
+              <CheckCircle className={`w-5 h-5 shrink-0 ${isDark ? "text-green-400" : "text-green-600"}`} />
+              <div>
+                <p className={`text-sm font-semibold ${isDark ? "text-green-400" : "text-green-700"}`}>
+                  ¡Perfil publicado!
+                </p>
+                <p className={`text-xs mt-0.5 ${isDark ? "text-green-600" : "text-green-600"}`}>
+                  Ya estás visible para clientes en Reconquista.
+                </p>
+              </div>
+            </div>
+            <Step4Notificaciones
+              isDark={isDark}
+              permission={permission}
+              isSupported={isSupported}
+              requestPermission={requestPermission}
+              onFinish={() => router.push(`/profesional/${createdSlug}`)}
+            />
+          </>
         )}
       </div>
     </div>
