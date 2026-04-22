@@ -208,11 +208,11 @@ export default function AdminPage() {
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
 
   // Outreach state
+  const [outreachTipo, setOutreachTipo] = useState<"visita" | "registro">("visita");
   const [outreachNombre, setOutreachNombre] = useState("");
   const [outreachRubro, setOutreachRubro] = useState("");
   const [outreachContacto, setOutreachContacto] = useState("");
   const [outreachMensaje, setOutreachMensaje] = useState("");
-  const [outreachLoading, setOutreachLoading] = useState(false);
   const [outreachCopied, setOutreachCopied] = useState(false);
 
   const isAdmin = isLoaded && user && ADMIN_CLERK_IDS.includes(user.id);
@@ -346,25 +346,40 @@ export default function AdminPage() {
 
   if (!isAdmin) return null;
 
-  async function generateOutreach() {
-    if (!outreachNombre.trim()) return;
-    setOutreachLoading(true);
-    setOutreachMensaje("");
-    try {
-      const token = await getToken();
-      const res = await fetch(`${API}/api/ai/generate-outreach`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nombre: outreachNombre.trim(),
-          rubro: outreachRubro.trim() || undefined,
-          contacto: outreachContacto.trim() || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (data.mensaje) setOutreachMensaje(data.mensaje);
-    } catch {/* silent */} finally {
-      setOutreachLoading(false);
+  function generateOutreach() {
+    const nombre = outreachNombre.trim();
+    const rubro = outreachRubro.trim();
+    const contacto = outreachContacto.trim();
+    if (!nombre) return;
+
+    const saludo = contacto ? `Hola ${contacto}!` : "Hola!";
+
+    if (outreachTipo === "visita") {
+      const rubros = rubro ? `que buscan ${rubro.toLowerCase()}` : "que buscan un comercio local";
+      setOutreachMensaje(
+`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
+
+Es una herramienta para que los vecinos de Reconquista ${rubros} te encuentren a vos: perfil con fotos, catálogo y WhatsApp directo. 100% gratis.
+
+En las próximas semanas vamos a tener el apoyo de empresas como Elías Yapur y otras para darle visibilidad a la plataforma. Los comercios que se registren ahora van a quedar como Comercios Fundadores, con un emblema especial y posicionados primeros en el listado, antes de que eso pase.
+
+¿Te viene bien que esta semana pase por el local a mostrártela en persona?
+
+https://reportesreconquista.com`
+      );
+    } else {
+      const rubroStr = rubro ? ` Si alguien en Reconquista busca ${rubro.toLowerCase()}, aparecés vos.` : "";
+      setOutreachMensaje(
+`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
+
+Estamos armando el directorio digital de comercios locales y me gustaría invitarte a registrar ${nombre}. En dos minutos cargás tu perfil con foto, descripción, catálogo de productos con precios y un botón de WhatsApp directo para que los clientes te contacten sin vueltas.
+
+La diferencia con Instagram es clave: acá la gente no "pasa el tiempo", sino que busca activamente lo que necesita.${rubroStr} Sin depender del algoritmo, sin que tu publicación se pierda en el feed.
+
+Además te damos un QR imprimible para la vidriera. Todo gratis, el registro tarda menos de 5 minutos:
+
+https://reportesreconquista.com/comercio/nuevo`
+      );
     }
   }
 
@@ -541,7 +556,32 @@ export default function AdminPage() {
                 <MessageSquare className="w-4 h-4 text-blue-400" />
                 <p className="text-sm font-bold text-white">Generador de mensajes de captacion</p>
               </div>
-              <p className="text-xs text-gray-500 mb-5">Completa los datos del comercio y te genero un mensaje personalizado para enviar por WhatsApp o Instagram.</p>
+
+              {/* Switch tipo */}
+              <div className="flex rounded-xl bg-gray-800 p-1 mb-5">
+                <button
+                  onClick={() => { setOutreachTipo("visita"); setOutreachMensaje(""); }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    outreachTipo === "visita" ? "bg-blue-600 text-white" : "text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  Solicitar visita
+                </button>
+                <button
+                  onClick={() => { setOutreachTipo("registro"); setOutreachMensaje(""); }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    outreachTipo === "registro" ? "bg-blue-600 text-white" : "text-gray-500 hover:text-gray-300"
+                  }`}
+                >
+                  Invitar a registrarse
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-500 mb-5">
+                {outreachTipo === "visita"
+                  ? "Para cerrar una visita presencial al local."
+                  : "Para cuando quieren registrarse solos desde el link."}
+              </p>
 
               <div className="flex flex-col gap-3">
                 <div>
@@ -574,14 +614,10 @@ export default function AdminPage() {
 
                 <button
                   onClick={generateOutreach}
-                  disabled={outreachLoading || !outreachNombre.trim()}
+                  disabled={!outreachNombre.trim()}
                   className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
                 >
-                  {outreachLoading ? (
-                    <><RefreshCw className="w-4 h-4 animate-spin" /> Generando...</>
-                  ) : (
-                    <><MessageSquare className="w-4 h-4" /> Generar mensaje</>
-                  )}
+                  <MessageSquare className="w-4 h-4" /> Generar mensaje
                 </button>
               </div>
             </div>
