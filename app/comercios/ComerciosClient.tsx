@@ -93,19 +93,27 @@ export default function ComerciosClient({ comercios }: Props) {
 
       <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
 
-        {/* Destacados */}
+        {/* Destacados — marquee infinito */}
         {!search.trim() && !selectedRubro && featured.length > 0 && (
           <div className="mb-6 mt-2">
+            <style>{`
+              @keyframes marquee-comercios {
+                0%   { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+              .marquee-comercios { animation: marquee-comercios ${featured.length * 2.5}s linear infinite; }
+              .marquee-comercios:hover { animation-play-state: paused; }
+            `}</style>
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
               Destacados
             </p>
-            <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
-              <div className="flex gap-4 pb-1" style={{ width: "max-content" }}>
-                {featured.map((comercio) => {
+            <div className="overflow-hidden -mx-4">
+              <div className="marquee-comercios flex gap-4 px-4 pb-1" style={{ width: "max-content" }}>
+                {[...featured, ...featured].map((comercio, idx) => {
                   const photo = photoUrl(comercio.logo || comercio.foto);
                   return (
                     <Link
-                      key={comercio.id}
+                      key={`${comercio.id}-${idx}`}
                       href={`/comercio/${comercio.slug}`}
                       className="flex flex-col items-center gap-1.5 w-20 group"
                     >
