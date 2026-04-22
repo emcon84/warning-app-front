@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
 import { Bell, CheckCircle } from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
@@ -180,7 +180,6 @@ function Step4Notificaciones({
 export default function NuevoProfesionalClient() {
   const router = useRouter();
   const { getToken } = useAuth();
-  const { isLoaded, isSignedIn } = useUser();
   const { permission, isSupported, requestPermission } = useNotifications();
 
   const { isDark } = useTheme();
@@ -212,12 +211,11 @@ export default function NuevoProfesionalClient() {
     setAiLoading(true);
     try {
       const token = await getToken();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
       const res = await fetch(`${API}/api/ai/generate-description`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify({
           oficios: form.oficios,
           nombre: form.nombre,
@@ -314,7 +312,6 @@ export default function NuevoProfesionalClient() {
     setLoading(true);
     setError("");
     try {
-      const token = await getToken();
       const descripcionFinal = [
         form.descripcion,
         form.experiencia ? `\n\nExperiencia: ${form.experiencia}` : "",
@@ -326,7 +323,6 @@ export default function NuevoProfesionalClient() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           nombre: form.nombre,
@@ -363,44 +359,6 @@ export default function NuevoProfesionalClient() {
     form.tipo === "oficio" ? OFICIOS_SUGERIDOS : PROFESIONES_SUGERIDAS;
   const tipoLabel = form.tipo === "profesion" ? "profesión" : "oficio";
   const tipoLabelPlural = form.tipo === "profesion" ? "profesiones" : "oficios";
-
-  if (!isLoaded) {
-    return (
-      <div className={`min-h-screen ${bg} flex items-center justify-center`}>
-        <div className="w-6 h-6 border-2 border-gray-700 border-t-white rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!isSignedIn) {
-    return (
-      <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col items-center justify-center px-6 gap-6`}>
-        <div className="text-center max-w-xs">
-          <div className={`w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center ${isDark ? "bg-gray-900 border border-gray-800" : "bg-gray-100"}`}>
-            <span className="text-2xl">🔧</span>
-          </div>
-          <h2 className={`text-xl font-bold mb-2 ${textPrimary}`}>Primero creá tu cuenta</h2>
-          <p className={`text-sm leading-relaxed ${textSec}`}>
-            Para publicar tu perfil profesional necesitás una cuenta. Es gratis y tarda menos de un minuto.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 w-full max-w-xs">
-          <button
-            onClick={() => router.push(`/sign-up?redirect_url=/profesional/nuevo`)}
-            className="w-full py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors"
-          >
-            Crear cuenta gratis
-          </button>
-          <button
-            onClick={() => router.push(`/sign-in?redirect_url=/profesional/nuevo`)}
-            className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
-          >
-            Ya tengo cuenta
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>

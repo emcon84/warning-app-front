@@ -132,6 +132,7 @@ export interface Professional {
   ratingAvg: number;
   ratingCount: number;
   descripcion?: string | null;
+  whatsapp?: string | null;
 }
 
 export interface ProfessionalRating {
