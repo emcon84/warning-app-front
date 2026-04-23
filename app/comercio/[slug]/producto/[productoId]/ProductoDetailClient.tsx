@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Comercio, Producto } from "../../../../types";
 import Navbar from "../../../../components/Navbar";
 import { useTheme } from "../../../../contexts/ThemeContext";
@@ -14,6 +14,14 @@ function photoUrl(url?: string | null) {
   return url.startsWith("/uploads/") ? `${API}${url}` : url;
 }
 
+function trackEvent(slug: string, type: string) {
+  fetch(`${API}/api/comercios/${slug}/track`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type }),
+  }).catch(() => {});
+}
+
 interface Props {
   producto: Producto;
   comercio: Comercio;
@@ -25,6 +33,10 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+
+  useEffect(() => {
+    trackEvent(comercio.slug, "product_view");
+  }, [comercio.slug]);
 
   const bg      = isDark ? "bg-gray-950" : "bg-gray-50";
   const cardBg  = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";

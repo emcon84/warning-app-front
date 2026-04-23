@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { ComercioOffer } from "../../../../types";
 import Navbar from "../../../../components/Navbar";
 import { useTheme } from "../../../../contexts/ThemeContext";
@@ -13,6 +14,14 @@ function photoUrl(url?: string | null) {
   return url.startsWith("/uploads/") ? `${API}${url}` : url;
 }
 
+function trackEvent(slug: string, type: string) {
+  fetch(`${API}/api/comercios/${slug}/track`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type }),
+  }).catch(() => {});
+}
+
 interface Props {
   offer: ComercioOffer & { comercio: { nombre: string; slug: string; logo?: string | null; whatsapp: string; rubro: string } };
   comercio: { nombre: string; slug: string; logo?: string | null; whatsapp: string; rubro: string };
@@ -21,6 +30,10 @@ interface Props {
 export default function OfertaDetailClient({ offer, comercio }: Props) {
   const { isDark } = useTheme();
   const router = useRouter();
+
+  useEffect(() => {
+    trackEvent(comercio.slug, "offer_view");
+  }, [comercio.slug]);
 
   const bg       = isDark ? "bg-gray-950" : "bg-gray-50";
   const cardBg   = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
