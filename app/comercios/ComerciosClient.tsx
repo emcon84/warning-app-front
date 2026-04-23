@@ -214,7 +214,11 @@ export default function ComerciosClient({ comercios }: Props) {
                   key={comercio.id}
                   onClick={() => router.push(`/comercio/${comercio.slug}`)}
                   className={`w-full text-left p-4 rounded-2xl border transition-colors ${cardBg} ${
-                    isDark ? "hover:border-gray-700" : "hover:border-gray-300"
+                    comercio.isFounder
+                      ? "border-amber-500/40"
+                      : comercio.isPremium
+                      ? "border-indigo-500/40"
+                      : isDark ? "hover:border-gray-700" : "hover:border-gray-300"
                   } active:scale-[0.99]`}
                 >
                   <div className="flex items-center gap-3">
@@ -233,6 +237,19 @@ export default function ComerciosClient({ comercios }: Props) {
                       <p className={`font-bold text-sm truncate ${textPrimary}`}>
                         {comercio.nombre}
                       </p>
+                      {/* Badges de plan */}
+                      <div className="flex items-center gap-1 mt-0.5">
+                        {comercio.isFounder && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-400 border border-amber-400/30">
+                            FOUNDER
+                          </span>
+                        )}
+                        {comercio.isPremium && !comercio.isFounder && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-400/20 text-indigo-400 border border-indigo-400/30">
+                            PREMIUM
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-1 mt-0.5">
                         <Tag className={`w-3 h-3 flex-shrink-0 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
                         <p className={`text-xs capitalize truncate ${isDark ? "text-blue-400" : "text-blue-600"}`}>

@@ -53,6 +53,7 @@ interface Comercio {
   logo?: string | null;
   activo: boolean;
   isPremium: boolean;
+  isFounder: boolean;
   createdAt: string;
 }
 
@@ -271,12 +272,22 @@ export default function AdminPage() {
 
   async function togglePremium(com: Comercio) {
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/comercios/${com.id}/premium`, {
+    const res = await fetch(`${API}/api/admin/comercios/${com.id}`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ isPremium: !com.isPremium }),
     });
     if (res.ok) setComercios(prev => prev.map(c => c.id === com.id ? { ...c, isPremium: !com.isPremium } : c));
+  }
+
+  async function toggleFounder(com: Comercio) {
+    const token = await getToken();
+    const res = await fetch(`${API}/api/admin/comercios/${com.id}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ isFounder: !com.isFounder }),
+    });
+    if (res.ok) setComercios(prev => prev.map(c => c.id === com.id ? { ...c, isFounder: !com.isFounder } : c));
   }
 
   async function deleteComerco(id: string) {
@@ -544,21 +555,35 @@ https://reportesreconquista.com/profesional/nuevo`
                       <span className="text-xs bg-red-900/40 text-red-400 border border-red-800 px-1.5 py-0.5 rounded-full">Inactivo</span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-400">{com.rubro} · {com.barrio}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <p className="text-xs text-gray-400">{com.rubro} · {com.barrio}</p>
+                    {com.isFounder && <span className="text-[10px] font-bold px-1 py-0.5 rounded bg-amber-900/40 text-amber-400 border border-amber-800/50">FOUNDER</span>}
+                    {com.isPremium && !com.isFounder && <span className="text-[10px] font-bold px-1 py-0.5 rounded bg-indigo-900/40 text-indigo-400 border border-indigo-800/50">PREMIUM</span>}
+                  </div>
                   <p className="text-xs text-gray-600 mt-0.5">
                     {new Date(com.createdAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
-                    onClick={() => togglePremium(com)}
+                    onClick={() => toggleFounder(com)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border ${
-                      com.isPremium
-                        ? "bg-yellow-900/30 text-yellow-400 border-yellow-800/50 hover:bg-yellow-900/60"
+                      com.isFounder
+                        ? "bg-amber-900/30 text-amber-400 border-amber-800/50 hover:bg-amber-900/60"
                         : "bg-gray-800 text-gray-500 border-gray-700 hover:bg-gray-700"
                     }`}
                   >
-                    {com.isPremium ? "★ Premium" : "Free"}
+                    {com.isFounder ? "★ Founder" : "Founder"}
+                  </button>
+                  <button
+                    onClick={() => togglePremium(com)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border ${
+                      com.isPremium
+                        ? "bg-indigo-900/30 text-indigo-400 border-indigo-800/50 hover:bg-indigo-900/60"
+                        : "bg-gray-800 text-gray-500 border-gray-700 hover:bg-gray-700"
+                    }`}
+                  >
+                    {com.isPremium ? "✦ Premium" : "Premium"}
                   </button>
                   <button
                     onClick={() => openShareComercio(com)}

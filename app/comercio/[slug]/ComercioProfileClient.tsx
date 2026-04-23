@@ -270,8 +270,13 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                 {comercio.rubro}
               </span>
               {comercio.isFounder && (
-                <span className="flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full border font-semibold bg-blue-500/10 border-blue-500/30 text-blue-400">
-                  ★ Comercio Fundador
+                <span className="flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full border font-semibold bg-amber-400/20 border-amber-400/30 text-amber-400">
+                  ★ Founder
+                </span>
+              )}
+              {comercio.isPremium && !comercio.isFounder && (
+                <span className="flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full border font-semibold bg-indigo-400/20 border-indigo-400/30 text-indigo-400">
+                  ✦ Premium
                 </span>
               )}
               {comercio.barrio && (

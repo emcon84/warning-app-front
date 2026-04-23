@@ -665,6 +665,41 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </button>
         </div>
 
+        {/* Banner de plan */}
+        {comercio.isFounder ? (
+          <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border border-amber-500/30 bg-amber-500/10">
+            <span className="text-amber-400 text-lg">★</span>
+            <div className="flex-1">
+              <p className="text-xs font-bold text-amber-400">Plan Founder</p>
+              <p className={`text-xs ${textMuted}`}>Acceso completo · Sin límites · Posición destacada</p>
+            </div>
+          </div>
+        ) : comercio.isPremium ? (
+          <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border border-indigo-500/30 bg-indigo-500/10">
+            <span className="text-indigo-400 text-lg">✦</span>
+            <div className="flex-1">
+              <p className="text-xs font-bold text-indigo-400">Plan Premium</p>
+              <p className={`text-xs ${textMuted}`}>Acceso completo · Sin límites · Posición destacada</p>
+            </div>
+          </div>
+        ) : (
+          <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"}`}>
+            <span className={`text-lg ${textMuted}`}>○</span>
+            <div className="flex-1">
+              <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
+              <p className={`text-xs ${textMuted}`}>Hasta 10 productos · Posición estándar</p>
+            </div>
+            <a
+              href={`https://wa.me/3482646949?text=${encodeURIComponent("Hola! Quiero saber más sobre el plan Premium para mi comercio")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0"
+            >
+              Ser Premium
+            </a>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className={`flex gap-1 p-1 rounded-2xl mb-6 overflow-x-auto ${isDark ? "bg-gray-900" : "bg-gray-100"}`}>
           {tabs.map((t) => (
