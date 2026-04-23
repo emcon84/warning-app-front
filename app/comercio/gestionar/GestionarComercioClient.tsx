@@ -11,6 +11,7 @@ import {
   Store, ImageIcon, Tag, ShoppingBag, QrCode, BarChart2,
   Plus, Trash2, ToggleLeft, ToggleRight,
   X, Check, Pencil, ExternalLink, Share2,
+  Eye, MessageCircle, Package,
 } from "lucide-react";
 import KitDigitalizacion from "./KitDigitalizacion";
 
@@ -1017,19 +1018,19 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               <>
                 {/* 4 Metric Cards */}
                 <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { key: "profile_view", label: "Visitas al perfil", icon: "👁️" },
-                    { key: "whatsapp_click", label: "Clicks en WhatsApp", icon: "💬" },
-                    { key: "product_view", label: "Vistas de productos", icon: "📦" },
-                    { key: "offer_view", label: "Vistas de ofertas", icon: "🏷️" },
-                  ].map(({ key, label, icon }) => {
+                  {([
+                    { key: "profile_view",   label: "Visitas al perfil",    Icon: Eye,            color: "text-indigo-400" },
+                    { key: "whatsapp_click", label: "Clicks en WhatsApp",   Icon: MessageCircle,  color: "text-green-400" },
+                    { key: "product_view",   label: "Vistas de productos",  Icon: Package,        color: "text-blue-400" },
+                    { key: "offer_view",     label: "Vistas de ofertas",    Icon: Tag,            color: "text-amber-400" },
+                  ] as const).map(({ key, label, Icon, color }) => {
                     const current = analytics.thisMonth[key] ?? 0;
                     const prev = analytics.lastMonth[key] ?? 0;
                     const pct = prev === 0 ? null : Math.round(((current - prev) / prev) * 100);
                     const up = pct !== null && pct >= 0;
                     return (
                       <div key={key} className={`rounded-2xl border p-4 ${cardBg}`}>
-                        <div className="text-2xl mb-1">{icon}</div>
+                        <Icon className={`w-5 h-5 mb-2 ${color}`} />
                         <p className={`text-2xl font-black ${textPri}`}>{current}</p>
                         <p className={`text-xs ${textMuted} mt-0.5`}>{label}</p>
                         {pct !== null && (
