@@ -10,7 +10,7 @@ import { Comercio, ComercioOffer, Producto } from "../../types";
 import {
   Store, ImageIcon, Tag, ShoppingBag, QrCode,
   Plus, Trash2, ToggleLeft, ToggleRight,
-  X, Check, Pencil, ExternalLink,
+  X, Check, Pencil, ExternalLink, Share2,
 } from "lucide-react";
 import KitDigitalizacion from "./KitDigitalizacion";
 
@@ -959,6 +959,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 <ProductoRow
                   key={p.id}
                   producto={p}
+                  slug={comercio.slug}
                   isDark={isDark}
                   cardBg={cardBg}
                   textPri={textPri}
@@ -1031,9 +1032,10 @@ function inicial(val: string | null | undefined): string {
 }
 
 function ProductoRow({
-  producto, isDark, cardBg, textPri, textSec, textMuted, onToggle, onDelete, onEdit,
+  producto, slug, isDark, cardBg, textPri, textSec, textMuted, onToggle, onDelete, onEdit,
 }: {
   producto: Producto;
+  slug: string;
   isDark: boolean;
   cardBg: string;
   textPri: string;
@@ -1044,7 +1046,16 @@ function ProductoRow({
   onEdit: () => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const fotoResolved = photoUrl(producto.foto);
+
+  function handleShareProducto() {
+    const link = `${window.location.origin}/comercio/${slug}/producto/${producto.id}`;
+    navigator.clipboard.writeText(link).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }).catch(() => {/* silent */});
+  }
 
   return (
     <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
@@ -1083,6 +1094,17 @@ function ProductoRow({
             </button>
             <button onClick={onEdit} className={`p-1.5 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-500 hover:text-blue-400 hover:border-blue-800" : "border-gray-200 text-gray-400 hover:text-blue-500 hover:border-blue-200"}`}>
               <Pencil className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleShareProducto}
+              title={shareCopied ? "¡Copiado!" : "Copiar link del producto"}
+              className={`p-1.5 rounded-lg border transition-colors ${
+                shareCopied
+                  ? isDark ? "border-green-700 text-green-400" : "border-green-300 text-green-600"
+                  : isDark ? "border-gray-700 text-gray-500 hover:text-purple-400 hover:border-purple-800" : "border-gray-200 text-gray-400 hover:text-purple-500 hover:border-purple-200"
+              }`}
+            >
+              {shareCopied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
             </button>
             {confirmDelete ? (
               <div className="flex gap-1">

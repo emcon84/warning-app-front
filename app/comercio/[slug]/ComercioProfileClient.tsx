@@ -382,6 +382,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                     producto={p}
                     whatsapp={comercio.whatsapp}
                     comercioNombre={comercio.nombre}
+                    comercioSlug={comercio.slug}
                     isDark={isDark}
                     cardBg={cardBg}
                     textPrimary={textPrimary}
@@ -442,11 +443,12 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
 // ─── Producto Card ───────────────────────────────────────────────────────────
 
 function ProductoCard({
-  producto, whatsapp, comercioNombre, isDark, cardBg, textPrimary, textSec, textMuted,
+  producto, whatsapp, comercioNombre, comercioSlug, isDark, cardBg, textPrimary, textSec, textMuted,
 }: {
   producto: Producto;
   whatsapp: string;
   comercioNombre: string;
+  comercioSlug: string;
   isDark: boolean;
   cardBg: string;
   textPrimary: string;
@@ -487,15 +489,25 @@ function ProductoCard({
         </div>
         {producto.descripcion && <p className={`text-xs leading-snug line-clamp-2 ${textSec}`}>{producto.descripcion}</p>}
         {producto.precio && <p className={`text-sm font-black text-green-500 dark:text-green-400`}>{producto.precio}</p>}
-        <a
-          href={waUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-auto flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
-        >
-          <MessageCircle className="w-3.5 h-3.5" />
-          {esServicio ? "Consultar servicio" : "Consultar"}
-        </a>
+        <div className="mt-auto flex flex-col gap-1.5">
+          <a
+            href={`/comercio/${comercioSlug}/producto/${producto.id}`}
+            className={`flex items-center justify-center gap-1.5 w-full py-1.5 rounded-xl text-xs font-semibold border transition-colors ${
+              isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            Ver detalle
+          </a>
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            {esServicio ? "Consultar servicio" : "Consultar"}
+          </a>
+        </div>
       </div>
     </div>
   );
