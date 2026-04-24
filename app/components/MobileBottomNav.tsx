@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Wrench, Store, ShoppingCart, Briefcase, MoreHorizontal } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
 
 const ITEMS = [
   { label: "Oficios",   Icon: Wrench,         href: "/oficios"   },
@@ -25,6 +26,7 @@ const HIDDEN_PATHS = [
 function Nav() {
   const router = useRouter();
   const pathname = usePathname();
+  const { isDark } = useTheme();
 
   const shouldHide =
     HIDDEN_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
@@ -46,7 +48,7 @@ function Nav() {
   }
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[1001] bg-gray-900/95 backdrop-blur-md border-t border-gray-800 safe-area-bottom">
+    <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-[1001] backdrop-blur-md border-t safe-area-bottom ${isDark ? "bg-gray-900/95 border-gray-800" : "bg-white/95 border-gray-200"}`}>
       <div className="flex items-center justify-around px-1 py-2">
         {ITEMS.map(({ label, Icon, href }) => {
           const active = isActive(href);

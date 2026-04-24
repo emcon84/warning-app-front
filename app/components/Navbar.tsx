@@ -142,8 +142,20 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     setDropdownOpen(false);
   }
 
+  const navBg      = isDark ? "bg-gray-900"  : "bg-white";
+  const navText    = isDark ? "text-white"   : "text-gray-900";
+  const hoverBg    = isDark ? "hover:bg-gray-800" : "hover:bg-gray-100";
+  const iconColor  = isDark ? "text-gray-300" : "text-gray-600";
+  const pillInact  = isDark ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200";
+  const dropBg     = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const dropBorder = isDark ? "border-gray-800" : "border-gray-200";
+  const dropHover  = isDark ? "hover:bg-gray-800" : "hover:bg-gray-50";
+  const textSec    = isDark ? "text-gray-400" : "text-gray-500";
+  const textMut    = isDark ? "text-gray-600" : "text-gray-400";
+  const shadow     = isDark ? "shadow-lg" : "shadow-sm border-b border-gray-200";
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[1002] bg-gray-900 text-white shadow-lg">
+    <nav className={`fixed top-0 left-0 right-0 z-[1002] ${navBg} ${navText} ${shadow}`}>
       <div className="flex items-center gap-2 px-3 py-2">
 
         {/* Hamburguesa — solo si hay sidebar y no está deshabilitado */}
@@ -151,7 +163,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
           <button
             onClick={onMenuClick}
             data-tour="sidebar-toggle"
-            className="p-2 rounded-lg transition-colors flex-shrink-0 hover:bg-gray-800"
+            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${hoverBg}`}
             aria-label="Toggle menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +203,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
                 else router.push(href);
               }}
               className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
-                active ? "bg-green-500 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                active ? "bg-green-500 text-white" : pillInact
               }`}
             >
               <Icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -208,23 +220,23 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={handleBellClick}
-                  className="relative p-1.5 rounded-lg hover:bg-gray-800 transition-colors"
+                  className={`relative p-1.5 rounded-lg ${hoverBg} transition-colors`}
                   aria-label="Notificaciones"
                 >
-                  <Bell className="w-5 h-5 text-gray-300" />
+                  <Bell className={`w-5 h-5 ${iconColor}`} />
                   {unreadCount > 0 && (
                     <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full" />
                   )}
                 </button>
 
                 {dropdownOpen && (
-                  <div className="fixed top-14 left-2 right-2 md:absolute md:top-10 md:left-auto md:right-0 md:w-80 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl z-50">
+                  <div className={`fixed top-14 left-2 right-2 md:absolute md:top-10 md:left-auto md:right-0 md:w-80 border rounded-2xl shadow-xl z-50 ${dropBg}`}>
                     {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
-                      <span className="text-sm font-semibold text-white">Mensajes</span>
+                    <div className={`flex items-center justify-between px-4 py-3 border-b ${dropBorder}`}>
+                      <span className={`text-sm font-semibold ${navText}`}>Mensajes</span>
                       <button
                         onClick={() => setDropdownOpen(false)}
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className={`${textSec} transition-colors`}
                         aria-label="Cerrar"
                       >
                         <X className="w-4 h-4" />
@@ -233,21 +245,21 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
 
                     {/* Body */}
                     {loadingConversations ? (
-                      <div className="px-4 py-6 text-center text-xs text-gray-500">Cargando...</div>
+                      <div className={`px-4 py-6 text-center text-xs ${textMut}`}>Cargando...</div>
                     ) : unreadConversations.length === 0 ? (
-                      <div className="px-4 py-6 text-center text-xs text-gray-500">Sin mensajes nuevos</div>
+                      <div className={`px-4 py-6 text-center text-xs ${textMut}`}>Sin mensajes nuevos</div>
                     ) : (
                       <ul>
                         {unreadConversations.map((conv) => (
                           <li
                             key={conv.id}
                             onClick={() => handleConversationClick(conv.id)}
-                            className="hover:bg-gray-800 cursor-pointer px-4 py-3 flex flex-col gap-0.5 first:rounded-t-none last:rounded-b-2xl transition-colors"
+                            className={`${dropHover} cursor-pointer px-4 py-3 flex flex-col gap-0.5 first:rounded-t-none last:rounded-b-2xl transition-colors`}
                           >
-                            <span className="text-sm font-semibold text-white">{conv.professionalName}</span>
-                            <span className="text-xs text-gray-400 truncate">{conv.lastMessage}</span>
+                            <span className={`text-sm font-semibold ${navText}`}>{conv.professionalName}</span>
+                            <span className={`text-xs ${textSec} truncate`}>{conv.lastMessage}</span>
                             {conv.lastMessageTime && (
-                              <span className="text-xs text-gray-600">{formatTime(conv.lastMessageTime)}</span>
+                              <span className={`text-xs ${textMut}`}>{formatTime(conv.lastMessageTime)}</span>
                             )}
                           </li>
                         ))}
@@ -260,10 +272,10 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               {/* Mis chats */}
               <button
                 onClick={() => router.push("/chats")}
-                className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors"
+                className={`p-1.5 rounded-lg ${hoverBg} transition-colors`}
                 aria-label="Mis chats"
               >
-                <MessageCircle className="w-5 h-5 text-gray-300" />
+                <MessageCircle className={`w-5 h-5 ${iconColor}`} />
               </button>
 
               {/* UserButton sin badge */}
@@ -276,7 +288,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
             </>
           ) : (
             <SignInButton mode="modal">
-              <button className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white text-gray-900 hover:bg-gray-200 transition-colors">
+              <button className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-200" : "bg-gray-900 text-white hover:bg-gray-700"}`}>
                 Entrar
               </button>
             </SignInButton>
@@ -286,7 +298,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
           <button
             onClick={toggleTheme}
             aria-label="Alternar tema"
-            className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+            className={`p-2 rounded-full ${textSec} ${hoverBg} transition-colors`}
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
