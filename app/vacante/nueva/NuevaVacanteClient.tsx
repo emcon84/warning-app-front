@@ -19,19 +19,6 @@ import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const BARRIOS = [
-  "Centro",
-  "Barrio Norte",
-  "Barrio Sur",
-  "Barrio Oeste",
-  "Villa del Parque",
-  "Las Lomas",
-  "Parque Industrial",
-  "Barrio Newbery",
-  "Los Lapachos",
-  "San Cayetano",
-  "Otro",
-];
 
 const HABILIDADES_SUGERIDAS = [
   "Administración",
@@ -103,7 +90,6 @@ export default function NuevaVacanteClient() {
   // Paso 1
   const [habilidades, setHabilidades] = useState<string[]>([]);
   const [habilidadInput, setHabilidadInput] = useState("");
-  const [barrio, setBarrio] = useState("");
   const [horario, setHorario] = useState("");
   const [salario, setSalario] = useState("");
   const [modalidad, setModalidad] = useState("");
@@ -179,7 +165,6 @@ export default function NuevaVacanteClient() {
           titulo: titulo.trim(),
           descripcion: descripcion.trim(),
           habilidades,
-          barrio: barrio || undefined,
           horario: horario.trim() || undefined,
           salario: salario.trim() || undefined,
           modalidad: modalidad || undefined,
@@ -443,25 +428,6 @@ export default function NuevaVacanteClient() {
                   </button>
                 ))}
             </div>
-          </div>
-
-          {/* Barrio */}
-          <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
-              Barrio (opcional)
-            </label>
-            <select
-              value={barrio}
-              onChange={(e) => setBarrio(e.target.value)}
-              className="w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white text-base focus:outline-none focus:border-indigo-500 transition-colors"
-            >
-              <option value="">Sin especificar</option>
-              {BARRIOS.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
           </div>
 
           {/* Horario */}
