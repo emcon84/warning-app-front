@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, Fragment } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import Link from "next/link";
 import { Comercio } from "../types";
 import Navbar from "../components/Navbar";
@@ -14,7 +14,7 @@ interface Props { comercios: Comercio[] }
 const PAGE_SIZE = 5;
 
 export default function ComerciosClient({ comercios }: Props) {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { isDark } = useTheme();
   const [search, setSearch] = useState("");
   const [selectedRubro, setSelectedRubro] = useState<string | null>(null);
@@ -229,9 +229,10 @@ export default function ComerciosClient({ comercios }: Props) {
                   } active:scale-[0.99]`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ${
-                      isDark ? "bg-gray-800" : "bg-gray-100"
-                    }`}>
+                    <div
+                      className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}
+                      style={{ viewTransitionName: `co-photo-${comercio.slug}` }}
+                    >
                       {photo ? (
                         <img src={photo} alt={comercio.nombre} className="w-full h-full object-cover" />
                       ) : (
@@ -241,7 +242,10 @@ export default function ComerciosClient({ comercios }: Props) {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`font-bold text-sm truncate ${textPrimary}`}>
+                      <p
+                        className={`font-bold text-sm truncate ${textPrimary}`}
+                        style={{ viewTransitionName: `co-name-${comercio.slug}` }}
+                      >
                         {comercio.nombre}
                       </p>
                       {/* Badges de plan */}

@@ -8,6 +8,7 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWARedirect from "./components/PWARedirect";
 import PostLoginWizard from "./components/PostLoginWizard";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ViewTransitions } from "next-view-transitions";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { dark } from "@clerk/themes";
 import { esES } from "@clerk/localizations";
@@ -111,6 +112,7 @@ export default function RootLayout({
           <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':true;if(d)document.documentElement.classList.add('dark');}catch(e){}})();` }} />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} font-sans antialiased`}>
+          <ViewTransitions />
           <ApiStatusBanner />
           <PWARedirect />
           <ThemeProvider>{children}</ThemeProvider>

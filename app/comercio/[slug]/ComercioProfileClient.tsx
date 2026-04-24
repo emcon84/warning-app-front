@@ -247,7 +247,10 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           <div className="relative px-5 pt-0">
             {/* Fila avatar + nombre */}
             <div className="flex items-end gap-3 -mt-10 mb-2">
-              <div className={`w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}>
+              <div
+                className={`w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}
+                style={{ viewTransitionName: `co-photo-${comercio.slug}` }}
+              >
                 {(comercio.logo || comercio.foto) ? (
                   <img
                     src={photoUrl((comercio.logo || comercio.foto)!)}
@@ -261,7 +264,12 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                 )}
               </div>
               <div className="pb-1 min-w-0">
-                <h1 className={`text-lg font-black leading-tight truncate ${textPrimary}`}>{comercio.nombre}</h1>
+                <h1
+                  className={`text-lg font-black leading-tight truncate ${textPrimary}`}
+                  style={{ viewTransitionName: `co-name-${comercio.slug}` }}
+                >
+                  {comercio.nombre}
+                </h1>
               </div>
             </div>
             {/* Pills separadas — con espacio propio, lejos del hero */}
