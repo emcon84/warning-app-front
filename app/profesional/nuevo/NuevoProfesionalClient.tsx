@@ -1,12 +1,19 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import Navbar from "../../components/Navbar";
-import { Bell, CheckCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  User,
+  Wrench,
+  FileText,
+  Bell,
+  ArrowLeft,
+  Sparkles,
+  Check,
+} from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
-import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -49,14 +56,30 @@ const PROFESIONES_SUGERIDAS = [
   "Escribano",
 ];
 
+const TOTAL_STEPS = 4;
+
+const variants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+};
+
+const iconVariants = {
+  hidden: { scale: 0.7, opacity: 0 },
+  visible: { scale: 1, opacity: 1, transition: { delay: 0.1, duration: 0.3 } },
+};
+
+// ---------- Input / Textarea base styles ----------
+const INPUT_CLS =
+  "w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors";
+
+// ---------- Step 4 — Notificaciones ----------
 function Step4Notificaciones({
-  isDark,
   permission,
   isSupported,
   requestPermission,
   onFinish,
 }: {
-  isDark: boolean;
   permission: NotificationPermission;
   isSupported: boolean;
   requestPermission: () => Promise<boolean>;
@@ -64,11 +87,6 @@ function Step4Notificaciones({
 }) {
   const [activating, setActivating] = useState(false);
   const [status, setStatus] = useState<"idle" | "denied" | "error">("idle");
-
-  const textSec = isDark ? "text-gray-400" : "text-gray-500";
-  const btnSecondary = isDark
-    ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
-    : "bg-gray-100 text-gray-600 hover:bg-gray-200";
 
   useEffect(() => {
     if (permission === "granted") {
@@ -84,19 +102,12 @@ function Step4Notificaciones({
       const success = await requestPermission();
       if (!success) {
         setStatus("denied");
-        // Si el usuario deniega el permiso, mostramos mensaje y permitimos continuar
-        setTimeout(() => {
-          onFinish();
-        }, 2000);
+        setTimeout(onFinish, 2000);
       }
-      // Si es exitoso, el useEffect se encargará de redirigir automáticamente
     } catch (error) {
       console.error("Error al activar notificaciones:", error);
       setStatus("error");
-      // En caso de error, permitimos continuar después de un tiempo
-      setTimeout(() => {
-        onFinish();
-      }, 2000);
+      setTimeout(onFinish, 2000);
     } finally {
       setActivating(false);
     }
@@ -104,24 +115,17 @@ function Step4Notificaciones({
 
   if (permission === "granted") {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <div
-          className={`w-16 h-16 rounded-full border flex items-center justify-center ${
-            isDark
-              ? "bg-green-900/40 border-green-700"
-              : "bg-green-100 border-green-300"
-          }`}
+      <div className="flex flex-col items-center justify-center py-12 gap-6">
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center"
         >
-          <CheckCircle
-            className={`w-8 h-8 ${isDark ? "text-green-400" : "text-green-600"}`}
-          />
-        </div>
-        <p
-          className={`font-semibold text-lg ${isDark ? "text-white" : "text-gray-900"}`}
-        >
-          Notificaciones activadas
-        </p>
-        <p className={`text-sm text-center ${textSec}`}>
+          <Check className="w-12 h-12 text-green-400" />
+        </motion.div>
+        <p className="font-bold text-xl text-white">Notificaciones activadas</p>
+        <p className="text-sm text-center text-gray-400">
           Te vamos a avisar cuando un cliente te contacte.
         </p>
       </div>
@@ -129,66 +133,26 @@ function Step4Notificaciones({
   }
 
   return (
-    <div>
-      <div className="flex flex-col items-center text-center mb-8">
-        <div
-          className={`w-16 h-16 rounded-full border flex items-center justify-center mb-4 ${
-            isDark
-              ? "bg-blue-950/60 border-blue-800"
-              : "bg-blue-50 border-blue-200"
-          }`}
-        >
-          <Bell
-            className={`w-8 h-8 ${isDark ? "text-blue-400" : "text-blue-600"}`}
-          />
-        </div>
-        <h1
-          className={`text-xl font-bold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}
-        >
-          Activa las notificaciones
-        </h1>
-        <p className={`text-sm ${textSec}`}>
-          Para saber cuando un cliente te contacta
-        </p>
-      </div>
-
+    <div className="flex flex-col gap-6">
       {!isSupported && (
-        <p
-          className={`text-xs text-center mb-6 ${isDark ? "text-gray-500" : "text-gray-400"}`}
-        >
-          Tu navegador no soporta notificaciones push. Podras activarlas despues
+        <p className="text-xs text-center text-gray-500">
+          Tu navegador no soporta notificaciones push. Podrás activarlas después
           desde tu perfil.
         </p>
       )}
 
-      {/* Feedback para permiso denegado */}
       {status === "denied" && (
-        <div
-          className={`text-center p-4 rounded-xl mb-4 ${
-            isDark
-              ? "bg-yellow-900/30 border border-yellow-800"
-              : "bg-yellow-50 border border-yellow-200"
-          }`}
-        >
-          <p
-            className={`text-sm ${isDark ? "text-yellow-400" : "text-yellow-700"}`}
-          >
+        <div className="text-center p-4 rounded-2xl bg-yellow-900/30 border border-yellow-800">
+          <p className="text-sm text-yellow-400">
             Las notificaciones fueron denegadas. Podrás activarlas luego desde
             tu perfil.
           </p>
         </div>
       )}
 
-      {/* Feedback para error */}
       {status === "error" && (
-        <div
-          className={`text-center p-4 rounded-xl mb-4 ${
-            isDark
-              ? "bg-red-900/30 border border-red-800"
-              : "bg-red-50 border border-red-200"
-          }`}
-        >
-          <p className={`text-sm ${isDark ? "text-red-400" : "text-red-700"}`}>
+        <div className="text-center p-4 rounded-2xl bg-red-900/30 border border-red-800">
+          <p className="text-sm text-red-400">
             Hubo un error al activar las notificaciones. Podrás intentarlo luego
             desde tu perfil.
           </p>
@@ -197,32 +161,34 @@ function Step4Notificaciones({
 
       <div className="flex flex-col gap-3">
         {isSupported && (
-          <button
+          <motion.button
             onClick={handleActivar}
             disabled={activating}
-            className="w-full py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors disabled:opacity-60"
+            whileTap={{ scale: 0.97 }}
+            className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {activating ? "Activando..." : "Activar notificaciones"}
-          </button>
+          </motion.button>
         )}
         <button
           onClick={onFinish}
-          className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-colors ${btnSecondary}`}
+          className="w-full py-2 text-sm text-gray-500 hover:text-white transition-colors"
         >
-          Omitir por ahora
+          Ahora no
         </button>
       </div>
     </div>
   );
 }
 
+// ---------- Main component ----------
 export default function NuevoProfesionalClient() {
   const router = useRouter();
   const { getToken } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
 
-  const { isDark } = useTheme();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [createdSlug, setCreatedSlug] = useState("");
@@ -240,10 +206,43 @@ export default function NuevoProfesionalClient() {
   });
 
   const [whatsappRaw, setWhatsappRaw] = useState("");
-
   const [aiForm, setAiForm] = useState({ anios: "", zona: "" });
   const [aiOpen, setAiOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+
+  function goNext() {
+    setDirection(1);
+    setStep((s) => s + 1);
+  }
+
+  function goBack() {
+    if (step === 0) {
+      router.back();
+      return;
+    }
+    setDirection(-1);
+    setStep((s) => s - 1);
+  }
+
+  function handleWhatsappChange(raw: string) {
+    setWhatsappRaw(raw);
+    const digits = raw.replace(/\D/g, "");
+    if (!digits) {
+      setForm((f) => ({ ...f, whatsapp: "" }));
+      return;
+    }
+    let formatted = digits;
+    if (digits.startsWith("549")) {
+      formatted = digits;
+    } else if (digits.startsWith("54")) {
+      formatted = "549" + digits.slice(2);
+    } else if (digits.startsWith("0")) {
+      formatted = "549" + digits.slice(1);
+    } else {
+      formatted = "549" + digits;
+    }
+    setForm((f) => ({ ...f, whatsapp: formatted }));
+  }
 
   async function handleGenerarDescripcion() {
     setAiLoading(true);
@@ -273,62 +272,6 @@ export default function NuevoProfesionalClient() {
       setAiLoading(false);
     }
   }
-
-  function handleWhatsappChange(raw: string) {
-    setWhatsappRaw(raw);
-    const digits = raw.replace(/\D/g, "");
-    if (!digits) {
-      setForm((f) => ({ ...f, whatsapp: "" }));
-      return;
-    }
-    let formatted = digits;
-    if (digits.startsWith("549")) {
-      formatted = digits;
-    } else if (digits.startsWith("54")) {
-      formatted = "549" + digits.slice(2);
-    } else if (digits.startsWith("0")) {
-      formatted = "549" + digits.slice(1);
-    } else {
-      formatted = "549" + digits;
-    }
-    setForm((f) => ({ ...f, whatsapp: formatted }));
-  }
-
-  // Theme helpers
-  const bg = isDark ? "bg-gray-950" : "bg-gray-50";
-  const textPrimary = isDark ? "text-white" : "text-gray-900";
-  const textSec = isDark ? "text-gray-400" : "text-gray-500";
-  const textMuted = isDark ? "text-gray-600" : "text-gray-400";
-  const inputCls = isDark
-    ? "bg-gray-900 border-gray-700 placeholder-gray-500 focus:border-gray-500"
-    : "bg-white border-gray-200 placeholder-gray-400 focus:border-gray-400";
-  const inputColor = isDark ? "#f9fafb" : "#111827";
-  const inputBg = isDark ? "#111827" : "#ffffff";
-  const btnSecondary = isDark
-    ? "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
-    : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200";
-  const stepFuture = isDark
-    ? "bg-gray-800 text-gray-500"
-    : "bg-gray-200 text-gray-400";
-  const stepLine = isDark ? "bg-gray-700" : "bg-gray-200";
-  const tagActive = isDark
-    ? "bg-white text-gray-900 border-white"
-    : "bg-gray-900 text-white border-gray-900";
-  const tagInactive = isDark
-    ? "bg-gray-900 text-gray-300 border-gray-700 hover:border-gray-500"
-    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400";
-  const selectedTag = isDark
-    ? "bg-green-900/50 text-green-400 border-green-800"
-    : "bg-green-100 text-green-700 border-green-300";
-  const customInput = isDark
-    ? "bg-gray-900 border-gray-700 text-white placeholder-gray-500 focus:border-gray-500"
-    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-gray-400";
-  const addBtn = isDark
-    ? "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
-    : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200";
-  const errorCls = isDark
-    ? "text-red-400 bg-red-900/20 border-red-800"
-    : "text-red-600 bg-red-50 border-red-300";
 
   function toggleOficio(oficio: string) {
     setForm((f) => ({
@@ -360,9 +303,7 @@ export default function NuevoProfesionalClient() {
 
       const res = await fetch(`${API}/api/professionals`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nombre: form.nombre,
           apellido: form.apellido,
@@ -381,7 +322,7 @@ export default function NuevoProfesionalClient() {
 
       const pro = await res.json();
       setCreatedSlug(pro.slug);
-      setStep(4);
+      goNext();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Error desconocido");
     } finally {
@@ -389,464 +330,426 @@ export default function NuevoProfesionalClient() {
     }
   }
 
-  const canGoStep2 = form.nombre && form.apellido && form.whatsapp.length >= 6;
-  const canGoStep3 = form.tipo !== "" && form.oficios.length > 0;
+  const onFinish = useCallback(
+    () => router.push(`/profesional/${createdSlug}`),
+    [router, createdSlug],
+  );
+
+  const canGoStep1 = form.nombre && form.apellido && form.whatsapp.length >= 6;
+  const canGoStep2 = form.tipo !== "" && form.oficios.length > 0;
   const canSubmit = form.descripcion.length >= 30;
   const categoriasSugeridas =
     form.tipo === "oficio" ? OFICIOS_SUGERIDOS : PROFESIONES_SUGERIDAS;
   const tipoLabel = form.tipo === "profesion" ? "profesión" : "oficio";
   const tipoLabelPlural = form.tipo === "profesion" ? "profesiones" : "oficios";
 
-  return (
-    <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
-      <Navbar sidebarDisabled />
-
-      <div className="flex-1 max-w-xl mx-auto w-full px-4 mt-24 mb-12">
-        {/* Progress */}
-        <div className="flex items-center mb-8">
-          {[1, 2, 3, 4].map((s) => (
-            <Fragment key={s}>
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
-                  s < step
-                    ? "bg-green-500 text-white"
-                    : s === step
-                      ? isDark
-                        ? "bg-white text-gray-900"
-                        : "bg-gray-900 text-white"
-                      : stepFuture
-                }`}
-              >
-                {s < step ? "✓" : s}
-              </div>
-              {s < 4 && (
-                <div
-                  className={`h-px flex-1 mx-2 transition-colors ${s < step ? "bg-green-500" : stepLine}`}
-                />
-              )}
-            </Fragment>
-          ))}
-        </div>
-
-        {/* Step 1 — Datos personales */}
-        {step === 1 && (
-          <div>
-            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>
-              Tus datos
-            </h1>
-            <p className={`text-sm mb-6 ${textSec}`}>
-              Como te van a ver los clientes.
-            </p>
-
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className={`text-xs mb-1.5 block ${textSec}`}>
-                    Nombre
-                  </label>
-                  <input
-                    value={form.nombre}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, nombre: e.target.value }))
-                    }
-                    placeholder="Juan"
-                    style={{ color: inputColor, backgroundColor: inputBg }}
-                    className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className={`text-xs mb-1.5 block ${textSec}`}>
-                    Apellido
-                  </label>
-                  <input
-                    value={form.apellido}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, apellido: e.target.value }))
-                    }
-                    placeholder="Garcia"
-                    style={{ color: inputColor, backgroundColor: inputBg }}
-                    className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Teléfono <span className={textMuted}>(opcional)</span>
-                </label>
-                <input
-                  value={form.telefono}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, telefono: e.target.value }))
-                  }
-                  placeholder="03482-XXXXXX"
-                  type="tel"
-                  inputMode="numeric"
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-                <p className={`text-xs mt-1 ${textMuted}`}>
-                  Solo se comparte cuando acordas con un cliente.
-                </p>
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  WhatsApp
-                </label>
-                <input
-                  value={whatsappRaw}
-                  onChange={(e) => handleWhatsappChange(e.target.value)}
-                  placeholder="Ej: 3482 123456"
-                  inputMode="numeric"
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-                {form.whatsapp.length >= 6 && (
-                  <p
-                    className={`text-xs mt-1.5 ${isDark ? "text-green-400" : "text-green-600"}`}
-                  >
-                    Listo: wa.me/{form.whatsapp}
-                  </p>
-                )}
-                {whatsappRaw && form.whatsapp.length < 6 && (
-                  <p
-                    className={`text-xs mt-1.5 ${isDark ? "text-yellow-500" : "text-yellow-600"}`}
-                  >
-                    Número incompleto.
-                  </p>
-                )}
-              </div>
+  // ---------- Step content ----------
+  const steps = [
+    {
+      // Step 0 — Datos
+      icon: <User className="w-8 h-8 text-indigo-400" />,
+      iconBg: "bg-indigo-500/20",
+      title: "¿Cómo te llamás?",
+      subtitle: "Así te van a ver tus clientes",
+      content: (
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="text-xs mb-1.5 block text-gray-400">Nombre</label>
+              <input
+                value={form.nombre}
+                onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
+                placeholder="Juan"
+                className={INPUT_CLS}
+              />
             </div>
-
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={() => router.back()}
-                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => setStep(2)}
-                disabled={!canGoStep2}
-                className="flex-1 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-              >
-                Continuar
-              </button>
+            <div className="flex-1">
+              <label className="text-xs mb-1.5 block text-gray-400">Apellido</label>
+              <input
+                value={form.apellido}
+                onChange={(e) => setForm((f) => ({ ...f, apellido: e.target.value }))}
+                placeholder="Garcia"
+                className={INPUT_CLS}
+              />
             </div>
           </div>
-        )}
 
-        {/* Step 2 — Oficios */}
-        {step === 2 && (
           <div>
-            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>
-              Tipo de perfil
-            </h1>
-            <p className={`text-sm mb-4 ${textSec}`}>
-              Primero elegí si ofrecés un oficio o una profesión.
-            </p>
-
-            <div className="flex gap-2 mb-5">
-              <button
-                onClick={() =>
-                  setForm((f) => ({
-                    ...f,
-                    tipo: "oficio",
-                    oficios: [],
-                    oficioCustom: "",
-                  }))
-                }
-                className={`flex-1 px-3 py-2 rounded-xl text-sm font-semibold border transition-colors ${
-                  form.tipo === "oficio" ? tagActive : tagInactive
-                }`}
-              >
-                Oficio
-              </button>
-              <button
-                onClick={() =>
-                  setForm((f) => ({
-                    ...f,
-                    tipo: "profesion",
-                    oficios: [],
-                    oficioCustom: "",
-                  }))
-                }
-                className={`flex-1 px-3 py-2 rounded-xl text-sm font-semibold border transition-colors ${
-                  form.tipo === "profesion" ? tagActive : tagInactive
-                }`}
-              >
-                Profesión
-              </button>
-            </div>
-
-            {form.tipo === "" && (
-              <p className={`text-sm text-center py-8 ${textMuted}`}>
-                Selecciona una opción para continuar.
+            <label className="text-xs mb-1.5 block text-gray-400">
+              WhatsApp
+            </label>
+            <input
+              value={whatsappRaw}
+              onChange={(e) => handleWhatsappChange(e.target.value)}
+              placeholder="3482 123456"
+              inputMode="numeric"
+              className={INPUT_CLS}
+            />
+            {form.whatsapp.length >= 6 && (
+              <p className="text-xs mt-1.5 text-green-400">
+                Listo: wa.me/{form.whatsapp}
               </p>
             )}
-
-            {form.tipo !== "" && (
-              <>
-                <p className={`text-sm mb-4 ${textSec}`}>
-                  Elegí hasta 3 {tipoLabelPlural}. Los clientes te van a
-                  encontrar por estas categorías.
-                </p>
-
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {categoriasSugeridas.map((o) => (
-                    <button
-                      key={o}
-                      onClick={() => toggleOficio(o)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                        form.oficios.includes(o) ? tagActive : tagInactive
-                      }`}
-                    >
-                      {o}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <input
-                    value={form.oficioCustom}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, oficioCustom: e.target.value }))
-                    }
-                    onKeyDown={(e) => e.key === "Enter" && addCustomOficio()}
-                    placeholder={`Otra ${tipoLabel}... (Enter para agregar)`}
-                    style={{ color: inputColor, backgroundColor: inputBg }}
-                    className={`flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${customInput}`}
-                  />
-                  <button
-                    onClick={addCustomOficio}
-                    className={`px-4 py-2.5 rounded-xl text-sm border transition-colors ${addBtn}`}
-                  >
-                    Agregar
-                  </button>
-                </div>
-
-                {form.oficios.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {form.oficios.map((o) => (
-                      <span
-                        key={o}
-                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm ${selectedTag}`}
-                      >
-                        {o}
-                        <button
-                          onClick={() => toggleOficio(o)}
-                          className="hover:opacity-70"
-                        >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </>
+            {whatsappRaw && form.whatsapp.length < 6 && (
+              <p className="text-xs mt-1.5 text-yellow-500">
+                Número incompleto.
+              </p>
             )}
-
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={() => setStep(1)}
-                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
-              >
-                Atras
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                disabled={!canGoStep3}
-                className="flex-1 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-              >
-                Continuar
-              </button>
-            </div>
           </div>
-        )}
 
-        {/* Step 3 — Perfil */}
-        {step === 3 && (
           <div>
-            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>
-              Tu perfil
-            </h1>
-            <p className={`text-sm mb-6 ${textSec}`}>
-              Contale a los clientes quien sos y que haces. Esto es lo primero
-              que van a leer.
+            <label className="text-xs mb-1.5 block text-gray-400">
+              Teléfono{" "}
+              <span className="text-gray-600">(opcional)</span>
+            </label>
+            <input
+              value={form.telefono}
+              onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))}
+              placeholder="03482-XXXXXX"
+              type="tel"
+              inputMode="numeric"
+              className={INPUT_CLS}
+            />
+            <p className="text-xs mt-1 text-gray-600">
+              Solo se comparte cuando acordas con un cliente.
             </p>
+          </div>
+        </div>
+      ),
+      canContinue: canGoStep1,
+      onContinue: goNext,
+    },
+    {
+      // Step 1 — Especialidad
+      icon: <Wrench className="w-8 h-8 text-amber-400" />,
+      iconBg: "bg-amber-500/20",
+      title: "¿Cuál es tu oficio?",
+      subtitle: "Podés agregar hasta 3",
+      content: (
+        <div className="flex flex-col gap-5">
+          {/* Toggle tipo */}
+          <div className="flex gap-2">
+            {(["oficio", "profesion"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() =>
+                  setForm((f) => ({
+                    ...f,
+                    tipo: t,
+                    oficios: [],
+                    oficioCustom: "",
+                  }))
+                }
+                className={`flex-1 px-3 py-2.5 rounded-2xl text-sm font-semibold border transition-all ${
+                  form.tipo === t
+                    ? "bg-indigo-500 border-indigo-500 text-white"
+                    : "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
+                }`}
+              >
+                {t === "oficio" ? "Oficio" : "Profesión"}
+              </button>
+            ))}
+          </div>
 
-            <div className="flex flex-col gap-4">
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Descripción{" "}
-                  <span className={textMuted}>
-                    ({form.descripcion.length}/500, mínimo 30)
-                  </span>
-                </label>
-                <textarea
-                  value={form.descripcion}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      descripcion: e.target.value.slice(0, 500),
-                    }))
-                  }
-                  placeholder="Contá qué hacés, cómo trabajás, en qué zonas atendés. Cuanto más claro, mejor."
-                  rows={5}
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
-                />
-                {form.descripcion.length > 0 &&
-                  form.descripcion.length < 30 && (
-                    <p className="text-xs text-yellow-600 mt-1">
-                      Faltan {30 - form.descripcion.length} caracteres más.
-                    </p>
-                  )}
+          {form.tipo === "" && (
+            <p className="text-sm text-center py-4 text-gray-600">
+              Seleccioná una opción para continuar.
+            </p>
+          )}
 
-                {/* Generar con IA */}
-                {!aiOpen ? (
+          {form.tipo !== "" && (
+            <>
+              <p className="text-sm text-gray-400">
+                Elegí hasta 3 {tipoLabelPlural}.
+              </p>
+
+              <div className="flex flex-wrap gap-2">
+                {categoriasSugeridas.map((o) => (
                   <button
-                    type="button"
-                    onClick={() => setAiOpen(true)}
-                    className={`mt-2 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl border transition-colors ${
-                      isDark
-                        ? "border-purple-800 text-purple-400 hover:bg-purple-900/30"
-                        : "border-purple-300 text-purple-600 hover:bg-purple-50"
+                    key={o}
+                    onClick={() => toggleOficio(o)}
+                    className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer ${
+                      form.oficios.includes(o)
+                        ? "bg-indigo-500/10 border-indigo-500 text-indigo-300"
+                        : "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
                     }`}
                   >
-                    <span>✦</span> Generar con IA
+                    {o}
                   </button>
-                ) : (
-                  <div
-                    className={`mt-3 p-3 rounded-xl border ${isDark ? "border-purple-800 bg-purple-950/30" : "border-purple-200 bg-purple-50"}`}
-                  >
-                    <p
-                      className={`text-xs font-medium mb-2 ${isDark ? "text-purple-300" : "text-purple-700"}`}
-                    >
-                      Dos preguntas rapidas y la IA escribe el borrador
-                    </p>
-                    <div className="flex flex-col gap-2">
-                      <input
-                        value={aiForm.anios}
-                        onChange={(e) =>
-                          setAiForm((f) => ({ ...f, anios: e.target.value }))
-                        }
-                        placeholder="Años de experiencia (ej: 10)"
-                        inputMode="numeric"
-                        style={{ color: inputColor, backgroundColor: inputBg }}
-                        className={`w-full px-3 py-2 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                      />
-                      <input
-                        value={aiForm.zona}
-                        onChange={(e) =>
-                          setAiForm((f) => ({ ...f, zona: e.target.value }))
-                        }
-                        placeholder="Zonas donde trabajas (ej: Centro, Barrio Norte)"
-                        style={{ color: inputColor, backgroundColor: inputBg }}
-                        className={`w-full px-3 py-2 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                      />
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        type="button"
-                        onClick={handleGenerarDescripcion}
-                        disabled={aiLoading}
-                        className="flex-1 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
-                      >
-                        {aiLoading ? "Generando..." : "Generar descripcion"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setAiOpen(false)}
-                        className={`px-3 py-2 rounded-xl text-xs border transition-colors ${btnSecondary}`}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
 
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Años de experiencia y trabajos destacados{" "}
-                  <span className={textMuted}>(opcional)</span>
-                </label>
-                <textarea
-                  value={form.experiencia}
+              <div className="flex gap-2">
+                <input
+                  value={form.oficioCustom}
                   onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      experiencia: e.target.value.slice(0, 300),
-                    }))
+                    setForm((f) => ({ ...f, oficioCustom: e.target.value }))
                   }
-                  placeholder="Ej: 10 años trabajando en Reconquista. Hice la instalación eléctrica del Colegio X, el barrio Y..."
-                  rows={3}
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
+                  onKeyDown={(e) => e.key === "Enter" && addCustomOficio()}
+                  placeholder={`Otra ${tipoLabel}... (Enter)`}
+                  className="flex-1 px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
                 />
+                <button
+                  onClick={addCustomOficio}
+                  className="px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-gray-400 text-sm hover:border-gray-600 transition-colors"
+                >
+                  Agregar
+                </button>
               </div>
-            </div>
 
-            {error && (
-              <p
-                className={`mt-4 text-sm border rounded-xl px-4 py-3 ${errorCls}`}
-              >
-                {error}
+              {form.oficios.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {form.oficios.map((o) => (
+                    <span
+                      key={o}
+                      className="flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm bg-indigo-500/10 border-indigo-500 text-indigo-300"
+                    >
+                      {o}
+                      <button
+                        onClick={() => toggleOficio(o)}
+                        className="hover:opacity-70"
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      ),
+      canContinue: canGoStep2,
+      onContinue: goNext,
+    },
+    {
+      // Step 2 — Perfil
+      icon: <FileText className="w-8 h-8 text-emerald-400" />,
+      iconBg: "bg-emerald-500/20",
+      title: "Contanos sobre vos",
+      subtitle: "Esto es lo primero que van a leer tus clientes",
+      content: (
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="text-xs mb-1.5 flex items-center justify-between text-gray-400">
+              <span>Descripción</span>
+              <span className="text-gray-600">
+                {form.descripcion.length}/500, mínimo 30
+              </span>
+            </label>
+            <textarea
+              value={form.descripcion}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  descripcion: e.target.value.slice(0, 500),
+                }))
+              }
+              placeholder="Contá qué hacés, cómo trabajás, en qué zonas atendés."
+              rows={5}
+              className="w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+            />
+            {form.descripcion.length > 0 && form.descripcion.length < 30 && (
+              <p className="text-xs text-yellow-500 mt-1">
+                Faltan {30 - form.descripcion.length} caracteres más.
               </p>
             )}
 
-            <div className="flex gap-3 mt-8">
+            {/* Botón Generar con IA */}
+            {!aiOpen ? (
               <button
-                onClick={() => setStep(2)}
-                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
+                type="button"
+                onClick={() => setAiOpen(true)}
+                className="mt-3 flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-2xl border border-indigo-800 text-indigo-400 hover:bg-indigo-900/30 transition-colors"
               >
-                Atras
+                <Sparkles className="w-3.5 h-3.5" /> Generar con IA
               </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!canSubmit || loading}
-                className="flex-1 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3 p-4 rounded-2xl border border-indigo-800 bg-indigo-950/30"
               >
-                {loading ? "Creando perfil..." : "Publicar perfil"}
-              </button>
-            </div>
+                <p className="text-xs font-medium mb-3 text-indigo-300">
+                  Dos preguntas rápidas y la IA escribe el borrador
+                </p>
+                <div className="flex flex-col gap-2">
+                  <input
+                    value={aiForm.anios}
+                    onChange={(e) =>
+                      setAiForm((f) => ({ ...f, anios: e.target.value }))
+                    }
+                    placeholder="Años de experiencia (ej: 10)"
+                    inputMode="numeric"
+                    className="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                  <input
+                    value={aiForm.zona}
+                    onChange={(e) =>
+                      setAiForm((f) => ({ ...f, zona: e.target.value }))
+                    }
+                    placeholder="Zonas donde trabajás (ej: Centro, Barrio Norte)"
+                    className="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={handleGenerarDescripcion}
+                    disabled={aiLoading}
+                    className="flex-1 py-2.5 rounded-2xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                  >
+                    {aiLoading ? "Generando..." : "Generar descripción"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAiOpen(false)}
+                    className="px-4 py-2.5 rounded-2xl text-xs border border-gray-800 text-gray-400 hover:border-gray-600 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </div>
-        )}
 
-        {/* Step 4 — Notificaciones */}
-        {step === 4 && (
-          <>
-            <div
-              className={`mb-6 p-4 rounded-2xl flex items-center gap-3 ${isDark ? "bg-green-900/30 border border-green-800" : "bg-green-50 border border-green-200"}`}
-            >
-              <CheckCircle
-                className={`w-5 h-5 shrink-0 ${isDark ? "text-green-400" : "text-green-600"}`}
-              />
-              <div>
-                <p
-                  className={`text-sm font-semibold ${isDark ? "text-green-400" : "text-green-700"}`}
-                >
-                  ¡Perfil publicado!
-                </p>
-                <p
-                  className={`text-xs mt-0.5 ${isDark ? "text-green-600" : "text-green-600"}`}
-                >
-                  Ya estás visible para clientes en Reconquista.
-                </p>
-              </div>
-            </div>
-            <Step4Notificaciones
-              isDark={isDark}
-              permission={permission}
-              isSupported={isSupported}
-              requestPermission={requestPermission}
-              onFinish={() => router.push(`/profesional/${createdSlug}`)}
+          <div>
+            <label className="text-xs mb-1.5 block text-gray-400">
+              Experiencia{" "}
+              <span className="text-gray-600">(opcional)</span>
+            </label>
+            <textarea
+              value={form.experiencia}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  experiencia: e.target.value.slice(0, 300),
+                }))
+              }
+              placeholder="Ej: 10 años trabajando en Reconquista. Hice la instalación eléctrica del Colegio X..."
+              rows={3}
+              className="w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors resize-none"
             />
-          </>
-        )}
+          </div>
+
+          {error && (
+            <p className="text-sm border rounded-2xl px-4 py-3 text-red-400 bg-red-900/20 border-red-800">
+              {error}
+            </p>
+          )}
+        </div>
+      ),
+      canContinue: canSubmit && !loading,
+      onContinue: handleSubmit,
+      ctaLabel: loading ? "Creando perfil..." : "Publicar perfil",
+    },
+    {
+      // Step 3 — Notificaciones
+      icon: <Bell className="w-8 h-8 text-violet-400" />,
+      iconBg: "bg-violet-500/20",
+      title: "Activá las notificaciones",
+      subtitle: "Avisamos cuando un cliente quiere contactarte",
+      content: (
+        <Step4Notificaciones
+          permission={permission}
+          isSupported={isSupported}
+          requestPermission={requestPermission}
+          onFinish={onFinish}
+        />
+      ),
+      canContinue: false, // manejado internamente por el step
+      onContinue: onFinish,
+      hideButton: true,
+    },
+  ];
+
+  const currentStep = steps[step];
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+      {/* Header fijo */}
+      <div className="fixed top-0 left-0 right-0 z-10 bg-gray-950/90 backdrop-blur-sm px-4 pt-safe">
+        <div className="max-w-lg mx-auto">
+          <div className="flex items-center justify-between py-4">
+            <button
+              onClick={goBack}
+              className="w-10 h-10 flex items-center justify-center rounded-2xl text-gray-500 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <span className="text-sm text-gray-500">
+              paso {step + 1}/{TOTAL_STEPS}
+            </span>
+            <div className="w-10" />
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1 bg-gray-800 rounded-full mb-2">
+            <motion.div
+              className="h-1 bg-indigo-500 rounded-full"
+              animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Contenido con scroll */}
+      <div className="flex-1 flex flex-col pt-[88px] pb-32">
+        <div className="max-w-lg mx-auto w-full px-4">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={step}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.28, ease: "easeOut" }}
+              className="flex flex-col"
+            >
+              {/* Icono del step */}
+              <div className="flex justify-center mt-8 mb-8">
+                <motion.div
+                  variants={iconVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={`w-24 h-24 rounded-full ${currentStep.iconBg} flex items-center justify-center`}
+                >
+                  {currentStep.icon}
+                </motion.div>
+              </div>
+
+              {/* Titulo y subtitulo */}
+              <h1 className="text-2xl font-bold text-white text-center mb-2">
+                {currentStep.title}
+              </h1>
+              <p className="text-gray-400 text-center mb-8">
+                {currentStep.subtitle}
+              </p>
+
+              {/* Contenido del step */}
+              {currentStep.content}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Bottom button fijo */}
+      {!currentStep.hideButton && (
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur-sm px-4 pb-safe">
+          <div className="max-w-lg mx-auto py-4">
+            <motion.button
+              onClick={currentStep.onContinue}
+              disabled={!currentStep.canContinue}
+              whileTap={{ scale: 0.97 }}
+              className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {currentStep.ctaLabel ?? "Continuar"}
+            </motion.button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
