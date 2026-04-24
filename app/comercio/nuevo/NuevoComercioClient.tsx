@@ -19,13 +19,6 @@ import { useConfetti } from "../../hooks/useConfetti";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const BARRIOS = [
-  "Reconquista (toda la ciudad)",
-  "Centro", "Barrio Norte", "Barrio Sur", "Barrio Oeste", "Villa del Parque",
-  "Las Lomas", "Parque Industrial", "Barrio Newbery", "Villa Ocampo",
-  "Los Lapachos", "San Cayetano", "Otro",
-];
-
 const RUBROS = [
   "Almacén/Despensa",
   "Restaurante/Comida",
@@ -189,7 +182,7 @@ export default function NuevoComercioClient() {
   const [form, setForm] = useState({
     nombre: "",
     rubro: "",
-    barrio: "",
+    barrio: "Reconquista (toda la ciudad)",
     whatsapp: "",
     telefono: "",
     direccion: "",
@@ -341,7 +334,7 @@ export default function NuevoComercioClient() {
     [router, createdSlug],
   );
 
-  const canGoStep1 = form.nombre.trim() && form.rubro && form.barrio && form.whatsapp.length >= 11;
+  const canGoStep1 = form.nombre.trim() && form.rubro && form.whatsapp.length >= 11;
   const canGoStep2 = true;
   const canSubmit = !loading;
 
@@ -412,26 +405,6 @@ export default function NuevoComercioClient() {
                   }`}
                 >
                   {r}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="text-xs mb-2 block text-gray-400">Barrio</label>
-            <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1">
-              {BARRIOS.map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, barrio: b }))}
-                  className={`px-3 py-2 rounded-2xl text-sm border text-left transition-all ${
-                    form.barrio === b
-                      ? "bg-amber-500/10 border-amber-500 text-amber-300"
-                      : "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
-                  }`}
-                >
-                  {b}
                 </button>
               ))}
             </div>
