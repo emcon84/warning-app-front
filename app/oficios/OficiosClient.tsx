@@ -155,7 +155,7 @@ export default function OficiosClient({ professionals }: Props) {
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
               Destacados
             </p>
-            <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
+            <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide py-1">
               <div className="flex gap-4 pb-1" style={{ width: "max-content" }}>
                 {featured.map((pro) => {
                   const photo = photoUrl(pro.foto);

@@ -108,7 +108,7 @@ export default function ComerciosClient({ comercios }: Props) {
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
               Destacados
             </p>
-            <div className="overflow-hidden -mx-4 py-2 -my-2">
+            <div className="overflow-hidden -mx-4 py-2">
               <div className="marquee-comercios flex gap-4 px-4 pb-1" style={{ width: "max-content" }}>
                 {[...featured, ...featured].map((comercio, idx) => {
                   const photo = photoUrl(comercio.logo || comercio.foto);
