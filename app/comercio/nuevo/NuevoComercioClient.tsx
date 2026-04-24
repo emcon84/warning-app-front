@@ -1,12 +1,21 @@
 "use client";
 
-import { useState, useEffect, useRef, Fragment } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import Navbar from "../../components/Navbar";
-import { Bell, CheckCircle, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Store,
+  MapPin,
+  Camera,
+  Bell,
+  ArrowLeft,
+  Sparkles,
+  Check,
+  X,
+} from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useConfetti } from "../../hooks/useConfetti";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -44,90 +53,119 @@ const RUBROS = [
   "Otro",
 ];
 
+const TOTAL_STEPS = 4;
+
+const variants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+};
+
+const iconVariants = {
+  hidden: { scale: 0.7, opacity: 0 },
+  visible: { scale: 1, opacity: 1, transition: { delay: 0.1, duration: 0.3 } },
+};
+
+const INPUT_CLS =
+  "w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors";
+
 // ─── Step 4: Notificaciones ──────────────────────────────────────────────────
 
 function Step4Notificaciones({
-  isDark,
   permission,
   isSupported,
   requestPermission,
   onFinish,
 }: {
-  isDark: boolean;
   permission: NotificationPermission;
   isSupported: boolean;
   requestPermission: () => Promise<boolean>;
   onFinish: () => void;
 }) {
   const [activating, setActivating] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  const textSec = isDark ? "text-gray-400" : "text-gray-500";
-  const btnSecondary = isDark
-    ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
-    : "bg-gray-100 text-gray-600 hover:bg-gray-200";
+  const [status, setStatus] = useState<"idle" | "denied" | "error">("idle");
 
   useEffect(() => {
-    if (success || permission === "granted") {
-      const t = setTimeout(onFinish, 1500);
+    if (permission === "granted") {
+      const t = setTimeout(onFinish, 1200);
       return () => clearTimeout(t);
     }
-  }, [success, permission, onFinish]);
+  }, [permission, onFinish]);
 
   async function handleActivar() {
     setActivating(true);
-    const granted = await requestPermission();
-    setActivating(false);
-    if (granted) setSuccess(true);
+    setStatus("idle");
+    try {
+      const success = await requestPermission();
+      if (!success) {
+        setStatus("denied");
+        setTimeout(onFinish, 2000);
+      }
+    } catch {
+      setStatus("error");
+      setTimeout(onFinish, 2000);
+    } finally {
+      setActivating(false);
+    }
   }
 
-  if (success || permission === "granted") {
+  if (permission === "granted") {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <div className={`w-16 h-16 rounded-full border flex items-center justify-center ${
-          isDark ? "bg-green-900/40 border-green-700" : "bg-green-100 border-green-300"
-        }`}>
-          <CheckCircle className={`w-8 h-8 ${isDark ? "text-green-400" : "text-green-600"}`} />
-        </div>
-        <p className={`font-semibold text-lg ${isDark ? "text-white" : "text-gray-900"}`}>Notificaciones activadas</p>
-        <p className={`text-sm text-center ${textSec}`}>Te vamos a avisar cuando un cliente te consulte.</p>
+      <div className="flex flex-col items-center justify-center py-12 gap-6">
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center"
+        >
+          <Check className="w-12 h-12 text-green-400" />
+        </motion.div>
+        <p className="font-bold text-xl text-white">Notificaciones activadas</p>
+        <p className="text-sm text-center text-gray-400">
+          Te vamos a avisar cuando un cliente te consulte.
+        </p>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex flex-col items-center text-center mb-8">
-        <div className={`w-16 h-16 rounded-full border flex items-center justify-center mb-4 ${
-          isDark ? "bg-blue-950/60 border-blue-800" : "bg-blue-50 border-blue-200"
-        }`}>
-          <Bell className={`w-8 h-8 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
-        </div>
-        <h1 className={`text-xl font-bold mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>Activa las notificaciones</h1>
-        <p className={`text-sm ${textSec}`}>Para saber cuando un cliente te consulta</p>
-      </div>
-
+    <div className="flex flex-col gap-6">
       {!isSupported && (
-        <p className={`text-xs text-center mb-6 ${isDark ? "text-gray-500" : "text-gray-400"}`}>
-          Tu navegador no soporta notificaciones push. Podras activarlas despues desde tu perfil.
+        <p className="text-xs text-center text-gray-500">
+          Tu navegador no soporta notificaciones push. Podrás activarlas después
+          desde tu perfil.
         </p>
       )}
-
+      {status === "denied" && (
+        <div className="text-center p-4 rounded-2xl bg-yellow-900/30 border border-yellow-800">
+          <p className="text-sm text-yellow-400">
+            Las notificaciones fueron denegadas. Podrás activarlas luego desde tu perfil.
+          </p>
+        </div>
+      )}
+      {status === "error" && (
+        <div className="text-center p-4 rounded-2xl bg-red-900/30 border border-red-800">
+          <p className="text-sm text-red-400">
+            Hubo un error al activar las notificaciones. Podrás intentarlo luego desde tu perfil.
+          </p>
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         {isSupported && (
-          <button
+          <motion.button
             onClick={handleActivar}
             disabled={activating}
-            className="w-full py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors disabled:opacity-60"
+            whileTap={{ scale: 0.97 }}
+            className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {activating ? "Activando..." : "Activar notificaciones"}
-          </button>
+          </motion.button>
         )}
         <button
           onClick={onFinish}
-          className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-colors ${btnSecondary}`}
+          className="w-full py-2 text-sm text-gray-500 hover:text-white transition-colors"
         >
-          Omitir por ahora
+          Ahora no
         </button>
       </div>
     </div>
@@ -140,14 +178,14 @@ export default function NuevoComercioClient() {
   const router = useRouter();
   const { getToken, isSignedIn, isLoaded } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
+  const { fire: fireConfetti } = useConfetti();
 
-  const { isDark } = useTheme();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [createdSlug, setCreatedSlug] = useState("");
 
-  // Step 1 fields
   const [form, setForm] = useState({
     nombre: "",
     rubro: "",
@@ -174,26 +212,21 @@ export default function NuevoComercioClient() {
   const mainPhotoRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
+  function goNext() {
+    setDirection(1);
+    setStep((s) => s + 1);
+  }
 
-  const bg           = isDark ? "bg-gray-950" : "bg-gray-50";
-  const textPrimary  = isDark ? "text-white" : "text-gray-900";
-  const textSec      = isDark ? "text-gray-400" : "text-gray-500";
-  const textMuted    = isDark ? "text-gray-600" : "text-gray-400";
-  const inputCls     = isDark
-    ? "bg-gray-900 border-gray-700 placeholder-gray-500 focus:border-gray-500"
-    : "bg-white border-gray-200 placeholder-gray-400 focus:border-gray-400";
-  const inputColor   = isDark ? "#f9fafb" : "#111827";
-  const inputBg      = isDark ? "#111827" : "#ffffff";
-  const btnSecondary = isDark
-    ? "bg-gray-800 text-gray-300 hover:bg-gray-700 border-gray-700"
-    : "bg-gray-100 text-gray-600 hover:bg-gray-200 border-gray-200";
-  const stepFuture   = isDark ? "bg-gray-800 text-gray-500" : "bg-gray-200 text-gray-400";
-  const stepLine     = isDark ? "bg-gray-700" : "bg-gray-200";
-  const errorCls     = isDark
-    ? "text-red-400 bg-red-900/20 border-red-800"
-    : "text-red-600 bg-red-50 border-red-300";
+  function goBack() {
+    if (step === 0) {
+      router.back();
+      return;
+    }
+    setDirection(-1);
+    setStep((s) => s - 1);
+  }
 
-  // WhatsApp formatting (same as NuevoProfesionalClient)
+  // WhatsApp formatting
   function handleWhatsappChange(raw: string) {
     setWhatsappRaw(raw);
     const digits = raw.replace(/\D/g, "");
@@ -232,8 +265,8 @@ export default function NuevoComercioClient() {
       const data = await res.json();
       setForm((f) => ({ ...f, descripcion: data.descripcion }));
       setAiOpen(false);
-    } catch (e: any) {
-      setError(e.message || "No se pudo generar la descripcion. Intenta de nuevo.");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "No se pudo generar la descripcion.");
     } finally {
       setAiLoading(false);
     }
@@ -242,8 +275,7 @@ export default function NuevoComercioClient() {
   function handleMainPhoto(file: File | null) {
     setMainPhoto(file);
     if (file) {
-      const url = URL.createObjectURL(file);
-      setMainPreview(url);
+      setMainPreview(URL.createObjectURL(file));
     } else {
       setMainPreview(null);
     }
@@ -253,8 +285,7 @@ export default function NuevoComercioClient() {
     if (!files) return;
     const newFiles = Array.from(files).slice(0, 6 - gallery.length);
     setGallery((prev) => [...prev, ...newFiles]);
-    const newPreviews = newFiles.map((f) => URL.createObjectURL(f));
-    setGalleryPreviews((prev) => [...prev, ...newPreviews]);
+    setGalleryPreviews((prev) => [...prev, ...newFiles.map((f) => URL.createObjectURL(f))]);
   }
 
   function removeGalleryItem(idx: number) {
@@ -296,426 +327,466 @@ export default function NuevoComercioClient() {
 
       const comercio = await res.json();
       setCreatedSlug(comercio.slug);
-      setStep(4);
-    } catch (e: any) {
-      setError(e.message);
+      fireConfetti();
+      goNext();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Error desconocido");
     } finally {
       setLoading(false);
     }
   }
 
-  const canGoStep2 = form.nombre.trim() && form.rubro && form.barrio && form.whatsapp.length >= 11;
-  const canGoStep3 = true; // step 2 fields are optional-ish (direccion, horario required-ish but descripcion can be empty)
-  const canSubmit  = !loading;
+  const onFinish = useCallback(
+    () => router.push(`/comercio/${createdSlug}`),
+    [router, createdSlug],
+  );
+
+  const canGoStep1 = form.nombre.trim() && form.rubro && form.barrio && form.whatsapp.length >= 11;
+  const canGoStep2 = true;
+  const canSubmit = !loading;
 
   if (isLoaded && !isSignedIn) {
     return (
-      <div className={`min-h-screen ${bg} flex flex-col`}>
-        <Navbar sidebarDisabled />
-        <div className="flex-1 flex items-center justify-center px-6">
-          <div className={`w-full max-w-sm rounded-2xl border p-8 flex flex-col items-center text-center gap-5 ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}>
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
-              🏪
-            </div>
-            <div>
-              <h2 className={`text-lg font-bold mb-2 ${textPrimary}`}>Necesitás una cuenta</h2>
-              <p className={`text-sm leading-relaxed ${textSec}`}>
-                Para registrar tu comercio tenés que iniciar sesión primero. Es gratis y tarda menos de un minuto.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <button
-                onClick={() => router.push(`/sign-in?redirect_url=/comercio/nuevo`)}
-                className="w-full py-3 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors border border-gray-200"
-              >
-                Iniciar sesión
-              </button>
-              <button
-                onClick={() => router.back()}
-                className={`w-full py-3 rounded-2xl text-sm font-medium transition-colors ${isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"}`}
-              >
-                Volver
-              </button>
-            </div>
+      <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-sm rounded-2xl border border-gray-800 bg-gray-900 p-8 flex flex-col items-center text-center gap-5">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl bg-gray-800">
+            🏪
+          </div>
+          <div>
+            <h2 className="text-lg font-bold mb-2 text-white">Necesitás una cuenta</h2>
+            <p className="text-sm leading-relaxed text-gray-400">
+              Para registrar tu comercio tenés que iniciar sesión primero. Es gratis y tarda menos de un minuto.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 w-full">
+            <button
+              onClick={() => router.push(`/sign-in?redirect_url=/comercio/nuevo`)}
+              className="w-full py-3 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors"
+            >
+              Iniciar sesión
+            </button>
+            <button
+              onClick={() => router.back()}
+              className="w-full py-3 rounded-2xl text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors"
+            >
+              Volver
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className={`min-h-screen ${bg} ${textPrimary} flex flex-col`}>
-      <Navbar sidebarDisabled />
-
-      <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-24 pb-40">
-
-        {/* Progress */}
-        <div className="flex items-center mb-8">
-          {[1, 2, 3, 4].map((s) => (
-            <Fragment key={s}>
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${
-                s < step  ? "bg-green-500 text-white" :
-                s === step ? (isDark ? "bg-white text-gray-900" : "bg-gray-900 text-white") :
-                stepFuture
-              }`}>
-                {s < step ? "✓" : s}
-              </div>
-              {s < 4 && <div className={`h-px flex-1 mx-2 transition-colors ${s < step ? "bg-green-500" : stepLine}`} />}
-            </Fragment>
-          ))}
-        </div>
-
-        {/* ── Step 1: Datos del comercio ─────────────────────────────── */}
-        {step === 1 && (
-          <div key={1} className="animate-step-enter">
-            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Tu comercio</h1>
-            <p className={`text-sm mb-6 ${textSec}`}>Los datos principales que van a ver tus clientes.</p>
-
-            <div className="flex flex-col gap-4">
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>Nombre del comercio</label>
-                <input
-                  value={form.nombre}
-                  onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
-                  placeholder="Ej: Almacén El Cruce"
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>Rubro</label>
-                <select
-                  value={form.rubro}
-                  onChange={(e) => setForm((f) => ({ ...f, rubro: e.target.value }))}
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                >
-                  <option value="">Selecciona un rubro</option>
-                  {RUBROS.map((r) => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>Barrio</label>
-                <select
-                  value={form.barrio}
-                  onChange={(e) => setForm((f) => ({ ...f, barrio: e.target.value }))}
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                >
-                  <option value="">Selecciona un barrio</option>
-                  {BARRIOS.map((b) => <option key={b} value={b}>{b}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>WhatsApp</label>
-                <input
-                  value={whatsappRaw}
-                  onChange={(e) => handleWhatsappChange(e.target.value)}
-                  placeholder="Ej: 3482 123456"
-                  inputMode="numeric"
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-                {form.whatsapp.length >= 11 && (
-                  <p className={`text-xs mt-1.5 ${isDark ? "text-green-400" : "text-green-600"}`}>
-                    Listo: wa.me/{form.whatsapp}
-                  </p>
-                )}
-                {whatsappRaw && form.whatsapp.length < 11 && (
-                  <p className={`text-xs mt-1.5 ${isDark ? "text-yellow-500" : "text-yellow-600"}`}>
-                    Numero incompleto.
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Telefono <span className={textMuted}>(opcional)</span>
-                </label>
-                <input
-                  value={form.telefono}
-                  onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))}
-                  placeholder="03482-XXXXXX"
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={() => setStep(2)}
-              disabled={!canGoStep2}
-              className="w-full mt-8 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-            >
-              Continuar
-            </button>
+  // Step definitions
+  const steps = [
+    {
+      // Step 0 — Datos básicos
+      icon: <Store className="w-8 h-8 text-amber-400" />,
+      iconBg: "bg-amber-500/20",
+      title: "¿Cómo se llama tu comercio?",
+      subtitle: "El nombre que tus clientes ya conocen",
+      content: (
+        <div className="flex flex-col gap-5">
+          <div>
+            <label className="text-xs mb-1.5 block text-gray-400">Nombre del comercio</label>
+            <input
+              value={form.nombre}
+              onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
+              placeholder="Ej: Almacén El Cruce"
+              className={INPUT_CLS}
+            />
           </div>
-        )}
 
-        {/* ── Step 2: Descripcion e info ─────────────────────────────── */}
-        {step === 2 && (
-          <div key={2} className="animate-step-enter">
-            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Info del local</h1>
-            <p className={`text-sm mb-6 ${textSec}`}>Donde estan y como los encontran los clientes.</p>
-
-            <div className="flex flex-col gap-4">
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Direccion <span className={textMuted}>(opcional)</span>
-                </label>
-                <input
-                  value={form.direccion}
-                  onChange={(e) => setForm((f) => ({ ...f, direccion: e.target.value }))}
-                  placeholder="Ej: San Martín 1234"
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Horario <span className={textMuted}>(opcional)</span>
-                </label>
-                <input
-                  value={form.horario}
-                  onChange={(e) => setForm((f) => ({ ...f, horario: e.target.value }))}
-                  placeholder="Ej: Lunes a Viernes 9 a 18hs, Sabados 9 a 13hs"
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Descripcion <span className={textMuted}>({form.descripcion.length}/500)</span>
-                </label>
-                <textarea
-                  value={form.descripcion}
-                  onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value.slice(0, 500) }))}
-                  placeholder="Conta que venden, que los diferencia, si tienen delivery, etc."
-                  rows={5}
-                  style={{ color: inputColor, backgroundColor: inputBg }}
-                  className={`w-full px-4 py-3 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
-                />
-                {form.descripcion.length > 0 && form.descripcion.length < 30 && (
-                  <p className="text-xs text-yellow-600 mt-1">Minimo 30 caracteres.</p>
-                )}
-
-                {/* Generar con IA */}
-                {!aiOpen ? (
-                  <button
-                    type="button"
-                    onClick={() => setAiOpen(true)}
-                    className={`mt-2 flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl border transition-colors ${
-                      isDark
-                        ? "border-purple-800 text-purple-400 hover:bg-purple-900/30"
-                        : "border-purple-300 text-purple-600 hover:bg-purple-50"
-                    }`}
-                  >
-                    <span>✦</span> Generar con IA
-                  </button>
-                ) : (
-                  <div className={`mt-3 p-3 rounded-xl border ${isDark ? "border-purple-800 bg-purple-950/30" : "border-purple-200 bg-purple-50"}`}>
-                    <p className={`text-xs font-medium mb-2 ${isDark ? "text-purple-300" : "text-purple-700"}`}>
-                      Una pregunta rapida y la IA escribe el borrador
-                    </p>
-                    <input
-                      value={aiExtra.zona}
-                      onChange={(e) => setAiExtra({ zona: e.target.value })}
-                      placeholder="Zonas donde entregan / donde atienden (opcional)"
-                      style={{ color: inputColor, backgroundColor: inputBg }}
-                      className={`w-full px-3 py-2 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        type="button"
-                        onClick={handleGenerarDescripcion}
-                        disabled={aiLoading}
-                        className="flex-1 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors"
-                      >
-                        {aiLoading ? "Generando..." : "Generar descripcion"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setAiOpen(false)}
-                        className={`px-3 py-2 rounded-xl text-xs border transition-colors ${btnSecondary}`}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={() => setStep(1)}
-                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
-              >
-                Atras
-              </button>
-              <button
-                onClick={() => setStep(3)}
-                disabled={!canGoStep3}
-                className="flex-1 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-              >
-                Continuar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ── Step 3: Fotos ──────────────────────────────────────────── */}
-        {step === 3 && (
-          <div key={3} className="animate-step-enter">
-            <h1 className={`text-xl font-bold mb-1 ${textPrimary}`}>Fotos del local</h1>
-            <p className={`text-sm mb-6 ${textSec}`}>
-              Subí fotos de tu local, productos o servicios. Los clientes confian mas en los comercios con buenas fotos.
-            </p>
-
-            {/* Foto principal */}
-            <div className="mb-6">
-              <label className={`text-xs mb-2 block ${textSec}`}>Logo o foto principal</label>
-              <div className="flex items-center gap-4">
+          <div>
+            <label className="text-xs mb-2 block text-gray-400">Rubro</label>
+            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+              {RUBROS.map((r) => (
                 <button
+                  key={r}
                   type="button"
-                  onClick={() => mainPhotoRef.current?.click()}
-                  className={`w-24 h-24 rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-colors ${
-                    isDark
-                      ? "border-gray-700 hover:border-gray-500 bg-gray-900"
-                      : "border-gray-300 hover:border-gray-400 bg-gray-100"
+                  onClick={() => setForm((f) => ({ ...f, rubro: r }))}
+                  className={`px-3 py-2 rounded-2xl text-sm border text-left transition-all ${
+                    form.rubro === r
+                      ? "bg-amber-500/10 border-amber-500 text-amber-300"
+                      : "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
                   }`}
                 >
-                  {mainPreview ? (
-                    <img src={mainPreview} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className={`text-3xl ${textMuted}`}>+</span>
-                  )}
+                  {r}
                 </button>
-                <div>
-                  <p className={`text-sm font-medium ${textPrimary}`}>
-                    {mainPreview ? "Foto seleccionada" : "Sin foto aun"}
-                  </p>
-                  <p className={`text-xs mt-1 ${textMuted}`}>Circular, recomendado 400x400px</p>
-                  {mainPreview && (
-                    <button
-                      type="button"
-                      onClick={() => { setMainPhoto(null); setMainPreview(null); }}
-                      className={`text-xs mt-1 ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500 hover:text-red-400"}`}
-                    >
-                      Quitar foto
-                    </button>
-                  )}
-                </div>
-              </div>
-              <input
-                ref={mainPhotoRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => handleMainPhoto(e.target.files?.[0] ?? null)}
-              />
+              ))}
             </div>
+          </div>
 
-            {/* Galeria */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <label className={`text-xs ${textSec}`}>
-                  Galeria <span className={textMuted}>({gallery.length}/6)</span>
-                </label>
-                {gallery.length < 6 && (
+          <div>
+            <label className="text-xs mb-2 block text-gray-400">Barrio</label>
+            <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1">
+              {BARRIOS.map((b) => (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, barrio: b }))}
+                  className={`px-3 py-2 rounded-2xl text-sm border text-left transition-all ${
+                    form.barrio === b
+                      ? "bg-amber-500/10 border-amber-500 text-amber-300"
+                      : "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs mb-1.5 block text-gray-400">WhatsApp</label>
+            <input
+              value={whatsappRaw}
+              onChange={(e) => handleWhatsappChange(e.target.value)}
+              placeholder="Ej: 3482 123456"
+              inputMode="numeric"
+              className={INPUT_CLS}
+            />
+            {form.whatsapp.length >= 11 && (
+              <p className="text-xs mt-1.5 text-green-400">Listo: wa.me/{form.whatsapp}</p>
+            )}
+            {whatsappRaw && form.whatsapp.length < 11 && (
+              <p className="text-xs mt-1.5 text-yellow-500">Número incompleto.</p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-xs mb-1.5 block text-gray-400">
+              Teléfono <span className="text-gray-600">(opcional)</span>
+            </label>
+            <input
+              value={form.telefono}
+              onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))}
+              placeholder="03482-XXXXXX"
+              className={INPUT_CLS}
+            />
+          </div>
+        </div>
+      ),
+      canContinue: !!canGoStep1,
+      onContinue: goNext,
+    },
+    {
+      // Step 1 — Info del local
+      icon: <MapPin className="w-8 h-8 text-blue-400" />,
+      iconBg: "bg-blue-500/20",
+      title: "¿Dónde encontrarte?",
+      subtitle: "Todo opcional, pero suma mucho",
+      content: (
+        <div className="flex flex-col gap-5">
+          <div>
+            <label className="text-xs mb-1.5 block text-gray-400">
+              Dirección <span className="text-gray-600">(opcional)</span>
+            </label>
+            <input
+              value={form.direccion}
+              onChange={(e) => setForm((f) => ({ ...f, direccion: e.target.value }))}
+              placeholder="Ej: San Martín 1234"
+              className={INPUT_CLS}
+            />
+          </div>
+
+          <div>
+            <label className="text-xs mb-1.5 block text-gray-400">
+              Horario <span className="text-gray-600">(opcional)</span>
+            </label>
+            <input
+              value={form.horario}
+              onChange={(e) => setForm((f) => ({ ...f, horario: e.target.value }))}
+              placeholder="Ej: Lunes a Viernes 9 a 18hs, Sábados 9 a 13hs"
+              className={INPUT_CLS}
+            />
+          </div>
+
+          <div>
+            <label className="text-xs mb-1.5 flex items-center justify-between text-gray-400">
+              <span>Descripción <span className="text-gray-600">(opcional)</span></span>
+              <span className="text-gray-600">{form.descripcion.length}/500</span>
+            </label>
+            <textarea
+              value={form.descripcion}
+              onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value.slice(0, 500) }))}
+              placeholder="Contá qué venden, qué los diferencia, si tienen delivery, etc."
+              rows={4}
+              className="w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+            />
+
+            {/* Generar con IA */}
+            {!aiOpen ? (
+              <button
+                type="button"
+                onClick={() => setAiOpen(true)}
+                className="mt-3 flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-2xl border border-indigo-800 text-indigo-400 hover:bg-indigo-900/30 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Generar con IA
+              </button>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3 p-4 rounded-2xl border border-indigo-800 bg-indigo-950/30"
+              >
+                <p className="text-xs font-medium mb-3 text-indigo-300">
+                  Una pregunta rápida y la IA escribe el borrador
+                </p>
+                <input
+                  value={aiExtra.zona}
+                  onChange={(e) => setAiExtra({ zona: e.target.value })}
+                  placeholder="Zonas donde entregan / donde atienden (opcional)"
+                  className="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                />
+                <div className="flex gap-2 mt-3">
                   <button
                     type="button"
-                    onClick={() => galleryRef.current?.click()}
-                    className={`text-xs px-3 py-1.5 rounded-xl border transition-colors ${btnSecondary}`}
+                    onClick={handleGenerarDescripcion}
+                    disabled={aiLoading}
+                    className="flex-1 py-2.5 rounded-2xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-colors"
                   >
-                    + Agregar fotos
+                    {aiLoading ? "Generando..." : "Generar descripción"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAiOpen(false)}
+                    className="px-4 py-2.5 rounded-2xl text-xs border border-gray-800 text-gray-400 hover:border-gray-600 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      ),
+      canContinue: canGoStep2,
+      onContinue: goNext,
+    },
+    {
+      // Step 2 — Fotos
+      icon: <Camera className="w-8 h-8 text-pink-400" />,
+      iconBg: "bg-pink-500/20",
+      title: "Mostrá tu comercio",
+      subtitle: "Una buena foto hace la diferencia",
+      content: (
+        <div className="flex flex-col gap-6">
+          {/* Foto principal */}
+          <div>
+            <label className="text-xs mb-3 block text-gray-400">Logo o foto principal</label>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => mainPhotoRef.current?.click()}
+                className="w-24 h-24 rounded-full border-2 border-dashed border-gray-700 hover:border-gray-500 bg-gray-900 flex items-center justify-center overflow-hidden transition-colors"
+              >
+                {mainPreview ? (
+                  <img src={mainPreview} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <Camera className="w-8 h-8 text-gray-600" />
+                )}
+              </button>
+              <div>
+                <p className="text-sm font-medium text-white">
+                  {mainPreview ? "Foto seleccionada" : "Sin foto aún"}
+                </p>
+                <p className="text-xs mt-1 text-gray-600">Circular, recomendado 400x400px</p>
+                {mainPreview && (
+                  <button
+                    type="button"
+                    onClick={() => { setMainPhoto(null); setMainPreview(null); }}
+                    className="text-xs mt-1 text-red-400 hover:text-red-300"
+                  >
+                    Quitar foto
                   </button>
                 )}
               </div>
+            </div>
+            <input
+              ref={mainPhotoRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleMainPhoto(e.target.files?.[0] ?? null)}
+            />
+          </div>
 
-              {gallery.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mb-3">
-                  {galleryPreviews.map((src, i) => (
-                    <div key={i} className="relative aspect-square">
-                      <div className={`w-full h-full rounded-xl overflow-hidden border ${isDark ? "border-gray-800" : "border-gray-200"}`}>
-                        <img src={src} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeGalleryItem(i)}
-                        className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black transition-colors"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {gallery.length === 0 && (
+          {/* Galería */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-xs text-gray-400">
+                Galería <span className="text-gray-600">({gallery.length}/6)</span>
+              </label>
+              {gallery.length < 6 && (
                 <button
                   type="button"
                   onClick={() => galleryRef.current?.click()}
-                  className={`w-full py-10 rounded-xl border-2 border-dashed flex flex-col items-center gap-2 transition-colors ${
-                    isDark
-                      ? "border-gray-700 hover:border-gray-500 text-gray-500"
-                      : "border-gray-300 hover:border-gray-400 text-gray-400"
-                  }`}
+                  className="text-xs px-3 py-1.5 rounded-xl border border-gray-800 text-gray-400 hover:border-gray-600 transition-colors"
                 >
-                  <span className="text-3xl">+</span>
-                  <span className="text-xs">Agregar fotos del local</span>
+                  + Agregar fotos
                 </button>
               )}
-
-              <input
-                ref={galleryRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={(e) => handleGalleryAdd(e.target.files)}
-              />
             </div>
 
-            {error && (
-              <p className={`mb-4 text-sm border rounded-xl px-4 py-3 ${errorCls}`}>{error}</p>
+            {gallery.length > 0 && (
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {galleryPreviews.map((src, i) => (
+                  <div key={i} className="relative aspect-square">
+                    <div className="w-full h-full rounded-xl overflow-hidden border border-gray-800">
+                      <img src={src} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeGalleryItem(i)}
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
 
-            <div className="flex gap-3">
+            {gallery.length === 0 && (
               <button
-                onClick={() => setStep(2)}
-                className={`flex-1 py-3.5 rounded-2xl font-semibold text-sm transition-colors border ${btnSecondary}`}
+                type="button"
+                onClick={() => galleryRef.current?.click()}
+                className="w-full py-10 rounded-xl border-2 border-dashed border-gray-700 hover:border-gray-500 flex flex-col items-center gap-2 text-gray-500 transition-colors"
               >
-                Atras
+                <Camera className="w-8 h-8" />
+                <span className="text-xs">Agregar fotos del local</span>
               </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!canSubmit}
-                className="flex-1 py-3.5 rounded-2xl bg-white text-gray-900 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-              >
-                {loading ? "Publicando..." : "Publicar comercio"}
-              </button>
-            </div>
+            )}
+
+            <input
+              ref={galleryRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => handleGalleryAdd(e.target.files)}
+            />
           </div>
-        )}
 
-        {/* ── Step 4: Notificaciones ─────────────────────────────────── */}
-        {step === 4 && (
-          <Step4Notificaciones
-            isDark={isDark}
-            permission={permission}
-            isSupported={isSupported}
-            requestPermission={requestPermission}
-            onFinish={() => router.push(`/comercio/${createdSlug}`)}
-          />
-        )}
+          {error && (
+            <p className="text-sm border rounded-2xl px-4 py-3 text-red-400 bg-red-900/20 border-red-800">
+              {error}
+            </p>
+          )}
+        </div>
+      ),
+      canContinue: canSubmit,
+      onContinue: handleSubmit,
+      ctaLabel: loading ? "Publicando..." : "Publicar comercio",
+    },
+    {
+      // Step 3 — Notificaciones
+      icon: <Bell className="w-8 h-8 text-violet-400" />,
+      iconBg: "bg-violet-500/20",
+      title: "Casi listo",
+      subtitle: "Avisamos cuando un cliente quiere contactarte",
+      content: (
+        <Step4Notificaciones
+          permission={permission}
+          isSupported={isSupported}
+          requestPermission={requestPermission}
+          onFinish={onFinish}
+        />
+      ),
+      canContinue: false,
+      onContinue: onFinish,
+      hideButton: true,
+    },
+  ];
 
+  const currentStep = steps[step];
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+      {/* Header fijo */}
+      <div className="fixed top-0 left-0 right-0 z-10 bg-gray-950/90 backdrop-blur-sm px-4 pt-safe">
+        <div className="max-w-lg mx-auto">
+          <div className="flex items-center justify-between py-4">
+            <button
+              onClick={goBack}
+              className="w-10 h-10 flex items-center justify-center rounded-2xl text-gray-500 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <span className="text-sm text-gray-500">
+              paso {step + 1}/{TOTAL_STEPS}
+            </span>
+            <div className="w-10" />
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-1 bg-gray-800 rounded-full mb-2">
+            <motion.div
+              className="h-1 bg-indigo-500 rounded-full"
+              animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Contenido con scroll */}
+      <div className="flex-1 flex flex-col pt-[88px] pb-32">
+        <div className="max-w-lg mx-auto w-full px-4">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={step}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.28, ease: "easeOut" }}
+              className="flex flex-col"
+            >
+              {/* Ícono del step */}
+              <div className="flex justify-center mt-8 mb-8">
+                <motion.div
+                  variants={iconVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className={`w-24 h-24 rounded-full ${currentStep.iconBg} flex items-center justify-center`}
+                >
+                  {currentStep.icon}
+                </motion.div>
+              </div>
+
+              {/* Título y subtítulo */}
+              <h1 className="text-2xl font-bold text-white text-center mb-2">
+                {currentStep.title}
+              </h1>
+              <p className="text-gray-400 text-center mb-8">
+                {currentStep.subtitle}
+              </p>
+
+              {/* Contenido del step */}
+              {currentStep.content}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Bottom button fijo */}
+      {!currentStep.hideButton && (
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur-sm px-4 pb-safe">
+          <div className="max-w-lg mx-auto py-4">
+            <motion.button
+              onClick={currentStep.onContinue}
+              disabled={!currentStep.canContinue}
+              whileTap={{ scale: 0.97 }}
+              className="w-full py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-base transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {("ctaLabel" in currentStep && currentStep.ctaLabel) || "Continuar"}
+            </motion.button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

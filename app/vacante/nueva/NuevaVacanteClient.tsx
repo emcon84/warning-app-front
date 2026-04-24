@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../../components/Navbar";
+import { useConfetti } from "../../hooks/useConfetti";
 import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -87,6 +88,7 @@ export default function NuevaVacanteClient() {
 
   const { isDark } = useTheme();
 
+  const { fire: fireConfetti } = useConfetti();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -189,6 +191,7 @@ export default function NuevaVacanteClient() {
       }
       const data = await res.json();
       setCreatedId(data.id);
+      fireConfetti();
       goNext();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error inesperado");

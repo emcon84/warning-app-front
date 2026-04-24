@@ -14,6 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
+import { useConfetti } from "../../hooks/useConfetti";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -187,6 +188,7 @@ export default function NuevoProfesionalClient() {
   const { getToken } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
 
+  const { fire: fireConfetti } = useConfetti();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -322,6 +324,7 @@ export default function NuevoProfesionalClient() {
 
       const pro = await res.json();
       setCreatedSlug(pro.slug);
+      fireConfetti();
       goNext();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Error desconocido");
