@@ -65,8 +65,7 @@ const iconVariants = {
   visible: { scale: 1, opacity: 1, transition: { delay: 0.1, duration: 0.3 } },
 };
 
-const INPUT_CLS =
-  "w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors";
+// INPUT_CLS se genera dinámicamente dentro del componente según el tema
 
 export default function NuevaVacanteClient() {
   const router = useRouter();
@@ -74,6 +73,22 @@ export default function NuevaVacanteClient() {
   const { getToken } = useAuth();
 
   const { isDark } = useTheme();
+
+  const pageBg   = isDark ? "bg-gray-950"  : "bg-gray-50";
+  const headerBg = isDark ? "bg-gray-950/90" : "bg-gray-50/90";
+  const border   = isDark ? "border-gray-800" : "border-gray-200";
+  const textPri  = isDark ? "text-white"   : "text-gray-900";
+  const textSec  = isDark ? "text-gray-400": "text-gray-500";
+  const textMut  = isDark ? "text-gray-600": "text-gray-400";
+  const inputCls = isDark
+    ? "bg-gray-900 border-gray-800 text-white placeholder-gray-600 focus:border-indigo-500"
+    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500";
+  const chipBase = isDark
+    ? "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
+    : "bg-gray-100 border-gray-200 text-gray-600 hover:border-gray-400";
+  const chipSel  = "bg-indigo-500/10 border-indigo-500 text-indigo-400";
+
+  const INPUT_CLS = `w-full px-4 py-3.5 rounded-2xl ${inputCls} text-base focus:outline-none transition-colors`;
 
   const { fire: fireConfetti } = useConfetti();
   const [step, setStep] = useState(0);
@@ -188,12 +203,9 @@ export default function NuevaVacanteClient() {
   // ---------- Guards ----------
   if (!isLoaded || checkingComercio) return null;
 
-  const bg = isDark ? "bg-gray-950" : "bg-gray-50";
-  const textSec = isDark ? "text-gray-400" : "text-gray-500";
-
   if (!isSignedIn) {
     return (
-      <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
+      <div className={`min-h-screen ${pageBg} pb-40 md:pb-0`}>
         <Navbar
           totalReports={0}
           onMenuClick={() => {}}
@@ -230,7 +242,7 @@ export default function NuevaVacanteClient() {
 
   if (!hasComercio) {
     return (
-      <div className={`min-h-screen ${bg} pb-40 md:pb-0`}>
+      <div className={`min-h-screen ${pageBg} pb-40 md:pb-0`}>
         <Navbar
           totalReports={0}
           onMenuClick={() => {}}
@@ -278,7 +290,7 @@ export default function NuevaVacanteClient() {
   // ---------- Step 2 — Exito ----------
   if (step === 2 && createdId) {
     return (
-      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-6 text-center gap-8">
+      <div className={`min-h-screen ${pageBg} flex flex-col items-center justify-center px-6 text-center gap-8`}>
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 1] }}
@@ -294,8 +306,8 @@ export default function NuevaVacanteClient() {
           transition={{ delay: 0.4, duration: 0.3 }}
           className="flex flex-col gap-2"
         >
-          <h1 className="text-3xl font-bold text-white">Publicado!</h1>
-          <p className="text-gray-400">Tu busqueda ya esta visible</p>
+          <h1 className={`text-3xl font-bold ${textPri}`}>Publicado!</h1>
+          <p className={textSec}>Tu busqueda ya esta visible</p>
         </motion.div>
 
         <motion.div
@@ -313,7 +325,7 @@ export default function NuevaVacanteClient() {
           </motion.button>
           <button
             onClick={() => router.push("/profesionales")}
-            className="w-full py-3 text-sm text-gray-500 hover:text-white transition-colors"
+            className={`w-full py-3 text-sm ${textSec} transition-colors`}
           >
             Volver al buscador
           </button>
@@ -332,7 +344,7 @@ export default function NuevaVacanteClient() {
       content: (
         <div className="flex flex-col gap-5">
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
               Título del puesto
             </label>
             <input
@@ -346,9 +358,9 @@ export default function NuevaVacanteClient() {
           </div>
 
           <div>
-            <label className="text-xs mb-1.5 flex items-center justify-between text-gray-400">
+            <label className={`text-xs mb-1.5 flex items-center justify-between ${textSec}`}>
               <span>Descripción</span>
-              <span className="text-gray-600">{descripcion.length}/1000</span>
+              <span className={textMut}>{descripcion.length}/1000</span>
             </label>
             <textarea
               value={descripcion}
@@ -356,7 +368,7 @@ export default function NuevaVacanteClient() {
               placeholder="Descripción del puesto, tareas principales, requisitos, condiciones de trabajo..."
               rows={6}
               maxLength={1000}
-              className="w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+              className={`w-full px-4 py-3.5 rounded-2xl border ${inputCls} text-base focus:outline-none transition-colors resize-none`}
             />
           </div>
         </div>
@@ -373,7 +385,7 @@ export default function NuevaVacanteClient() {
         <div className="flex flex-col gap-5">
           {/* Habilidades */}
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
               Habilidades buscadas
             </label>
             <div className="flex gap-2 mb-2">
@@ -383,14 +395,14 @@ export default function NuevaVacanteClient() {
                 onChange={(e) => setHabilidadInput(e.target.value)}
                 onKeyDown={handleHabilidadKeyDown}
                 placeholder="Escribí una y Enter"
-                className="flex-1 px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                className={`flex-1 px-4 py-3 rounded-2xl border ${inputCls} text-sm focus:outline-none transition-colors`}
               />
               <button
                 onClick={() => {
                   addHabilidad(habilidadInput);
                   setHabilidadInput("");
                 }}
-                className="px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-gray-400 text-sm hover:border-gray-600 transition-colors"
+                className={`px-4 py-3 rounded-2xl border ${chipBase} text-sm transition-colors`}
               >
                 +
               </button>
@@ -401,7 +413,7 @@ export default function NuevaVacanteClient() {
                 {habilidades.map((h) => (
                   <span
                     key={h}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm bg-indigo-500/10 border-indigo-500 text-indigo-300"
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm ${chipSel}`}
                   >
                     {h}
                     <button
@@ -422,7 +434,7 @@ export default function NuevaVacanteClient() {
                   <button
                     key={h}
                     onClick={() => addHabilidad(h)}
-                    className="px-3 py-1.5 rounded-full text-xs border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-600 transition-colors"
+                    className={`px-3 py-1.5 rounded-full text-xs border ${chipBase} transition-colors`}
                   >
                     + {h}
                   </button>
@@ -432,7 +444,7 @@ export default function NuevaVacanteClient() {
 
           {/* Horario */}
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
               Horario (opcional)
             </label>
             <input
@@ -447,7 +459,7 @@ export default function NuevaVacanteClient() {
 
           {/* Salario */}
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
               Remuneración (opcional)
             </label>
             <input
@@ -462,7 +474,7 @@ export default function NuevaVacanteClient() {
 
           {/* Modalidad */}
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
               Modalidad (opcional)
             </label>
             <div className="flex flex-wrap gap-2">
@@ -471,9 +483,7 @@ export default function NuevaVacanteClient() {
                   key={m}
                   onClick={() => setModalidad(modalidad === m ? "" : m)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
-                    modalidad === m
-                      ? "bg-indigo-500/10 border-indigo-500 text-indigo-300"
-                      : "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
+                    modalidad === m ? chipSel : chipBase
                   }`}
                 >
                   {m}
@@ -498,25 +508,25 @@ export default function NuevaVacanteClient() {
   const currentStep = stepDefs[step];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className={`min-h-screen ${pageBg} ${textPri} flex flex-col`}>
       {/* Header fijo */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-gray-950/90 backdrop-blur-sm px-4 pt-safe">
+      <div className={`fixed top-0 left-0 right-0 z-10 ${headerBg} backdrop-blur-sm px-4 pt-safe`}>
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between py-4">
             <button
               onClick={goBack}
-              className="w-10 h-10 flex items-center justify-center rounded-2xl text-gray-500 hover:text-white transition-colors"
+              className={`w-10 h-10 flex items-center justify-center rounded-2xl ${textSec} transition-colors`}
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <span className="text-sm text-gray-500">
+            <span className={`text-sm ${textSec}`}>
               paso {step + 1}/{TOTAL_STEPS}
             </span>
             <div className="w-10" />
           </div>
 
           {/* Progress bar */}
-          <div className="h-1 bg-gray-800 rounded-full mb-2">
+          <div className={`h-1 ${isDark ? "bg-gray-800" : "bg-gray-200"} rounded-full mb-2`}>
             <motion.div
               className="h-1 bg-indigo-500 rounded-full"
               animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
@@ -553,10 +563,10 @@ export default function NuevaVacanteClient() {
               </div>
 
               {/* Titulo y subtitulo */}
-              <h1 className="text-2xl font-bold text-white text-center mb-2">
+              <h1 className={`text-2xl font-bold ${textPri} text-center mb-2`}>
                 {currentStep.title}
               </h1>
-              <p className="text-gray-400 text-center mb-8">
+              <p className={`${textSec} text-center mb-8`}>
                 {currentStep.subtitle}
               </p>
 
@@ -568,7 +578,7 @@ export default function NuevaVacanteClient() {
       </div>
 
       {/* Bottom button fijo */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur-sm px-4 pb-safe">
+      <div className={`fixed bottom-0 left-0 right-0 ${headerBg} backdrop-blur-sm px-4 pb-safe`}>
         <div className="max-w-lg mx-auto py-4">
           <motion.button
             onClick={currentStep.onContinue}

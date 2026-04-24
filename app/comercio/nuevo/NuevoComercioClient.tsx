@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useConfetti } from "../../hooks/useConfetti";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -59,8 +60,7 @@ const iconVariants = {
   visible: { scale: 1, opacity: 1, transition: { delay: 0.1, duration: 0.3 } },
 };
 
-const INPUT_CLS =
-  "w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors";
+// INPUT_CLS se genera dinámicamente dentro del componente según el tema
 
 // ─── Step 4: Notificaciones ──────────────────────────────────────────────────
 
@@ -77,6 +77,9 @@ function Step4Notificaciones({
 }) {
   const [activating, setActivating] = useState(false);
   const [status, setStatus] = useState<"idle" | "denied" | "error">("idle");
+  const { isDark } = useTheme();
+  const textPri = isDark ? "text-white" : "text-gray-900";
+  const textSec = isDark ? "text-gray-400" : "text-gray-500";
 
   useEffect(() => {
     if (permission === "granted") {
@@ -113,8 +116,8 @@ function Step4Notificaciones({
         >
           <Check className="w-12 h-12 text-green-400" />
         </motion.div>
-        <p className="font-bold text-xl text-white">Notificaciones activadas</p>
-        <p className="text-sm text-center text-gray-400">
+        <p className={`font-bold text-xl ${textPri}`}>Notificaciones activadas</p>
+        <p className={`text-sm text-center ${textSec}`}>
           Te vamos a avisar cuando un cliente te consulte.
         </p>
       </div>
@@ -124,7 +127,7 @@ function Step4Notificaciones({
   return (
     <div className="flex flex-col gap-6">
       {!isSupported && (
-        <p className="text-xs text-center text-gray-500">
+        <p className={`text-xs text-center ${textSec}`}>
           Tu navegador no soporta notificaciones push. Podrás activarlas después
           desde tu perfil.
         </p>
@@ -156,7 +159,7 @@ function Step4Notificaciones({
         )}
         <button
           onClick={onFinish}
-          className="w-full py-2 text-sm text-gray-500 hover:text-white transition-colors"
+          className={`w-full py-2 text-sm ${textSec} transition-colors`}
         >
           Ahora no
         </button>
@@ -172,6 +175,24 @@ export default function NuevoComercioClient() {
   const { getToken, isSignedIn, isLoaded } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
   const { fire: fireConfetti } = useConfetti();
+  const { isDark } = useTheme();
+
+  const pageBg   = isDark ? "bg-gray-950"  : "bg-gray-50";
+  const headerBg = isDark ? "bg-gray-950/90" : "bg-gray-50/90";
+  const cardBg   = isDark ? "bg-gray-900"  : "bg-white";
+  const border   = isDark ? "border-gray-800" : "border-gray-200";
+  const textPri  = isDark ? "text-white"   : "text-gray-900";
+  const textSec  = isDark ? "text-gray-400": "text-gray-500";
+  const textMut  = isDark ? "text-gray-600": "text-gray-400";
+  const inputCls = isDark
+    ? "bg-gray-900 border-gray-800 text-white placeholder-gray-600 focus:border-indigo-500"
+    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500";
+  const chipBase = isDark
+    ? "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
+    : "bg-gray-100 border-gray-200 text-gray-600 hover:border-gray-400";
+  const chipSel  = "bg-indigo-500/10 border-indigo-500 text-indigo-400";
+
+  const INPUT_CLS = `w-full px-4 py-3.5 rounded-2xl ${inputCls} text-base focus:outline-none transition-colors`;
 
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -340,27 +361,27 @@ export default function NuevoComercioClient() {
 
   if (isLoaded && !isSignedIn) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center px-6">
-        <div className="w-full max-w-sm rounded-2xl border border-gray-800 bg-gray-900 p-8 flex flex-col items-center text-center gap-5">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl bg-gray-800">
+      <div className={`min-h-screen ${pageBg} ${textPri} flex flex-col items-center justify-center px-6`}>
+        <div className={`w-full max-w-sm rounded-2xl border ${border} ${cardBg} p-8 flex flex-col items-center text-center gap-5`}>
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
             🏪
           </div>
           <div>
-            <h2 className="text-lg font-bold mb-2 text-white">Necesitás una cuenta</h2>
-            <p className="text-sm leading-relaxed text-gray-400">
+            <h2 className={`text-lg font-bold mb-2 ${textPri}`}>Necesitás una cuenta</h2>
+            <p className={`text-sm leading-relaxed ${textSec}`}>
               Para registrar tu comercio tenés que iniciar sesión primero. Es gratis y tarda menos de un minuto.
             </p>
           </div>
           <div className="flex flex-col gap-2 w-full">
             <button
               onClick={() => router.push(`/sign-in?redirect_url=/comercio/nuevo`)}
-              className="w-full py-3 rounded-2xl bg-white text-gray-900 font-semibold text-sm hover:bg-gray-100 transition-colors"
+              className={`w-full py-3 rounded-2xl font-semibold text-sm transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-gray-800"}`}
             >
               Iniciar sesión
             </button>
             <button
               onClick={() => router.back()}
-              className="w-full py-3 rounded-2xl text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors"
+              className={`w-full py-3 rounded-2xl text-sm font-medium ${textSec} transition-colors`}
             >
               Volver
             </button>
@@ -381,7 +402,7 @@ export default function NuevoComercioClient() {
       content: (
         <div className="flex flex-col gap-5">
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">Nombre del comercio</label>
+            <label className={`text-xs mb-1.5 block ${textSec}`}>Nombre del comercio</label>
             <input
               value={form.nombre}
               onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
@@ -391,7 +412,7 @@ export default function NuevoComercioClient() {
           </div>
 
           <div>
-            <label className="text-xs mb-2 block text-gray-400">Rubro</label>
+            <label className={`text-xs mb-2 block ${textSec}`}>Rubro</label>
             <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
               {RUBROS.map((r) => (
                 <button
@@ -401,7 +422,7 @@ export default function NuevoComercioClient() {
                   className={`px-3 py-2 rounded-2xl text-sm border text-left transition-all ${
                     form.rubro === r
                       ? "bg-amber-500/10 border-amber-500 text-amber-300"
-                      : "bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-600"
+                      : chipBase
                   }`}
                 >
                   {r}
@@ -411,7 +432,7 @@ export default function NuevoComercioClient() {
           </div>
 
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">WhatsApp</label>
+            <label className={`text-xs mb-1.5 block ${textSec}`}>WhatsApp</label>
             <input
               value={whatsappRaw}
               onChange={(e) => handleWhatsappChange(e.target.value)}
@@ -428,8 +449,8 @@ export default function NuevoComercioClient() {
           </div>
 
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
-              Teléfono <span className="text-gray-600">(opcional)</span>
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
+              Teléfono <span className={textMut}>(opcional)</span>
             </label>
             <input
               value={form.telefono}
@@ -452,8 +473,8 @@ export default function NuevoComercioClient() {
       content: (
         <div className="flex flex-col gap-5">
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
-              Dirección <span className="text-gray-600">(opcional)</span>
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
+              Dirección <span className={textMut}>(opcional)</span>
             </label>
             <input
               value={form.direccion}
@@ -464,8 +485,8 @@ export default function NuevoComercioClient() {
           </div>
 
           <div>
-            <label className="text-xs mb-1.5 block text-gray-400">
-              Horario <span className="text-gray-600">(opcional)</span>
+            <label className={`text-xs mb-1.5 block ${textSec}`}>
+              Horario <span className={textMut}>(opcional)</span>
             </label>
             <input
               value={form.horario}
@@ -476,16 +497,16 @@ export default function NuevoComercioClient() {
           </div>
 
           <div>
-            <label className="text-xs mb-1.5 flex items-center justify-between text-gray-400">
-              <span>Descripción <span className="text-gray-600">(opcional)</span></span>
-              <span className="text-gray-600">{form.descripcion.length}/500</span>
+            <label className={`text-xs mb-1.5 flex items-center justify-between ${textSec}`}>
+              <span>Descripción <span className={textMut}>(opcional)</span></span>
+              <span className={textMut}>{form.descripcion.length}/500</span>
             </label>
             <textarea
               value={form.descripcion}
               onChange={(e) => setForm((f) => ({ ...f, descripcion: e.target.value.slice(0, 500) }))}
               placeholder="Contá qué venden, qué los diferencia, si tienen delivery, etc."
               rows={4}
-              className="w-full px-4 py-3.5 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-base focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+              className={`w-full px-4 py-3.5 rounded-2xl border ${inputCls} text-base focus:outline-none transition-colors resize-none`}
             />
 
             {/* Generar con IA */}
@@ -510,7 +531,7 @@ export default function NuevoComercioClient() {
                   value={aiExtra.zona}
                   onChange={(e) => setAiExtra({ zona: e.target.value })}
                   placeholder="Zonas donde entregan / donde atienden (opcional)"
-                  className="w-full px-4 py-3 rounded-2xl bg-gray-900 border border-gray-800 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  className={`w-full px-4 py-3 rounded-2xl border ${inputCls} text-sm focus:outline-none transition-colors`}
                 />
                 <div className="flex gap-2 mt-3">
                   <button
@@ -524,7 +545,7 @@ export default function NuevoComercioClient() {
                   <button
                     type="button"
                     onClick={() => setAiOpen(false)}
-                    className="px-4 py-2.5 rounded-2xl text-xs border border-gray-800 text-gray-400 hover:border-gray-600 transition-colors"
+                    className={`px-4 py-2.5 rounded-2xl text-xs border ${border} ${textSec} hover:border-gray-600 transition-colors`}
                   >
                     Cancelar
                   </button>
@@ -547,24 +568,24 @@ export default function NuevoComercioClient() {
         <div className="flex flex-col gap-6">
           {/* Foto principal */}
           <div>
-            <label className="text-xs mb-3 block text-gray-400">Logo o foto principal</label>
+            <label className={`text-xs mb-3 block ${textSec}`}>Logo o foto principal</label>
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={() => mainPhotoRef.current?.click()}
-                className="w-24 h-24 rounded-full border-2 border-dashed border-gray-700 hover:border-gray-500 bg-gray-900 flex items-center justify-center overflow-hidden transition-colors"
+                className={`w-24 h-24 rounded-full border-2 border-dashed ${isDark ? "border-gray-700 hover:border-gray-500 bg-gray-900" : "border-gray-300 hover:border-gray-400 bg-gray-100"} flex items-center justify-center overflow-hidden transition-colors`}
               >
                 {mainPreview ? (
                   <img src={mainPreview} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
-                  <Camera className="w-8 h-8 text-gray-600" />
+                  <Camera className={`w-8 h-8 ${textMut}`} />
                 )}
               </button>
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className={`text-sm font-medium ${textPri}`}>
                   {mainPreview ? "Foto seleccionada" : "Sin foto aún"}
                 </p>
-                <p className="text-xs mt-1 text-gray-600">Circular, recomendado 400x400px</p>
+                <p className={`text-xs mt-1 ${textMut}`}>Circular, recomendado 400x400px</p>
                 {mainPreview && (
                   <button
                     type="button"
@@ -588,14 +609,14 @@ export default function NuevoComercioClient() {
           {/* Galería */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="text-xs text-gray-400">
-                Galería <span className="text-gray-600">({gallery.length}/6)</span>
+              <label className={`text-xs ${textSec}`}>
+                Galería <span className={textMut}>({gallery.length}/6)</span>
               </label>
               {gallery.length < 6 && (
                 <button
                   type="button"
                   onClick={() => galleryRef.current?.click()}
-                  className="text-xs px-3 py-1.5 rounded-xl border border-gray-800 text-gray-400 hover:border-gray-600 transition-colors"
+                  className={`text-xs px-3 py-1.5 rounded-xl border ${border} ${textSec} hover:border-gray-600 transition-colors`}
                 >
                   + Agregar fotos
                 </button>
@@ -606,7 +627,7 @@ export default function NuevoComercioClient() {
               <div className="grid grid-cols-3 gap-2 mb-3">
                 {galleryPreviews.map((src, i) => (
                   <div key={i} className="relative aspect-square">
-                    <div className="w-full h-full rounded-xl overflow-hidden border border-gray-800">
+                    <div className={`w-full h-full rounded-xl overflow-hidden border ${border}`}>
                       <img src={src} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
                     </div>
                     <button
@@ -625,7 +646,7 @@ export default function NuevoComercioClient() {
               <button
                 type="button"
                 onClick={() => galleryRef.current?.click()}
-                className="w-full py-10 rounded-xl border-2 border-dashed border-gray-700 hover:border-gray-500 flex flex-col items-center gap-2 text-gray-500 transition-colors"
+                className={`w-full py-10 rounded-xl border-2 border-dashed ${isDark ? "border-gray-700 hover:border-gray-500 text-gray-500" : "border-gray-300 hover:border-gray-400 text-gray-400"} flex flex-col items-center gap-2 transition-colors`}
               >
                 <Camera className="w-8 h-8" />
                 <span className="text-xs">Agregar fotos del local</span>
@@ -676,25 +697,25 @@ export default function NuevoComercioClient() {
   const currentStep = steps[step];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className={`min-h-screen ${pageBg} ${textPri} flex flex-col`}>
       {/* Header fijo */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-gray-950/90 backdrop-blur-sm px-4 pt-safe">
+      <div className={`fixed top-0 left-0 right-0 z-10 ${headerBg} backdrop-blur-sm px-4 pt-safe`}>
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between py-4">
             <button
               onClick={goBack}
-              className="w-10 h-10 flex items-center justify-center rounded-2xl text-gray-500 hover:text-white transition-colors"
+              className={`w-10 h-10 flex items-center justify-center rounded-2xl ${textSec} transition-colors`}
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <span className="text-sm text-gray-500">
+            <span className={`text-sm ${textSec}`}>
               paso {step + 1}/{TOTAL_STEPS}
             </span>
             <div className="w-10" />
           </div>
 
           {/* Progress bar */}
-          <div className="h-1 bg-gray-800 rounded-full mb-2">
+          <div className={`h-1 ${isDark ? "bg-gray-800" : "bg-gray-200"} rounded-full mb-2`}>
             <motion.div
               className="h-1 bg-indigo-500 rounded-full"
               animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
@@ -731,10 +752,10 @@ export default function NuevoComercioClient() {
               </div>
 
               {/* Título y subtítulo */}
-              <h1 className="text-2xl font-bold text-white text-center mb-2">
+              <h1 className={`text-2xl font-bold ${textPri} text-center mb-2`}>
                 {currentStep.title}
               </h1>
-              <p className="text-gray-400 text-center mb-8">
+              <p className={`${textSec} text-center mb-8`}>
                 {currentStep.subtitle}
               </p>
 
@@ -747,7 +768,7 @@ export default function NuevoComercioClient() {
 
       {/* Bottom button fijo */}
       {!currentStep.hideButton && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur-sm px-4 pb-safe">
+        <div className={`fixed bottom-0 left-0 right-0 ${headerBg} backdrop-blur-sm px-4 pb-safe`}>
           <div className="max-w-lg mx-auto py-4">
             <motion.button
               onClick={currentStep.onContinue}
