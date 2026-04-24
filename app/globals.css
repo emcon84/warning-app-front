@@ -25,6 +25,15 @@ body {
   font-family: var(--font-montserrat), 'Montserrat', sans-serif;
 }
 
+/* Ocultar scrollbar manteniendo el scroll */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Placeholder base */
 input::placeholder, textarea::placeholder {
   color: #9ca3af;

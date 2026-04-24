@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth, useUser } from "@clerk/nextjs";
@@ -1166,31 +1167,50 @@ export default function ProfesionalesClient({ professionals }: Props) {
                       : `Sin resultados para "${query}"`}
                   </p>
                   <div className="flex flex-col gap-3">
-                    {proResults.map((pro) => (
-                      <ResultCard
+                    {proResults.map((pro, index) => (
+                      <motion.div
                         key={pro.id}
-                        pro={pro}
-                        dark={isDark}
-                        favIds={favIds}
-                        onToggleFav={handleToggleFav}
-                      />
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: index * 0.03, ease: "easeOut" }}
+                      >
+                        <ResultCard
+                          pro={pro}
+                          dark={isDark}
+                          favIds={favIds}
+                          onToggleFav={handleToggleFav}
+                        />
+                      </motion.div>
                     ))}
-                    {comercioResults.map((c) => (
-                      <ComercioResultCard
+                    {comercioResults.map((c, index) => (
+                      <motion.div
                         key={c.id}
-                        comercio={c}
-                        dark={isDark}
-                      />
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: index * 0.03, ease: "easeOut" }}
+                      >
+                        <ComercioResultCard comercio={c} dark={isDark} />
+                      </motion.div>
                     ))}
-                    {empleadoResults.map((e) => (
-                      <EmpleadoResultCard
+                    {empleadoResults.map((e, index) => (
+                      <motion.div
                         key={e.id}
-                        empleado={e}
-                        dark={isDark}
-                      />
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: index * 0.03, ease: "easeOut" }}
+                      >
+                        <EmpleadoResultCard empleado={e} dark={isDark} />
+                      </motion.div>
                     ))}
-                    {vacanteResults.map((v) => (
-                      <VacanteResultCard key={v.id} vacante={v} dark={isDark} />
+                    {vacanteResults.map((v, index) => (
+                      <motion.div
+                        key={v.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: index * 0.03, ease: "easeOut" }}
+                      >
+                        <VacanteResultCard vacante={v} dark={isDark} />
+                      </motion.div>
                     ))}
                   </div>
                 </>

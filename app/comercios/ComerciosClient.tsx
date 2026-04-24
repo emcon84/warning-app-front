@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, Fragment } from "react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Comercio } from "../types";
@@ -207,9 +208,15 @@ export default function ComerciosClient({ comercios }: Props) {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {visible.map((comercio) => {
+            {visible.map((comercio, index) => {
               const photo = photoUrl(comercio.logo || comercio.foto);
               return (
+                <motion.div
+                  key={comercio.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, delay: index * 0.04, ease: "easeOut" }}
+                >
                 <button
                   key={comercio.id}
                   onClick={() => router.push(`/comercio/${comercio.slug}`)}
@@ -266,6 +273,7 @@ export default function ComerciosClient({ comercios }: Props) {
                     <ChevronRight className={`w-4 h-4 flex-shrink-0 ${textMuted}`} />
                   </div>
                 </button>
+                </motion.div>
               );
             })}
           </div>

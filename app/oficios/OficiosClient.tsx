@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Professional } from "../types";
@@ -248,9 +249,15 @@ export default function OficiosClient({ professionals }: Props) {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {visible.map((pro) => {
+            {visible.map((pro, index) => {
               const photo = photoUrl(pro.foto);
               return (
+                <motion.div
+                  key={pro.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, delay: index * 0.04, ease: "easeOut" }}
+                >
                 <button
                   key={pro.id}
                   onClick={() => router.push(`/profesional/${pro.slug}`)}
@@ -290,6 +297,7 @@ export default function OficiosClient({ professionals }: Props) {
                     <ChevronRight className={`w-4 h-4 flex-shrink-0 ${textMuted}`} />
                   </div>
                 </button>
+                </motion.div>
               );
             })}
           </div>
