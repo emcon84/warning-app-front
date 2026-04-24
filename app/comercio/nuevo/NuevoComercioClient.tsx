@@ -47,7 +47,7 @@ const RUBROS = [
   "Otro",
 ];
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 const variants = {
   enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
@@ -355,8 +355,9 @@ export default function NuevoComercioClient() {
     [router, createdSlug],
   );
 
-  const canGoStep1 = form.nombre.trim() && form.rubro && form.whatsapp.length >= 11;
-  const canGoStep2 = true;
+  const canGoStep0  = !!(form.nombre.trim() && form.whatsapp.length >= 11);
+  const canGoRubro  = !!form.rubro;
+  const canGoStep2  = true;
   const canSubmit = !loading;
 
   if (isLoaded && !isSignedIn) {
@@ -394,7 +395,7 @@ export default function NuevoComercioClient() {
   // Step definitions
   const steps = [
     {
-      // Step 0 — Datos básicos
+      // Step 0 — Nombre y contacto
       icon: <Store className="w-8 h-8 text-amber-400" />,
       iconBg: "bg-amber-500/20",
       title: "¿Cómo se llama tu comercio?",
@@ -409,26 +410,6 @@ export default function NuevoComercioClient() {
               placeholder="Ej: Almacén El Cruce"
               className={INPUT_CLS}
             />
-          </div>
-
-          <div>
-            <label className={`text-xs mb-2 block ${textSec}`}>Rubro</label>
-            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
-              {RUBROS.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, rubro: r }))}
-                  className={`px-3 py-2 rounded-2xl text-sm border text-left transition-all ${
-                    form.rubro === r
-                      ? "bg-amber-500/10 border-amber-500 text-amber-300"
-                      : chipBase
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div>
@@ -461,7 +442,38 @@ export default function NuevoComercioClient() {
           </div>
         </div>
       ),
-      canContinue: !!canGoStep1,
+      canContinue: canGoStep0,
+      onContinue: goNext,
+    },
+    {
+      // Step 1 — Rubro (pantalla dedicada)
+      icon: <Store className="w-8 h-8 text-orange-400" />,
+      iconBg: "bg-orange-500/20",
+      title: "¿Cuál es tu rubro?",
+      subtitle: "Elegí el que mejor describe tu negocio",
+      content: (
+        <div className="flex flex-col gap-2">
+          {RUBROS.map((r) => {
+            const selected = form.rubro === r;
+            return (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, rubro: r }))}
+                className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border text-left text-sm font-medium transition-all ${
+                  selected
+                    ? "bg-amber-500/10 border-amber-500 text-amber-400"
+                    : `${chipBase}`
+                }`}
+              >
+                <span>{r}</span>
+                {selected && <Check className="w-4 h-4 flex-shrink-0 ml-2" />}
+              </button>
+            );
+          })}
+        </div>
+      ),
+      canContinue: canGoRubro,
       onContinue: goNext,
     },
     {
