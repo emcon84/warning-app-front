@@ -112,14 +112,15 @@ export default function RootLayout({
           <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':true;if(d)document.documentElement.classList.add('dark');}catch(e){}})();` }} />
         </head>
         <body className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} font-sans antialiased`}>
-          <ViewTransitions />
-          <ApiStatusBanner />
-          <PWARedirect />
-          <ThemeProvider>{children}</ThemeProvider>
-          <PostLoginWizard />
-          <MobileBottomNav />
-          <NotificationPrompt />
-          <PWAInstallPrompt />
+          <ViewTransitions>
+            <ApiStatusBanner />
+            <PWARedirect />
+            <ThemeProvider>{children}</ThemeProvider>
+            <PostLoginWizard />
+            <MobileBottomNav />
+            <NotificationPrompt />
+            <PWAInstallPrompt />
+          </ViewTransitions>
         </body>
       </html>
     </ClerkProvider>
