@@ -115,11 +115,13 @@ export default function RootLayout({
           <ViewTransitions>
             <ApiStatusBanner />
             <PWARedirect />
-            <ThemeProvider>{children}</ThemeProvider>
-            <PostLoginWizard />
-            <MobileBottomNav />
-            <NotificationPrompt />
-            <PWAInstallPrompt />
+            <ThemeProvider>
+              {children}
+              <PostLoginWizard />
+              <MobileBottomNav />
+              <NotificationPrompt />
+              <PWAInstallPrompt />
+            </ThemeProvider>
           </ViewTransitions>
         </body>
       </html>
