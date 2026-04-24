@@ -323,7 +323,7 @@ function InfiniteCarousel<T extends { id: string }>({
   const halfWidthPx = copiesPerHalf * items.length * itemSlot;
   const duration = Math.round(halfWidthPx / 50);
   return (
-    <div className="overflow-hidden -mx-4">
+    <div className="overflow-hidden -mx-4 py-2 -my-2">
       <div
         className="flex carousel-marquee"
         style={{ gap: "1rem", animationDuration: `${duration}s` }}

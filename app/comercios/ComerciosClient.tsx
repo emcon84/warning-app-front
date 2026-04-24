@@ -108,7 +108,7 @@ export default function ComerciosClient({ comercios }: Props) {
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
               Destacados
             </p>
-            <div className="overflow-hidden -mx-4">
+            <div className="overflow-hidden -mx-4 py-2 -my-2">
               <div className="marquee-comercios flex gap-4 px-4 pb-1" style={{ width: "max-content" }}>
                 {[...featured, ...featured].map((comercio, idx) => {
                   const photo = photoUrl(comercio.logo || comercio.foto);
@@ -219,7 +219,14 @@ export default function ComerciosClient({ comercios }: Props) {
                 >
                 <button
                   key={comercio.id}
-                  onClick={() => router.push(`/comercio/${comercio.slug}`)}
+                  onClick={(e) => {
+                    const card = e.currentTarget;
+                    const photo = card.querySelector<HTMLElement>("[data-vt-photo]");
+                    const name  = card.querySelector<HTMLElement>("[data-vt-name]");
+                    if (photo) photo.style.viewTransitionName = `co-photo-${comercio.slug}`;
+                    if (name)  name.style.viewTransitionName  = `co-name-${comercio.slug}`;
+                    router.push(`/comercio/${comercio.slug}`);
+                  }}
                   className={`w-full text-left p-4 rounded-2xl border transition-colors ${cardBg} ${
                     comercio.isFounder
                       ? "border-amber-500/40"
@@ -230,8 +237,8 @@ export default function ComerciosClient({ comercios }: Props) {
                 >
                   <div className="flex items-center gap-3">
                     <div
+                      data-vt-photo
                       className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}
-                      style={{ viewTransitionName: `co-photo-${comercio.slug}` }}
                     >
                       {photo ? (
                         <img src={photo} alt={comercio.nombre} className="w-full h-full object-cover" />
@@ -243,8 +250,8 @@ export default function ComerciosClient({ comercios }: Props) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
+                        data-vt-name
                         className={`font-bold text-sm truncate ${textPrimary}`}
-                        style={{ viewTransitionName: `co-name-${comercio.slug}` }}
                       >
                         {comercio.nombre}
                       </p>
