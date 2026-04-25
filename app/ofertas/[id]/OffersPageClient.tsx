@@ -7,6 +7,7 @@ import { Supermarket, Offer } from "../../types";
 import { deleteSupermarketOffer } from "../../utils/api";
 import AddOfferModal from "../../components/AddOfferModal";
 import EditOfferModal from "../../components/EditOfferModal";
+import Navbar from "../../components/Navbar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -169,33 +170,37 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Header simplificado */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3 min-w-0">
-        <button
-          onClick={() => router.push("/ofertas")}
-          className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors flex-shrink-0"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
-          {supermarket.logo ? (
-            <img src={supermarket.logo} alt={supermarket.name} className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-sm font-bold text-gray-400 dark:text-gray-500">
-              {supermarket.name.charAt(0).toUpperCase()}
-            </span>
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-sm font-bold text-gray-900 dark:text-white truncate leading-none">{supermarket.name}</h1>
-          {supermarket.address && (
-            <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">{supermarket.address}</p>
-          )}
+      <Navbar />
+
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-20 pb-2">
+        {/* Breadcrumb + store info */}
+        <div className="flex items-center gap-3 mb-5">
+          <button
+            onClick={() => router.push("/ofertas")}
+            className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors flex-shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0">
+            {supermarket.logo ? (
+              <img src={supermarket.logo} alt={supermarket.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-sm font-bold text-gray-400 dark:text-gray-500">
+                {supermarket.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-base font-bold text-gray-900 dark:text-white truncate leading-none">{supermarket.name}</h1>
+            {supermarket.address && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">{supermarket.address}</p>
+            )}
+          </div>
         </div>
       </div>
 
       {/* SEO: título visible para crawlers */}
-      <div className="max-w-6xl mx-auto px-4 pt-5 pb-2">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-2 pb-2">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
           Ofertas vigentes
           <span className="ml-2 text-sm font-normal text-gray-400 dark:text-gray-500">
@@ -208,7 +213,7 @@ export default function OffersPageClient({ supermarket, initialOffers }: Props) 
       </div>
 
       {/* Grid de ofertas */}
-      <div className="max-w-6xl mx-auto px-4 py-4">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-4">
         {offers.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 gap-2 text-gray-400 dark:text-gray-600 text-center">
             <p className="text-4xl">😔</p>
