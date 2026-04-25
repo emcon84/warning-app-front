@@ -128,6 +128,23 @@ export default function OficiosClient({ professionals }: Props) {
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
+        {/* Buscador */}
+        <div className="relative mb-5 mt-2 md:max-w-2xl md:mx-auto">
+          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={tab === "oficio" ? "Buscar plomero, electricista..." : "Buscar abogado, contador..."}
+            className={`w-full pl-11 pr-11 py-3 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 ${inputCls}`}
+          />
+          {search && (
+            <button onClick={() => setSearch("")} className={`absolute right-4 top-1/2 -translate-y-1/2 ${textMuted}`}>
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
         {/* Sub-tabs */}
         <div className={`flex p-1 rounded-2xl mb-5 mt-2 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-gray-100"}`}>
           {([
@@ -247,23 +264,6 @@ export default function OficiosClient({ professionals }: Props) {
           <p className={`text-sm ${textMuted}`}>
             {filtered.length} {tab === "oficio" ? "oficios" : "profesionales"} disponibles
           </p>
-        </div>
-
-        {/* Buscador */}
-        <div className="relative mb-4 md:max-w-2xl md:mx-auto">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={tab === "oficio" ? "Buscar plomero, electricista..." : "Buscar abogado, contador..."}
-            className={`w-full pl-9 pr-9 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className={`absolute right-3 top-1/2 -translate-y-1/2 ${textMuted}`}>
-              <X className="w-4 h-4" />
-            </button>
-          )}
         </div>
 
         {/* Tags */}

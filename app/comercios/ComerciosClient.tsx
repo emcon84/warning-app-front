@@ -94,6 +94,23 @@ export default function ComerciosClient({ comercios }: Props) {
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
+        {/* Buscador */}
+        <div className="relative mb-5 mt-2 md:max-w-2xl md:mx-auto">
+          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar panaderia, ferreteria, ropa..."
+            className={`w-full pl-11 pr-11 py-3 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 ${inputCls}`}
+          />
+          {search && (
+            <button onClick={() => setSearch("")} className={`absolute right-4 top-1/2 -translate-y-1/2 ${textMuted}`}>
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
         {/* Destacados — marquee infinito */}
         {!search.trim() && !selectedRubro && featured.length > 0 && (
           <div className="mb-6 mt-2">
@@ -212,23 +229,6 @@ export default function ComerciosClient({ comercios }: Props) {
           <p className={`text-sm ${textMuted}`}>
             {filtered.length} comercios disponibles
           </p>
-        </div>
-
-        {/* Buscador */}
-        <div className="relative mb-4 md:max-w-2xl md:mx-auto">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar panaderia, ferreteria, ropa..."
-            className={`w-full pl-9 pr-9 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className={`absolute right-3 top-1/2 -translate-y-1/2 ${textMuted}`}>
-              <X className="w-4 h-4" />
-            </button>
-          )}
         </div>
 
         {/* Rubros */}

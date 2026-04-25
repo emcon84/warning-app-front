@@ -114,13 +114,13 @@ export default function MedicosClient({ doctors }: Props) {
 
         {/* Buscador */}
         <div className="relative mb-4 md:max-w-2xl md:mx-auto">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
+          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nombre, especialidad o barrio..."
-            className={`w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm focus:outline-none transition-colors ${inputCls}`}
+            className={`w-full pl-11 pr-11 py-3 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors ${inputCls}`}
           />
           {search && (
             <button
