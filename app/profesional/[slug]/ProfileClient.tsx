@@ -256,7 +256,7 @@ export default function ProfileClient({ pro, slug }: Props) {
       )}
 
       {/* Contenido: flex col debajo del navbar — pb-16 reserva espacio para la bottom nav */}
-      <div className="flex flex-col flex-1 overflow-hidden max-w-xl mx-auto w-full pb-16">
+      <div className="flex flex-col flex-1 overflow-hidden max-w-xl md:max-w-3xl mx-auto w-full pb-16">
 
         {/* BLOQUE FIJO: header + descripción */}
         <div className="flex-shrink-0 px-4 pt-16 pb-3">
