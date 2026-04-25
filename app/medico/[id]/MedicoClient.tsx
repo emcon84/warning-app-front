@@ -152,7 +152,7 @@ export default function MedicoClient({ doctor: initial }: Props) {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar sidebarDisabled mapView="doctors" />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
+      <div className="max-w-xl md:max-w-4xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
         {/* Volver */}
         <button
@@ -201,8 +201,11 @@ export default function MedicoClient({ doctor: initial }: Props) {
           </div>
         </div>
 
+        {/* Desktop: 2 columnas (card principal + obras sociales) */}
+        <div className="md:grid md:grid-cols-2 md:gap-4">
+
         {/* Card principal */}
-        <div className={`rounded-2xl border p-5 mb-4 ${cardBg}`}>
+        <div className={`rounded-2xl border p-5 mb-4 md:mb-0 ${cardBg}`}>
           <div className="flex items-start gap-4 mb-4">
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 ${
               isDark ? "bg-blue-900/40 border border-blue-800" : "bg-blue-50 border border-blue-100"
@@ -262,13 +265,15 @@ export default function MedicoClient({ doctor: initial }: Props) {
           </div>
         )}
 
+        </div>{/* end desktop 2-col grid */}
+
         {/* Mapa — vista (solo si tiene coords) */}
         {doctor.lat && doctor.lng && !editOpen && (
-          <div className={`rounded-2xl border overflow-hidden mb-4 ${cardBg}`}>
+          <div className={`rounded-2xl border overflow-hidden mb-4 mt-4 ${cardBg}`}>
             <div className="px-4 pt-4 pb-2">
               <p className={`text-xs font-semibold uppercase tracking-wider ${textMuted}`}>Ubicacion</p>
             </div>
-            <div className="h-52">
+            <div className="h-52 md:h-80">
               <MiniMap lat={doctor.lat} lng={doctor.lng} nombre={doctor.nombre} isDark={isDark} />
             </div>
             {doctor.direccion && (
