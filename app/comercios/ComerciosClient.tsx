@@ -92,7 +92,7 @@ export default function ComerciosClient({ comercios }: Props) {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
         {/* Destacados — marquee infinito */}
         {!search.trim() && !selectedRubro && featured.length > 0 && (
@@ -108,7 +108,8 @@ export default function ComerciosClient({ comercios }: Props) {
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
               Destacados
             </p>
-            <div className="overflow-hidden -mx-4 py-2">
+            {/* Mobile: marquee infinito */}
+            <div className="md:hidden overflow-hidden -mx-4 py-2">
               <div className="marquee-comercios flex gap-4 px-4 pb-1" style={{ width: "max-content" }}>
                 {[...featured, ...featured].map((comercio, idx) => {
                   const photo = photoUrl(comercio.logo || comercio.foto);
@@ -156,6 +157,53 @@ export default function ComerciosClient({ comercios }: Props) {
                 })}
               </div>
             </div>
+            {/* Desktop: grid estático */}
+            <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-6 gap-4 py-2">
+              {featured.map((comercio) => {
+                const photo = photoUrl(comercio.logo || comercio.foto);
+                return (
+                  <Link
+                    key={comercio.id}
+                    href={`/comercio/${comercio.slug}`}
+                    className="flex flex-col items-center gap-1.5 w-20 group"
+                  >
+                    <div className="relative">
+                      <div className={`w-14 h-14 rounded-full overflow-hidden ring-2 transition-all ${
+                        isDark
+                          ? comercio.isPremium ? "ring-amber-600 group-hover:ring-amber-400" : "ring-gray-800 group-hover:ring-amber-800"
+                          : comercio.isPremium ? "ring-amber-400 group-hover:ring-amber-500 shadow-md" : "ring-gray-200 group-hover:ring-amber-300 shadow-sm"
+                      }`}>
+                        {photo ? (
+                          <img src={photo} alt={comercio.nombre} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
+                            isDark ? "bg-amber-900/40 text-amber-500" : "bg-amber-50 text-amber-600"
+                          }`}>
+                            {comercio.nombre[0].toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      {comercio.isPremium && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-amber-500 flex items-center justify-center ring-2 ring-offset-0 ring-transparent">
+                          <span className="text-[8px] font-black text-white leading-none">P</span>
+                        </div>
+                      )}
+                      {!comercio.isPremium && comercio.isFounder && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center ring-2 ring-offset-0 ring-transparent" title="Comercio Fundador">
+                          <span className="text-[8px] font-black text-white leading-none">★</span>
+                        </div>
+                      )}
+                    </div>
+                    <p className={`text-xs font-semibold truncate w-full text-center ${textPrimary}`}>
+                      {comercio.nombre}
+                    </p>
+                    <p className={`text-[10px] capitalize truncate w-full text-center ${textMuted}`}>
+                      {comercio.rubro}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -167,7 +215,7 @@ export default function ComerciosClient({ comercios }: Props) {
         </div>
 
         {/* Buscador */}
-        <div className="relative mb-4">
+        <div className="relative mb-4 md:max-w-2xl md:mx-auto">
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
           <input
             type="text"
@@ -207,7 +255,7 @@ export default function ComerciosClient({ comercios }: Props) {
             <p className={`text-sm ${textSec}`}>No se encontraron comercios</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {visible.map((comercio, index) => {
               const photo = photoUrl(comercio.logo || comercio.foto);
               return (

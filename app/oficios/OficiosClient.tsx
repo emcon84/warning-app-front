@@ -126,7 +126,7 @@ export default function OficiosClient({ professionals }: Props) {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
         {/* Sub-tabs */}
         <div className={`flex p-1 rounded-2xl mb-5 mt-2 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-gray-100"}`}>
@@ -155,7 +155,8 @@ export default function OficiosClient({ professionals }: Props) {
             <p className={`text-xs font-semibold uppercase tracking-wide mb-3 ${textMuted}`}>
               Destacados
             </p>
-            <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide py-1">
+            {/* Mobile: scroll horizontal */}
+            <div className="md:hidden overflow-x-auto -mx-4 px-4 scrollbar-hide py-1">
               <div className="flex gap-4 pb-1" style={{ width: "max-content" }}>
                 {featured.map((pro) => {
                   const photo = photoUrl(pro.foto);
@@ -197,6 +198,47 @@ export default function OficiosClient({ professionals }: Props) {
                 })}
               </div>
             </div>
+            {/* Desktop: grid */}
+            <div className="hidden md:grid md:grid-cols-6 lg:grid-cols-8 gap-4 py-1">
+              {featured.map((pro) => {
+                const photo = photoUrl(pro.foto);
+                return (
+                  <Link
+                    key={pro.id}
+                    href={`/profesional/${pro.slug}`}
+                    className="flex flex-col items-center gap-1.5 w-20 group"
+                  >
+                    <div className={`w-14 h-14 rounded-full overflow-hidden ring-2 transition-all ${
+                      isDark
+                        ? "ring-gray-800 group-hover:ring-gray-600"
+                        : "ring-gray-200 group-hover:ring-gray-400 shadow-sm"
+                    }`}>
+                      {photo ? (
+                        <img src={photo} alt={pro.nombre} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
+                          isDark ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"
+                        }`}>
+                          {pro.nombre[0].toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <p className={`text-xs font-semibold truncate w-full text-center ${textPrimary}`}>
+                      {pro.nombre}
+                    </p>
+                    <p className={`text-[10px] capitalize truncate w-full text-center ${textMuted}`}>
+                      {pro.oficios[0]}
+                    </p>
+                    {pro.ratingCount > 0 && (
+                      <div className="flex items-center gap-0.5">
+                        <Star className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />
+                        <span className="text-[10px] text-yellow-400">{pro.ratingAvg.toFixed(1)}</span>
+                      </div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -208,7 +250,7 @@ export default function OficiosClient({ professionals }: Props) {
         </div>
 
         {/* Buscador */}
-        <div className="relative mb-4">
+        <div className="relative mb-4 md:max-w-2xl md:mx-auto">
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
           <input
             type="text"
@@ -226,7 +268,7 @@ export default function OficiosClient({ professionals }: Props) {
 
         {/* Tags */}
         {allTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-5">
+          <div className="flex flex-wrap gap-2 mb-5 md:max-w-4xl md:mx-auto">
             {allTags.slice(0, 20).map((tag) => (
               <button
                 key={tag}
@@ -248,7 +290,7 @@ export default function OficiosClient({ professionals }: Props) {
             <p className={`text-sm ${textSec}`}>No se encontraron resultados</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col md:grid md:grid-cols-2 gap-3">
             {visible.map((pro, index) => {
               const photo = photoUrl(pro.foto);
               return (
