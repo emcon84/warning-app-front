@@ -184,8 +184,8 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
         {/* Spacer mobile — empuja auth a la derecha cuando las pills están ocultas */}
         <div className="flex-1 md:hidden" />
 
-        {/* Pills de vista — ocultas en mobile, se muestran en el bottom nav */}
-        <div className="hidden md:flex flex-1 items-center justify-center gap-1 overflow-x-auto" data-tour="view-pills">
+        {/* Pills de vista — ocultas en mobile, se muestran en el bottom nav. Ocultas en desktop cuando sidebarDisabled */}
+        <div className={`hidden ${sidebarDisabled ? "" : "md:flex"} flex-1 items-center justify-center gap-1 overflow-x-auto`} data-tour="view-pills">
           {(
             [
               { key: "oficios",   label: "Oficios",   Icon: Wrench,       href: "/oficios",            active: pathname.startsWith("/oficios") || pathname.startsWith("/profesional"),           mapKey: null },
