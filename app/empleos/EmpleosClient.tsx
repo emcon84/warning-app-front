@@ -90,7 +90,7 @@ export default function EmpleosClient({ empleados, vacantes }: Props) {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
         {/* Sub-tabs */}
         <div className={`flex p-1 rounded-2xl mb-5 mt-2 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-gray-100"}`}>
@@ -121,7 +121,7 @@ export default function EmpleosClient({ empleados, vacantes }: Props) {
         </div>
 
         {/* Buscador */}
-        <div className="relative mb-5">
+        <div className="relative mb-5 md:max-w-2xl md:mx-auto">
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
           <input
             type="text"
@@ -144,7 +144,7 @@ export default function EmpleosClient({ empleados, vacantes }: Props) {
             <p className={`text-sm ${textSec}`}>No se encontraron resultados</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="grid md:grid-cols-2 gap-3">
             {tab === "vacantes"
               ? (visible as Vacante[]).map((v) => {
                   const photo = photoUrl(v.comercio.foto);

@@ -102,7 +102,7 @@ export default function MedicosClient({ doctors }: Props) {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar mapView="doctors" />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
         {/* Header */}
         <div className="mb-5">
@@ -113,7 +113,7 @@ export default function MedicosClient({ doctors }: Props) {
         </div>
 
         {/* Buscador */}
-        <div className="relative mb-4">
+        <div className="relative mb-4 md:max-w-2xl md:mx-auto">
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
           <input
             type="text"
@@ -133,7 +133,7 @@ export default function MedicosClient({ doctors }: Props) {
         </div>
 
         {/* Filtros en fila */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row gap-3 mb-4 md:max-w-2xl md:mx-auto">
           {/* Especialidad — select dropdown */}
           <div className="flex-1">
             <select
@@ -150,7 +150,7 @@ export default function MedicosClient({ doctors }: Props) {
         </div>
 
         {/* Obra social — pills con wrap */}
-        <div className="mb-5">
+        <div className="mb-5 md:max-w-4xl md:mx-auto">
           <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${textMuted}`}>Obra Social</p>
           <div className="flex flex-wrap gap-2">
             {OBRAS_SOCIALES_COMUNES.map((os) => (
@@ -186,7 +186,7 @@ export default function MedicosClient({ doctors }: Props) {
             <p className={`text-xs mt-1 ${textMuted}`}>Proba con otros filtros</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="grid md:grid-cols-2 gap-3">
             {visibleDoctors.map((doctor) => (
               <button
                 key={doctor.id}
