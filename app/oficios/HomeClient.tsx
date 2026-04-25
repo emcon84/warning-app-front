@@ -29,7 +29,7 @@ interface Props {
 }
 
 const QUICK_ACCESS = [
-  { label: "Oficios",    href: "/profesionales", Icon: Wrench,       color: "bg-blue-500/15 text-blue-500"   },
+  { label: "Oficios",    href: "/oficios/lista", Icon: Wrench,       color: "bg-blue-500/15 text-blue-500"   },
   { label: "Médicos",    href: "/medicos",        Icon: Stethoscope,  color: "bg-red-500/15 text-red-500"     },
   { label: "Farmacias",  href: "/mas",            Icon: Pill,         color: "bg-green-500/15 text-green-500" },
   { label: "Comercios",  href: "/comercios",      Icon: Store,        color: "bg-purple-500/15 text-purple-500"},
@@ -218,7 +218,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
           >
             <div className="flex items-center justify-between mb-3">
               <p className={`text-base font-bold ${textPrimary}`}>Profesionales Destacados</p>
-              <Link href="/profesionales" className={`text-xs flex items-center gap-0.5 ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+              <Link href="/oficios/lista" className={`text-xs flex items-center gap-0.5 ${isDark ? "text-blue-400" : "text-blue-600"}`}>
                 Ver todos <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -275,7 +275,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
         >
           <div className="flex items-center justify-between mb-3">
             <p className={`text-base font-bold ${textPrimary}`}>Para tu hogar</p>
-            <Link href="/profesionales" className={`text-xs flex items-center gap-0.5 ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+            <Link href="/oficios/lista" className={`text-xs flex items-center gap-0.5 ${isDark ? "text-blue-400" : "text-blue-600"}`}>
               Ver listado <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -283,7 +283,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
             {HOGAR_CATS.map(({ label, Icon, gradient }) => (
               <Link
                 key={label}
-                href="/profesionales"
+                href="/oficios/lista"
                 className={`relative h-24 rounded-2xl overflow-hidden bg-gradient-to-br ${gradient} flex flex-col justify-end p-3 active:scale-[0.97] transition-all`}
               >
                 <Icon className="absolute top-3 right-3 w-10 h-10 text-white opacity-20" />

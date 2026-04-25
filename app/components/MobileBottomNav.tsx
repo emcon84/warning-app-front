@@ -41,7 +41,7 @@ function Nav() {
         || pathname.startsWith("/medicos") || pathname.startsWith("/farmacias")
         || pathname.startsWith("/farmacias");
     }
-    if (href === "/oficios") return pathname === "/oficios" || pathname.startsWith("/profesional");
+    if (href === "/oficios") return pathname === "/oficios" || pathname === "/oficios/lista" || pathname.startsWith("/profesional");
     if (href === "/comercios") return pathname.startsWith("/comercios") || pathname.startsWith("/comercio");
     if (href === "/empleos") return pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante");
     return pathname === href || pathname.startsWith(href + "/");
