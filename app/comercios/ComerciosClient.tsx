@@ -52,8 +52,8 @@ export default function ComerciosClient({ comercios }: Props) {
       if (search.trim()) {
         const q = search.toLowerCase();
         return (
-          c.nombre.toLowerCase().includes(q) ||
-          c.rubro.toLowerCase().includes(q) ||
+          (c.nombre ?? "").toLowerCase().includes(q) ||
+          (c.rubro ?? "").toLowerCase().includes(q) ||
           (c.barrio?.toLowerCase().includes(q) ?? false) ||
           (c.descripcion?.toLowerCase().includes(q) ?? false)
         );
@@ -131,7 +131,7 @@ export default function ComerciosClient({ comercios }: Props) {
                             <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
                               isDark ? "bg-amber-900/40 text-amber-500" : "bg-amber-50 text-amber-600"
                             }`}>
-                              {comercio.nombre[0].toUpperCase()}
+                              {(comercio.nombre?.[0] ?? "?").toUpperCase()}
                             </div>
                           )}
                         </div>
@@ -179,7 +179,7 @@ export default function ComerciosClient({ comercios }: Props) {
                           <div className={`w-full h-full flex items-center justify-center text-lg font-bold ${
                             isDark ? "bg-amber-900/40 text-amber-500" : "bg-amber-50 text-amber-600"
                           }`}>
-                            {comercio.nombre[0].toUpperCase()}
+                            {(comercio.nombre?.[0] ?? "?").toUpperCase()}
                           </div>
                         )}
                       </div>

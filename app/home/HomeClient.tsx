@@ -31,7 +31,7 @@ interface Props {
 const QUICK_ACCESS = [
   { label: "Oficios",    href: "/oficios", Icon: Wrench,       color: "bg-blue-500/15 text-blue-500"   },
   { label: "Médicos",    href: "/medicos",        Icon: Stethoscope,  color: "bg-red-500/15 text-red-500"     },
-  { label: "Farmacias",  href: "/mas",            Icon: Pill,         color: "bg-green-500/15 text-green-500" },
+  { label: "Farmacias",  href: "/app?view=farmacias", Icon: Pill,      color: "bg-green-500/15 text-green-500" },
   { label: "Comercios",  href: "/comercios",      Icon: Store,        color: "bg-purple-500/15 text-purple-500"},
   { label: "Ofertas",    href: "/ofertas",         Icon: ShoppingCart, color: "bg-amber-500/15 text-amber-500" },
   { label: "Mapa",       href: "/app",            Icon: Map,          color: "bg-sky-500/15 text-sky-500"     },

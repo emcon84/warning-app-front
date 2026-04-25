@@ -52,16 +52,16 @@ export default function MedicosClient({ doctors }: Props) {
       if (selectedEspecialidad && d.especialidad !== selectedEspecialidad) return false;
       if (selectedOS) {
         const osLower = selectedOS.toLowerCase();
-        const hasOS = d.obrasSociales.some((os) => os.toLowerCase().includes(osLower));
+        const hasOS = (d.obrasSociales ?? []).some((os) => os.toLowerCase().includes(osLower));
         const hasIapos = selectedOS === "IAPOS" && d.iapos;
         if (!hasOS && !hasIapos) return false;
       }
       if (search.trim()) {
         const q = search.toLowerCase();
         const match =
-          d.nombre.toLowerCase().includes(q) ||
-          d.especialidad.toLowerCase().includes(q) ||
-          d.barrio.toLowerCase().includes(q);
+          (d.nombre ?? "").toLowerCase().includes(q) ||
+          (d.especialidad ?? "").toLowerCase().includes(q) ||
+          (d.barrio ?? "").toLowerCase().includes(q);
         if (!match) return false;
       }
       return true;
@@ -234,7 +234,7 @@ export default function MedicosClient({ doctors }: Props) {
                             IAPOS
                           </span>
                         )}
-                        {doctor.obrasSociales?.slice(0, 3).map((os) => (
+                        {(doctor.obrasSociales ?? []).slice(0, 3).map((os) => (
                           <span key={os} className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${
                             isDark
                               ? "bg-gray-800 text-gray-400 border-gray-700"
