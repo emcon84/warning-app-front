@@ -311,13 +311,13 @@ export default function Home() {
                 </ul>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
-                    href="/comercio/nuevo"
+                    href="/home"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-2xl transition-colors text-sm"
                   >
                     Registrar mi comercio gratis
                   </Link>
                   <Link
-                    href="/para-comercios"
+                    href="/home"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:border-amber-500 font-semibold rounded-2xl transition-colors text-sm"
                   >
                     Saber mas
@@ -445,7 +445,7 @@ export default function Home() {
               Quien llega a tu perfil en la app ya está buscando un comercio como el tuyo. Esa intención de compra no existe en ninguna red social.
             </p>
             <Link
-              href="/comercio/nuevo"
+              href="/home"
               className="inline-flex items-center gap-2 mt-8 px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-sm transition-colors"
             >
               Registrar mi comercio gratis

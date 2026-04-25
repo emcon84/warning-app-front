@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
+import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -157,7 +157,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[1002] ${navBg} ${navText} ${shadow}`}>
-      <div className="flex items-center gap-2 px-3 py-2">
+      <div className="max-w-5xl mx-auto w-full flex items-center gap-2 px-4 py-2">
 
         {/* Hamburguesa — solo si hay sidebar y no está deshabilitado */}
         {onMenuClick && !sidebarDisabled && (
@@ -178,7 +178,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
           src="/icon.svg"
           className="w-7 h-7 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           alt="Reportes RQ"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/home")}
         />
 
         {/* Spacer mobile — empuja auth a la derecha cuando las pills están ocultas */}
@@ -188,6 +188,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
         <div className={`hidden ${sidebarDisabled ? "" : "md:flex"} flex-1 items-center justify-center gap-1 overflow-x-auto`} data-tour="view-pills">
           {(
             [
+              { key: "home",      label: "Home",      Icon: Home,         href: "/home",               active: pathname === "/home",                                                            mapKey: null },
               { key: "oficios",   label: "Oficios",   Icon: Wrench,       href: "/oficios",            active: pathname.startsWith("/oficios") || pathname.startsWith("/profesional"),           mapKey: null },
               { key: "comercios", label: "Comercios", Icon: Store,        href: "/comercios",           active: pathname.startsWith("/comercios") || pathname.startsWith("/comercio"),           mapKey: null },
               { key: "ofertas",   label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",             active: pathname.startsWith("/ofertas"),                                                 mapKey: null },
