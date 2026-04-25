@@ -38,12 +38,12 @@ const QUICK_ACCESS = [
 ] as const;
 
 const HOGAR_CATS = [
-  { label: "Gasistas",      Icon: Flame,     gradient: "from-blue-500 to-cyan-400"    },
-  { label: "Electricistas", Icon: Zap,       gradient: "from-yellow-400 to-amber-500" },
-  { label: "Plomeros",      Icon: Droplets,  gradient: "from-teal-500 to-green-400"   },
-  { label: "Albañiles",     Icon: HardHat,   gradient: "from-orange-500 to-red-400"   },
-  { label: "Carpinteros",   Icon: Trees,     gradient: "from-amber-600 to-yellow-400" },
-  { label: "Mecánicos",     Icon: Settings2, gradient: "from-slate-600 to-gray-400"   },
+  { label: "Gasistas",      Icon: Flame,     image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=200&fit=crop&q=80" },
+  { label: "Electricistas", Icon: Zap,       image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=200&fit=crop&q=80" },
+  { label: "Plomeros",      Icon: Droplets,  image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=200&fit=crop&q=80" },
+  { label: "Albañiles",     Icon: HardHat,   image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=200&fit=crop&q=80" },
+  { label: "Carpinteros",   Icon: Trees,     image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=200&fit=crop&q=80" },
+  { label: "Mecánicos",     Icon: Settings2, image: "https://images.unsplash.com/photo-1530046339160-ce3e530d7b4e?w=400&h=200&fit=crop&q=80" },
 ] as const;
 
 const PRO_GRADIENTS = [
@@ -92,7 +92,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0, ease: "easeOut" }}
-          className="mb-6"
+          className="mb-6 text-center"
         >
           <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs mb-3 ${isDark ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"}`}>
             <MapPin className="w-3 h-3" />
@@ -116,7 +116,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar plomero, electricista, médico..."
-              className={`w-full pl-11 pr-11 py-3.5 rounded-2xl border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+              className={`w-full pl-11 pr-11 py-3.5 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                 isDark
                   ? "bg-gray-900 border-gray-700 text-white placeholder-gray-600"
                   : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm"
@@ -280,16 +280,17 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {HOGAR_CATS.map(({ label, Icon, gradient }) => (
+            {HOGAR_CATS.map(({ label, Icon, image }) => (
               <Link
                 key={label}
                 href="/oficios/lista"
-                className={`relative h-24 rounded-2xl overflow-hidden bg-gradient-to-br ${gradient} flex flex-col justify-end p-3 active:scale-[0.97] transition-all`}
+                className="relative h-24 rounded-2xl overflow-hidden active:scale-[0.97] transition-all"
               >
-                <Icon className="absolute top-3 right-3 w-10 h-10 text-white opacity-20" />
-                <div className="flex items-center gap-1.5">
-                  <Icon className="w-4 h-4 text-white" />
-                  <span className="text-sm font-semibold text-white">{label}</span>
+                <img src={image} alt={label} className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/50" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 flex items-center gap-1.5">
+                  <Icon className="w-4 h-4 text-white flex-shrink-0" />
+                  <span className="text-sm font-bold text-white">{label}</span>
                 </div>
               </Link>
             ))}

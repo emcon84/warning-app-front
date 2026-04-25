@@ -2,15 +2,15 @@
 
 import { Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Home, Wrench, Store, ShoppingCart, Briefcase, MoreHorizontal } from "lucide-react";
+import { Home, Wrench, Store, ShoppingCart, MoreHorizontal } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 
 const ITEMS = [
-  { label: "Home",      Icon: Home,           href: "/oficios"   },
-  { label: "Comercios", Icon: Store,           href: "/comercios" },
-  { label: "Ofertas",   Icon: ShoppingCart,   href: "/ofertas"   },
-  { label: "Empleos",   Icon: Briefcase,      href: "/empleos"   },
-  { label: "Mas",       Icon: MoreHorizontal, href: "/mas"       },
+  { label: "Home",      Icon: Home,           href: "/oficios"       },
+  { label: "Oficios",   Icon: Wrench,         href: "/oficios/lista" },
+  { label: "Comercios", Icon: Store,          href: "/comercios"     },
+  { label: "Ofertas",   Icon: ShoppingCart,   href: "/ofertas"       },
+  { label: "Mas",       Icon: MoreHorizontal, href: "/mas"           },
 ];
 
 const HIDDEN_PATHS = [
@@ -38,10 +38,10 @@ function Nav() {
   function isActive(href: string) {
     if (href === "/mas") {
       return pathname === "/mas" || pathname === "/app"
-        || pathname.startsWith("/medicos") || pathname.startsWith("/farmacias")
-        || pathname.startsWith("/farmacias");
+        || pathname.startsWith("/medicos") || pathname.startsWith("/farmacias");
     }
-    if (href === "/oficios") return pathname === "/oficios" || pathname === "/oficios/lista" || pathname.startsWith("/profesional");
+    if (href === "/oficios") return pathname === "/oficios";
+    if (href === "/oficios/lista") return pathname === "/oficios/lista" || pathname.startsWith("/profesional");
     if (href === "/comercios") return pathname.startsWith("/comercios") || pathname.startsWith("/comercio");
     if (href === "/empleos") return pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante");
     return pathname === href || pathname.startsWith(href + "/");
