@@ -132,7 +132,7 @@ const FEATURES = [
     description: "Reporta baches, inundaciones, alumbrado roto y situaciones urbanas. Quedan geolocalizados y visibles para todos los vecinos.",
     color: "text-orange-500 dark:text-orange-400",
     bg: "bg-orange-500/10 border-orange-500/20",
-    href: "/app",
+    href: "/home",
   },
   {
     icon: Stethoscope,
@@ -140,7 +140,7 @@ const FEATURES = [
     description: "Directorio completo de medicos en Reconquista con especialidad, obra social y ubicacion en el mapa.",
     color: "text-cyan-600 dark:text-cyan-400",
     bg: "bg-cyan-500/10 border-cyan-500/20",
-    href: "/medicos",
+    href: "/home",
   },
   {
     icon: Pill,
@@ -148,7 +148,7 @@ const FEATURES = [
     description: "Sabe cuál farmacia esta de turno hoy en Reconquista. Actualizado diariamente con direccion y telefono.",
     color: "text-green-600 dark:text-green-400",
     bg: "bg-green-500/10 border-green-500/20",
-    href: "/farmacias",
+    href: "/home",
   },
   {
     icon: Wrench,
@@ -156,7 +156,7 @@ const FEATURES = [
     description: "Plomeros, electricistas, albaniles, contadores, abogados y mas. Contacto directo por chat en tiempo real.",
     color: "text-purple-600 dark:text-purple-400",
     bg: "bg-purple-500/10 border-purple-500/20",
-    href: "/oficios",
+    href: "/home",
   },
   {
     icon: Store,
@@ -164,7 +164,7 @@ const FEATURES = [
     description: "El directorio de negocios de Reconquista. Encontra lo que necesitas y contacta directamente por WhatsApp.",
     color: "text-amber-600 dark:text-amber-400",
     bg: "bg-amber-500/10 border-amber-500/20",
-    href: "/comercios",
+    href: "/home",
   },
   {
     icon: ShoppingCart,
@@ -172,7 +172,7 @@ const FEATURES = [
     description: "Las mejores ofertas y promociones de los supermercados de Reconquista actualizadas por la comunidad.",
     color: "text-yellow-600 dark:text-yellow-400",
     bg: "bg-yellow-500/10 border-yellow-500/20",
-    href: "/ofertas",
+    href: "/home",
   },
 ];
 
@@ -219,7 +219,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <LandingThemeToggle />
               <Link
-                href="/oficios"
+                href="/home"
                 className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-colors"
               >
                 Abrir app
@@ -508,10 +508,10 @@ export default function Home() {
             </p>
             <div className="flex items-center gap-4">
               {[
-                { label: "App", href: "/app" },
-                { label: "Oficios", href: "/oficios" },
-                { label: "Comercios", href: "/comercios" },
-                { label: "Farmacias", href: "/farmacias" },
+                { label: "App", href: "/home" },
+                { label: "Oficios", href: "/home" },
+                { label: "Comercios", href: "/home" },
+                { label: "Farmacias", href: "/home" },
               ].map((l) => (
                 <Link key={l.label} href={l.href} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                   {l.label}

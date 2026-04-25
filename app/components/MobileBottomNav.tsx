@@ -6,11 +6,11 @@ import { Home, Wrench, Store, ShoppingCart, MoreHorizontal } from "lucide-react"
 import { useTheme } from "../contexts/ThemeContext";
 
 const ITEMS = [
-  { label: "Home",      Icon: Home,           href: "/oficios"       },
-  { label: "Oficios",   Icon: Wrench,         href: "/oficios/lista" },
-  { label: "Comercios", Icon: Store,          href: "/comercios"     },
-  { label: "Ofertas",   Icon: ShoppingCart,   href: "/ofertas"       },
-  { label: "Mas",       Icon: MoreHorizontal, href: "/mas"           },
+  { label: "Home",      Icon: Home,           href: "/home"      },
+  { label: "Oficios",   Icon: Wrench,         href: "/oficios"   },
+  { label: "Comercios", Icon: Store,          href: "/comercios" },
+  { label: "Ofertas",   Icon: ShoppingCart,   href: "/ofertas"   },
+  { label: "Mas",       Icon: MoreHorizontal, href: "/mas"       },
 ];
 
 const HIDDEN_PATHS = [
@@ -40,8 +40,8 @@ function Nav() {
       return pathname === "/mas" || pathname === "/app"
         || pathname.startsWith("/medicos") || pathname.startsWith("/farmacias");
     }
-    if (href === "/oficios") return pathname === "/oficios";
-    if (href === "/oficios/lista") return pathname === "/oficios/lista" || pathname.startsWith("/profesional");
+    if (href === "/home") return pathname === "/home";
+    if (href === "/oficios") return pathname === "/oficios" || pathname.startsWith("/profesional");
     if (href === "/comercios") return pathname.startsWith("/comercios") || pathname.startsWith("/comercio");
     if (href === "/empleos") return pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante");
     return pathname === href || pathname.startsWith(href + "/");
