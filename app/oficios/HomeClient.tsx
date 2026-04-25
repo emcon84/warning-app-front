@@ -38,12 +38,12 @@ const QUICK_ACCESS = [
 ] as const;
 
 const HOGAR_CATS = [
-  { label: "Gasistas",      Icon: Flame,     image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=200&fit=crop&q=80" },
+  { label: "Gasistas",      Icon: Flame,     image: "/banners/gasistas.webp"  },
   { label: "Electricistas", Icon: Zap,       image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=200&fit=crop&q=80" },
-  { label: "Plomeros",      Icon: Droplets,  image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=200&fit=crop&q=80" },
-  { label: "Albañiles",     Icon: HardHat,   image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=200&fit=crop&q=80" },
-  { label: "Carpinteros",   Icon: Trees,     image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=200&fit=crop&q=80" },
-  { label: "Mecánicos",     Icon: Settings2, image: "https://images.unsplash.com/photo-1530046339160-ce3e530d7b4e?w=400&h=200&fit=crop&q=80" },
+  { label: "Plomeros",      Icon: Droplets,  image: "/banners/plomeros.webp"  },
+  { label: "Albañiles",     Icon: HardHat,   image: "/banners/albanil.webp"   },
+  { label: "Carpinteros",   Icon: Trees,     image: "/banners/carpintero.webp"},
+  { label: "Mecánicos",     Icon: Settings2, image: "/banners/mecanicos.webp" },
 ] as const;
 
 const PRO_GRADIENTS = [
