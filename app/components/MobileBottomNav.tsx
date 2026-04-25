@@ -2,11 +2,11 @@
 
 import { Suspense } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Wrench, Store, ShoppingCart, Briefcase, MoreHorizontal } from "lucide-react";
+import { Home, Wrench, Store, ShoppingCart, Briefcase, MoreHorizontal } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 
 const ITEMS = [
-  { label: "Oficios",   Icon: Wrench,         href: "/oficios"   },
+  { label: "Home",      Icon: Home,           href: "/oficios"   },
   { label: "Comercios", Icon: Store,           href: "/comercios" },
   { label: "Ofertas",   Icon: ShoppingCart,   href: "/ofertas"   },
   { label: "Empleos",   Icon: Briefcase,      href: "/empleos"   },
@@ -41,7 +41,7 @@ function Nav() {
         || pathname.startsWith("/medicos") || pathname.startsWith("/farmacias")
         || pathname.startsWith("/farmacias");
     }
-    if (href === "/oficios") return pathname.startsWith("/oficios") || pathname.startsWith("/profesional");
+    if (href === "/oficios") return pathname === "/oficios" || pathname.startsWith("/profesional");
     if (href === "/comercios") return pathname.startsWith("/comercios") || pathname.startsWith("/comercio");
     if (href === "/empleos") return pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante");
     return pathname === href || pathname.startsWith(href + "/");
