@@ -3,7 +3,7 @@
 import type { ComponentType } from "react";
 import { Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { SignInButton, UserButton, useUser, useAuth } from "@clerk/nextjs";
+import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -53,6 +53,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { openSignIn } = useClerk();
   const [unreadCount, setUnreadCount] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [unreadConversations, setUnreadConversations] = useState<UnreadConversation[]>([]);
@@ -287,11 +288,12 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               </UserButton>
             </>
           ) : (
-            <SignInButton mode="modal">
-              <button className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-200" : "bg-gray-900 text-white hover:bg-gray-700"}`}>
+              <button
+                onClick={() => openSignIn()}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-200" : "bg-gray-900 text-white hover:bg-gray-700"}`}
+              >
                 Entrar
               </button>
-            </SignInButton>
           )}
 
           {/* Toggle de tema — siempre visible */}
