@@ -219,7 +219,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <LandingThemeToggle />
               <Link
-                href="/app"
+                href="/oficios"
                 className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-colors"
               >
                 Abrir app
