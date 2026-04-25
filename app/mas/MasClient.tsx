@@ -51,7 +51,7 @@ export default function MasClient() {
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
-      <Navbar sidebarDisabled />
+      <Navbar />
 
       <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
 

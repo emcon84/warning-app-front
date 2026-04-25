@@ -100,7 +100,7 @@ export default function MedicosClient({ doctors }: Props) {
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
-      <Navbar sidebarDisabled mapView="doctors" />
+      <Navbar mapView="doctors" />
 
       <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
 

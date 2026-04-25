@@ -215,7 +215,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
         </div>
 
         {/* Auth */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
           {isSignedIn ? (
             <>
               {/* Campana de notificaciones */}
