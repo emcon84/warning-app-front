@@ -61,10 +61,10 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
     : professionals.filter((p) => {
         if (!p.disponible) return false;
         return (
-          p.nombre.toLowerCase().includes(q) ||
-          p.apellido.toLowerCase().includes(q) ||
-          p.oficios.some((o) => o.toLowerCase().includes(q)) ||
-          p.barrio.toLowerCase().includes(q)
+          (p.nombre ?? "").toLowerCase().includes(q) ||
+          (p.apellido ?? "").toLowerCase().includes(q) ||
+          (p.oficios ?? []).some((o) => o.toLowerCase().includes(q)) ||
+          (p.barrio ?? "").toLowerCase().includes(q)
         );
       });
 
@@ -73,9 +73,9 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
     : comercios.filter((c) => {
         if (!c.activo) return false;
         return (
-          c.nombre.toLowerCase().includes(q) ||
-          c.rubro.toLowerCase().includes(q) ||
-          c.barrio.toLowerCase().includes(q) ||
+          (c.nombre ?? "").toLowerCase().includes(q) ||
+          (c.rubro ?? "").toLowerCase().includes(q) ||
+          (c.barrio ?? "").toLowerCase().includes(q) ||
           (c.descripcion ?? "").toLowerCase().includes(q)
         );
       });
@@ -85,10 +85,10 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
     : doctors.filter((d) => {
         if (!d.activo) return false;
         return (
-          d.nombre.toLowerCase().includes(q) ||
-          d.especialidad.toLowerCase().includes(q) ||
-          d.barrio.toLowerCase().includes(q) ||
-          d.obrasSociales.some((os) => os.toLowerCase().includes(q))
+          (d.nombre ?? "").toLowerCase().includes(q) ||
+          (d.especialidad ?? "").toLowerCase().includes(q) ||
+          (d.barrio ?? "").toLowerCase().includes(q) ||
+          (d.obrasSociales ?? []).some((os) => os.toLowerCase().includes(q))
         );
       });
 
@@ -241,7 +241,7 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
                           <img src={photo} alt={pro.nombre} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-lg font-bold text-blue-500">
-                            {pro.nombre[0].toUpperCase()}
+                            {(pro.nombre?.[0] ?? "?").toUpperCase()}
                           </span>
                         )}
                       </div>
@@ -251,7 +251,7 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
                           {pro.nombre} {pro.apellido}
                         </p>
                         <p className={`text-xs capitalize truncate ${isDark ? "text-blue-400" : "text-blue-600"}`}>
-                          {pro.oficios[0]}
+                          {(pro.oficios ?? [])[0] ?? ""}
                         </p>
                         <div className={`flex items-center gap-2 mt-0.5 ${textMuted}`}>
                           <div className="flex items-center gap-0.5">
@@ -374,9 +374,9 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
                         <span className="text-xs">{doc.barrio}</span>
                       </div>
                       {/* Obras sociales */}
-                      {doc.obrasSociales.length > 0 && (
+                      {(doc.obrasSociales ?? []).length > 0 && (
                         <div className="flex items-center gap-1 mt-1 flex-wrap">
-                          {doc.obrasSociales.slice(0, 2).map((os) => (
+                          {(doc.obrasSociales ?? []).slice(0, 2).map((os) => (
                             <span
                               key={os}
                               className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${isDark ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"}`}
@@ -384,9 +384,9 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
                               {os}
                             </span>
                           ))}
-                          {doc.obrasSociales.length > 2 && (
+                          {(doc.obrasSociales ?? []).length > 2 && (
                             <span className={`text-[10px] ${textMuted}`}>
-                              +{doc.obrasSociales.length - 2}
+                              +{(doc.obrasSociales ?? []).length - 2}
                             </span>
                           )}
                         </div>
