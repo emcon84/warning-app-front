@@ -361,7 +361,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                   return (
                     <Link
                       key={comercio.id}
-                      href={`/comercios/${comercio.slug}`}
+                      href={`/comercio/${comercio.slug}`}
                       className={`w-40 flex-shrink-0 p-3 rounded-2xl border flex flex-col gap-2 transition-all active:scale-[0.97] ${cardBg} ${isDark ? "hover:border-gray-700" : "hover:border-gray-300"}`}
                     >
                       <div className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
@@ -401,7 +401,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                 return (
                   <Link
                     key={comercio.id}
-                    href={`/comercios/${comercio.slug}`}
+                    href={`/comercio/${comercio.slug}`}
                     className={`p-3 rounded-2xl border flex flex-col gap-2 transition-all active:scale-[0.97] ${cardBg} ${isDark ? "hover:border-gray-700" : "hover:border-gray-300"}`}
                   >
                     <div className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
