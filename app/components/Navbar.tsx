@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Bell, MessageCircle, X, Settings, Sun, Moon } from "lucide-react";
+import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Settings, Sun, Moon } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -218,68 +218,6 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
         <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
           {isSignedIn ? (
             <>
-              {/* Campana de notificaciones */}
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={handleBellClick}
-                  className={`relative p-1.5 rounded-lg ${hoverBg} transition-colors`}
-                  aria-label="Notificaciones"
-                >
-                  <Bell className={`w-5 h-5 ${iconColor}`} />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full" />
-                  )}
-                </button>
-
-                {dropdownOpen && (
-                  <div className={`fixed top-14 left-2 right-2 md:absolute md:top-10 md:left-auto md:right-0 md:w-80 border rounded-2xl shadow-xl z-50 ${dropBg}`}>
-                    {/* Header */}
-                    <div className={`flex items-center justify-between px-4 py-3 border-b ${dropBorder}`}>
-                      <span className={`text-sm font-semibold ${navText}`}>Mensajes</span>
-                      <button
-                        onClick={() => setDropdownOpen(false)}
-                        className={`${textSec} transition-colors`}
-                        aria-label="Cerrar"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    {/* Body */}
-                    {loadingConversations ? (
-                      <div className={`px-4 py-6 text-center text-xs ${textMut}`}>Cargando...</div>
-                    ) : unreadConversations.length === 0 ? (
-                      <div className={`px-4 py-6 text-center text-xs ${textMut}`}>Sin mensajes nuevos</div>
-                    ) : (
-                      <ul>
-                        {unreadConversations.map((conv) => (
-                          <li
-                            key={conv.id}
-                            onClick={() => handleConversationClick(conv.id)}
-                            className={`${dropHover} cursor-pointer px-4 py-3 flex flex-col gap-0.5 first:rounded-t-none last:rounded-b-2xl transition-colors`}
-                          >
-                            <span className={`text-sm font-semibold ${navText}`}>{conv.professionalName}</span>
-                            <span className={`text-xs ${textSec} truncate`}>{conv.lastMessage}</span>
-                            {conv.lastMessageTime && (
-                              <span className={`text-xs ${textMut}`}>{formatTime(conv.lastMessageTime)}</span>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Mis chats */}
-              <button
-                onClick={() => router.push("/chats")}
-                className={`p-1.5 rounded-lg ${hoverBg} transition-colors`}
-                aria-label="Mis chats"
-              >
-                <MessageCircle className={`w-5 h-5 ${iconColor}`} />
-              </button>
-
               {/* UserButton sin badge */}
               <UserButton>
                 <UserButton.MenuItems>
