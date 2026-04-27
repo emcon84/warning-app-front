@@ -11,7 +11,7 @@ export default function SplashScreen() {
     if (!shown) {
       setVisible(true);
       sessionStorage.setItem("rr-splash", "1");
-      const t = setTimeout(() => setVisible(false), 2000);
+      const t = setTimeout(() => setVisible(false), 2200);
       return () => clearTimeout(t);
     }
   }, []);
@@ -22,26 +22,27 @@ export default function SplashScreen() {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-blue-600"
+          transition={{ duration: 0.4 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          style={{ backgroundColor: "#2563eb" }}
         >
           <div className="flex flex-col items-center gap-5">
-            {/* Logo */}
-            <motion.div
-              initial={{ scale: 0.4, opacity: 0 }}
+            {/* Ícono — bounce sutil entrando */}
+            <motion.img
+              src="/icon-192x192.png"
+              alt="Reportes Reconquista"
+              initial={{ scale: 0.82, opacity: 0.7 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.55, ease: [0.34, 1.56, 0.64, 1] }}
-              className="w-24 h-24 rounded-3xl bg-white/20 flex items-center justify-center shadow-2xl shadow-black/20"
-            >
-              <img src="/icon.svg" alt="Reportes Reconquista" className="w-14 h-14" />
-            </motion.div>
+              className="w-28 h-28 rounded-[28%]"
+            />
 
             {/* Nombre */}
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, duration: 0.35 }}
-              className="text-white font-bold text-xl tracking-wide drop-shadow"
+              transition={{ delay: 0.4, duration: 0.3 }}
+              className="text-white font-bold text-xl tracking-wide"
             >
               Reportes Reconquista
             </motion.p>
@@ -51,23 +52,23 @@ export default function SplashScreen() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.3 }}
-              className="text-blue-100 text-sm"
+              className="text-blue-200 text-sm -mt-2"
             >
               Reconquista, Santa Fe
             </motion.p>
 
-            {/* Dots pulsantes */}
+            {/* Dots */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.75 }}
-              className="flex gap-2 mt-2"
+              transition={{ delay: 0.8 }}
+              className="flex gap-2 mt-1"
             >
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-white/70"
-                  animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.2, 0.8] }}
+                  className="w-1.5 h-1.5 rounded-full bg-white/60"
+                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
                   transition={{ repeat: Infinity, duration: 1.1, delay: i * 0.18, ease: "easeInOut" }}
                 />
               ))}
