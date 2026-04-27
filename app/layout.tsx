@@ -7,7 +7,6 @@ import MobileBottomNav from "./components/MobileBottomNav";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PWARedirect from "./components/PWARedirect";
 import PostLoginWizard from "./components/PostLoginWizard";
-import SplashScreen from "./components/SplashScreen";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ViewTransitions } from "next-view-transitions";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -117,7 +116,6 @@ export default function RootLayout({
             <ApiStatusBanner />
             <PWARedirect />
             <ThemeProvider>
-              <SplashScreen />
               {children}
               <PostLoginWizard />
               <MobileBottomNav />
