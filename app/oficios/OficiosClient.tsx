@@ -45,17 +45,26 @@ export default function OficiosClient({ professionals, initialCategoria, initial
   const searchParams = useSearchParams();
   const { isDark } = useTheme();
   
-  // Get categoria from URL first, fallback to initial prop (for server-side hydration)
-  const urlCategoria = searchParams.get("categoria");
-  const urlTipo = searchParams.get("tipo");
-  
   // Initialize tab from URL params (default to "oficio")
-  const [tab, setTab] = useState<"oficio" | "profesion">(urlTipo === "profesion" ? "profesion" : (initialTipo === "profesion" ? "profesion" : "oficio"));
+  const [tab, setTab] = useState<"oficio" | "profesion">(initialTipo === "profesion" ? "profesion" : "oficio");
   // Initialize selected tag from URL params - prioritize URL over initial prop
   const [search, setSearch] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(urlCategoria || initialCategoria || null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(initialCategoria || null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Sync state with URL params after hydration
+  useEffect(() => {
+    const urlCat = searchParams.get("categoria");
+    const urlTipo = searchParams.get("tipo");
+    
+    if (urlCat && urlCat !== selectedTag) {
+      setSelectedTag(urlCat);
+    }
+    if (urlTipo && urlTipo !== tab) {
+      setTab(urlTipo === "profesion" ? "profesion" : "oficio");
+    }
+  }, [searchParams]);
 
   // Update URL when selectedTag changes
   const handleTagClick = useCallback((tag: string | null) => {

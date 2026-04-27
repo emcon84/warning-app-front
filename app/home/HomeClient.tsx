@@ -41,9 +41,9 @@ const HOGAR_CATS = [
   { label: "Gasistas",      Icon: Flame,     image: "/banners/gasistas.webp",  tag: "gasista"      },
   { label: "Electricistas", Icon: Zap,       image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&h=200&fit=crop&q=80", tag: "electricista" },
   { label: "Plomeros",      Icon: Droplets,  image: "/banners/plomeros.webp",  tag: "plomero"      },
-  { label: "Albañiles",     Icon: HardHat,   image: "/banners/albanil.webp",   tag: "alba%C3%B1il" },
+  { label: "Albañiles",     Icon: HardHat,   image: "/banners/albanil.webp",   tag: "albañil" },
   { label: "Carpinteros",   Icon: Trees,     image: "/banners/carpintero.webp",tag: "carpintero"   },
-  { label: "Mecánicos",     Icon: Settings2, image: "/banners/mecanicos.webp", tag: "mec%C3%A1nico"},
+  { label: "Mecánicos",     Icon: Settings2, image: "/banners/mecanicos.webp", tag: "mecánico"},
 ] as const;
 
 const PRO_GRADIENTS = [
@@ -426,7 +426,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
             {HOGAR_CATS.map(({ label, Icon, image, tag }) => (
               <Link
                 key={label}
-                href={`/oficios?tag=${tag}`}
+                href={`/oficios?categoria=${tag}`}
                 className="relative h-24 md:h-32 rounded-2xl overflow-hidden active:scale-[0.97] transition-all"
               >
                 <img src={image} alt={label} className="absolute inset-0 w-full h-full object-cover" />
