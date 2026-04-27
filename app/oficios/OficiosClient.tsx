@@ -42,15 +42,45 @@ function StarRow({ score, count }: { score: number; count: number }) {
 
 export default function OficiosClient({ professionals, initialCategoria, initialTipo }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isDark } = useTheme();
   
+  // Get categoria from URL first, fallback to initial prop (for server-side hydration)
+  const urlCategoria = searchParams.get("categoria");
+  const urlTipo = searchParams.get("tipo");
+  
   // Initialize tab from URL params (default to "oficio")
-  const [tab, setTab] = useState<"oficio" | "profesion">(initialTipo === "profesion" ? "profesion" : "oficio");
-  // Initialize selected tag from URL params
+  const [tab, setTab] = useState<"oficio" | "profesion">(urlTipo === "profesion" ? "profesion" : (initialTipo === "profesion" ? "profesion" : "oficio"));
+  // Initialize selected tag from URL params - prioritize URL over initial prop
   const [search, setSearch] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(initialCategoria || null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(urlCategoria || initialCategoria || null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Update URL when selectedTag changes
+  const handleTagClick = useCallback((tag: string | null) => {
+    const newTag = selectedTag === tag ? null : tag;
+    setSelectedTag(newTag);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    if (newTag) {
+      params.set("categoria", newTag);
+    } else {
+      params.delete("categoria");
+    }
+    router.push(`/oficios?${params.toString()}`, { scroll: false });
+  }, [selectedTag, router, searchParams]);
+
+  // Handler for tab change - also updates URL
+  const handleTabChange = useCallback((newTab: "oficio" | "profesion") => {
+    setTab(newTab);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tipo", newTab);
+    // Clear categoria when switching tabs
+    params.delete("categoria");
+    router.push(`/oficios?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   const bg          = isDark ? "bg-gray-950" : "bg-gray-50";
   const textPrimary = isDark ? "text-white" : "text-gray-900";
@@ -169,7 +199,7 @@ export default function OficiosClient({ professionals, initialCategoria, initial
           ] as const).map(({ key, label, Icon }) => (
             <button
               key={key}
-              onClick={() => setTab(key)}
+              onClick={() => handleTabChange(key)}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 tab === key
                   ? isDark ? "bg-white text-gray-900 shadow" : "bg-white text-gray-900 shadow"
@@ -288,7 +318,7 @@ export default function OficiosClient({ professionals, initialCategoria, initial
             {allTags.slice(0, 20).map((tag) => (
               <button
                 key={tag}
-                onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                onClick={() => handleTagClick(tag)}
                 className={`text-xs px-3 py-1.5 rounded-full border font-medium capitalize transition-colors ${
                   selectedTag === tag ? pillActive : pillInactive
                 }`}
