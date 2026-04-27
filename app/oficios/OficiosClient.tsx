@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Professional } from "../types";
 import Navbar from "../components/Navbar";
@@ -22,7 +22,11 @@ const TAGS_PROFESION = [
   "consultor", "escribano",
 ];
 
-interface Props { professionals: Professional[]; }
+interface Props {
+  professionals: Professional[];
+  initialCategoria?: string | null;
+  initialTipo?: string | null;
+}
 
 const PAGE_SIZE = 20;
 
@@ -36,12 +40,15 @@ function StarRow({ score, count }: { score: number; count: number }) {
   );
 }
 
-export default function OficiosClient({ professionals }: Props) {
+export default function OficiosClient({ professionals, initialCategoria, initialTipo }: Props) {
   const router = useRouter();
   const { isDark } = useTheme();
-  const [tab, setTab] = useState<"oficio" | "profesion">("oficio");
+  
+  // Initialize tab from URL params (default to "oficio")
+  const [tab, setTab] = useState<"oficio" | "profesion">(initialTipo === "profesion" ? "profesion" : "oficio");
+  // Initialize selected tag from URL params
   const [search, setSearch] = useState("");
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(initialCategoria || null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +102,16 @@ export default function OficiosClient({ professionals }: Props) {
     [byTab]
   );
 
-  useEffect(() => { setVisibleCount(PAGE_SIZE); setSelectedTag(null); setSearch(""); }, [tab]);
+  // Only reset when tab changes AND the current tag is not valid for the new tab
+  useEffect(() => { 
+    setVisibleCount(PAGE_SIZE); 
+    // Check if current tag is valid for the new tab
+    const currentTags = tab === "oficio" ? TAGS_OFICIO : TAGS_PROFESION;
+    if (selectedTag && !currentTags.includes(selectedTag)) {
+      setSelectedTag(null);
+      setSearch("");
+    }
+  }, [tab]);
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedTag, search]);
 
   const loadMore = useCallback(() => {

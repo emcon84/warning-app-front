@@ -1,4 +1,4 @@
-import OfiiciosClient from "./OficiosClient";
+import OficiosClient from "./OficiosClient";
 import { Professional } from "../types";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -13,7 +13,12 @@ async function getProfessionals(): Promise<Professional[]> {
   }
 }
 
-export default async function OficiosPage() {
+interface PageProps {
+  searchParams: Promise<{ categoria?: string; tipo?: string }>;
+}
+
+export default async function OficiosPage({ searchParams }: PageProps) {
+  const { categoria, tipo } = await searchParams;
   const professionals = await getProfessionals();
-  return <OfiiciosClient professionals={professionals} />;
+  return <OfiiciosClient professionals={professionals} initialCategoria={categoria} initialTipo={tipo} />;
 }
