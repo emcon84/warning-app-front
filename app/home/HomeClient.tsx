@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -54,6 +54,76 @@ const PRO_GRADIENTS = [
   "from-violet-500 to-violet-700",
 ] as const;
 
+// ── Weather ────────────────────────────────────────────────────────────────
+type WeatherCondition = "sunny" | "partly-cloudy" | "cloudy" | "rainy" | "stormy" | "snowy" | "foggy" | "night";
+interface WeatherData { temp: number; condition: WeatherCondition; }
+
+const WEATHER_CFG: Record<WeatherCondition, { icon: string; gradient: string }> = {
+  sunny:          { icon: "☀️",  gradient: "linear-gradient(180deg,#0369a1 0%,#0284c7 45%,#38bdf8 100%)" },
+  "partly-cloudy":{ icon: "⛅",  gradient: "linear-gradient(180deg,#374151 0%,#4b5563 50%,#6b7280 100%)" },
+  cloudy:         { icon: "☁️",  gradient: "linear-gradient(180deg,#374151 0%,#6b7280 100%)" },
+  rainy:          { icon: "🌧️", gradient: "linear-gradient(180deg,#1e293b 0%,#334155 50%,#475569 100%)" },
+  stormy:         { icon: "⛈️", gradient: "linear-gradient(180deg,#0f172a 0%,#1e293b 60%,#334155 100%)" },
+  snowy:          { icon: "❄️",  gradient: "linear-gradient(180deg,#7dd3fc 0%,#bae6fd 50%,#e0f2fe 100%)" },
+  foggy:          { icon: "🌫️", gradient: "linear-gradient(180deg,#64748b 0%,#94a3b8 100%)" },
+  night:          { icon: "🌙",  gradient: "linear-gradient(180deg,#0f172a 0%,#1e1b4b 50%,#1e3a5f 100%)" },
+};
+
+function codeToCondition(code: number): WeatherCondition {
+  const h = new Date().getHours();
+  if (h >= 20 || h < 6) return "night";
+  if (code === 0)                               return "sunny";
+  if (code <= 2)                                return "partly-cloudy";
+  if (code === 3)                               return "cloudy";
+  if (code <= 48)                               return "foggy";
+  if (code <= 67 || (code >= 80 && code <= 82)) return "rainy";
+  if (code <= 77 || code === 85 || code === 86) return "snowy";
+  return "stormy";
+}
+
+function WeatherAnimation({ c }: { c: WeatherCondition }) {
+  if (c === "rainy" || c === "stormy") return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <style>{`@keyframes rr-rain{0%{transform:translateY(-20px) rotate(12deg);opacity:.55}100%{transform:translateY(340px) rotate(12deg);opacity:0}}`}</style>
+      {Array.from({length:22},(_,i)=>(
+        <div key={i} style={{position:"absolute",top:0,left:`${(i*4.6)%100}%`,width:"1.5px",height:`${10+(i*5)%16}px`,background:"rgba(255,255,255,.28)",borderRadius:"2px",animation:`rr-rain ${.5+(i*.04)%.4}s linear ${(i*.07)%1.2}s infinite`}}/>
+      ))}
+      {c==="stormy"&&<><style>{`@keyframes rr-flash{0%,94%,96%,100%{opacity:0}95%{opacity:1}}`}</style><div style={{position:"absolute",inset:0,background:"rgba(255,255,220,.04)",animation:"rr-flash 5s ease-in-out infinite"}}/></>}
+    </div>
+  );
+  if (c === "sunny") return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <style>{`@keyframes rr-glow{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.15);opacity:1}}`}</style>
+      <div style={{position:"absolute",top:"-25%",right:"-5%",width:"260px",height:"260px",borderRadius:"50%",background:"radial-gradient(circle,rgba(251,191,36,.28) 0%,transparent 70%)",animation:"rr-glow 4s ease-in-out infinite"}}/>
+    </div>
+  );
+  if (c === "partly-cloudy" || c === "cloudy") return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <style>{`@keyframes rr-cloud{0%,100%{transform:translateX(-8px)}50%{transform:translateX(8px)}}`}</style>
+      {[{w:130,h:55,top:"18%",left:"5%",d:"0s",o:.13},{w:170,h:65,top:"35%",left:"48%",d:"1.8s",o:.09},{w:95,h:42,top:"8%",left:"62%",d:".8s",o:.11}].map((cl,i)=>(
+        <div key={i} style={{position:"absolute",top:cl.top,left:cl.left,width:cl.w,height:cl.h,borderRadius:"50%",background:`rgba(255,255,255,${cl.o})`,filter:"blur(22px)",animation:`rr-cloud ${5+i*1.5}s ease-in-out ${cl.d} infinite`}}/>
+      ))}
+    </div>
+  );
+  if (c === "night") return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <style>{`@keyframes rr-twinkle{0%,100%{opacity:.15}50%{opacity:.9}}`}</style>
+      {Array.from({length:28},(_,i)=>(
+        <div key={i} style={{position:"absolute",top:`${(i*3.4)%88}%`,left:`${(i*7.3)%96}%`,width:`${i%3===0?2:1.5}px`,height:`${i%3===0?2:1.5}px`,borderRadius:"50%",background:"rgba(255,255,255,.9)",animation:`rr-twinkle ${1.5+(i*.1)%1.5}s ease-in-out ${(i*.18)%2.5}s infinite`}}/>
+      ))}
+    </div>
+  );
+  if (c === "snowy") return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <style>{`@keyframes rr-snow{0%{transform:translateY(-10px) translateX(0);opacity:.8}100%{transform:translateY(340px) translateX(18px);opacity:0}}`}</style>
+      {Array.from({length:18},(_,i)=>(
+        <div key={i} style={{position:"absolute",top:0,left:`${(i*5.4)%100}%`,width:`${3+(i*2)%4}px`,height:`${3+(i*2)%4}px`,borderRadius:"50%",background:"rgba(255,255,255,.75)",animation:`rr-snow ${2+(i*.14)%2}s linear ${(i*.12)%2}s infinite`}}/>
+      ))}
+    </div>
+  );
+  return null;
+}
+
 export default function HomeClient({ professionals, comercios, turno, supermarkets }: Props) {
   const router = useRouter();
   const { user } = useUser();
@@ -67,6 +137,18 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
   const cardBg      = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
 
   const greeting = user?.firstName ? `¡Hola, ${user.firstName}!` : "¡Hola, Bienvenido!";
+
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+
+  useEffect(() => {
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=-29.15&longitude=-59.64&current=temperature_2m,weather_code&timezone=America/Argentina/Buenos_Aires")
+      .then(r => r.json())
+      .then(d => setWeather({
+        temp: Math.round(d.current.temperature_2m),
+        condition: codeToCondition(d.current.weather_code),
+      }))
+      .catch(() => {});
+  }, []);
 
   const disponibles = professionals.filter((p) => p.disponible);
 
@@ -87,52 +169,63 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
 
-        {/* ── 1. Header con saludo ─────────────────────────────────────── */}
+        {/* ── 1+2. Weather Hero ─────────────────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0, ease: "easeOut" }}
-          className="mb-6 text-center md:py-6"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="relative overflow-hidden rounded-3xl mb-6"
+          style={{
+            background: weather
+              ? WEATHER_CFG[weather.condition].gradient
+              : "linear-gradient(180deg,#1e3a8a 0%,#1e40af 100%)",
+            minHeight: "220px",
+          }}
         >
-          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs mb-3 ${isDark ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"}`}>
-            <MapPin className="w-3 h-3" />
-            Reconquista, Santa Fe
-          </div>
-          <h1 className={`text-2xl md:text-4xl font-bold ${textPrimary}`}>{greeting}</h1>
-          <p className={`text-sm mt-1 ${textSec}`}>¿Qué necesitás hoy?</p>
-        </motion.div>
+          {/* Animación climática */}
+          <WeatherAnimation c={weather?.condition ?? "cloudy"} />
 
-        {/* ── 2. Buscador prominente ────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.05, ease: "easeOut" }}
-          className="mb-6"
-        >
-          <form onSubmit={handleSearch} className="relative mb-6 md:max-w-2xl md:mx-auto">
-            <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${textMuted}`} />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onClick={() => { if (!query) router.push('/buscar'); }}
-              placeholder="Buscar plomero, electricista, médico..."
-              className={`w-full pl-11 pr-11 py-3.5 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                isDark
-                  ? "bg-gray-900 border-gray-700 text-white placeholder-gray-600"
-                  : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm"
-              }`}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                className={`absolute right-4 top-1/2 -translate-y-1/2 ${textMuted} hover:text-gray-400 transition-colors`}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </form>
+          {/* Contenido encima de la animación */}
+          <div className="relative z-10 flex flex-col items-center justify-center gap-4 px-6 py-10 md:py-14 text-center">
+
+            {/* Location + weather badge */}
+            <div className="flex items-center gap-3 flex-wrap justify-center">
+              <div className="flex items-center gap-1.5 text-white/70 text-xs">
+                <MapPin className="w-3 h-3" />
+                <span>Reconquista, Santa Fe</span>
+              </div>
+              {weather && (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-semibold">
+                  <span>{WEATHER_CFG[weather.condition].icon}</span>
+                  <span>{weather.temp}°C</span>
+                </div>
+              )}
+            </div>
+
+            {/* Greeting */}
+            <div>
+              <h1 className="text-2xl md:text-4xl font-bold text-white drop-shadow-md">{greeting}</h1>
+              <p className="text-white/70 text-sm mt-1">¿Qué necesitás hoy?</p>
+            </div>
+
+            {/* Search bar */}
+            <form onSubmit={handleSearch} className="relative w-full md:max-w-2xl">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onClick={() => { if (!query) router.push('/buscar'); }}
+                placeholder="Buscar plomero, electricista, médico..."
+                className="w-full pl-11 pr-11 py-3.5 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/90 text-gray-900 placeholder-gray-400 shadow-lg border-0"
+              />
+              {query && (
+                <button type="button" onClick={() => setQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </form>
+          </div>
         </motion.div>
 
         {/* ── 3. Accesos rápidos ────────────────────────────────────────── */}
