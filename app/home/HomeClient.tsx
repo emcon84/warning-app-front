@@ -93,8 +93,21 @@ function WeatherAnimation({ c }: { c: WeatherCondition }) {
   );
   if (c === "sunny") return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      <style>{`@keyframes rr-glow{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.15);opacity:1}}`}</style>
-      <div style={{position:"absolute",top:"-25%",right:"-5%",width:"260px",height:"260px",borderRadius:"50%",background:"radial-gradient(circle,rgba(251,191,36,.28) 0%,transparent 70%)",animation:"rr-glow 4s ease-in-out infinite"}}/>
+      <style>{`
+        @keyframes rr-sun-pulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.06);opacity:1}}
+        @keyframes rr-rays{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        @keyframes rr-halo{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:.55;transform:scale(1.12)}}
+      `}</style>
+      {/* Halo exterior */}
+      <div style={{position:"absolute",top:"-60px",right:"-60px",width:"280px",height:"280px",borderRadius:"50%",background:"radial-gradient(circle,rgba(251,191,36,.45) 0%,rgba(251,191,36,.15) 45%,transparent 70%)",animation:"rr-halo 3.5s ease-in-out infinite"}}/>
+      {/* Disco solar */}
+      <div style={{position:"absolute",top:"2px",right:"2px",width:"110px",height:"110px",borderRadius:"50%",background:"radial-gradient(circle,rgba(255,230,100,1) 0%,rgba(251,191,36,.95) 60%,rgba(251,146,36,.7) 100%)",boxShadow:"0 0 40px rgba(251,191,36,.6),0 0 80px rgba(251,191,36,.25)",animation:"rr-sun-pulse 3s ease-in-out infinite"}}/>
+      {/* Rayos girando */}
+      <div style={{position:"absolute",top:"-15px",right:"-15px",width:"170px",height:"170px",animation:"rr-rays 12s linear infinite"}}>
+        {Array.from({length:8},(_,i)=>(
+          <div key={i} style={{position:"absolute",top:"50%",left:"50%",width:"60px",height:"3px",borderRadius:"2px",background:"rgba(255,220,80,.55)",transformOrigin:"left center",transform:`rotate(${i*45}deg) translateY(-1.5px)`}}/>
+        ))}
+      </div>
     </div>
   );
   if (c === "partly-cloudy" || c === "cloudy") return (
