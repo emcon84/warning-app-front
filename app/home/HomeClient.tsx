@@ -167,26 +167,25 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar sidebarDisabled />
 
-      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
-
-        {/* ── 1+2. Weather Hero ─────────────────────────────────────────── */}
+      {/* ── 1+2. Weather Hero ─────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative overflow-hidden rounded-3xl mb-6"
+          className="relative overflow-hidden w-full"
           style={{
             background: weather
               ? WEATHER_CFG[weather.condition].gradient
               : "linear-gradient(180deg,#1e3a8a 0%,#1e40af 100%)",
-            minHeight: "220px",
+            minHeight: "280px",
+            paddingTop: "80px",
           }}
         >
           {/* Animación climática */}
           <WeatherAnimation c={weather?.condition ?? "cloudy"} />
 
           {/* Contenido encima de la animación */}
-          <div className="relative z-10 flex flex-col items-center justify-center gap-4 px-6 py-10 md:py-14 text-center">
+          <div className="relative z-10 max-w-xl md:max-w-3xl mx-auto px-4 md:px-8 flex flex-col items-center justify-center gap-4 py-10 md:py-14 text-center">
 
             {/* Location + weather badge */}
             <div className="flex items-center gap-3 flex-wrap justify-center">
@@ -227,6 +226,8 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
             </form>
           </div>
         </motion.div>
+
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-32">
 
         {/* ── 3. Accesos rápidos ────────────────────────────────────────── */}
         <motion.div
