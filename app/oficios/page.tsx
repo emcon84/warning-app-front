@@ -20,5 +20,5 @@ interface PageProps {
 export default async function OficiosPage({ searchParams }: PageProps) {
   const { categoria, tipo } = await searchParams;
   const professionals = await getProfessionals();
-  return <OfiiciosClient professionals={professionals} initialCategoria={categoria} initialTipo={tipo} />;
+  return <OficiosClient professionals={professionals} initialCategoria={categoria} initialTipo={tipo} />;
 }
