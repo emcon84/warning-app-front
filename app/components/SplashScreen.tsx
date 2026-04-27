@@ -32,19 +32,39 @@ export default function SplashScreen() {
             `,
           }}
         >
-          {/* Logo: empieza pequeño y borroso, crece y se enfoca */}
-          <motion.img
-            src="/icon-192x192.png"
-            alt="Reportes Reconquista"
-            initial={{ scale: 0.12, filter: "blur(14px)", opacity: 0.5 }}
-            animate={{ scale: 1,    filter: "blur(0px)",  opacity: 1   }}
-            transition={{
-              scale:   { duration: 0.85, ease: [0.34, 1.2, 0.64, 1] },
-              filter:  { duration: 0.7,  ease: "easeOut" },
-              opacity: { duration: 0.4,  ease: "easeOut" },
-            }}
-            className="w-28 h-28 rounded-[28%]"
-          />
+          <div className="flex flex-col items-center gap-5">
+            {/* Logo: empieza pequeño y borroso, crece y se enfoca */}
+            <motion.img
+              src="/icon-192x192.png"
+              alt="Reportes Reconquista"
+              initial={{ scale: 0.12, filter: "blur(14px)", opacity: 0.5 }}
+              animate={{ scale: 1,    filter: "blur(0px)",  opacity: 1   }}
+              transition={{
+                scale:   { duration: 0.85, ease: [0.34, 1.2, 0.64, 1] },
+                filter:  { duration: 0.7,  ease: "easeOut" },
+                opacity: { duration: 0.4,  ease: "easeOut" },
+              }}
+              className="w-28 h-28 rounded-[28%]"
+            />
+
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.35 }}
+              className="text-white font-bold text-xl tracking-wide"
+            >
+              Reportes Reconquista
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.3 }}
+              className="text-blue-200 text-sm -mt-2"
+            >
+              Reconquista, Santa Fe
+            </motion.p>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
