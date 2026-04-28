@@ -5,6 +5,24 @@ export const runtime = "edge";
 
 const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
+async function toDataUrl(url: string): Promise<string> {
+  if (!url) return "";
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) return "";
+    const buf = await r.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    }
+    const mime = r.headers.get("content-type") ?? "image/jpeg";
+    return `data:${mime};base64,${btoa(binary)}`;
+  } catch {
+    return "";
+  }
+}
+
 export async function GET(req: NextRequest) {
   const s = req.nextUrl.searchParams;
   const isStory = s.get("format") !== "feed";
@@ -17,6 +35,11 @@ export async function GET(req: NextRequest) {
   const slug = s.get("slug") ?? "";
   const foto = s.get("foto") ?? "";
   const logo = s.get("logo") ?? "";
+
+  const [fotoData, logoData] = await Promise.all([
+    foto ? toDataUrl(foto) : Promise.resolve(""),
+    logo ? toDataUrl(logo) : Promise.resolve(""),
+  ]);
 
   const profileUrl = `reportesreconquista.com/comercio/${slug}`;
   const rubroBarrio = barrio ? `${rubro} - ${barrio}` : rubro;
@@ -41,16 +64,16 @@ export async function GET(req: NextRequest) {
 
           <div style={{ width: "936px", height: "800px", borderRadius: "40px", overflow: "hidden", background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid rgba(255,255,255,0.06)", margin: "52px 0 0" }}>
             {foto
-              ? <img src={foto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               : logo
-                ? <img src={logo} style={{ width: "360px", height: "360px", objectFit: "contain", borderRadius: "32px" }} />
+                ? <img src={logoData} style={{ width: "360px", height: "360px", objectFit: "contain", borderRadius: "32px" }} />
                 : <span style={{ color: "#334155", fontSize: "80px", fontWeight: 600 }}>Sin foto</span>
             }
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "32px", width: "100%", padding: "48px 72px 0" }}>
             {logo
-              ? <img src={logo} width={100} height={100} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(34,197,94,0.5)" }} />
+              ? <img src={logoData} width={100} height={100} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(34,197,94,0.5)" }} />
               : <div style={{ width: 100, height: 100, borderRadius: "50%", background: "#1e293b", border: "4px solid rgba(34,197,94,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <span style={{ color: "#475569", fontSize: "44px", fontWeight: 700 }}>C</span>
                 </div>
@@ -99,14 +122,14 @@ export async function GET(req: NextRequest) {
         <div style={{ display: "flex", flex: 1, width: "100%", gap: "0" }}>
           <div style={{ width: "520px", height: "100%", background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             {foto
-              ? <img src={foto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               : <span style={{ color: "#334155", fontSize: "80px", fontWeight: 600 }}>Sin foto</span>
             }
           </div>
 
           <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "52px 52px 40px", gap: "0" }}>
             {logo
-              ? <img src={logo} width={90} height={90} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(34,197,94,0.5)", marginBottom: "28px" }} />
+              ? <img src={logoData} width={90} height={90} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(34,197,94,0.5)", marginBottom: "28px" }} />
               : <div style={{ width: 90, height: 90, borderRadius: "50%", background: "#1e293b", border: "4px solid rgba(34,197,94,0.3)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "28px" }}>
                   <span style={{ color: "#475569", fontSize: "40px", fontWeight: 700 }}>C</span>
                 </div>

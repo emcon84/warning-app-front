@@ -5,6 +5,24 @@ export const runtime = "edge";
 
 const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
+async function toDataUrl(url: string): Promise<string> {
+  if (!url) return "";
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) return "";
+    const buf = await r.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    }
+    const mime = r.headers.get("content-type") ?? "image/jpeg";
+    return `data:${mime};base64,${btoa(binary)}`;
+  } catch {
+    return "";
+  }
+}
+
 export async function GET(req: NextRequest) {
   const s = req.nextUrl.searchParams;
   const isStory = s.get("format") !== "feed";
@@ -17,6 +35,8 @@ export async function GET(req: NextRequest) {
   const barrio = s.get("barrio") ?? "";
   const slug = s.get("slug") ?? "";
   const foto = s.get("foto") ?? "";
+
+  const fotoData = foto ? await toDataUrl(foto) : "";
 
   const profileUrl = `reportesreconquista.com/profesional/${slug}`;
   const nombreCompleto = `${nombre} ${apellido}`.trim();
@@ -45,7 +65,7 @@ export async function GET(req: NextRequest) {
             display: "flex", alignItems: "center", justifyContent: "center", margin: "80px 0 0",
           }}>
             {foto
-              ? <img src={foto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               : <span style={{ color: "#334155", fontSize: "120px", fontWeight: 700 }}>P</span>
             }
           </div>
@@ -103,7 +123,7 @@ export async function GET(req: NextRequest) {
           <div style={{ width: "460px", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, padding: "48px" }}>
             <div style={{ width: "360px", height: "360px", borderRadius: "50%", overflow: "hidden", background: "#1e293b", border: "8px solid rgba(59,130,246,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {foto
-                ? <img src={foto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 : <span style={{ color: "#334155", fontSize: "100px", fontWeight: 700 }}>P</span>
               }
             </div>

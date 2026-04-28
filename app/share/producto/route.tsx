@@ -5,6 +5,24 @@ export const runtime = "edge";
 
 const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
+async function toDataUrl(url: string): Promise<string> {
+  if (!url) return "";
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) return "";
+    const buf = await r.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    }
+    const mime = r.headers.get("content-type") ?? "image/jpeg";
+    return `data:${mime};base64,${btoa(binary)}`;
+  } catch {
+    return "";
+  }
+}
+
 export async function GET(req: NextRequest) {
   const s = req.nextUrl.searchParams;
   const W = 1080;
@@ -16,6 +34,11 @@ export async function GET(req: NextRequest) {
   const foto = s.get("foto") ?? "";
   const comercioNombre = s.get("comercio") ?? "";
   const logo = s.get("logo") ?? "";
+
+  const [fotoData, logoData] = await Promise.all([
+    foto ? toDataUrl(foto) : Promise.resolve(""),
+    logo ? toDataUrl(logo) : Promise.resolve(""),
+  ]);
 
   const precioNum = precio ? Number(precio.replace(/\D/g, "")) : 0;
   const precioFormateado = precioNum ? `$ ${precioNum.toLocaleString()}` : "";
@@ -46,15 +69,13 @@ export async function GET(req: NextRequest) {
         <div style={{ position: "absolute", top: "-200px", right: "-200px", width: "700px", height: "700px", borderRadius: "50%", background: `radial-gradient(circle, ${orbeColor1} 0%, transparent 70%)`, display: "flex" }} />
         <div style={{ position: "absolute", bottom: "200px", left: "-150px", width: "500px", height: "500px", borderRadius: "50%", background: `radial-gradient(circle, ${orbeColor2} 0%, transparent 70%)`, display: "flex" }} />
 
-        {/* Badge tipo */}
         <div style={{ width: "100%", background: badgeBg, display: "flex", alignItems: "center", justifyContent: "center", padding: "36px 0" }}>
           <span style={{ color: "#ffffff", fontSize: "80px", fontWeight: 900, letterSpacing: "-1px", textTransform: "uppercase" }}>{badgeLabel}</span>
         </div>
 
-        {/* Header: logo + comercio */}
         <div style={{ display: "flex", alignItems: "center", gap: "32px", width: "100%", padding: "52px 72px 40px" }}>
-          {logo
-            ? <img src={logo} width={110} height={110} style={{ borderRadius: "50%", objectFit: "cover", border: `4px solid ${accentBorder}` }} />
+          {logoData
+            ? <img src={logoData} width={110} height={110} style={{ borderRadius: "50%", objectFit: "cover", border: `4px solid ${accentBorder}` }} />
             : <div style={{ width: 110, height: 110, borderRadius: "50%", background: "#1e293b", border: `4px solid ${accentBorder}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <span style={{ color: "#475569", fontSize: "48px", fontWeight: 700 }}>C</span>
               </div>
@@ -65,24 +86,21 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
 
-        {/* Nombre producto */}
         <div style={{ display: "flex", width: "100%", padding: "0 72px 44px" }}>
           <span style={{ color: "#ffffff", fontSize: "72px", fontWeight: 800, lineHeight: 1.1 }}>{nombre}</span>
         </div>
 
-        {/* Foto */}
         <div style={{
           width: "936px", flex: 1, borderRadius: "40px", overflow: "hidden",
           background: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center",
           border: "2px solid rgba(255,255,255,0.06)",
         }}>
-          {foto
-            ? <img src={foto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          {fotoData
+            ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             : <span style={{ color: "#334155", fontSize: "48px", fontWeight: 600 }}>Sin foto</span>
           }
         </div>
 
-        {/* Precio */}
         {precioFormateado
           ? <div style={{
               background: accentBg, border: `3px solid ${accentBorder}`, borderRadius: "28px",
@@ -94,7 +112,6 @@ export async function GET(req: NextRequest) {
           : <div style={{ height: "44px" }} />
         }
 
-        {/* Footer */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "44px 0 52px", gap: "16px" }}>
           <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#334155", display: "flex" }} />
           <span style={{ color: "#475569", fontSize: "32px", fontWeight: 600, letterSpacing: "0.5px" }}>reportesreconquista.com</span>

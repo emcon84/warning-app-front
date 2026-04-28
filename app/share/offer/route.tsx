@@ -5,6 +5,24 @@ export const runtime = "edge";
 
 const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
+async function toDataUrl(url: string): Promise<string> {
+  if (!url) return "";
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) return "";
+    const buf = await r.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    }
+    const mime = r.headers.get("content-type") ?? "image/jpeg";
+    return `data:${mime};base64,${btoa(binary)}`;
+  } catch {
+    return "";
+  }
+}
+
 export async function GET(req: NextRequest) {
   const s = req.nextUrl.searchParams;
   const format = s.get("format") === "feed" ? "feed" : "story";
@@ -17,6 +35,11 @@ export async function GET(req: NextRequest) {
   const comercioNombre = s.get("comercio") ?? "";
   const logo = s.get("logo") ?? "";
   const validaHasta = s.get("validaHasta") ?? "";
+
+  const [fotoData, logoData] = await Promise.all([
+    foto ? toDataUrl(foto) : Promise.resolve(""),
+    logo ? toDataUrl(logo) : Promise.resolve(""),
+  ]);
 
   const precioNum = precio ? Number(precio.replace(/\D/g, "")) : 0;
   const precioFormateado = precioNum ? `$ ${precioNum.toLocaleString()}` : "";
@@ -48,8 +71,8 @@ export async function GET(req: NextRequest) {
             width: "50%", height: "100%", background: "#1e293b",
             display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
           }}>
-            {foto
-              ? <img src={foto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            {fotoData
+              ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               : <div style={{ color: "#334155", fontSize: "80px", fontWeight: 600, display: "flex" }}>Oferta</div>
             }
           </div>
@@ -65,7 +88,7 @@ export async function GET(req: NextRequest) {
 
             <div style={{ display: "flex", alignItems: "center", gap: "20px", padding: "36px 40px 20px" }}>
               {logo
-                ? <img src={logo} width={72} height={72} style={{ borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(234,179,8,0.4)" }} />
+                ? <img src={logoData} width={72} height={72} style={{ borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(234,179,8,0.4)" }} />
                 : <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#1e293b", border: "3px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ color: "#475569", fontSize: "32px", fontWeight: 700 }}>C</span>
                   </div>
@@ -130,7 +153,7 @@ export async function GET(req: NextRequest) {
 
         <div style={{ display: "flex", alignItems: "center", gap: "32px", width: "100%", padding: "52px 72px 40px" }}>
           {logo
-            ? <img src={logo} width={110} height={110} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(234,179,8,0.4)" }} />
+            ? <img src={logoData} width={110} height={110} style={{ borderRadius: "50%", objectFit: "cover", border: "4px solid rgba(234,179,8,0.4)" }} />
             : <div style={{ width: 110, height: 110, borderRadius: "50%", background: "#1e293b", border: "4px solid rgba(234,179,8,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <span style={{ color: "#475569", fontSize: "48px", fontWeight: 700 }}>C</span>
               </div>
@@ -155,7 +178,7 @@ export async function GET(req: NextRequest) {
           border: "2px solid rgba(255,255,255,0.06)",
         }}>
           {foto
-            ? <img src={foto} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             : <span style={{ color: "#334155", fontSize: "48px", fontWeight: 600 }}>Sin foto</span>
           }
         </div>
