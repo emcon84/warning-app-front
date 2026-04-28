@@ -6,7 +6,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import Navbar from "../../components/Navbar";
 import {
   Camera, Trash2, ArrowLeft, Save, ToggleLeft, ToggleRight,
-  ImagePlus, Loader2, CheckCircle2, ExternalLink, KeyRound,
+  ImagePlus, Loader2, CheckCircle2, ExternalLink, KeyRound, Eye, EyeOff,
 } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -41,9 +41,11 @@ export default function GestionarProfesionalClient() {
   const { isDark } = useTheme();
 
   const [code, setCode] = useState<string | null>(null);
-  const [codeInput, setCodeInput] = useState("");
-  const [codeError, setCodeError] = useState("");
-  const [codeLoading, setCodeLoading] = useState(false);
+  const [waInput, setWaInput] = useState("");
+  const [pinInput, setPinInput] = useState("");
+  const [showPin, setShowPin] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
 
   const [pro, setPro] = useState<Professional | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,24 +112,29 @@ export default function GestionarProfesionalClient() {
     }
   }
 
-  async function handleCodeSubmit(e: React.FormEvent) {
+  async function handleAuth(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = codeInput.trim();
-    if (!trimmed) return;
-    setCodeLoading(true);
-    setCodeError("");
+    const wa = waInput.replace(/\D/g, "");
+    const pin = pinInput.trim();
+    if (!wa || !pin) return;
+    setAuthLoading(true);
+    setAuthError("");
     try {
-      const res = await fetch(`${API}/api/professionals/me`, {
-        headers: proHeaders(trimmed),
+      const res = await fetch(`${API}/api/professionals/auth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ whatsapp: wa, pin }),
       });
       if (!res.ok) {
-        setCodeError("Codigo incorrecto. Verificalo e intentá de nuevo.");
+        const data = await res.json().catch(() => ({}));
+        setAuthError(data.error ?? "Numero o PIN incorrecto.");
         return;
       }
-      localStorage.setItem(STORAGE_KEY, trimmed);
-      setCode(trimmed);
+      const { id } = await res.json();
+      localStorage.setItem(STORAGE_KEY, id);
+      setCode(id);
     } finally {
-      setCodeLoading(false);
+      setAuthLoading(false);
     }
   }
 
@@ -238,7 +245,7 @@ export default function GestionarProfesionalClient() {
     );
   }
 
-  // ─── Code entry form ────────────────────────────────────────────────────────
+  // ─── Auth form ──────────────────────────────────────────────────────────────
   if (!code || !pro) {
     return (
       <div className={`min-h-screen ${bg} ${textPri}`}>
@@ -250,31 +257,51 @@ export default function GestionarProfesionalClient() {
           <div className="text-center">
             <h1 className={`text-xl font-bold mb-2 ${textPri}`}>Acceder a mi panel</h1>
             <p className={`text-sm ${textSec}`}>
-              Ingresa el codigo que recibiste cuando te registraste como profesional.
+              Ingresa tu WhatsApp y el PIN que elegiste al registrarte.
             </p>
           </div>
 
-          <form onSubmit={handleCodeSubmit} className="w-full flex flex-col gap-3">
-            <input
-              value={codeInput}
-              onChange={(e) => { setCodeInput(e.target.value); setCodeError(""); }}
-              placeholder="Pega o escribe tu codigo aqui"
-              className={`w-full px-4 py-3.5 rounded-2xl border text-sm focus:outline-none font-mono transition-colors ${inputCls}`}
-              autoComplete="off"
-              spellCheck={false}
-            />
-            {codeError && <p className="text-red-400 text-xs text-center">{codeError}</p>}
+          <form onSubmit={handleAuth} className="w-full flex flex-col gap-3">
+            <div>
+              <label className={`text-xs mb-1.5 block ${textSec}`}>Numero de WhatsApp</label>
+              <input
+                value={waInput}
+                onChange={(e) => { setWaInput(e.target.value); setAuthError(""); }}
+                placeholder="3482 123456"
+                inputMode="numeric"
+                className={`w-full px-4 py-3.5 rounded-2xl border text-sm focus:outline-none transition-colors ${inputCls}`}
+              />
+            </div>
+            <div>
+              <label className={`text-xs mb-1.5 block ${textSec}`}>PIN de 4 digitos</label>
+              <div className="relative">
+                <input
+                  value={pinInput}
+                  onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, "").slice(0, 4)); setAuthError(""); }}
+                  placeholder="••••"
+                  type={showPin ? "text" : "password"}
+                  inputMode="numeric"
+                  maxLength={4}
+                  className={`w-full px-4 py-3.5 rounded-2xl border text-sm focus:outline-none transition-colors pr-12 text-center text-2xl tracking-[0.5em] font-bold ${inputCls}`}
+                />
+                <button type="button" onClick={() => setShowPin(v => !v)}
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            {authError && <p className="text-red-400 text-xs text-center">{authError}</p>}
             <button
               type="submit"
-              disabled={!codeInput.trim() || codeLoading}
+              disabled={!waInput.trim() || pinInput.length < 4 || authLoading}
               className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
             >
-              {codeLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Verificando...</> : "Ingresar"}
+              {authLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Verificando...</> : "Ingresar"}
             </button>
           </form>
 
           <p className={`text-xs text-center ${textMut}`}>
-            El codigo se guarda en este dispositivo. No vas a tener que ingresarlo de nuevo.
+            Una vez que ingras, este dispositivo te va a recordar. No vas a tener que volver a ingresar.
           </p>
         </div>
       </div>

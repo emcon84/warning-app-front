@@ -12,6 +12,9 @@ import {
   ArrowLeft,
   Sparkles,
   Check,
+  Eye,
+  EyeOff,
+  Lock,
 } from "lucide-react";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useConfetti } from "../../hooks/useConfetti";
@@ -226,7 +229,10 @@ export default function NuevoProfesionalClient() {
     oficioCustom: "",
     descripcion: "",
     experiencia: "",
+    pin: "",
+    pinConfirm: "",
   });
+  const [showPin, setShowPin] = useState(false);
 
   const [whatsappRaw, setWhatsappRaw] = useState("");
   const [aiForm, setAiForm] = useState({ anios: "", zona: "" });
@@ -339,6 +345,7 @@ export default function NuevoProfesionalClient() {
           tipo: form.tipo || "oficio",
           oficios: form.oficios.map((o) => o.toLowerCase()),
           descripcion: descripcionFinal,
+          pin: form.pin || null,
         }),
       });
 
@@ -366,7 +373,8 @@ export default function NuevoProfesionalClient() {
     [router, createdSlug],
   );
 
-  const canGoStep1 = form.nombre && form.apellido && form.whatsapp.length >= 6;
+  const pinValid = /^\d{4}$/.test(form.pin) && form.pin === form.pinConfirm;
+  const canGoStep1 = form.nombre && form.apellido && form.whatsapp.length >= 6 && pinValid;
   const canGoStep2 = form.tipo !== "" && form.oficios.length > 0;
   const canSubmit = form.descripcion.length >= 30;
   const categoriasSugeridas =
@@ -444,6 +452,59 @@ export default function NuevoProfesionalClient() {
             <p className={`text-xs mt-1 ${textMut}`}>
               Solo se comparte cuando acordas con un cliente.
             </p>
+          </div>
+
+          {/* PIN de acceso */}
+          <div className={`rounded-2xl border p-4 ${isDark ? "bg-blue-950/30 border-blue-800/40" : "bg-blue-50 border-blue-200"}`}>
+            <div className="flex items-center gap-2 mb-1">
+              <Lock className={`w-4 h-4 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
+              <p className={`text-sm font-semibold ${isDark ? "text-blue-300" : "text-blue-700"}`}>
+                Elegí un PIN de 4 dígitos
+              </p>
+            </div>
+            <p className={`text-xs mb-3 ${isDark ? "text-blue-400/70" : "text-blue-600/70"}`}>
+              Con tu WhatsApp + este PIN vas a poder gestionar tu perfil desde cualquier dispositivo.
+            </p>
+            <div className="flex flex-col gap-3">
+              <div className="relative">
+                <input
+                  value={form.pin}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setForm((f) => ({ ...f, pin: v }));
+                  }}
+                  placeholder="1234"
+                  type={showPin ? "text" : "password"}
+                  inputMode="numeric"
+                  maxLength={4}
+                  className={`${INPUT_CLS} pr-12 text-center text-2xl tracking-[0.5em] font-bold`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin((v) => !v)}
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 ${isDark ? "text-gray-500" : "text-gray-400"}`}
+                >
+                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <input
+                value={form.pinConfirm}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                  setForm((f) => ({ ...f, pinConfirm: v }));
+                }}
+                placeholder="Repetí el PIN"
+                type={showPin ? "text" : "password"}
+                inputMode="numeric"
+                maxLength={4}
+                className={`${INPUT_CLS} text-center text-2xl tracking-[0.5em] font-bold`}
+              />
+              {form.pin.length === 4 && form.pinConfirm.length === 4 && (
+                <p className={`text-xs text-center font-medium ${form.pin === form.pinConfirm ? "text-green-400" : "text-red-400"}`}>
+                  {form.pin === form.pinConfirm ? "Los PINs coinciden" : "Los PINs no coinciden"}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       ),
@@ -686,23 +747,21 @@ export default function NuevoProfesionalClient() {
             requestPermission={requestPermission}
             onFinish={onFinish}
           />
-          {/* Código de acceso al panel */}
+          {/* Acceso al panel */}
           {createdId && (
             <div className={`rounded-2xl border p-4 ${isDark ? "bg-blue-950/40 border-blue-800/50" : "bg-blue-50 border-blue-200"}`}>
-              <p className={`text-xs font-semibold mb-1 ${isDark ? "text-blue-300" : "text-blue-700"}`}>
-                Tu codigo de acceso al panel
+              <p className={`text-sm font-semibold mb-1 ${isDark ? "text-blue-300" : "text-blue-700"}`}>
+                Tu perfil ya esta publicado
               </p>
               <p className={`text-xs mb-3 ${isDark ? "text-blue-400/70" : "text-blue-600/70"}`}>
-                Guarda este codigo. Con el podes gestionar tu perfil, subir fotos y actualizar tu info desde cualquier dispositivo.
+                Desde el panel podes subir fotos de tus trabajos, actualizar tu info y activar o pausar tu disponibilidad.
+                Para entrar usas tu WhatsApp + el PIN que elegiste.
               </p>
-              <div className={`rounded-xl p-3 font-mono text-xs break-all select-all ${isDark ? "bg-blue-900/40 text-blue-200" : "bg-white text-blue-800 border border-blue-200"}`}>
-                {createdId}
-              </div>
               <button
                 onClick={() => router.push("/profesional/gestionar")}
-                className="mt-3 w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors"
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors"
               >
-                Ir a mi panel ahora
+                Ir a mi panel
               </button>
             </div>
           )}
