@@ -14,6 +14,33 @@ interface Props { comercios: Comercio[] }
 
 const PAGE_SIZE = 5;
 
+const RUBROS_BASE = [
+  "Almacén/Despensa",
+  "Restaurante/Comida",
+  "Indumentaria",
+  "Calzado",
+  "Electrónica",
+  "Tecnología/Informática",
+  "Electricidad e Iluminacion",
+  "Ferretería",
+  "Materiales/Construcción",
+  "Farmacia",
+  "Salud/Bienestar",
+  "Peluquería/Estética",
+  "Librería/Papelería",
+  "Veterinaria",
+  "Deportes",
+  "Mueblería",
+  "Joyería/Relojería",
+  "Automotriz/Mecánica",
+  "Inmobiliaria",
+  "Seguros/Finanzas",
+  "Educación/Clases",
+  "Fotografía/Arte",
+  "Contaduría/Administración",
+  "Agro/Cerealista",
+];
+
 export default function ComerciosClient({ comercios }: Props) {
   const router = useTransitionRouter();
   const urlRouter = useRouter();
@@ -45,9 +72,10 @@ export default function ComerciosClient({ comercios }: Props) {
   );
 
   const rubros = useMemo(() => {
-    const set = new Set<string>();
-    comercios.forEach((c) => c.rubro && set.add(c.rubro));
-    return [...set].sort();
+    const fromData = new Set<string>();
+    comercios.forEach((c) => c.rubro && fromData.add(c.rubro));
+    const extra = [...fromData].filter((r) => !RUBROS_BASE.includes(r)).sort();
+    return [...RUBROS_BASE, ...extra];
   }, [comercios]);
 
   const filtered = useMemo(() => {

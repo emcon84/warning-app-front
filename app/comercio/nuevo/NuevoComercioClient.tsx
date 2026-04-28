@@ -27,6 +27,7 @@ const RUBROS = [
   "Calzado",
   "Electrónica",
   "Tecnología/Informática",
+  "Electricidad e Iluminacion",
   "Ferretería",
   "Materiales/Construcción",
   "Farmacia",
