@@ -323,9 +323,13 @@ export default function NuevoProfesionalClient() {
         .join("")
         .trim();
 
+      const token = await getToken();
+      const authHeaders: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) authHeaders["Authorization"] = `Bearer ${token}`;
+
       const res = await fetch(`${API}/api/professionals`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify({
           nombre: form.nombre,
           apellido: form.apellido,
