@@ -59,7 +59,13 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
   const [unreadConversations, setUnreadConversations] = useState<UnreadConversation[]>([]);
   const [loadingConversations, setLoadingConversations] = useState(false);
   const [hasProfessionalProfile, setHasProfessionalProfile] = useState(false);
+  const [hasPanelCode, setHasPanelCode] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Check localStorage for anonymous professional panel code (no Clerk needed)
+  useEffect(() => {
+    setHasPanelCode(!!localStorage.getItem("professional_panel_code"));
+  }, []);
 
   useEffect(() => {
     if (!isSignedIn) return;
@@ -229,7 +235,6 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
         <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
           {isSignedIn ? (
             <>
-              {/* UserButton sin badge */}
               <UserButton>
                 <UserButton.MenuItems>
                   {hasProfessionalProfile && (
@@ -245,12 +250,22 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               </UserButton>
             </>
           ) : (
+            <>
+              {hasPanelCode && (
+                <button
+                  onClick={() => router.push("/profesional/gestionar")}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-700 hover:bg-gray-50"}`}
+                >
+                  Mi panel
+                </button>
+              )}
               <button
                 onClick={() => openSignIn()}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-200" : "bg-gray-900 text-white hover:bg-gray-700"}`}
               >
                 Entrar
               </button>
+            </>
           )}
 
           {/* Toggle de tema — siempre visible */}

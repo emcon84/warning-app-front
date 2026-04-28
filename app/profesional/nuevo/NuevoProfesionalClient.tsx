@@ -214,6 +214,7 @@ export default function NuevoProfesionalClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [createdSlug, setCreatedSlug] = useState("");
+  const [createdId, setCreatedId] = useState("");
 
   const [form, setForm] = useState({
     nombre: "",
@@ -348,6 +349,9 @@ export default function NuevoProfesionalClient() {
 
       const pro = await res.json();
       setCreatedSlug(pro.slug);
+      setCreatedId(pro.id);
+      // Save code to localStorage so they can access the panel immediately
+      localStorage.setItem("professional_panel_code", pro.id);
       fireConfetti();
       goNext();
     } catch (e: unknown) {
@@ -669,20 +673,42 @@ export default function NuevoProfesionalClient() {
       ctaLabel: loading ? "Creando perfil..." : "Publicar perfil",
     },
     {
-      // Step 3 — Notificaciones
+      // Step 3 — Notificaciones + Código de acceso
       icon: <Bell className="w-8 h-8 text-violet-400" />,
       iconBg: "bg-violet-500/20",
       title: "Activá las notificaciones",
       subtitle: "Avisamos cuando un cliente quiere contactarte",
       content: (
-        <Step4Notificaciones
-          permission={permission}
-          isSupported={isSupported}
-          requestPermission={requestPermission}
-          onFinish={onFinish}
-        />
+        <div className="flex flex-col gap-4">
+          <Step4Notificaciones
+            permission={permission}
+            isSupported={isSupported}
+            requestPermission={requestPermission}
+            onFinish={onFinish}
+          />
+          {/* Código de acceso al panel */}
+          {createdId && (
+            <div className={`rounded-2xl border p-4 ${isDark ? "bg-blue-950/40 border-blue-800/50" : "bg-blue-50 border-blue-200"}`}>
+              <p className={`text-xs font-semibold mb-1 ${isDark ? "text-blue-300" : "text-blue-700"}`}>
+                Tu codigo de acceso al panel
+              </p>
+              <p className={`text-xs mb-3 ${isDark ? "text-blue-400/70" : "text-blue-600/70"}`}>
+                Guarda este codigo. Con el podes gestionar tu perfil, subir fotos y actualizar tu info desde cualquier dispositivo.
+              </p>
+              <div className={`rounded-xl p-3 font-mono text-xs break-all select-all ${isDark ? "bg-blue-900/40 text-blue-200" : "bg-white text-blue-800 border border-blue-200"}`}>
+                {createdId}
+              </div>
+              <button
+                onClick={() => router.push("/profesional/gestionar")}
+                className="mt-3 w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors"
+              >
+                Ir a mi panel ahora
+              </button>
+            </div>
+          )}
+        </div>
       ),
-      canContinue: false, // manejado internamente por el step
+      canContinue: false,
       onContinue: onFinish,
       hideButton: true,
     },
