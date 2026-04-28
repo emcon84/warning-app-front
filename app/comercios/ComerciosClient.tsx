@@ -272,22 +272,20 @@ export default function ComerciosClient({ comercios }: Props) {
           </p>
         </div>
 
-        {/* Rubros */}
-        {rubros.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-5">
-            {rubros.map((rubro) => (
-              <button
-                key={rubro}
-                onClick={() => handleRubroClick(rubro)}
-                className={`text-xs px-3 py-1.5 rounded-full border font-medium capitalize transition-colors ${
-                  selectedRubro === rubro ? pillActive : pillInactive
-                }`}
-              >
-                {rubro}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Rubros — scroll horizontal */}
+        <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+          {rubros.map((rubro) => (
+            <button
+              key={rubro}
+              onClick={() => handleRubroClick(rubro)}
+              className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium capitalize transition-colors whitespace-nowrap ${
+                selectedRubro === rubro ? pillActive : pillInactive
+              }`}
+            >
+              {rubro}
+            </button>
+          ))}
+        </div>
 
         {/* Lista */}
         {filtered.length === 0 ? (
