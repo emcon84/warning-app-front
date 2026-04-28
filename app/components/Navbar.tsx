@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Settings, Sun, Moon } from "lucide-react";
+import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Settings, Sun, Moon, LayoutDashboard } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -58,6 +58,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [unreadConversations, setUnreadConversations] = useState<UnreadConversation[]>([]);
   const [loadingConversations, setLoadingConversations] = useState(false);
+  const [hasProfessionalProfile, setHasProfessionalProfile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,7 +77,17 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
       }
     }
 
+    async function checkProfessionalProfile() {
+      const token = await getToken();
+      if (!token || cancelled) return;
+      const res = await fetch(`${API}/api/professionals/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok && !cancelled) setHasProfessionalProfile(true);
+    }
+
     fetchUnread();
+    checkProfessionalProfile();
     const interval = setInterval(fetchUnread, 30_000);
     return () => { cancelled = true; clearInterval(interval); };
   }, [isSignedIn]);
@@ -221,6 +232,13 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
               {/* UserButton sin badge */}
               <UserButton>
                 <UserButton.MenuItems>
+                  {hasProfessionalProfile && (
+                    <UserButton.Link
+                      label="Mi panel profesional"
+                      labelIcon={<LayoutDashboard className="w-4 h-4" />}
+                      href="/profesional/gestionar"
+                    />
+                  )}
                   <UserButton.Link label="Mi perfil" labelIcon={<User className="w-4 h-4" />} href="/mi-perfil" />
                   <UserButton.Link label="Configuración" labelIcon={<Settings className="w-4 h-4" />} href="/settings" />
                 </UserButton.MenuItems>
