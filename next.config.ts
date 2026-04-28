@@ -11,6 +11,14 @@ const withPWA = withPWAInit({
     disableDevLogs: true,
     skipWaiting: true,
     clientsClaim: true,
+    runtimeCaching: [
+      {
+        // Share routes generate dynamic images — never cache them
+        urlPattern: /^\/share\//,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        handler: "NetworkOnly" as any,
+      },
+    ],
   },
 });
 

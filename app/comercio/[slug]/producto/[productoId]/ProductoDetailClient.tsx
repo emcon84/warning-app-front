@@ -5,7 +5,7 @@ import { Comercio, Producto } from "../../../../types";
 import Navbar from "../../../../components/Navbar";
 import { useTheme } from "../../../../contexts/ThemeContext";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Share2, Copy, Check, X } from "lucide-react";
+import { ArrowLeft, Share2, Copy, Check, X, Instagram, Download } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -33,6 +33,7 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [loadingShare, setLoadingShare] = useState(false);
 
   useEffect(() => {
     trackEvent(comercio.slug, "product_view");
@@ -73,10 +74,25 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
     } catch {/* silent */}
   }
 
-  async function handleNativeShare() {
+  async function downloadAndShare() {
+    const imageUrl = `${window.location.origin}${storyUrl}`;
+    setLoadingShare(true);
     try {
-      await navigator.share({ title: producto.nombre, url: productoLink });
-    } catch {/* silent */}
+      const res = await fetch(imageUrl);
+      const blob = await res.blob();
+      const file = new File([blob], "producto-story.png", { type: "image/png" });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] });
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "producto-story.png";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+    } catch {/* silent */} finally {
+      setLoadingShare(false);
+    }
   }
 
   const tipoBadge = producto.tipo === "servicio"
@@ -192,55 +208,58 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
         </div>
       </div>
 
-      {/* Modal Share Story */}
+      {/* Modal Share */}
       {showShareModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 px-4 pb-8 sm:p-4">
-          <div className={`w-full max-w-sm rounded-3xl ${isDark ? "bg-gray-900" : "bg-white"} shadow-2xl overflow-hidden`}>
-            <div className="flex items-center justify-between px-5 pt-5 pb-3">
-              <p className={`font-bold text-sm ${isDark ? "text-white" : "text-gray-900"}`}>Compartir producto</p>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800 text-gray-400" : "hover:bg-gray-100 text-gray-500"}`}
-              >
-                <X className="w-4 h-4" />
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ zIndex: 1300, backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
+          onClick={() => setShowShareModal(false)}
+        >
+          <div
+            className={`w-full max-w-sm rounded-2xl shadow-2xl p-6 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-white border border-gray-200"}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className={`text-base font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Compartir en Instagram</h3>
+                <p className={`text-xs mt-0.5 truncate max-w-[220px] ${isDark ? "text-gray-500" : "text-gray-400"}`}>{producto.nombre}</p>
+              </div>
+              <button onClick={() => setShowShareModal(false)} className={`p-1.5 rounded-full ${isDark ? "hover:bg-gray-800 text-gray-400" : "hover:bg-gray-100 text-gray-500"}`}>
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Preview story */}
-            <div className="px-5 pb-4">
-              <div className="w-full aspect-[9/16] rounded-2xl overflow-hidden bg-gray-950 relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={storyUrl}
-                  alt="Story preview"
-                  className="w-full h-full object-cover"
-                />
+            <button
+              onClick={downloadAndShare}
+              disabled={loadingShare}
+              className={`w-full flex flex-col items-center gap-3 p-5 rounded-xl border transition-colors disabled:opacity-40 ${isDark ? "border-gray-700 hover:border-gray-500 hover:bg-gray-800" : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"}`}
+            >
+              <div className={`w-10 h-16 rounded-lg border-2 flex items-center justify-center ${isDark ? "border-gray-600 bg-gray-800" : "border-gray-300 bg-gray-100"}`}>
+                {loadingShare
+                  ? <div className="w-4 h-4 border-2 border-gray-500 border-t-white rounded-full animate-spin" />
+                  : <Instagram className={`w-4 h-4 ${isDark ? "text-gray-400" : "text-gray-500"}`} />
+                }
               </div>
-            </div>
+              <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                {loadingShare ? "Generando..." : "Generar Story"}
+              </span>
+              <span className={`text-[10px] ${isDark ? "text-gray-600" : "text-gray-400"}`}>1080 x 1920 · Instagram</span>
+            </button>
 
-            <div className="flex flex-col gap-2.5 px-5 pb-5">
-              {/* Native share (si el browser lo soporta) */}
-              {typeof navigator !== "undefined" && "share" in navigator && (
-                <button
-                  onClick={handleNativeShare}
-                  className="w-full py-3 rounded-2xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Compartir...
-                </button>
-              )}
+            <div className={`mt-4 border-t pt-4 ${isDark ? "border-gray-800" : "border-gray-100"}`}>
               <button
                 onClick={() => handleCopyLink(setCopied)}
-                className={`w-full py-3 rounded-2xl text-sm font-semibold border transition-colors flex items-center justify-center gap-2 ${
-                  isDark
-                    ? "border-gray-700 text-gray-300 hover:bg-gray-800"
-                    : "border-gray-200 text-gray-700 hover:bg-gray-50"
-                }`}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-colors ${isDark ? "border-gray-700 hover:border-gray-500 hover:bg-gray-800 text-gray-300" : "border-gray-200 hover:border-gray-400 hover:bg-gray-50 text-gray-700"}`}
               >
-                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                 {copied ? "Link copiado!" : "Copiar link"}
               </button>
             </div>
+
+            <p className={`text-[10px] text-center mt-3 flex items-center justify-center gap-1 ${isDark ? "text-gray-700" : "text-gray-400"}`}>
+              <Download className="w-3 h-3" />
+              En desktop descarga la imagen. En mobile abre el selector del sistema.
+            </p>
           </div>
         </div>
       )}
