@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, Fragment } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useTransitionRouter } from "next-view-transitions";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Comercio } from "../types";
 import Navbar from "../components/Navbar";
@@ -15,9 +16,13 @@ const PAGE_SIZE = 5;
 
 export default function ComerciosClient({ comercios }: Props) {
   const router = useTransitionRouter();
+  const urlRouter = useRouter();
+  const searchParams = useSearchParams();
   const { isDark } = useTheme();
   const [search, setSearch] = useState("");
-  const [selectedRubro, setSelectedRubro] = useState<string | null>(null);
+  const [selectedRubro, setSelectedRubro] = useState<string | null>(
+    searchParams.get("rubro") ?? null
+  );
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +66,14 @@ export default function ComerciosClient({ comercios }: Props) {
       return true;
     });
   }, [comercios, selectedRubro, search]);
+
+  const handleRubroClick = useCallback((rubro: string) => {
+    const next = selectedRubro === rubro ? null : rubro;
+    setSelectedRubro(next);
+    const params = new URLSearchParams(searchParams.toString());
+    if (next) params.set("rubro", next); else params.delete("rubro");
+    urlRouter.push(`/comercios?${params.toString()}`, { scroll: false });
+  }, [selectedRubro, searchParams, urlRouter]);
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedRubro, search]);
 
@@ -234,10 +247,10 @@ export default function ComerciosClient({ comercios }: Props) {
         {/* Rubros */}
         {rubros.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-5">
-            {rubros.slice(0, 20).map((rubro) => (
+            {rubros.map((rubro) => (
               <button
                 key={rubro}
-                onClick={() => setSelectedRubro(selectedRubro === rubro ? null : rubro)}
+                onClick={() => handleRubroClick(rubro)}
                 className={`text-xs px-3 py-1.5 rounded-full border font-medium capitalize transition-colors ${
                   selectedRubro === rubro ? pillActive : pillInactive
                 }`}

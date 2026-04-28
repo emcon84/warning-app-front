@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import ComerciosClient from "./ComerciosClient";
 import { Comercio } from "../types";
 
@@ -19,5 +20,9 @@ async function getComerciosData(): Promise<Comercio[]> {
 
 export default async function ComerciosPage() {
   const comercios = await getComerciosData();
-  return <ComerciosClient comercios={comercios} />;
+  return (
+    <Suspense>
+      <ComerciosClient comercios={comercios} />
+    </Suspense>
+  );
 }

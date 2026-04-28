@@ -450,27 +450,53 @@ export default function NuevoComercioClient() {
       icon: <Store className="w-8 h-8 text-orange-400" />,
       iconBg: "bg-orange-500/20",
       title: "¿Cuál es tu rubro?",
-      subtitle: "Elegí el que mejor describe tu negocio",
+      subtitle: "Elegí uno o escribí el tuyo",
       content: (
-        <div className="flex flex-col gap-2">
-          {RUBROS.map((r) => {
-            const selected = form.rubro === r;
-            return (
+        <div className="flex flex-col gap-3">
+          {/* Input libre — siempre visible */}
+          <div className="relative">
+            <input
+              value={form.rubro}
+              onChange={(e) => setForm((f) => ({ ...f, rubro: e.target.value }))}
+              placeholder="Ej: Florería, Carpintería, Kiosco..."
+              className={INPUT_CLS}
+            />
+            {form.rubro && (
               <button
-                key={r}
                 type="button"
-                onClick={() => setForm((f) => ({ ...f, rubro: r }))}
-                className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border text-left text-sm font-medium transition-all ${
-                  selected
-                    ? "bg-amber-500/10 border-amber-500 text-amber-400"
-                    : `${chipBase}`
-                }`}
+                onClick={() => setForm((f) => ({ ...f, rubro: "" }))}
+                className={`absolute right-4 top-1/2 -translate-y-1/2 ${textMut}`}
               >
-                <span>{r}</span>
-                {selected && <Check className="w-4 h-4 flex-shrink-0 ml-2" />}
+                <X className="w-4 h-4" />
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {/* Separador */}
+          <p className={`text-xs ${textMut} mt-1`}>O elegí de la lista:</p>
+
+          {/* Lista filtrada por lo que se escribe */}
+          {RUBROS
+            .filter((r) => !form.rubro || r.toLowerCase().includes(form.rubro.toLowerCase()))
+            .map((r) => {
+              const selected = form.rubro === r;
+              return (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, rubro: r }))}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border text-left text-sm font-medium transition-all ${
+                    selected
+                      ? "bg-amber-500/10 border-amber-500 text-amber-400"
+                      : `${chipBase}`
+                  }`}
+                >
+                  <span>{r}</span>
+                  {selected && <Check className="w-4 h-4 flex-shrink-0 ml-2" />}
+                </button>
+              );
+            })
+          }
         </div>
       ),
       canContinue: canGoRubro,
