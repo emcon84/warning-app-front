@@ -323,12 +323,12 @@ export default function OficiosClient({ professionals, initialCategoria, initial
 
         {/* Tags */}
         {allTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-5 md:max-w-4xl md:mx-auto">
-            {allTags.slice(0, 20).map((tag) => (
+          <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide md:max-w-4xl md:mx-auto md:px-0">
+            {allTags.map((tag) => (
               <button
                 key={tag}
                 onClick={() => handleTagClick(tag)}
-                className={`text-xs px-3 py-1.5 rounded-full border font-medium capitalize transition-colors ${
+                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-full border font-medium capitalize transition-colors whitespace-nowrap ${
                   selectedTag === tag ? pillActive : pillInactive
                 }`}
               >
