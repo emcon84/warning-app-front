@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -244,6 +244,8 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
   const [proDir, setProDir] = useState(1);
   const [comercioSlide, setComercioSlide] = useState(0);
   const [comercioDir, setComercioDir] = useState(1);
+  const proSwipeX = useRef(0);
+  const comSwipeX = useRef(0);
 
   useEffect(() => {
     fetch("https://api.open-meteo.com/v1/forecast?latitude=-29.15&longitude=-59.64&current=temperature_2m,weather_code&timezone=America/Argentina/Buenos_Aires")
@@ -443,7 +445,15 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                 Ver todos <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            <div className="relative rounded-2xl overflow-hidden h-44 md:h-52">
+            <div
+              className="relative rounded-2xl overflow-hidden h-44 md:h-52 touch-pan-y"
+              onPointerDown={(e) => { proSwipeX.current = e.clientX; }}
+              onPointerUp={(e) => {
+                const d = proSwipeX.current - e.clientX;
+                if (d > 50) { setProDir(1); setProSlide(p => (p + 1) % proSlides.length); }
+                else if (d < -50) { setProDir(-1); setProSlide(p => (p - 1 + proSlides.length) % proSlides.length); }
+              }}
+            >
               <AnimatePresence mode="wait" custom={proDir}>
                 {(() => {
                   const item = proSlides[proSlide];
@@ -522,20 +532,6 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
 
 
-              {/* Dots */}
-              {proSlides.length > 1 && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                  {proSlides.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => { setProDir(i > proSlide ? 1 : -1); setProSlide(i); }}
-                      className={`rounded-full transition-all duration-300 ${
-                        i === proSlide ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40"
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
           </motion.div>
         )}
@@ -585,7 +581,15 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                 Ver todos <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            <div className="relative rounded-2xl overflow-hidden h-44 md:h-52">
+            <div
+              className="relative rounded-2xl overflow-hidden h-44 md:h-52 touch-pan-y"
+              onPointerDown={(e) => { comSwipeX.current = e.clientX; }}
+              onPointerUp={(e) => {
+                const d = comSwipeX.current - e.clientX;
+                if (d > 50) { setComercioDir(1); setComercioSlide(p => (p + 1) % comSlides.length); }
+                else if (d < -50) { setComercioDir(-1); setComercioSlide(p => (p - 1 + comSlides.length) % comSlides.length); }
+              }}
+            >
               <AnimatePresence mode="wait" custom={comercioDir}>
                 {(() => {
                   const item = comSlides[comercioSlide];
@@ -663,20 +667,6 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
 
 
-              {/* Dots */}
-              {comSlides.length > 1 && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                  {comSlides.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => { setComercioDir(i > comercioSlide ? 1 : -1); setComercioSlide(i); }}
-                      className={`rounded-full transition-all duration-300 ${
-                        i === comercioSlide ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40"
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
             </div>
           </motion.div>
         )}
