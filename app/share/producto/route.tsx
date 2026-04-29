@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
+const NO_CACHE = { "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400" };
 
 async function toDataUrl(url: string): Promise<string> {
   if (!url) return "";
