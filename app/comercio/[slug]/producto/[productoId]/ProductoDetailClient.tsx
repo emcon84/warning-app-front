@@ -34,6 +34,7 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [loadingShare, setLoadingShare] = useState(false);
+  const [shareError, setShareError] = useState(false);
 
   useEffect(() => {
     trackEvent(comercio.slug, "product_view");
@@ -77,8 +78,10 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
   async function downloadAndShare() {
     const imageUrl = `${window.location.origin}${storyUrl}`;
     setLoadingShare(true);
+    setShareError(false);
     try {
       const res = await fetch(imageUrl);
+      if (!res.ok) throw new Error("error generando imagen");
       const blob = await res.blob();
       const file = new File([blob], "producto-story.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
@@ -90,7 +93,10 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
         a.click();
         URL.revokeObjectURL(a.href);
       }
-    } catch {/* silent */} finally {
+    } catch {
+      setShareError(true);
+      setTimeout(() => setShareError(false), 3000);
+    } finally {
       setLoadingShare(false);
     }
   }
@@ -241,7 +247,7 @@ export default function ProductoDetailClient({ producto, comercio }: Props) {
                 }
               </div>
               <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-                {loadingShare ? "Generando..." : "Generar Story"}
+                {loadingShare ? "Generando..." : shareError ? "Error — intentá de nuevo" : "Generar Story"}
               </span>
               <span className={`text-[10px] ${isDark ? "text-gray-600" : "text-gray-400"}`}>1080 x 1920 · Instagram</span>
             </button>
