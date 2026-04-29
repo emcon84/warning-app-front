@@ -262,9 +262,9 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
         {/* ── Info card ─────────────────────────────────────────────── */}
         <div className={`mx-4 rounded-2xl border ${cardBg} overflow-visible -mt-4`}>
           {/* Avatar + nombre en la misma fila, avatar sobresale del hero */}
-          <div className="relative px-5 pt-0">
-            {/* Fila avatar + nombre */}
-            <div className="flex items-end gap-3 -mt-10 mb-5">
+          <div className="relative px-5 pt-2">
+            {/* Avatar solo — sobresale del hero */}
+            <div className="-mt-12 mb-3">
               <div
                 className={`w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}
                 style={{ viewTransitionName: `co-photo-${comercio.slug}` }}
@@ -281,15 +281,14 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                   </div>
                 )}
               </div>
-              <div className="pb-1 min-w-0">
-                <h1
-                  className={`text-lg font-black leading-tight truncate ${textPrimary}`}
-                  style={{ viewTransitionName: `co-name-${comercio.slug}` }}
-                >
-                  {comercio.nombre}
-                </h1>
-              </div>
             </div>
+            {/* Nombre — claramente debajo del avatar, separado del banner */}
+            <h1
+              className={`text-xl font-black leading-tight mb-3 ${textPrimary}`}
+              style={{ viewTransitionName: `co-name-${comercio.slug}` }}
+            >
+              {comercio.nombre}
+            </h1>
             {/* Pills separadas — con espacio propio, lejos del hero */}
             <div className="flex items-center gap-2 mb-4 flex-wrap">
               <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
@@ -363,7 +362,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
               className={"mt-2 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm transition-colors " + (recommended ? (isDark ? "bg-green-900/30 border border-green-800 text-green-400 cursor-default" : "bg-green-600 border border-green-700 text-white cursor-default") : "bg-amber-500 hover:bg-amber-400 text-white")}
             >
               {recommended ? (
-                <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Recomendado &middot; {recCount}</>
+                <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Ya recomendaste este comercio</>
               ) : (
                 <><ThumbsUp className="w-4 h-4" />{recCount > 0 ? "Recomendar · " + recCount : "Recomendar"}</>
               )}
