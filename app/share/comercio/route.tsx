@@ -1,9 +1,26 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
+
+async function toDataUrl(url: string): Promise<string> {
+  if (!url) return "";
+  try {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) return "";
+    const buf = await r.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    }
+    const mime = r.headers.get("content-type") ?? "image/jpeg";
+    return `data:${mime};base64,${btoa(binary)}`;
+  } catch {
+    return "";
+  }
+}
+
 
 export async function GET(req: NextRequest) {
   const s = req.nextUrl.searchParams;
@@ -18,8 +35,10 @@ export async function GET(req: NextRequest) {
   const foto = s.get("foto") ?? "";
   const logo = s.get("logo") ?? "";
 
-  const fotoData = foto || "";
-  const logoData = logo || "";
+  const [fotoData, logoData] = await Promise.all([
+    foto ? toDataUrl(foto) : Promise.resolve(""),
+    logo ? toDataUrl(logo) : Promise.resolve(""),
+  ]);
 
   const profileUrl = `reportesreconquista.com/comercio/${slug}`;
   const rubroBarrio = barrio ? `${rubro} - ${barrio}` : rubro;
