@@ -241,6 +241,8 @@ export interface Comercio {
   isPremium?: boolean;
   isFounder?: boolean;
   recommendations?: number;
+  ratingAvg?: number;
+  ratingCount?: number;
   createdAt: string;
   offers?: ComercioOffer[];
   productos?: Producto[];

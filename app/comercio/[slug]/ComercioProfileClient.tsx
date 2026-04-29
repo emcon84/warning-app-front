@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Comercio, ComercioOffer, Producto } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -96,6 +97,49 @@ const RUBRO_GRADIENT: Record<string, string> = {
   "Otro":                      "from-gray-900 to-gray-700",
 };
 
+interface ComercioReview {
+  id: string;
+  score: number;
+  createdAt: string;
+}
+
+const STAR_PATH = "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z";
+
+function Stars({ score, size = "sm", dark = true }: { score: number; size?: "sm" | "md"; dark?: boolean }) {
+  const cls = size === "md" ? "w-5 h-5" : "w-3.5 h-3.5";
+  return (
+    <div className="flex">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <svg key={i} className={`${cls} ${i <= score ? "text-yellow-400" : dark ? "text-gray-700" : "text-gray-300"}`} fill="currentColor" viewBox="0 0 20 20">
+          <path d={STAR_PATH} />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <button
+          key={i}
+          type="button"
+          onMouseEnter={() => setHover(i)}
+          onMouseLeave={() => setHover(0)}
+          onClick={() => onChange(i)}
+          className="focus:outline-none"
+        >
+          <svg className={`w-7 h-7 transition-colors ${i <= (hover || value) ? "text-yellow-400" : "text-gray-600"}`} fill="currentColor" viewBox="0 0 20 20">
+            <path d={STAR_PATH} />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function photoUrl(url: string): string {
   if (!url) return url;
   return url.startsWith("/uploads/") ? `${API}${url}` : url;
@@ -142,12 +186,28 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
 
   const waText = encodeURIComponent("Hola, te contacto desde Reportes Reconquista");
   const waUrl  = `https://wa.me/${comercio.whatsapp}?text=${waText}`;
+  const { isSignedIn } = useUser();
+  const { getToken } = useAuth();
   const [recommended, setRecommended] = useState(false);
   const [recCount, setRecCount] = useState(comercio.recommendations || 0);
+  const [comercioReviews, setComercioReviews] = useState<ComercioReview[]>([]);
+  const [loadingCReviews, setLoadingCReviews] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [formCScore, setFormCScore] = useState(0);
+  const [submittingCReview, setSubmittingCReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined")
       setRecommended(!!localStorage.getItem("rec_com_" + comercio.slug));
+  }, [comercio.slug]);
+
+  useEffect(() => {
+    fetch(`${API}/api/comercios/${comercio.slug}/reviews`)
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setComercioReviews(data); setLoadingCReviews(false); })
+      .catch(() => setLoadingCReviews(false));
   }, [comercio.slug]);
 
   async function handleRecommend() {
@@ -159,6 +219,34 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
       setRecCount(data.count ?? recCount + 1);
       localStorage.setItem("rec_com_" + comercio.slug, "1");
     } catch {}
+  }
+
+  async function handleSubmitCReview(e: React.FormEvent) {
+    e.preventDefault();
+    if (formCScore === 0 || submittingCReview) return;
+    setSubmittingCReview(true);
+    setReviewError("");
+    try {
+      const clerkToken = await getToken();
+      const res = await fetch(`${API}/api/comercios/${comercio.slug}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}) },
+        body: JSON.stringify({ score: formCScore }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setReviewError((err as { error?: string }).error || "Error al enviar. Intentá de nuevo.");
+        return;
+      }
+      setReviewSuccess(true);
+      setShowReviewForm(false);
+      const r = await fetch(`${API}/api/comercios/${comercio.slug}/reviews`).then((x) => x.json());
+      if (Array.isArray(r)) setComercioReviews(r);
+    } catch {
+      setReviewError("Error al enviar. Intentá de nuevo.");
+    } finally {
+      setSubmittingCReview(false);
+    }
   }
 
   const activeOffers = comercio.offers || [];
@@ -384,6 +472,80 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           </div>
         </div>
 
+        {/* ── Calificaciones ──────────────────────────────────────────── */}
+        <div className="mx-4 mt-4">
+          <div className="flex items-center justify-between mb-4">
+            <p className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+              Calificaciones{comercioReviews.length > 0 ? ` (${comercioReviews.length})` : ""}
+            </p>
+            {!showReviewForm && !reviewSuccess && isSignedIn && (
+              <button
+                onClick={() => setShowReviewForm(true)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${tagBg} hover:opacity-80`}
+              >
+                + Calificar
+              </button>
+            )}
+            {!showReviewForm && !reviewSuccess && !isSignedIn && (
+              <button
+                onClick={() => router.push("/sign-in")}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${tagBg} hover:opacity-80`}
+              >
+                + Calificar
+              </button>
+            )}
+          </div>
+
+          {(comercio.ratingAvg ?? 0) > 0 && (
+            <div className={`flex items-center gap-3 p-3 rounded-2xl border mb-4 ${cardBg}`}>
+              <span className={`text-3xl font-black ${textPrimary}`}>{(comercio.ratingAvg ?? 0).toFixed(1)}</span>
+              <div>
+                <Stars score={Math.round(comercio.ratingAvg ?? 0)} size="md" dark={isDark} />
+                <p className={`text-xs mt-0.5 ${textMuted}`}>{comercio.ratingCount} calificacion{(comercio.ratingCount ?? 0) !== 1 ? "es" : ""}</p>
+              </div>
+            </div>
+          )}
+
+          {reviewSuccess && (
+            <div className="mb-4 p-3 rounded-xl bg-green-900/30 border border-green-800 text-sm text-green-400">
+              Gracias por tu calificacion!
+            </div>
+          )}
+
+          {loadingCReviews ? (
+            <div className="flex flex-col gap-3">
+              {[1, 2].map((i) => (
+                <div key={i} className={`h-16 rounded-2xl border animate-pulse ${cardBg}`} />
+              ))}
+            </div>
+          ) : comercioReviews.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {comercioReviews.map((r) => (
+                <div key={r.id} className={`p-4 rounded-2xl border ${cardBg}`}>
+                  <div className="flex items-center justify-between">
+                    <Stars score={r.score} size="sm" dark={isDark} />
+                    <p className={`text-xs ${textMuted}`}>
+                      {new Date(r.createdAt).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center">
+              <p className={`text-sm ${textMuted}`}>Aun no hay calificaciones.</p>
+              {!showReviewForm && (
+                <button
+                  onClick={() => setShowReviewForm(true)}
+                  className={`mt-2 text-sm underline transition-colors ${textSec}`}
+                >
+                  Se el primero en calificar
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* ── Galeria ─────────────────────────────────────────────────── */}
         {galeriaFotos.length > 0 && (
           <div className="mx-4 mt-4">
@@ -494,6 +656,45 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
         </div>
 
       </div>
+
+      {/* Bottom sheet: calificar comercio */}
+      {showReviewForm && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center p-0 md:p-4"
+          onClick={() => { setShowReviewForm(false); setReviewError(""); }}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <form
+            onSubmit={handleSubmitCReview}
+            onClick={(e) => e.stopPropagation()}
+            className={`relative flex flex-col gap-3 rounded-t-3xl md:rounded-3xl border-t md:border px-4 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] md:pb-5 md:max-w-lg md:w-full ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
+          >
+            <div className={`w-10 h-1 rounded-full mx-auto mb-1 ${isDark ? "bg-gray-700" : "bg-gray-300"}`} />
+            <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Calificar {comercio.nombre}</p>
+            <div>
+              <p className={`text-xs mb-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}>Tu calificacion</p>
+              <StarPicker value={formCScore} onChange={setFormCScore} />
+            </div>
+            {reviewError && <p className="text-xs text-red-400">{reviewError}</p>}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => { setShowReviewForm(false); setReviewError(""); }}
+                className={`flex-1 py-2.5 rounded-xl text-sm transition-colors border ${isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={formCScore === 0 || submittingCReview}
+                className="flex-1 py-2.5 rounded-xl bg-white text-gray-950 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
+              >
+                {submittingCReview ? "Enviando..." : "Publicar"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

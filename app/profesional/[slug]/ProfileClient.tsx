@@ -364,14 +364,14 @@ export default function ProfileClient({ pro, slug }: Props) {
         <div className="mb-4">
           <div className="flex items-center justify-between mb-4">
             <p className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
-              Opiniones{reviews.length > 0 ? ` (${reviews.length})` : ""}
+              Calificaciones{reviews.length > 0 ? ` (${reviews.length})` : ""}
             </p>
             {!showForm && !submitSuccess && isSignedIn && (
               <button
                 onClick={() => setShowForm(true)}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${tagBg} hover:opacity-80`}
               >
-                + Dejar opinión
+                + Calificar
               </button>
             )}
             {!showForm && !submitSuccess && !isSignedIn && (
@@ -379,7 +379,7 @@ export default function ProfileClient({ pro, slug }: Props) {
                 onClick={() => { setLoginModalContext("review"); setShowLoginModal(true); }}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${tagBg} hover:opacity-80`}
               >
-                + Dejar opinión
+                + Calificar
               </button>
             )}
           </div>
@@ -440,7 +440,7 @@ export default function ProfileClient({ pro, slug }: Props) {
                   onClick={() => setShowForm(true)}
                   className={`mt-2 text-sm underline transition-colors ${textSec} hover:${textPrimary}`}
                 >
-                  Sé el primero en opinar
+                  Sé el primero en calificar
                 </button>
               )}
             </div>
