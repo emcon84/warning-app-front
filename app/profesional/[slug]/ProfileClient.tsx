@@ -456,12 +456,12 @@ export default function ProfileClient({ pro, slug }: Props) {
 
         {/* Bottom sheet: formulario nueva opinión */}
         {showForm && (
-          <div className="fixed inset-0 z-50 flex flex-col justify-end" onClick={() => { setShowForm(false); setSubmitError(""); }}>
+          <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center p-0 md:p-4" onClick={() => { setShowForm(false); setSubmitError(""); }}>
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             <form
               onSubmit={handleSubmitReview}
               onClick={(e) => e.stopPropagation()}
-              className={`relative flex flex-col gap-3 rounded-t-3xl border-t px-4 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
+              className={`relative flex flex-col gap-3 rounded-t-3xl md:rounded-3xl border-t md:border px-4 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] md:pb-5 md:max-w-lg md:w-full ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
             >
               <div className={`w-10 h-1 rounded-full mx-auto mb-1 ${isDark ? "bg-gray-700" : "bg-gray-300"}`} />
 
@@ -504,17 +504,6 @@ export default function ProfileClient({ pro, slug }: Props) {
                 <p className="text-xs text-red-400">{submitError}</p>
               )}
 
-              <button
-            onClick={handleRecommend}
-            disabled={recommended}
-            className={"w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold text-sm transition-colors " + (recommended ? (isDark ? "bg-green-900/30 border border-green-800 text-green-400 cursor-default" : "bg-green-50 border border-green-200 text-green-700 cursor-default") : "bg-amber-500 hover:bg-amber-400 text-white")}
-          >
-            {recommended ? (
-              <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Recomendado &middot; {recCount}</>
-            ) : (
-              <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 1.99l-3.714 5.06a2 2 0 00-.373 1.169V19a2 2 0 002 2h.095c.497 0 .905-.402.905-.9V16.91c0-.333.215-.627.527-.738l2.527-.946" /></svg>{recCount > 0 ? "Recomendar · " + recCount : "Recomendar"}</>
-            )}
-          </button>
           <div className="flex gap-2">
                 <button
                   type="button"
@@ -562,6 +551,17 @@ export default function ProfileClient({ pro, slug }: Props) {
             </button>
           )}
 
+          <button
+            onClick={handleRecommend}
+            disabled={recommended}
+            className={"w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold text-sm transition-colors " + (recommended ? (isDark ? "bg-green-900/30 border border-green-800 text-green-400 cursor-default" : "bg-green-50 border border-green-200 text-green-700 cursor-default") : "bg-amber-500 hover:bg-amber-400 text-white")}
+          >
+            {recommended ? (
+              <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Recomendado &middot; {recCount}</>
+            ) : (
+              <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 1.99l-3.714 5.06a2 2 0 00-.373 1.169V19a2 2 0 002 2h.095c.497 0 .905-.402.905-.9V16.91c0-.333.215-.627.527-.738l2.527-.946" /></svg>{recCount > 0 ? "Recomendar · " + recCount : "Recomendar"}</>
+            )}
+          </button>
           <div className="flex gap-2">
             <button
               onClick={handleShare}
