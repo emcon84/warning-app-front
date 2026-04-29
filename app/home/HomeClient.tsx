@@ -520,23 +520,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                 })()}
               </AnimatePresence>
 
-              {/* Flechas nav */}
-              {proSlides.length > 1 && (
-                <>
-                  <button
-                    onClick={() => { setProDir(-1); setProSlide(p => (p - 1 + proSlides.length) % proSlides.length); }}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => { setProDir(1); setProSlide(p => (p + 1) % proSlides.length); }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </>
-              )}
+
 
               {/* Dots */}
               {proSlides.length > 1 && (
@@ -677,23 +661,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                 })()}
               </AnimatePresence>
 
-              {/* Flechas nav */}
-              {comSlides.length > 1 && (
-                <>
-                  <button
-                    onClick={() => { setComercioDir(-1); setComercioSlide(p => (p - 1 + comSlides.length) % comSlides.length); }}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => { setComercioDir(1); setComercioSlide(p => (p + 1) % comSlides.length); }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </>
-              )}
+
 
               {/* Dots */}
               {comSlides.length > 1 && (
