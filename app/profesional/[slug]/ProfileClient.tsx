@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
+import confetti from "canvas-confetti";
 import { ProfessionalDetail, PublicReview } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -36,8 +37,9 @@ function Stars({ score, size = "sm", dark = true }: { score: number; size?: "sm"
 
 function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   const [hover, setHover] = useState(0);
+  const active = hover || value;
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-3 justify-center">
       {[1, 2, 3, 4, 5].map((i) => (
         <button
           key={i}
@@ -45,15 +47,35 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
           onMouseEnter={() => setHover(i)}
           onMouseLeave={() => setHover(0)}
           onClick={() => onChange(i)}
-          className="focus:outline-none"
+          className="focus:outline-none transition-transform active:scale-90"
+          style={{ transform: i <= active ? "scale(1.15)" : "scale(1)" }}
         >
-          <svg className={`w-7 h-7 transition-colors ${i <= (hover || value) ? "text-yellow-400" : "text-gray-600"}`} fill="currentColor" viewBox="0 0 20 20">
+          <svg
+            className={`w-11 h-11 transition-all duration-150 ${i <= active ? "text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.6)]" : "text-gray-400"}`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
             <path d={STAR_PATH} />
           </svg>
         </button>
       ))}
     </div>
   );
+}
+
+const SCORE_LABELS = ["", "Muy malo", "Malo", "Regular", "Bueno", "Excelente"];
+const SCORE_COLORS = ["", "text-red-500", "text-orange-400", "text-yellow-400", "text-green-400", "text-emerald-400"];
+
+function fireConfetti(score: number) {
+  if (score >= 4) {
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ["#FFD700", "#FFA500", "#10B981", "#3B82F6", "#F472B6"] });
+    setTimeout(() => {
+      confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 }, colors: ["#FFD700", "#FFA500", "#10B981"] });
+      confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 }, colors: ["#FFD700", "#FFA500", "#10B981"] });
+    }, 300);
+  } else if (score <= 2) {
+    confetti({ particleCount: 50, spread: 30, origin: { y: 0.2 }, colors: ["#6B7280", "#9CA3AF", "#60A5FA"], gravity: 0.5, ticks: 250, drift: 0 });
+  }
 }
 
 export default function ProfileClient({ pro, slug }: Props) {
@@ -133,9 +155,8 @@ export default function ProfileClient({ pro, slug }: Props) {
       .finally(() => setLoadingReviews(false));
   }, [slug]);
 
-  async function handleSubmitReview(e: React.FormEvent) {
-    e.preventDefault();
-    if (formScore === 0) return;
+  async function submitReview(score: number) {
+    if (submitting) return;
     setSubmitting(true);
     setSubmitError("");
     try {
@@ -148,7 +169,7 @@ export default function ProfileClient({ pro, slug }: Props) {
           ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
         },
         body: JSON.stringify({
-          score: formScore,
+          score,
           clientToken: clientToken || undefined,
         }),
       });
@@ -158,6 +179,7 @@ export default function ProfileClient({ pro, slug }: Props) {
       }
       const newReview: PublicReview = await res.json();
       setReviews((prev) => [newReview, ...prev]);
+      fireConfetti(score);
       setSubmitSuccess(true);
       setShowForm(false);
       setFormScore(0);
@@ -386,8 +408,8 @@ export default function ProfileClient({ pro, slug }: Props) {
 
           {/* Mensaje de éxito */}
           {submitSuccess && (
-            <div className="mb-4 p-3 rounded-xl bg-green-900/30 border border-green-800 text-sm text-green-400">
-              ¡Gracias por tu opinión!
+            <div className={`mb-4 p-3 rounded-xl text-sm font-medium ${isDark ? "bg-green-900/30 border border-green-800 text-green-400" : "bg-green-100 border border-green-300 text-green-800"}`}>
+              Gracias por tu calificacion!
             </div>
           )}
 
@@ -448,44 +470,72 @@ export default function ProfileClient({ pro, slug }: Props) {
         </div>
         </div>{/* fin bloque scrolleable */}
 
-        {/* Bottom sheet: formulario nueva opinión */}
+        {/* Bottom sheet: calificar profesional */}
         {showForm && (
-          <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center p-0 md:p-4" onClick={() => { setShowForm(false); setSubmitError(""); }}>
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <form
-              onSubmit={handleSubmitReview}
+          <div
+            className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center p-0 md:p-4"
+            onClick={() => { if (!submitting) { setShowForm(false); setSubmitError(""); setFormScore(0); } }}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <div
               onClick={(e) => e.stopPropagation()}
-              className={`relative flex flex-col gap-3 rounded-t-3xl md:rounded-3xl border-t md:border px-4 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] md:pb-5 md:max-w-lg md:w-full ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
+              className={`relative flex flex-col items-center gap-5 rounded-t-3xl md:rounded-3xl border-t md:border px-6 pt-6 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] md:pb-8 md:max-w-sm md:w-full ${isDark ? "bg-gray-950 border-gray-800" : "bg-white border-gray-200"}`}
             >
-              <div className={`w-10 h-1 rounded-full mx-auto mb-1 ${isDark ? "bg-gray-700" : "bg-gray-300"}`} />
+              <div className={`w-10 h-1 rounded-full ${isDark ? "bg-gray-700" : "bg-gray-300"}`} />
 
-              <div>
-                <p className={`text-xs mb-2 ${textSec}`}>Tu calificación</p>
-                <StarPicker value={formScore} onChange={setFormScore} />
-              </div>
-
-
-              {submitError && (
-                <p className="text-xs text-red-400">{submitError}</p>
+              {/* Foto del profesional */}
+              {pro.foto && (
+                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 shadow-lg flex-shrink-0" style={{ borderColor: isDark ? "#374151" : "#e5e7eb" }}>
+                  <img src={`${API}${pro.foto}`} alt={pro.nombre} className="w-full h-full object-cover" />
+                </div>
               )}
 
-          <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => { setShowForm(false); setSubmitError(""); }}
-                  className={`flex-1 py-2.5 rounded-xl text-sm transition-colors border ${secBtn}`}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={formScore === 0 || submitting}
-                  className="flex-1 py-2.5 rounded-xl bg-white text-gray-950 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-                >
-                  {submitting ? "Enviando..." : "Publicar"}
-                </button>
+              <div className="text-center">
+                <p className={`text-base font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  {submitting ? "Guardando..." : "¿Cómo fue tu experiencia?"}
+                </p>
+                <p className={`text-sm mt-0.5 ${isDark ? "text-gray-400" : "text-gray-500"}`}>{pro.nombre}</p>
               </div>
-            </form>
+
+              {/* Estrellas grandes — tocar = auto-submit */}
+              <StarPicker
+                value={formScore}
+                onChange={(score) => {
+                  if (submitting) return;
+                  setFormScore(score);
+                  setTimeout(() => submitReview(score), 420);
+                }}
+              />
+
+              {/* Label contextual */}
+              <div className="h-5">
+                {formScore > 0 && !submitting && (
+                  <p className={`text-sm font-semibold transition-all ${SCORE_COLORS[formScore]}`}>
+                    {SCORE_LABELS[formScore]}
+                  </p>
+                )}
+                {submitting && (
+                  <div className="flex gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {submitError && (
+                <p className="text-xs text-red-400 text-center -mt-2">{submitError}</p>
+              )}
+
+              <button
+                type="button"
+                onClick={() => { setShowForm(false); setSubmitError(""); setFormScore(0); }}
+                disabled={submitting}
+                className={`text-sm transition-colors ${isDark ? "text-gray-500 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"}`}
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         )}
 
