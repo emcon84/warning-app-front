@@ -67,6 +67,86 @@ const slideVariants = {
   center: { x: 0, opacity: 1 },
   exit: (dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
 };
+interface PromoSlide {
+  type: "promo";
+  id: string;
+  tag: string;
+  title: string;
+  subtitle: string;
+  cta: string;
+  href: string;
+  image: string;
+  gradient: string;
+  accent: string;
+}
+
+type SlideItem<T> = { type: "profile"; data: T } | PromoSlide;
+
+const PRO_PROMOS: PromoSlide[] = [
+  {
+    type: "promo" as const,
+    id: "pro-cta",
+    tag: "OFRECÉ TUS SERVICIOS",
+    title: "Tu oficio tiene valor. Hacelo visible.",
+    subtitle: "Creá tu perfil gratis y llegá a cientos de vecinos de Reconquista que buscan tu trabajo.",
+    cta: "Crear mi perfil",
+    href: "/profesional/nuevo",
+    image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=400&fit=crop&q=80",
+    gradient: "from-slate-950/95 via-slate-900/80 to-transparent",
+    accent: "bg-white text-gray-900",
+  },
+  {
+    type: "promo" as const,
+    id: "pro-ranking",
+    tag: "SISTEMA DE RANKING",
+    title: "Los mejores aparecen primero.",
+    subtitle: "Calificaciones de vecinos + recomendaciones = más visibilidad en Destacados.",
+    cta: "Ver profesionales",
+    href: "/oficios",
+    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&h=400&fit=crop&q=80",
+    gradient: "from-amber-950/95 via-amber-900/80 to-transparent",
+    accent: "bg-amber-400 text-gray-900",
+  },
+];
+
+const COM_PROMOS: PromoSlide[] = [
+  {
+    type: "promo" as const,
+    id: "com-founder",
+    tag: "INSIGNIA FOUNDER",
+    title: "Sé de los primeros. Para siempre.",
+    subtitle: "La insignia Founder es permanente y da máxima visibilidad a tu comercio en toda la app.",
+    cta: "Registrar mi comercio",
+    href: "/comercio/nuevo",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop&q=80",
+    gradient: "from-blue-950/95 via-blue-900/80 to-transparent",
+    accent: "bg-white text-gray-900",
+  },
+  {
+    type: "promo" as const,
+    id: "com-cta",
+    tag: "COMERCIOS LOCALES",
+    title: "Tus clientes te buscan acá.",
+    subtitle: "Mostrá tus productos, ofertas y contacto directo por WhatsApp. Simple y gratis.",
+    cta: "Crear mi perfil",
+    href: "/comercio/nuevo",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop&q=80",
+    gradient: "from-violet-950/95 via-violet-900/80 to-transparent",
+    accent: "bg-purple-400 text-white",
+  },
+];
+
+function buildMixed<T>(items: T[], promos: PromoSlide[], every: number): SlideItem<T>[] {
+  const result: SlideItem<T>[] = [];
+  let pi = 0;
+  items.forEach((item, i) => {
+    result.push({ type: "profile" as const, data: item });
+    if ((i + 1) % every === 0 && pi < promos.length) result.push(promos[pi++]);
+  });
+  while (pi < promos.length) result.push(promos[pi++]);
+  return result;
+}
+
 
 // ── Weather ────────────────────────────────────────────────────────────────
 type WeatherCondition = "sunny" | "partly-cloudy" | "cloudy" | "rainy" | "stormy" | "snowy" | "foggy" | "night";
@@ -177,28 +257,30 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
   const disponibles = professionals.filter((p) => p.disponible);
   const proItems = disponibles.slice(0, 8);
+  const proSlides = buildMixed(proItems, PRO_PROMOS, 3);
 
   const featuredComercios = comercios.filter(
     (c) => c.activo && (c.isPremium || c.isFounder)
   );
+  const comSlides = buildMixed(featuredComercios, COM_PROMOS, 2);
 
   useEffect(() => {
-    if (proItems.length <= 1) return;
+    if (proSlides.length <= 1) return;
     const t = setInterval(() => {
       setProDir(1);
-      setProSlide(p => (p + 1) % proItems.length);
+      setProSlide(p => (p + 1) % proSlides.length);
     }, 5000);
     return () => clearInterval(t);
-  }, [proItems.length]);
+  }, [proSlides.length]);
 
   useEffect(() => {
-    if (featuredComercios.length <= 1) return;
+    if (comSlides.length <= 1) return;
     const t = setInterval(() => {
       setComercioDir(1);
-      setComercioSlide(p => (p + 1) % featuredComercios.length);
+      setComercioSlide(p => (p + 1) % comSlides.length);
     }, 6000);
     return () => clearInterval(t);
-  }, [featuredComercios.length]);
+  }, [comSlides.length]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -348,7 +430,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
         )}
 
         {/* ── 5. Profesionales Destacados ──────────────────────────────── */}
-        {proItems.length > 0 && (
+        {proSlides.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -364,7 +446,25 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
             <div className="relative rounded-2xl overflow-hidden h-44 md:h-52">
               <AnimatePresence mode="wait" custom={proDir}>
                 {(() => {
-                  const pro = proItems[proSlide];
+                  const item = proSlides[proSlide];
+                  if (!item) return null;
+                  if (item.type === "promo") return (
+                    <motion.div key={item.id} custom={proDir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.35, ease: "easeInOut" }} className="absolute inset-0">
+                      <div className="h-full relative overflow-hidden">
+                        <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover object-right" />
+                        <div className={"absolute inset-0 bg-gradient-to-r " + item.gradient} />
+                        <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-2 max-w-[68%]">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">{item.tag}</span>
+                          <h3 className="text-white font-bold text-base md:text-lg leading-tight">{item.title}</h3>
+                          <p className="text-white/70 text-xs leading-relaxed">{item.subtitle}</p>
+                          <Link href={item.href} className={"inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full w-fit mt-1 transition-opacity hover:opacity-90 " + item.accent}>
+                            {item.cta} <ChevronRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                  const pro = item.data;
                   const photo = photoUrl(pro.foto);
                   const gradient = PRO_GRADIENTS[proSlide % PRO_GRADIENTS.length];
                   return (
@@ -380,7 +480,6 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                     >
                       <Link href={`/profesional/${pro.slug}`} className="block h-full">
                         <div className={`h-full bg-gradient-to-br ${gradient} flex`}>
-                          {/* Foto izquierda */}
                           <div className="w-2/5 flex items-center justify-center p-5">
                             <div className="w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden ring-4 ring-white/20 shadow-xl">
                               {photo ? (
@@ -392,20 +491,15 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                               )}
                             </div>
                           </div>
-                          {/* Info derecha */}
                           <div className="flex-1 flex flex-col justify-center gap-2 pr-5 py-5">
                             <div>
-                              <p className="text-white font-bold text-lg leading-tight">
-                                {pro.nombre} {pro.apellido}
-                              </p>
+                              <p className="text-white font-bold text-lg leading-tight">{pro.nombre} {pro.apellido}</p>
                               <p className="text-white/70 text-sm capitalize mt-0.5">{pro.oficios[0]}</p>
                             </div>
                             {pro.ratingCount > 0 && (
                               <div className="flex items-center gap-1">
                                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                <span className="text-sm text-yellow-400 font-semibold">
-                                  {pro.ratingAvg.toFixed(1)}
-                                </span>
+                                <span className="text-sm text-yellow-400 font-semibold">{pro.ratingAvg.toFixed(1)}</span>
                                 <span className="text-white/40 text-xs">({pro.ratingCount})</span>
                               </div>
                             )}
@@ -427,16 +521,16 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
               </AnimatePresence>
 
               {/* Flechas nav */}
-              {proItems.length > 1 && (
+              {proSlides.length > 1 && (
                 <>
                   <button
-                    onClick={() => { setProDir(-1); setProSlide(p => (p - 1 + proItems.length) % proItems.length); }}
+                    onClick={() => { setProDir(-1); setProSlide(p => (p - 1 + proSlides.length) % proSlides.length); }}
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => { setProDir(1); setProSlide(p => (p + 1) % proItems.length); }}
+                    onClick={() => { setProDir(1); setProSlide(p => (p + 1) % proSlides.length); }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -445,9 +539,9 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
               )}
 
               {/* Dots */}
-              {proItems.length > 1 && (
+              {proSlides.length > 1 && (
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                  {proItems.map((_, i) => (
+                  {proSlides.map((_, i) => (
                     <button
                       key={i}
                       onClick={() => { setProDir(i > proSlide ? 1 : -1); setProSlide(i); }}
@@ -494,7 +588,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
         </motion.div>
 
         {/* ── 7. Comercios Destacados ───────────────────────────────────── */}
-        {featuredComercios.length > 0 && (
+        {comSlides.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -510,7 +604,25 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
             <div className="relative rounded-2xl overflow-hidden h-44 md:h-52">
               <AnimatePresence mode="wait" custom={comercioDir}>
                 {(() => {
-                  const comercio = featuredComercios[comercioSlide];
+                  const item = comSlides[comercioSlide];
+                  if (!item) return null;
+                  if (item.type === "promo") return (
+                    <motion.div key={item.id} custom={comercioDir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.35, ease: "easeInOut" }} className="absolute inset-0">
+                      <div className="h-full relative overflow-hidden">
+                        <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover object-right" />
+                        <div className={"absolute inset-0 bg-gradient-to-r " + item.gradient} />
+                        <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-2 max-w-[68%]">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">{item.tag}</span>
+                          <h3 className="text-white font-bold text-base md:text-lg leading-tight">{item.title}</h3>
+                          <p className="text-white/70 text-xs leading-relaxed">{item.subtitle}</p>
+                          <Link href={item.href} className={"inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full w-fit mt-1 transition-opacity hover:opacity-90 " + item.accent}>
+                            {item.cta} <ChevronRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                  const comercio = item.data;
                   const logo = photoUrl(comercio.logo || comercio.foto);
                   const bgGrad = COMERCIO_BG_GRADIENTS[comercioSlide % COMERCIO_BG_GRADIENTS.length];
                   return (
@@ -526,11 +638,8 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                     >
                       <Link href={`/comercio/${comercio.slug}`} className="block h-full">
                         <div className={`h-full bg-gradient-to-br ${bgGrad} flex relative overflow-hidden`}>
-                          {/* Círculos decorativos */}
                           <div className="absolute -right-12 -top-12 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
                           <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-white/5 pointer-events-none" />
-
-                          {/* Logo izquierda */}
                           <div className="w-2/5 flex items-center justify-center p-5">
                             <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden bg-white shadow-xl flex items-center justify-center">
                               {logo ? (
@@ -542,24 +651,14 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                               )}
                             </div>
                           </div>
-
-                          {/* Info derecha */}
                           <div className="flex-1 flex flex-col justify-center gap-2 pr-5 py-5">
                             <div>
                               <p className="text-white font-bold text-lg leading-tight">{comercio.nombre}</p>
                               <p className="text-purple-300 text-sm mt-0.5">{comercio.rubro}</p>
                             </div>
                             <div className="flex gap-1.5 flex-wrap">
-                              {comercio.isFounder && (
-                                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-500/25 text-blue-300 border border-blue-500/30">
-                                  FOUNDER
-                                </span>
-                              )}
-                              {!comercio.isFounder && comercio.isPremium && (
-                                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/25 text-amber-300 border border-amber-500/30">
-                                  PREMIUM
-                                </span>
-                              )}
+                              {comercio.isFounder && <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-500/25 text-blue-300 border border-blue-500/30">FOUNDER</span>}
+                              {!comercio.isFounder && comercio.isPremium && <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/25 text-amber-300 border border-amber-500/30">PREMIUM</span>}
                               {(comercio.recommendations ?? 0) > 0 && (
                                 <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 flex items-center gap-1">
                                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 1.99l-3.714 5.06a2 2 0 00-.373 1.169V19a2 2 0 002 2h.095c.497 0 .905-.402.905-.9V16.91c0-.333.215-.627.527-.738l2.527-.946" /></svg>
@@ -579,16 +678,16 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
               </AnimatePresence>
 
               {/* Flechas nav */}
-              {featuredComercios.length > 1 && (
+              {comSlides.length > 1 && (
                 <>
                   <button
-                    onClick={() => { setComercioDir(-1); setComercioSlide(p => (p - 1 + featuredComercios.length) % featuredComercios.length); }}
+                    onClick={() => { setComercioDir(-1); setComercioSlide(p => (p - 1 + comSlides.length) % comSlides.length); }}
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => { setComercioDir(1); setComercioSlide(p => (p + 1) % featuredComercios.length); }}
+                    onClick={() => { setComercioDir(1); setComercioSlide(p => (p + 1) % comSlides.length); }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center transition-colors hover:bg-black/50"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -597,9 +696,9 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
               )}
 
               {/* Dots */}
-              {featuredComercios.length > 1 && (
+              {comSlides.length > 1 && (
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                  {featuredComercios.map((_, i) => (
+                  {comSlides.map((_, i) => (
                     <button
                       key={i}
                       onClick={() => { setComercioDir(i > comercioSlide ? 1 : -1); setComercioSlide(i); }}

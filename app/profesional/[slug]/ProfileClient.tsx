@@ -79,8 +79,6 @@ export default function ProfileClient({ pro, slug }: Props) {
   // Formulario
   const [showForm, setShowForm] = useState(false);
   const [formScore, setFormScore] = useState(0);
-  const [formName, setFormName] = useState("");
-  const [formComment, setFormComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -137,7 +135,7 @@ export default function ProfileClient({ pro, slug }: Props) {
 
   async function handleSubmitReview(e: React.FormEvent) {
     e.preventDefault();
-    if (formScore === 0 || formComment.trim().length < 10) return;
+    if (formScore === 0) return;
     setSubmitting(true);
     setSubmitError("");
     try {
@@ -151,8 +149,6 @@ export default function ProfileClient({ pro, slug }: Props) {
         },
         body: JSON.stringify({
           score: formScore,
-          comment: formComment.trim(),
-          reviewerName: formName.trim() || undefined,
           clientToken: clientToken || undefined,
         }),
       });
@@ -165,8 +161,6 @@ export default function ProfileClient({ pro, slug }: Props) {
       setSubmitSuccess(true);
       setShowForm(false);
       setFormScore(0);
-      setFormName("");
-      setFormComment("");
     } catch (err: any) {
       setSubmitError(err.message);
     } finally {
@@ -418,7 +412,7 @@ export default function ProfileClient({ pro, slug }: Props) {
                     </div>
                     <Stars score={r.score} size="sm" dark={isDark} />
                   </div>
-                  <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>{r.comment}</p>
+                  {r.comment && r.comment.trim().length > 0 && <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>{r.comment}</p>}
                   <div className="flex items-center justify-between mt-2">
                     <p className={`text-xs ${textMuted}`}>
                       {new Date(r.createdAt).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}
@@ -470,35 +464,6 @@ export default function ProfileClient({ pro, slug }: Props) {
                 <StarPicker value={formScore} onChange={setFormScore} />
               </div>
 
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>Tu nombre <span className={textMuted}>(opcional)</span></label>
-                <input
-                  type="text"
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  placeholder="Vecino anónimo"
-                  maxLength={60}
-                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-                />
-              </div>
-
-              <div>
-                <label className={`text-xs mb-1.5 block ${textSec}`}>
-                  Comentario <span className={textMuted}>({formComment.length}/500)</span>
-                </label>
-                <textarea
-                  value={formComment}
-                  onChange={(e) => setFormComment(e.target.value.slice(0, 500))}
-                  placeholder="¿Cómo fue tu experiencia con este profesional?"
-                  rows={3}
-                  style={{ color: inputColor, backgroundColor: isDark ? "#1f2937" : "#ffffff" }}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
-                />
-                {formComment.length > 0 && formComment.length < 10 && (
-                  <p className="text-xs text-yellow-600 mt-1">Mínimo 10 caracteres.</p>
-                )}
-              </div>
 
               {submitError && (
                 <p className="text-xs text-red-400">{submitError}</p>
@@ -514,7 +479,7 @@ export default function ProfileClient({ pro, slug }: Props) {
                 </button>
                 <button
                   type="submit"
-                  disabled={formScore === 0 || formComment.trim().length < 10 || submitting}
+                  disabled={formScore === 0 || submitting}
                   className="flex-1 py-2.5 rounded-xl bg-white text-gray-950 font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
                 >
                   {submitting ? "Enviando..." : "Publicar"}
