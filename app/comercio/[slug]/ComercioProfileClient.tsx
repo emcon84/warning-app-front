@@ -264,7 +264,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           {/* Avatar + nombre en la misma fila, avatar sobresale del hero */}
           <div className="relative px-5 pt-0">
             {/* Fila avatar + nombre */}
-            <div className="flex items-end gap-3 -mt-10 mb-2">
+            <div className="flex items-end gap-3 -mt-10 mb-5">
               <div
                 className={`w-20 h-20 rounded-full overflow-hidden border-4 flex-shrink-0 ${isDark ? "border-gray-900 bg-gray-800" : "border-white bg-gray-100"}`}
                 style={{ viewTransitionName: `co-photo-${comercio.slug}` }}
@@ -360,7 +360,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
             <button
               onClick={handleRecommend}
               disabled={recommended}
-              className={"mt-2 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm transition-colors " + (recommended ? "bg-green-900/30 border border-green-800 text-green-400 cursor-default" : "bg-amber-500 hover:bg-amber-400 text-white")}
+              className={"mt-2 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm transition-colors " + (recommended ? (isDark ? "bg-green-900/30 border border-green-800 text-green-400 cursor-default" : "bg-green-600 border border-green-700 text-white cursor-default") : "bg-amber-500 hover:bg-amber-400 text-white")}
             >
               {recommended ? (
                 <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Recomendado &middot; {recCount}</>
