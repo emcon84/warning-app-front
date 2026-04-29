@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Comercio, ComercioOffer, Producto } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
-import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag } from "lucide-react";
+import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag, ThumbsUp } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -142,6 +142,24 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
 
   const waText = encodeURIComponent("Hola, te contacto desde Reportes Reconquista");
   const waUrl  = `https://wa.me/${comercio.whatsapp}?text=${waText}`;
+  const [recommended, setRecommended] = useState(false);
+  const [recCount, setRecCount] = useState(comercio.recommendations || 0);
+
+  useEffect(() => {
+    if (typeof window !== "undefined")
+      setRecommended(!!localStorage.getItem("rec_com_" + comercio.slug));
+  }, [comercio.slug]);
+
+  async function handleRecommend() {
+    if (recommended) return;
+    try {
+      const res = await fetch(API + "/api/comercios/" + comercio.slug + "/recommend", { method: "POST" });
+      const data = await res.json();
+      setRecommended(true);
+      setRecCount(data.count ?? recCount + 1);
+      localStorage.setItem("rec_com_" + comercio.slug, "1");
+    } catch {}
+  }
 
   const activeOffers = comercio.offers || [];
   const activeProductos = comercio.productos || [];
@@ -338,6 +356,18 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
               <WaIcon />
               Contactar por WhatsApp
             </a>
+
+            <button
+              onClick={handleRecommend}
+              disabled={recommended}
+              className={"mt-2 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-semibold text-sm transition-colors " + (recommended ? "bg-green-900/30 border border-green-800 text-green-400 cursor-default" : "bg-amber-500 hover:bg-amber-400 text-white")}
+            >
+              {recommended ? (
+                <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Recomendado &middot; {recCount}</>
+              ) : (
+                <><ThumbsUp className="w-4 h-4" />{recCount > 0 ? "Recomendar · " + recCount : "Recomendar"}</>
+              )}
+            </button>
 
             {isOwner && (
               <button

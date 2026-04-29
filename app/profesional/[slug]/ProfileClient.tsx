@@ -61,6 +61,8 @@ export default function ProfileClient({ pro, slug }: Props) {
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [recommended, setRecommended] = useState(false);
+  const [recCount, setRecCount] = useState(pro.recommendations || 0);
   const profileUrl = `${SITE_URL}/profesional/${pro.slug}`;
   const { isDark } = useTheme();
 
@@ -206,6 +208,23 @@ export default function ProfileClient({ pro, slug }: Props) {
   const tagBg        = isDark ? "bg-gray-800 border-gray-700 text-gray-300"        : "bg-gray-100 border-gray-200 text-gray-600";
   const inputCls     = isDark ? "bg-gray-800 border-gray-700 placeholder-gray-600" : "bg-white border-gray-300 placeholder-gray-400";
   const inputColor   = isDark ? "#f9fafb"                                          : "#111827";
+
+  useEffect(() => {
+    if (typeof window !== "undefined")
+      setRecommended(!!localStorage.getItem("rec_pro_" + pro.slug));
+  }, [pro.slug]);
+
+  async function handleRecommend() {
+    if (recommended) return;
+    try {
+      const res = await fetch(API + "/api/professionals/" + pro.slug + "/recommend", { method: "POST" });
+      const data = await res.json();
+      setRecommended(true);
+      setRecCount(data.count ?? recCount + 1);
+      localStorage.setItem("rec_pro_" + pro.slug, "1");
+    } catch {}
+  }
+
   const bottomBar    = isDark ? `${bg} border-gray-900`                            : "bg-white border-gray-200";
   const secBtn       = isDark ? "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700" : "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200";
   const starEmpty    = isDark ? "text-gray-700"                                    : "text-gray-300";
@@ -485,7 +504,18 @@ export default function ProfileClient({ pro, slug }: Props) {
                 <p className="text-xs text-red-400">{submitError}</p>
               )}
 
-              <div className="flex gap-2">
+              <button
+            onClick={handleRecommend}
+            disabled={recommended}
+            className={"w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold text-sm transition-colors " + (recommended ? (isDark ? "bg-green-900/30 border border-green-800 text-green-400 cursor-default" : "bg-green-50 border border-green-200 text-green-700 cursor-default") : "bg-amber-500 hover:bg-amber-400 text-white")}
+          >
+            {recommended ? (
+              <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Recomendado &middot; {recCount}</>
+            ) : (
+              <><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 1.99l-3.714 5.06a2 2 0 00-.373 1.169V19a2 2 0 002 2h.095c.497 0 .905-.402.905-.9V16.91c0-.333.215-.627.527-.738l2.527-.946" /></svg>{recCount > 0 ? "Recomendar · " + recCount : "Recomendar"}</>
+            )}
+          </button>
+          <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setSubmitError(""); }}

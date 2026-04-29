@@ -131,6 +131,7 @@ export interface Professional {
   disponible: boolean;
   ratingAvg: number;
   ratingCount: number;
+  recommendations?: number;
   descripcion?: string | null;
   whatsapp?: string | null;
 }
@@ -239,6 +240,7 @@ export interface Comercio {
   activo: boolean;
   isPremium?: boolean;
   isFounder?: boolean;
+  recommendations?: number;
   createdAt: string;
   offers?: ComercioOffer[];
   productos?: Producto[];

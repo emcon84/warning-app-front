@@ -409,6 +409,12 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                                 <span className="text-white/40 text-xs">({pro.ratingCount})</span>
                               </div>
                             )}
+                            {(pro.recommendations ?? 0) > 0 && (
+                              <div className="flex items-center gap-1">
+                                <svg className="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 1.99l-3.714 5.06a2 2 0 00-.373 1.169V19a2 2 0 002 2h.095c.497 0 .905-.402.905-.9V16.91c0-.333.215-.627.527-.738l2.527-.946" /></svg>
+                                <span className="text-xs text-amber-400 font-semibold">{pro.recommendations} recomendaciones</span>
+                              </div>
+                            )}
                             <span className="inline-flex items-center gap-1 text-xs font-semibold text-white/80 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 w-fit mt-1">
                               Ver perfil <ChevronRight className="w-3 h-3" />
                             </span>
@@ -543,7 +549,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                               <p className="text-white font-bold text-lg leading-tight">{comercio.nombre}</p>
                               <p className="text-purple-300 text-sm mt-0.5">{comercio.rubro}</p>
                             </div>
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-1.5 flex-wrap">
                               {comercio.isFounder && (
                                 <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-500/25 text-blue-300 border border-blue-500/30">
                                   FOUNDER
@@ -552,6 +558,12 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                               {!comercio.isFounder && comercio.isPremium && (
                                 <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/25 text-amber-300 border border-amber-500/30">
                                   PREMIUM
+                                </span>
+                              )}
+                              {(comercio.recommendations ?? 0) > 0 && (
+                                <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 1.99l-3.714 5.06a2 2 0 00-.373 1.169V19a2 2 0 002 2h.095c.497 0 .905-.402.905-.9V16.91c0-.333.215-.627.527-.738l2.527-.946" /></svg>
+                                  {comercio.recommendations}
                                 </span>
                               )}
                             </div>
