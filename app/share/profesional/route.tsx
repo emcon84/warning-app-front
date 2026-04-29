@@ -5,24 +5,6 @@ export const runtime = "edge";
 
 const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
-async function toDataUrl(url: string): Promise<string> {
-  if (!url) return "";
-  try {
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) return "";
-    const buf = await r.arrayBuffer();
-    const bytes = new Uint8Array(buf);
-    let binary = "";
-    for (let i = 0; i < bytes.length; i += 8192) {
-      binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
-    }
-    const mime = r.headers.get("content-type") ?? "image/jpeg";
-    return `data:${mime};base64,${btoa(binary)}`;
-  } catch {
-    return "";
-  }
-}
-
 export async function GET(req: NextRequest) {
   const s = req.nextUrl.searchParams;
   const isStory = s.get("format") !== "feed";
@@ -36,7 +18,7 @@ export async function GET(req: NextRequest) {
   const slug = s.get("slug") ?? "";
   const foto = s.get("foto") ?? "";
 
-  const fotoData = foto ? await toDataUrl(foto) : "";
+  const fotoData = foto || "";
 
   const profileUrl = `reportesreconquista.com/profesional/${slug}`;
   const nombreCompleto = `${nombre} ${apellido}`.trim();
