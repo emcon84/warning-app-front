@@ -5,16 +5,21 @@ const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
 async function toDataUrl(url: string): Promise<string> {
   if (!url) return "";
+  // Satori only supports jpeg, png, gif — convert webp/avif via proxy
+  const toFetch = /\.(webp|avif)$/i.test(url) || url.includes("r2.dev")
+    ? `https://images.weserv.nl/?url=${encodeURIComponent(url)}&output=jpg&q=90`
+    : url;
   try {
-    const r = await fetch(url, { cache: "no-store" });
+    const r = await fetch(toFetch, { cache: "no-store" });
     if (!r.ok) return "";
+    const mime = r.headers.get("content-type") ?? "image/jpeg";
+    if (mime === "image/webp" || mime === "image/avif") return "";
     const buf = await r.arrayBuffer();
     const bytes = new Uint8Array(buf);
     let binary = "";
     for (let i = 0; i < bytes.length; i += 8192) {
       binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
     }
-    const mime = r.headers.get("content-type") ?? "image/jpeg";
     return `data:${mime};base64,${btoa(binary)}`;
   } catch {
     return "";
