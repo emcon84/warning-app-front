@@ -538,7 +538,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           )}
 
           {reviewSuccess && (
-            <div className="mb-4 p-3 rounded-xl bg-green-900/30 border border-green-800 text-sm text-green-400">
+            <div className={`mb-4 p-3 rounded-xl text-sm font-medium ${isDark ? "bg-green-900/30 border border-green-800 text-green-400" : "bg-green-100 border border-green-300 text-green-800"}`}>
               Gracias por tu calificacion!
             </div>
           )}
