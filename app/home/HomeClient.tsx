@@ -92,7 +92,7 @@ const PRO_PROMOS: PromoSlide[] = [
     cta: "Crear mi perfil",
     href: "/profesional/nuevo",
     image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&h=400&fit=crop&q=80",
-    gradient: "from-slate-950/95 via-slate-900/80 to-transparent",
+    gradient: "from-slate-950/98 via-slate-950/85 to-slate-900/50",
     accent: "bg-white text-gray-900",
   },
   {
@@ -104,7 +104,7 @@ const PRO_PROMOS: PromoSlide[] = [
     cta: "Ver profesionales",
     href: "/oficios",
     image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&h=400&fit=crop&q=80",
-    gradient: "from-amber-950/95 via-amber-900/80 to-transparent",
+    gradient: "from-amber-950/98 via-amber-950/85 to-amber-900/50",
     accent: "bg-amber-400 text-gray-900",
   },
 ];
@@ -119,7 +119,7 @@ const COM_PROMOS: PromoSlide[] = [
     cta: "Registrar mi comercio",
     href: "/comercio/nuevo",
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop&q=80",
-    gradient: "from-blue-950/95 via-blue-900/80 to-transparent",
+    gradient: "from-blue-950/98 via-blue-950/85 to-blue-900/50",
     accent: "bg-white text-gray-900",
   },
   {
@@ -131,7 +131,7 @@ const COM_PROMOS: PromoSlide[] = [
     cta: "Crear mi perfil",
     href: "/comercio/nuevo",
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop&q=80",
-    gradient: "from-violet-950/95 via-violet-900/80 to-transparent",
+    gradient: "from-violet-950/98 via-violet-950/85 to-violet-900/50",
     accent: "bg-purple-400 text-white",
   },
 ];
@@ -453,11 +453,11 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                       <div className="h-full relative overflow-hidden">
                         <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover object-right" />
                         <div className={"absolute inset-0 bg-gradient-to-r " + item.gradient} />
-                        <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-2 max-w-[68%]">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">{item.tag}</span>
-                          <h3 className="text-white font-bold text-base md:text-lg leading-tight">{item.title}</h3>
-                          <p className="text-white/70 text-xs leading-relaxed">{item.subtitle}</p>
-                          <Link href={item.href} className={"inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full w-fit mt-1 transition-opacity hover:opacity-90 " + item.accent}>
+                        <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-1.5 w-[90%] md:max-w-[60%]">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-white/60">{item.tag}</span>
+                          <h3 className="text-white font-bold text-lg leading-tight">{item.title}</h3>
+                          <p className="text-white/70 text-xs leading-relaxed line-clamp-2 md:line-clamp-3">{item.subtitle}</p>
+                          <Link href={item.href} className={"inline-flex items-center gap-1.5 font-bold text-xs px-4 py-2.5 rounded-full w-fit mt-0.5 transition-opacity hover:opacity-90 " + item.accent}>
                             {item.cta} <ChevronRight className="w-3 h-3" />
                           </Link>
                         </div>
@@ -595,11 +595,11 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                       <div className="h-full relative overflow-hidden">
                         <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover object-right" />
                         <div className={"absolute inset-0 bg-gradient-to-r " + item.gradient} />
-                        <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-2 max-w-[68%]">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">{item.tag}</span>
-                          <h3 className="text-white font-bold text-base md:text-lg leading-tight">{item.title}</h3>
-                          <p className="text-white/70 text-xs leading-relaxed">{item.subtitle}</p>
-                          <Link href={item.href} className={"inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full w-fit mt-1 transition-opacity hover:opacity-90 " + item.accent}>
+                        <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-1.5 w-[90%] md:max-w-[60%]">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-white/60">{item.tag}</span>
+                          <h3 className="text-white font-bold text-lg leading-tight">{item.title}</h3>
+                          <p className="text-white/70 text-xs leading-relaxed line-clamp-2 md:line-clamp-3">{item.subtitle}</p>
+                          <Link href={item.href} className={"inline-flex items-center gap-1.5 font-bold text-xs px-4 py-2.5 rounded-full w-fit mt-0.5 transition-opacity hover:opacity-90 " + item.accent}>
                             {item.cta} <ChevronRight className="w-3 h-3" />
                           </Link>
                         </div>
