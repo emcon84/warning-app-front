@@ -834,6 +834,12 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               <p className="text-xs font-bold text-amber-400">Plan Master</p>
               <p className={`text-xs ${textMuted}`}>Ilimitado · Soporte prioritario · Posición destacada</p>
             </div>
+            <button
+              onClick={() => setShowPlanModal(true)}
+              className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-amber-500 text-amber-400 hover:bg-amber-500/20 transition-colors flex-shrink-0"
+            >
+              Ver planes
+            </button>
           </div>
         ) : planInfo?.plan === "premium" ? (
           <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border border-indigo-500/30 bg-indigo-500/10">
@@ -844,6 +850,12 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 {planInfo.usage.productos}/{planInfo.limits.totalProducts} productos · {planInfo.limits.dailyAi}/día IA
               </p>
             </div>
+            <button
+              onClick={() => setShowPlanModal(true)}
+              className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-indigo-500 text-indigo-400 hover:bg-indigo-500/20 transition-colors flex-shrink-0"
+            >
+              Ver planes
+            </button>
           </div>
         ) : (
           <div className={`mb-6 flex flex-col gap-2 px-4 py-3 rounded-2xl border ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"}`}>
