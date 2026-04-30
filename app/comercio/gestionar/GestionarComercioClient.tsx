@@ -547,6 +547,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
     upgradeUrl: string | null;
   } | null>(null);
   const [planLoading, setPlanLoading] = useState(true);
+  const [showPlanModal, setShowPlanModal] = useState(false);
 
   // Fetch plan info on mount
   useEffect(() => {
@@ -854,14 +855,12 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                   {planInfo?.usage.productos ?? 0}/{planInfo?.limits.totalProducts ?? 50} productos
                 </p>
               </div>
-              <a
-                href={`https://wa.me/3482445015?text=${encodeURIComponent("Hola! Quiero saber más sobre el plan Premium para mi comercio")}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => setShowPlanModal(true)}
                 className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0"
               >
                 Upgrade
-              </a>
+              </button>
             </div>
             {planInfo?.canUpgrade && planInfo.usage.productos >= (planInfo.limits.totalProducts as number) - 3 && (
               <p className="text-xs text-amber-500">¡Casi alcanzás el límite! Considerá pasar a Premium.</p>
@@ -1311,6 +1310,15 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </div>
         )}
       </div>
+
+      {showPlanModal && planInfo && (
+        <PlanModal
+          isDark={isDark}
+          currentPlan={planInfo.plan}
+          planInfo={planInfo}
+          onClose={() => setShowPlanModal(false)}
+        />
+      )}
     </div>
   );
 }
@@ -1550,6 +1558,155 @@ function OfertaRow({
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function PlanModal({
+  isDark,
+  currentPlan,
+  planInfo,
+  onClose,
+}: {
+  isDark: boolean;
+  currentPlan: string;
+  planInfo: { limits: { dailyAi: number; totalProducts: number | "ilimitado" }; usage: { productos: number } } | null;
+  onClose: () => void;
+}) {
+  const bg = isDark ? "bg-gray-900" : "bg-white";
+  const textPri = isDark ? "text-white" : "text-gray-900";
+  const textSec = isDark ? "text-gray-400" : "text-gray-600";
+  const textMuted = isDark ? "text-gray-500" : "text-gray-400";
+  const border = isDark ? "border-gray-700" : "border-gray-200";
+
+  const plans = [
+    {
+      id: "free",
+      name: "Gratis",
+      price: "0",
+      features: [
+        "Hasta 50 productos",
+        "2 fotos con IA por día",
+        "Perfil básico",
+        "Posición estándar",
+      ],
+      current: currentPlan === "free",
+    },
+    {
+      id: "premium",
+      name: "Premium",
+      price: "U$20/mes",
+      features: [
+        "Hasta 100 productos",
+        "20 fotos con IA por día",
+        "Perfil destacado",
+        "Posición preferente",
+        "Banner personalizado",
+      ],
+      popular: true,
+    },
+    {
+      id: "master",
+      name: "Master",
+      price: "Consultar",
+      features: [
+        "Productos ilimitados",
+        "IA ilimitada",
+        "Perfil premium",
+        "Posición primera",
+        "Soporte prioritario",
+        "Herramientas exclusivas",
+      ],
+    },
+  ];
+
+  const getUsageText = () => {
+    if (!planInfo) return "";
+    const { usage, limits } = planInfo;
+    if (typeof limits.totalProducts === "number") {
+      return `${usage.productos}/${limits.totalProducts} productos`;
+    }
+    return `${usage.productos} productos`;
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className={`relative rounded-3xl ${bg} max-w-lg w-full max-h-[90vh] overflow-y-auto p-6`}>
+        <button
+          onClick={onClose}
+          className={`absolute top-4 right-4 p-2 rounded-full ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <h2 className={`text-xl font-black mb-2 ${textPri}`}>Elegí tu plan</h2>
+        <p className={`text-sm mb-6 ${textSec}`}>
+          Tu uso actual: {getUsageText()}
+        </p>
+
+        <div className="flex flex-col gap-4">
+          {plans.map((plan) => (
+            <div
+              key={plan.id}
+              className={`relative rounded-2xl border-2 p-4 ${
+                plan.current
+                  ? "border-indigo-500 bg-indigo-500/10"
+                  : plan.popular
+                  ? "border-indigo-500 shadow-lg shadow-indigo-500/20"
+                  : border
+              }`}
+            >
+              {plan.popular && (
+                <span className="absolute -top-2 right-4 text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500 text-white">
+                  Más popular
+                </span>
+              )}
+              {plan.current && (
+                <span className="absolute -top-2 right-4 text-xs font-bold px-2 py-0.5 rounded-full bg-green-500 text-white">
+                  Tu plan
+                </span>
+              )}
+
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className={`font-bold text-lg ${textPri}`}>{plan.name}</h3>
+                  <p className={`text-2xl font-black ${plan.id === "free" ? textMuted : "text-indigo-500"}`}>
+                    {plan.price}
+                  </p>
+                </div>
+                {!plan.current && (
+                  <a
+                    href={`https://wa.me/3482445015?text=${encodeURIComponent(
+                      plan.id === "premium"
+                        ? "Hola! Quiero activar el plan Premium para mi comercio en Reportes Reconquista."
+                        : "Hola! Quiero información sobre el plan Master para mi comercio."
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold px-4 py-2 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
+                  >
+                    Elegir
+                  </a>
+                )}
+              </div>
+
+              <ul className="space-y-2">
+                {plan.features.map((feature, i) => (
+                  <li key={i} className={`flex items-center gap-2 text-sm ${textSec}`}>
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <p className={`text-xs mt-6 text-center ${textMuted}`}>
+          ¿Necesitás algo diferente? Escribinos y armamos un plan a tu medida.
+        </p>
       </div>
     </div>
   );
