@@ -11,7 +11,7 @@ import {
   Store, ImageIcon, Tag, ShoppingBag, QrCode, BarChart2,
   Plus, Trash2, ToggleLeft, ToggleRight,
   X, Check, Pencil, ExternalLink, Share2,
-  Eye, MessageCircle, Package,
+  Eye, MessageCircle, Package, Camera, Sparkles,
 } from "lucide-react";
 import KitDigitalizacion from "./KitDigitalizacion";
 
@@ -37,6 +37,41 @@ const BARRIOS = [
 function photoUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   return url.startsWith("/uploads/") ? `${API}${url}` : url;
+}
+
+async function compressImageForAi(file: File): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+
+  const imageUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = document.createElement("img");
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = imageUrl;
+    });
+    const maxSide = 1600;
+    const ratio = Math.min(1, maxSide / Math.max(image.width, image.height));
+    const width = Math.max(1, Math.round(image.width * ratio));
+    const height = Math.max(1, Math.round(image.height * ratio));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(image, 0, 0, width, height);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/jpeg", 0.78);
+    });
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    });
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
 }
 
 type Tab = "datos" | "fotos" | "ofertas" | "productos" | "kit" | "stats";
@@ -279,14 +314,71 @@ function ProductoModal({
   const [photoPreview, setPhotoPreview] = useState<string | null>(editing?.foto ? photoUrl(editing.foto) : null);
   const [clearPhoto, setClearPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiMessage, setAiMessage] = useState("");
   const [error, setError] = useState("");
   const photoRef = useRef<HTMLInputElement>(null);
+  const aiPhotoRef = useRef<HTMLInputElement>(null);
 
   const bg = isDark ? "bg-gray-900" : "bg-white";
   const inputCls = isDark
     ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
     : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400";
   const labelCls = isDark ? "text-gray-400" : "text-gray-500";
+
+  function setSelectedPhoto(file: File) {
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+    setClearPhoto(false);
+  }
+
+  async function handleSmartPhoto(file: File) {
+    setAiLoading(true);
+    setAiMessage("");
+    setError("");
+    try {
+      const preparedFile = await compressImageForAi(file);
+      setSelectedPhoto(preparedFile);
+      const token = await getToken();
+      const fd = new FormData();
+      fd.append("photo", preparedFile);
+      const res = await fetch(`${API}/api/comercios/me/productos/autocompletar`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      const data = (await res.json()) as {
+        nombre?: string;
+        precio?: string;
+        descripcion?: string;
+        tipo?: "producto" | "servicio";
+        confianza?: number;
+        notas?: string;
+        error?: string;
+        message?: string;
+      };
+      if (!res.ok) throw new Error(data.message || data.error || "No se pudo analizar la foto");
+
+      if (data.tipo === "servicio" || data.tipo === "producto") setTipo(data.tipo);
+      if (data.nombre) setNombre(data.nombre);
+      if (data.precio) setPrecio(data.precio);
+      if (data.descripcion) setDescripcion(data.descripcion);
+
+      const confidence = typeof data.confianza === "number" ? data.confianza : 0;
+      const foundSomething = data.nombre || data.precio || data.descripcion;
+      if (!foundSomething) {
+        setAiMessage("No se detectaron datos claros. Podés completar los campos manualmente.");
+      } else if (confidence < 0.55) {
+        setAiMessage("La IA completó algunos datos con baja confianza. Revisalos antes de publicar.");
+      } else {
+        setAiMessage(data.notas || "Campos autocompletados. Revisalos antes de publicar.");
+      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "No se pudo analizar la foto");
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   async function handleSubmit() {
     if (!nombre.trim()) { setError("El nombre es obligatorio"); return; }
@@ -332,6 +424,44 @@ function ProductoModal({
           </button>
         </div>
         <div className="flex flex-col gap-4 overflow-y-auto p-5">
+          {!editing && (
+            <div className={`rounded-xl border p-3 ${isDark ? "border-blue-900/60 bg-blue-950/25" : "border-blue-100 bg-blue-50"}`}>
+              <div className="flex items-start gap-3">
+                <div className={`mt-0.5 h-9 w-9 rounded-lg flex items-center justify-center ${isDark ? "bg-blue-500/15 text-blue-300" : "bg-blue-100 text-blue-700"}`}>
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-sm font-semibold ${isDark ? "text-blue-100" : "text-blue-950"}`}>Autocompletar con IA</p>
+                  <p className={`text-xs mt-0.5 ${isDark ? "text-blue-200/75" : "text-blue-800/80"}`}>Sacá una foto del producto, etiqueta o cartel de precio.</p>
+                  <button
+                    type="button"
+                    onClick={() => aiPhotoRef.current?.click()}
+                    disabled={aiLoading}
+                    className={`mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
+                      isDark ? "bg-blue-400 text-blue-950 hover:bg-blue-300" : "bg-blue-700 text-white hover:bg-blue-800"
+                    }`}
+                  >
+                    <Camera className="w-4 h-4" />
+                    {aiLoading ? "Analizando..." : "Abrir cámara"}
+                  </button>
+                </div>
+              </div>
+              <input
+                ref={aiPhotoRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.currentTarget.value = "";
+                  if (!f) return;
+                  handleSmartPhoto(f);
+                }}
+              />
+            </div>
+          )}
+
           <div>
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Tipo *</label>
             <div className={`flex rounded-xl border overflow-hidden ${isDark ? "border-gray-700" : "border-gray-200"}`}>
@@ -373,13 +503,14 @@ function ProductoModal({
                 <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); setClearPhoto(true); }} className={`text-xs ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500"}`}>Quitar foto</button>
               )}
             </div>
-            <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setPhotoFile(f); setPhotoPreview(URL.createObjectURL(f)); }} />
+            <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setSelectedPhoto(f); }} />
           </div>
+          {aiMessage && <p className={`text-sm px-3 py-2 rounded-xl border ${isDark ? "text-blue-200 bg-blue-950/30 border-blue-900" : "text-blue-800 bg-blue-50 border-blue-100"}`}>{aiMessage}</p>}
           {error && <p className={`text-sm px-3 py-2 rounded-xl border ${isDark ? "text-red-400 bg-red-900/20 border-red-800" : "text-red-600 bg-red-50 border-red-200"}`}>{error}</p>}
         </div>
         <div className={`flex gap-3 p-5 pt-3 flex-shrink-0 border-t ${isDark ? "border-gray-800" : "border-gray-100"}`}>
           <button onClick={onClose} className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>Cancelar</button>
-          <button onClick={handleSubmit} disabled={loading || !nombre.trim()} className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-40">
+          <button onClick={handleSubmit} disabled={loading || aiLoading || !nombre.trim()} className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-40">
             {loading ? "Guardando..." : editing ? "Guardar cambios" : `Publicar ${tipo}`}
           </button>
         </div>
