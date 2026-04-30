@@ -537,6 +537,33 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
+  // Plan info
+  const [planInfo, setPlanInfo] = useState<{
+    plan: string;
+    planName: string;
+    limits: { dailyAi: number; totalProducts: number | "ilimitado" };
+    usage: { productos: number; aiHoy: number; aiGlobalHoy: number };
+    canUpgrade: boolean;
+    upgradeUrl: string | null;
+  } | null>(null);
+  const [planLoading, setPlanLoading] = useState(true);
+
+  // Fetch plan info on mount
+  useEffect(() => {
+    async function fetchPlan() {
+      const token = await getToken();
+      const res = await fetch(`${API}/comercios/me/plan`, {
+        headers: { Authorization: `Bearer ${token ?? ""}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPlanInfo(data);
+      }
+      setPlanLoading(false);
+    }
+    fetchPlan();
+  }, [getToken]);
+
   // Datos form state
   const [form, setForm] = useState({
     nombre: inicial(comercio.nombre),
@@ -796,38 +823,49 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </button>
         </div>
 
-        {/* Banner de plan */}
-        {comercio.isFounder ? (
+        {/* Banner de plan con límites y uso */}
+        {planLoading ? (
+          <div className={`mb-6 h-20 rounded-2xl animate-pulse ${isDark ? "bg-gray-800" : "bg-gray-100"}`} />
+        ) : planInfo?.plan === "master" ? (
           <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border border-amber-500/30 bg-amber-500/10">
             <span className="text-amber-400 text-lg">★</span>
             <div className="flex-1">
-              <p className="text-xs font-bold text-amber-400">Plan Founder</p>
-              <p className={`text-xs ${textMuted}`}>Acceso completo · Sin límites · Posición destacada</p>
+              <p className="text-xs font-bold text-amber-400">Plan Master</p>
+              <p className={`text-xs ${textMuted}`}>Ilimitado · Soporte prioritario · Posición destacada</p>
             </div>
           </div>
-        ) : comercio.isPremium ? (
+        ) : planInfo?.plan === "premium" ? (
           <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border border-indigo-500/30 bg-indigo-500/10">
             <span className="text-indigo-400 text-lg">✦</span>
             <div className="flex-1">
               <p className="text-xs font-bold text-indigo-400">Plan Premium</p>
-              <p className={`text-xs ${textMuted}`}>Acceso completo · Sin límites · Posición destacada</p>
+              <p className={`text-xs ${textMuted}`}>
+                {planInfo.usage.productos}/{planInfo.limits.totalProducts} productos · {planInfo.limits.dailyAi}/día IA
+              </p>
             </div>
           </div>
         ) : (
-          <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"}`}>
-            <span className={`text-lg ${textMuted}`}>○</span>
-            <div className="flex-1">
-              <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
-              <p className={`text-xs ${textMuted}`}>Hasta 10 productos · Posición estándar</p>
+          <div className={`mb-6 flex flex-col gap-2 px-4 py-3 rounded-2xl border ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"}`}>
+            <div className="flex items-center gap-3">
+              <span className={`text-lg ${textMuted}`}>○</span>
+              <div className="flex-1">
+                <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
+                <p className={`text-xs ${textMuted}`}>
+                  {planInfo?.usage.productos ?? 0}/{planInfo?.limits.totalProducts ?? 50} productos
+                </p>
+              </div>
+              <a
+                href={`https://wa.me/3482646949?text=${encodeURIComponent("Hola! Quiero saber más sobre el plan Premium para mi comercio")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0"
+              >
+                Upgrade
+              </a>
             </div>
-            <a
-              href={`https://wa.me/3482646949?text=${encodeURIComponent("Hola! Quiero saber más sobre el plan Premium para mi comercio")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0"
-            >
-              Ser Premium
-            </a>
+            {planInfo?.canUpgrade && planInfo.usage.productos >= (planInfo.limits.totalProducts as number) - 3 && (
+              <p className="text-xs text-amber-500">¡Casi alcanzás el límite! Considerá pasar a Premium.</p>
+            )}
           </div>
         )}
 
