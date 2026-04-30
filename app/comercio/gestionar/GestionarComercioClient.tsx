@@ -1643,9 +1643,9 @@ function PlanModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-2 py-20">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className={`relative rounded-3xl ${bg} max-w-lg w-full max-h-[90vh] overflow-y-auto p-6`}>
+      <div className={`relative rounded-3xl ${bg} max-w-lg w-full max-h-[75vh] overflow-y-auto p-4`}>
         <button
           onClick={onClose}
           className={`absolute top-4 right-4 p-2 rounded-full ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}
@@ -1653,8 +1653,8 @@ function PlanModal({
           <X className="w-5 h-5" />
         </button>
 
-        <h2 className={`text-xl font-black mb-2 ${textPri}`}>Elegí tu plan</h2>
-        <p className={`text-sm mb-6 ${textSec}`}>
+        <h2 className={`text-lg font-black mb-1 ${textPri}`}>Elegí tu plan</h2>
+        <p className={`text-xs mb-3 ${textSec}`}>
           Tu uso actual: {getUsageText()}
         </p>
 
@@ -1662,7 +1662,7 @@ function PlanModal({
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-2xl border-2 p-4 ${
+              className={`relative rounded-2xl border-2 p-3 ${
                 plan.current
                   ? "border-indigo-500 bg-indigo-500/10"
                   : plan.popular
@@ -1671,20 +1671,20 @@ function PlanModal({
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-2 right-4 text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500 text-white">
+                <span className="absolute -top-2 right-3 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-500 text-white">
                   Más popular
                 </span>
               )}
               {plan.current && (
-                <span className="absolute -top-2 right-4 text-xs font-bold px-2 py-0.5 rounded-full bg-green-500 text-white">
+                <span className="absolute -top-2 right-3 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-green-500 text-white">
                   Tu plan
                 </span>
               )}
 
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-2">
                 <div>
-                  <h3 className={`font-bold text-lg ${textPri}`}>{plan.name}</h3>
-                  <p className={`text-2xl font-black ${plan.id === "free" ? textMuted : "text-indigo-500"}`}>
+                  <h3 className={`font-bold text-base ${textPri}`}>{plan.name}</h3>
+                  <p className={`text-lg font-black ${plan.id === "free" ? textMuted : "text-indigo-500"}`}>
                     {plan.price}
                   </p>
                 </div>
@@ -1697,17 +1697,17 @@ function PlanModal({
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-semibold px-4 py-2 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
                   >
                     Elegir
                   </a>
                 )}
               </div>
 
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className={`flex items-center gap-2 text-sm ${textSec}`}>
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  <li key={i} className={`flex items-center gap-2 text-xs ${textSec}`}>
+                    <Check className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
                     {feature}
                   </li>
                 ))}
@@ -1716,7 +1716,7 @@ function PlanModal({
           ))}
         </div>
 
-        <p className={`text-xs mt-6 text-center ${textMuted}`}>
+        <p className={`text-xs mt-3 text-center ${textMuted}`}>
           ¿Necesitás algo diferente? Escribinos y armamos un plan a tu medida.
         </p>
       </div>
