@@ -553,7 +553,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   useEffect(() => {
     async function fetchPlan() {
       const token = await getToken();
-      const res = await fetch(`${API}/comercios/me/plan`, {
+      const res = await fetch(`${API}/api/comercios/me/plan`, {
         headers: { Authorization: `Bearer ${token ?? ""}` },
       });
       if (res.ok) {
