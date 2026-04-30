@@ -855,7 +855,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 </p>
               </div>
               <a
-                href={`https://wa.me/3482646949?text=${encodeURIComponent("Hola! Quiero saber más sobre el plan Premium para mi comercio")}`}
+                href={`https://wa.me/3482445015?text=${encodeURIComponent("Hola! Quiero saber más sobre el plan Premium para mi comercio")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0"
@@ -1161,7 +1161,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 <p className={`text-sm font-bold ${isDark ? "text-yellow-400" : "text-yellow-700"}`}>★ Límite del plan gratuito alcanzado</p>
                 <p className={`text-xs ${isDark ? "text-yellow-600" : "text-yellow-600"}`}>Tenés 10 items en tu catálogo. Pasate al plan Premium para agregar más.</p>
                 <a
-                  href={`https://wa.me/3482646949?text=${encodeURIComponent(`Hola! Quiero activar el plan Premium para mi comercio en Reportes Reconquista.`)}`}
+                  href={`https://wa.me/3482445015?text=${encodeURIComponent(`Hola! Quiero activar el plan Premium para mi comercio en Reportes Reconquista.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-1 py-2.5 rounded-xl text-sm font-semibold bg-yellow-500 hover:bg-yellow-400 text-gray-900 text-center transition-colors"
