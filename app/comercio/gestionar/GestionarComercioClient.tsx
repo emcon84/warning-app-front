@@ -160,8 +160,8 @@ function OfertaModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4 pt-4 pb-24 sm:p-4">
-      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 7rem)" }}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4 pt-20 pb-24 sm:p-4">
+      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 10rem)" }}>
         <div className="flex items-center justify-between p-5 pb-0 flex-shrink-0">
           <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar oferta" : "Nueva oferta"}</h2>
           <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
@@ -415,10 +415,10 @@ function ProductoModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4 pt-4 pb-24 sm:p-4">
-      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 7rem)" }}>
+<div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 px-4 pt-20 pb-24 sm:p-4">
+      <div className={`w-full max-w-lg rounded-2xl ${bg} shadow-xl flex flex-col`} style={{ maxHeight: "calc(100dvh - 10rem)" }}>
         <div className="flex items-center justify-between p-5 pb-0 flex-shrink-0">
-          <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? `Editar ${tipo}` : `Nuevo ${tipo}`}</h2>
+          <h2 className={`font-bold text-base ${isDark ? "text-white" : "text-gray-900"}`}>{editing ? "Editar producto" : "Nuevo producto"}</h2>
           <button onClick={onClose} className={`p-1.5 rounded-lg ${isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"}`}>
             <X className="w-4 h-4" />
           </button>
