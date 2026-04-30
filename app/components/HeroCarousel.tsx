@@ -360,35 +360,32 @@ export default function HeroCarousel() {
 
   return (
     <div
-      className="relative flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20 py-16 lg:py-24 px-4"
+      className="relative flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-20 py-10 lg:py-24 px-4"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
       onTouchEnd={(e) => { const d = touchStartX.current - e.changedTouches[0].clientX; if (Math.abs(d) > 50) d > 0 ? next() : prev(); }}
     >
-      {/* Text */}
-      <div className="flex-1 max-w-lg text-center lg:text-left order-2 lg:order-1" style={fadeStyle}>
-        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border mb-5 ${slide.badgeCls}`}>
+      {/* Text — siempre primero en mobile, izquierda en desktop */}
+      <div className="flex-1 max-w-lg text-center lg:text-left" style={fadeStyle}>
+        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border mb-4 lg:mb-5 ${slide.badgeCls}`}>
           {slide.badge}
         </span>
-        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white leading-[1.1] mb-5 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 dark:text-white leading-[1.1] mb-4 lg:mb-5 tracking-tight">
           {slide.headline}{" "}
           <span className={slide.accentCls}>{slide.headlineSuffix}</span>
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-lg leading-relaxed mb-8">
+        <p className="text-gray-500 dark:text-gray-400 text-base lg:text-lg leading-relaxed mb-6 lg:mb-8">
           {slide.sub}
         </p>
         <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
-          <Link href={slide.cta.href} className="inline-flex items-center gap-2 px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-colors text-sm">
+          <Link href={slide.cta.href} className="inline-flex items-center gap-2 px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl transition-colors text-sm w-full sm:w-auto justify-center">
             {slide.cta.label}
-          </Link>
-          <Link href="/app" className="inline-flex items-center gap-2 px-7 py-3.5 border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-2xl transition-colors text-sm">
-            Abrir la app
           </Link>
         </div>
         {/* Dots + arrows */}
-        <div className="flex items-center gap-3 mt-10 justify-center lg:justify-start">
-          <button onClick={prev} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+        <div className="flex items-center gap-3 mt-7 lg:mt-10 justify-center lg:justify-start">
+          <button onClick={prev} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 hover:text-gray-700 dark:hover:text-white">
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-1.5">
@@ -396,14 +393,14 @@ export default function HeroCarousel() {
               <button key={i} onClick={() => goTo(i)} className={`rounded-full transition-all duration-300 ${i === current ? `w-6 h-2 ${slide.dotActiveCls}` : "w-2 h-2 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-500"}`} />
             ))}
           </div>
-          <button onClick={next} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+          <button onClick={next} className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 flex items-center justify-center transition-colors text-gray-400 hover:text-gray-700 dark:hover:text-white">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Phone */}
-      <div className="order-1 lg:order-2 shrink-0" style={fadeStyle}>
+      {/* Phone — solo visible en desktop (lg+) */}
+      <div className="hidden lg:block shrink-0" style={fadeStyle}>
         <PhoneFrame glow={slide.glow}>{getMockup(slide.id)}</PhoneFrame>
       </div>
     </div>
