@@ -383,7 +383,7 @@ function ProductoModal({
 
       // Generar imagen automáticamente si se detectó un nombre
       if (extractedNombre) {
-        handleGenerateImage(extractedNombre, extractedDescripcion, extractedTipo);
+        handleGenerateImage(extractedNombre, extractedDescripcion, extractedTipo, preparedFile);
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "No se pudo analizar la foto");
@@ -396,16 +396,26 @@ function ProductoModal({
     nombreVal = nombre,
     descripcionVal = descripcion,
     tipoVal = tipo,
+    photoFileVal: File | null = photoFile,
   ) {
     if (!nombreVal.trim() || generatingImg) return;
+    if (!photoFileVal) {
+      setImgGenError("Necesitás subir una foto del producto primero.");
+      return;
+    }
     setGeneratingImg(true);
     setImgGenError("");
     try {
       const token = await getToken();
+      const fd = new FormData();
+      fd.append("photo", photoFileVal);
+      fd.append("nombre", nombreVal.trim());
+      fd.append("descripcion", descripcionVal);
+      fd.append("tipo", tipoVal);
       const res = await fetch(`${API}/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ nombre: nombreVal.trim(), descripcion: descripcionVal, tipo: tipoVal }),
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
       });
       const text = await res.text();
       let data: { url?: string; error?: string; message?: string } = {};
