@@ -544,7 +544,7 @@ function ProductoModal({
                 {nombre.trim() && (
                   <button
                     type="button"
-                    onClick={handleGenerateImage}
+                    onClick={() => handleGenerateImage()}
                     disabled={generatingImg || aiLoading}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
                       isDark ? "bg-purple-500/20 text-purple-300 border border-purple-700 hover:bg-purple-500/30" : "bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100"
