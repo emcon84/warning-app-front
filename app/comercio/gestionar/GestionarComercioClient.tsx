@@ -406,8 +406,10 @@ function ProductoModal({
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ nombre: nombreVal.trim(), descripcion: descripcionVal, tipo: tipoVal }),
       });
-      const data = await res.json() as { url?: string; error?: string; message?: string };
-      if (!res.ok) throw new Error(data.message || data.error || "Error al generar");
+      const text = await res.text();
+      let data: { url?: string; error?: string; message?: string } = {};
+      try { data = JSON.parse(text); } catch {}
+      if (!res.ok) throw new Error(data.message || data.error || "No se pudo generar la imagen");
       const fullUrl = data.url!.startsWith("http") ? data.url! : `${API}${data.url}`;
       const imgRes = await fetch(fullUrl);
       const blob = await imgRes.blob();
