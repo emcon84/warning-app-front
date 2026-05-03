@@ -361,19 +361,28 @@ function ProductoModal({
       };
       if (!res.ok) throw new Error(data.message || data.error || "No se pudo analizar la foto");
 
+      const extractedTipo = (data.tipo === "servicio" || data.tipo === "producto") ? data.tipo : tipo;
+      const extractedNombre = data.nombre || "";
+      const extractedDescripcion = data.descripcion || "";
+
       if (data.tipo === "servicio" || data.tipo === "producto") setTipo(data.tipo);
-      if (data.nombre) setNombre(data.nombre);
+      if (extractedNombre) setNombre(extractedNombre);
       if (data.precio) setPrecio(data.precio);
-      if (data.descripcion) setDescripcion(data.descripcion);
+      if (extractedDescripcion) setDescripcion(extractedDescripcion);
 
       const confidence = typeof data.confianza === "number" ? data.confianza : 0;
-      const foundSomething = data.nombre || data.precio || data.descripcion;
+      const foundSomething = extractedNombre || data.precio || extractedDescripcion;
       if (!foundSomething) {
         setAiMessage("No se detectaron datos claros. Podés completar los campos manualmente.");
       } else if (confidence < 0.55) {
-        setAiMessage("La IA completó algunos datos con baja confianza. Revisalos antes de publicar.");
+        setAiMessage("Datos completados con baja confianza. Revisalos. Generando imagen de catálogo...");
       } else {
-        setAiMessage(data.notas || "Campos autocompletados. Revisalos antes de publicar.");
+        setAiMessage("Datos completados. Generando imagen de catálogo...");
+      }
+
+      // Generar imagen automáticamente si se detectó un nombre
+      if (extractedNombre) {
+        handleGenerateImage(extractedNombre, extractedDescripcion, extractedTipo);
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "No se pudo analizar la foto");
@@ -382,8 +391,12 @@ function ProductoModal({
     }
   }
 
-  async function handleGenerateImage() {
-    if (!nombre.trim() || generatingImg) return;
+  async function handleGenerateImage(
+    nombreVal = nombre,
+    descripcionVal = descripcion,
+    tipoVal = tipo,
+  ) {
+    if (!nombreVal.trim() || generatingImg) return;
     setGeneratingImg(true);
     setImgGenError("");
     try {
@@ -391,7 +404,7 @@ function ProductoModal({
       const res = await fetch(`${API}/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ nombre: nombre.trim(), descripcion, tipo }),
+        body: JSON.stringify({ nombre: nombreVal.trim(), descripcion: descripcionVal, tipo: tipoVal }),
       });
       const data = await res.json() as { url?: string; error?: string; message?: string };
       if (!res.ok) throw new Error(data.message || data.error || "Error al generar");
@@ -400,6 +413,7 @@ function ProductoModal({
       const blob = await imgRes.blob();
       const file = new File([blob], "catalogo-ia.png", { type: "image/png" });
       setSelectedPhoto(file);
+      setAiMessage("Imagen de catálogo generada. Revisá los datos y publicá.");
     } catch (e: unknown) {
       setImgGenError(e instanceof Error ? e.message : "No se pudo generar la imagen");
     } finally {
