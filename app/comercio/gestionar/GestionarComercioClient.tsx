@@ -316,6 +316,8 @@ function ProductoModal({
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiMessage, setAiMessage] = useState("");
+  const [generatingImg, setGeneratingImg] = useState(false);
+  const [imgGenError, setImgGenError] = useState("");
   const [error, setError] = useState("");
   const photoRef = useRef<HTMLInputElement>(null);
   const aiPhotoRef = useRef<HTMLInputElement>(null);
@@ -377,6 +379,31 @@ function ProductoModal({
       setError(e instanceof Error ? e.message : "No se pudo analizar la foto");
     } finally {
       setAiLoading(false);
+    }
+  }
+
+  async function handleGenerateImage() {
+    if (!nombre.trim() || generatingImg) return;
+    setGeneratingImg(true);
+    setImgGenError("");
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API}/api/comercios/me/productos/generar-imagen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ nombre: nombre.trim(), descripcion, tipo }),
+      });
+      const data = await res.json() as { url?: string; error?: string; message?: string };
+      if (!res.ok) throw new Error(data.message || data.error || "Error al generar");
+      const fullUrl = data.url!.startsWith("http") ? data.url! : `${API}${data.url}`;
+      const imgRes = await fetch(fullUrl);
+      const blob = await imgRes.blob();
+      const file = new File([blob], "catalogo-ia.png", { type: "image/png" });
+      setSelectedPhoto(file);
+    } catch (e: unknown) {
+      setImgGenError(e instanceof Error ? e.message : "No se pudo generar la imagen");
+    } finally {
+      setGeneratingImg(false);
     }
   }
 
@@ -495,15 +522,31 @@ function ProductoModal({
           </div>
           <div>
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Foto del producto</label>
-            <div className="flex items-center gap-3">
-              <button type="button" onClick={() => photoRef.current?.click()} className={`w-16 h-16 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden transition-colors ${isDark ? "border-gray-700 hover:border-gray-500 bg-gray-800" : "border-gray-300 hover:border-gray-400 bg-gray-50"}`}>
+            <div className="flex items-center gap-3 flex-wrap">
+              <button type="button" onClick={() => photoRef.current?.click()} className={`w-16 h-16 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden transition-colors flex-shrink-0 ${isDark ? "border-gray-700 hover:border-gray-500 bg-gray-800" : "border-gray-300 hover:border-gray-400 bg-gray-50"}`}>
                 {photoPreview ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" /> : <ImageIcon className={`w-5 h-5 ${isDark ? "text-gray-600" : "text-gray-400"}`} />}
               </button>
-              {photoPreview && (
-                <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); setClearPhoto(true); }} className={`text-xs ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500"}`}>Quitar foto</button>
-              )}
+              <div className="flex flex-col gap-1.5">
+                {nombre.trim() && (
+                  <button
+                    type="button"
+                    onClick={handleGenerateImage}
+                    disabled={generatingImg || aiLoading}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 ${
+                      isDark ? "bg-purple-500/20 text-purple-300 border border-purple-700 hover:bg-purple-500/30" : "bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100"
+                    }`}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {generatingImg ? "Generando..." : "Generar imagen IA"}
+                  </button>
+                )}
+                {photoPreview && (
+                  <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); setClearPhoto(true); setImgGenError(""); }} className={`text-xs ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500"}`}>Quitar foto</button>
+                )}
+              </div>
             </div>
             <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setSelectedPhoto(f); }} />
+            {imgGenError && <p className={`mt-2 text-xs px-2 py-1.5 rounded-lg border ${isDark ? "text-red-400 bg-red-900/20 border-red-800" : "text-red-600 bg-red-50 border-red-200"}`}>{imgGenError}</p>}
           </div>
           {aiMessage && <p className={`text-sm px-3 py-2 rounded-xl border ${isDark ? "text-blue-200 bg-blue-950/30 border-blue-900" : "text-blue-800 bg-blue-50 border-blue-100"}`}>{aiMessage}</p>}
           {error && <p className={`text-sm px-3 py-2 rounded-xl border ${isDark ? "text-red-400 bg-red-900/20 border-red-800" : "text-red-600 bg-red-50 border-red-200"}`}>{error}</p>}
