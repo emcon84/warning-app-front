@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 import { motion } from "framer-motion";
 import { useTransitionRouter } from "next-view-transitions";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -52,6 +52,26 @@ export default function ComerciosClient({ comercios }: Props) {
   );
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const filtersRef  = useRef<HTMLDivElement>(null);
+  const dragState   = useRef({ dragging: false, startX: 0, scrollLeft: 0 });
+
+  function onFilterMouseDown(e: ReactMouseEvent<HTMLDivElement>) {
+    const el = filtersRef.current;
+    if (!el) return;
+    dragState.current = { dragging: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+    el.style.cursor = "grabbing";
+    el.style.userSelect = "none";
+  }
+  function onFilterMouseMove(e: ReactMouseEvent<HTMLDivElement>) {
+    if (!dragState.current.dragging || !filtersRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - filtersRef.current.offsetLeft;
+    filtersRef.current.scrollLeft = dragState.current.scrollLeft - (x - dragState.current.startX) * 1.2;
+  }
+  function onFilterMouseUp() {
+    dragState.current.dragging = false;
+    if (filtersRef.current) { filtersRef.current.style.cursor = ""; filtersRef.current.style.userSelect = ""; }
+  }
 
   const bg          = isDark ? "bg-gray-950" : "bg-gray-50";
   const textPrimary = isDark ? "text-white" : "text-gray-900";
@@ -272,8 +292,15 @@ export default function ComerciosClient({ comercios }: Props) {
           </p>
         </div>
 
-        {/* Rubros — scroll horizontal */}
-        <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+        {/* Rubros — scroll horizontal + mouse drag en desktop */}
+        <div
+          ref={filtersRef}
+          className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide cursor-grab select-none"
+          onMouseDown={onFilterMouseDown}
+          onMouseMove={onFilterMouseMove}
+          onMouseUp={onFilterMouseUp}
+          onMouseLeave={onFilterMouseUp}
+        >
           {rubros.map((rubro) => (
             <button
               key={rubro}

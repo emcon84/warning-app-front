@@ -882,14 +882,14 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-20 pb-40">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className={`text-xl font-black ${textPri}`}>{comercio.nombre}</h1>
-            <p className={`text-sm ${textSec}`}>{comercio.rubro} · {comercio.barrio}</p>
+        <div className="flex items-center justify-between mb-6 gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className={`text-xl font-black truncate ${textPri}`}>{comercio.nombre}</h1>
+            <p className={`text-sm truncate ${textSec}`}>{comercio.rubro} · {comercio.barrio}</p>
           </div>
           <button
             onClick={() => router.push(`/comercio/${comercio.slug}`)}
-            className={`flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+            className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
           >
             <ExternalLink className="w-3.5 h-3.5" />
             Ver perfil
@@ -1469,7 +1469,7 @@ function ProductoRow({
           </div>
           {producto.descripcion && <p className={`text-xs leading-relaxed line-clamp-2 ${textSec}`}>{producto.descripcion}</p>}
           {producto.precio && <span className={`text-sm font-black ${isDark ? "text-green-400" : "text-green-600"}`}>{producto.precio}</span>}
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex flex-wrap items-center gap-1.5 mt-1">
             <button onClick={onToggle} className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
               {producto.activo ? <ToggleRight className="w-3.5 h-3.5 text-green-500" /> : <ToggleLeft className="w-3.5 h-3.5" />}
               {producto.activo ? "Desactivar" : "Activar"}
@@ -1490,8 +1490,8 @@ function ProductoRow({
             </button>
             {confirmDelete ? (
               <div className="flex gap-1">
-                <button onClick={onDelete} className="text-xs px-2.5 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors">Confirmar</button>
-                <button onClick={() => setConfirmDelete(false)} className={`text-xs px-2.5 py-1 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}>Cancelar</button>
+                <button onClick={onDelete} className="text-xs px-2.5 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors whitespace-nowrap">Confirmar</button>
+                <button onClick={() => setConfirmDelete(false)} className={`text-xs px-2.5 py-1 rounded-lg border transition-colors whitespace-nowrap ${isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}>Cancelar</button>
               </div>
             ) : (
               <button onClick={() => setConfirmDelete(true)} className={`p-1.5 rounded-lg border transition-colors ${isDark ? "border-gray-700 text-gray-500 hover:text-red-400 hover:border-red-800" : "border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200"}`}>
