@@ -318,6 +318,7 @@ function ProductoModal({
   const [aiMessage, setAiMessage] = useState("");
   const [generatingImg, setGeneratingImg] = useState(false);
   const [imgGenError, setImgGenError] = useState("");
+  const [aiGeneratedUrl, setAiGeneratedUrl] = useState("");
   const [error, setError] = useState("");
   const photoRef = useRef<HTMLInputElement>(null);
   const aiPhotoRef = useRef<HTMLInputElement>(null);
@@ -411,10 +412,11 @@ function ProductoModal({
       try { data = JSON.parse(text); } catch {}
       if (!res.ok) throw new Error(data.message || data.error || "No se pudo generar la imagen");
       const fullUrl = data.url!.startsWith("http") ? data.url! : `${API}${data.url}`;
-      const imgRes = await fetch(fullUrl);
-      const blob = await imgRes.blob();
-      const file = new File([blob], "catalogo-ia.png", { type: "image/png" });
-      setSelectedPhoto(file);
+      // Usamos la URL de R2 directamente — sin re-descargar (evita CORS)
+      setPhotoPreview(fullUrl);
+      setPhotoFile(null);
+      setClearPhoto(false);
+      setAiGeneratedUrl(fullUrl);
       setAiMessage("Imagen de catálogo generada. Revisá los datos y publicá.");
     } catch (e: unknown) {
       setImgGenError(e instanceof Error ? e.message : "No se pudo generar la imagen");
@@ -435,7 +437,8 @@ function ProductoModal({
       if (descripcion.trim()) fd.append("descripcion", descripcion.trim());
       if (precio.trim()) fd.append("precio", precio.trim());
       if (photoFile) fd.append("photo", photoFile);
-      if (clearPhoto && !photoFile) fd.append("clearPhoto", "1");
+      else if (aiGeneratedUrl) fd.append("generatedPhotoUrl", aiGeneratedUrl);
+      if (clearPhoto && !photoFile && !aiGeneratedUrl) fd.append("clearPhoto", "1");
 
       const url = editing
         ? `${API}/api/comercios/me/productos/${editing.id}`
@@ -557,7 +560,7 @@ function ProductoModal({
                   </button>
                 )}
                 {photoPreview && (
-                  <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); setClearPhoto(true); setImgGenError(""); }} className={`text-xs ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500"}`}>Quitar foto</button>
+                  <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); setClearPhoto(true); setImgGenError(""); setAiGeneratedUrl(""); }} className={`text-xs ${isDark ? "text-red-400 hover:text-red-300" : "text-red-500"}`}>Quitar foto</button>
                 )}
               </div>
             </div>
