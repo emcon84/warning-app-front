@@ -110,7 +110,7 @@ export default function ParaComerciosPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(245,158,11,0.06)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_rgba(245,158,11,0.06)_0%,_transparent_60%)]" />
         <div className="max-w-6xl mx-auto px-4 py-16 lg:py-24 flex flex-col lg:flex-row items-center gap-14 lg:gap-20">
 
           {/* Text */}
