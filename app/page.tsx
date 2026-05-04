@@ -218,6 +218,19 @@ export default function Home() {
             </Link>
             <div className="flex items-center gap-3">
               <LandingThemeToggle />
+              <Link
+                href="/para-comercios"
+                className="hidden sm:flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-500 transition-colors"
+              >
+                <Store className="w-4 h-4" />
+                Sos comerciante?
+              </Link>
+              <Link
+                href="/comercio/nuevo"
+                className="flex items-center gap-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-gray-950 text-sm font-bold rounded-xl transition-colors"
+              >
+                Registrar comercio
+              </Link>
             </div>
           </div>
         </header>
@@ -304,16 +317,16 @@ export default function Home() {
                 </ul>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
-                    href="/home"
+                    href="/comercio/nuevo"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold rounded-2xl transition-colors text-sm"
                   >
                     Registrar mi comercio gratis
                   </Link>
                   <Link
-                    href="/home"
+                    href="/para-comercios"
                     className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-amber-500/40 text-amber-600 dark:text-amber-400 hover:border-amber-500 font-semibold rounded-2xl transition-colors text-sm"
                   >
-                    Saber mas
+                    Ver planes y precios
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -438,7 +451,7 @@ export default function Home() {
               Quien llega a tu perfil en la app ya está buscando un comercio como el tuyo. Esa intención de compra no existe en ninguna red social.
             </p>
             <Link
-              href="/home"
+              href="/comercio/nuevo"
               className="inline-flex items-center gap-2 mt-8 px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-2xl text-sm transition-colors"
             >
               Registrar mi comercio gratis
