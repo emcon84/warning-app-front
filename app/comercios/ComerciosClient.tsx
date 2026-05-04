@@ -1,6 +1,23 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+interface RecentProducto {
+  id: string;
+  nombre: string;
+  tipo: string;
+  descripcion?: string;
+  precio?: string;
+  foto?: string;
+  comercio: { nombre: string; slug: string; logo?: string; foto?: string };
+}
+
+function resolvePhoto(url?: string | null): string | null {
+  if (!url) return null;
+  return url.startsWith("/uploads/") ? `${API_URL}${url}` : url;
+}
 import { motion } from "framer-motion";
 import { useTransitionRouter } from "next-view-transitions";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -122,6 +139,14 @@ export default function ComerciosClient({ comercios }: Props) {
     if (next) params.set("rubro", next); else params.delete("rubro");
     urlRouter.push(`/comercios?${params.toString()}`, { scroll: false });
   }, [selectedRubro, searchParams, urlRouter]);
+
+  const [recentProductos, setRecentProductos] = useState<RecentProducto[]>([]);
+  useEffect(() => {
+    fetch(`${API_URL}/api/productos/recientes?limit=20`)
+      .then(r => r.json())
+      .then(data => Array.isArray(data) && setRecentProductos(data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedRubro, search]);
 
@@ -281,6 +306,55 @@ export default function ComerciosClient({ comercios }: Props) {
                   </Link>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Últimos productos — marquee */}
+        {recentProductos.length > 0 && (
+          <div className="mb-6 mt-2">
+            <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${textMuted}`}>
+              Últimos productos y servicios
+            </p>
+            <div className="overflow-hidden -mx-4">
+              <div
+                className="flex gap-3 carousel-marquee"
+                style={{ animationDuration: `${Math.max(18, recentProductos.length * 1.8)}s`, width: "max-content" }}
+              >
+                {[...recentProductos, ...recentProductos].map((p, i) => {
+                  const foto = resolvePhoto(p.foto);
+                  const logo = resolvePhoto(p.comercio.logo || p.comercio.foto);
+                  const esServicio = p.tipo === "servicio";
+                  return (
+                    <a
+                      key={`${p.id}-${i}`}
+                      href={`/comercio/${p.comercio.slug}`}
+                      className={`flex-shrink-0 w-40 rounded-2xl border overflow-hidden flex flex-col transition-transform hover:scale-[1.02] active:scale-95 ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
+                    >
+                      {/* Foto o placeholder */}
+                      <div className={`w-full h-28 flex items-center justify-center flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+                        {foto
+                          ? <img src={foto} alt={p.nombre} className="w-full h-full object-cover" />
+                          : <span className="text-3xl">{esServicio ? "🔧" : "🛍"}</span>
+                        }
+                      </div>
+                      {/* Info */}
+                      <div className="p-2.5 flex flex-col gap-1 flex-1">
+                        <p className={`text-xs font-bold leading-snug line-clamp-2 ${isDark ? "text-white" : "text-gray-900"}`}>{p.nombre}</p>
+                        {p.precio && <p className="text-xs font-black text-green-500">{p.precio}</p>}
+                        {/* Comercio */}
+                        <div className="flex items-center gap-1.5 mt-auto pt-1.5 border-t border-gray-100 dark:border-gray-800">
+                          {logo
+                            ? <img src={logo} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                            : <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-black ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-600"}`}>{p.comercio.nombre[0]}</div>
+                          }
+                          <p className={`text-[10px] truncate ${isDark ? "text-gray-400" : "text-gray-500"}`}>{p.comercio.nombre}</p>
+                        </div>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

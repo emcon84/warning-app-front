@@ -63,9 +63,9 @@ const COMERCIO_BG_GRADIENTS = [
 ] as const;
 
 const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? "100%" : "-100%", opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
+  enter: () => ({ scale: 0.92, opacity: 0, filter: "blur(4px)" }),
+  center: { scale: 1, opacity: 1, filter: "blur(0px)" },
+  exit: () => ({ scale: 1.06, opacity: 0, filter: "blur(2px)" }),
 };
 interface PromoSlide {
   type: "promo";
@@ -459,7 +459,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                   const item = proSlides[proSlide];
                   if (!item) return null;
                   if (item.type === "promo") return (
-                    <motion.div key={item.id} custom={proDir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.35, ease: "easeInOut" }} className="absolute inset-0">
+                    <motion.div key={item.id} custom={proDir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="absolute inset-0">
                       <div className="h-full relative overflow-hidden">
                         <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover object-right" />
                         <div className={"absolute inset-0 bg-gradient-to-r " + item.gradient} />
@@ -485,7 +485,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                       initial="enter"
                       animate="center"
                       exit="exit"
-                      transition={{ duration: 0.35, ease: "easeInOut" }}
+                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                       className="absolute inset-0"
                     >
                       <Link href={`/profesional/${pro.slug}`} className="block h-full">
@@ -595,7 +595,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                   const item = comSlides[comercioSlide];
                   if (!item) return null;
                   if (item.type === "promo") return (
-                    <motion.div key={item.id} custom={comercioDir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.35, ease: "easeInOut" }} className="absolute inset-0">
+                    <motion.div key={item.id} custom={comercioDir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="absolute inset-0">
                       <div className="h-full relative overflow-hidden">
                         <img src={item.image} alt="" className="absolute inset-0 w-full h-full object-cover object-right" />
                         <div className={"absolute inset-0 bg-gradient-to-r " + item.gradient} />
@@ -621,7 +621,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                       initial="enter"
                       animate="center"
                       exit="exit"
-                      transition={{ duration: 0.35, ease: "easeInOut" }}
+                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                       className="absolute inset-0"
                     >
                       <Link href={`/comercio/${comercio.slug}`} className="block h-full">

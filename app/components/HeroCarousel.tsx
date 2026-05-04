@@ -130,15 +130,15 @@ const SLIDES: Slide[] = [
 // ─── Animación ─────────────────────────────────────────────────
 
 const textVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
+  enter: (dir: number) => ({ y: dir > 0 ? 28 : -28, opacity: 0, filter: "blur(6px)" }),
+  center: { y: 0, opacity: 1, filter: "blur(0px)" },
+  exit: (dir: number) => ({ y: dir > 0 ? -18 : 18, opacity: 0, filter: "blur(3px)" }),
 };
 
 const screenVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 50 : -50, opacity: 0, scale: 0.97 }),
-  center: { x: 0, opacity: 1, scale: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -50 : 50, opacity: 0, scale: 0.97 }),
+  enter: (dir: number) => ({ x: dir > 0 ? 18 : -18, scale: 0.88, opacity: 0 }),
+  center: { x: 0, scale: 1, opacity: 1 },
+  exit: (dir: number) => ({ x: dir > 0 ? -18 : 18, scale: 1.1, opacity: 0 }),
 };
 
 // ─── Main ──────────────────────────────────────────────────────
@@ -189,7 +189,7 @@ export default function HeroCarousel() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
           >
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border mb-4 lg:mb-5 ${slide.badgeCls}`}>
               {slide.badge}
@@ -253,7 +253,7 @@ export default function HeroCarousel() {
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{ duration: 0.52, ease: [0.22, 1, 0.36, 1] }}
               src={slide.screenshot}
               alt={slide.badge}
               className="absolute inset-0 w-full h-full object-cover object-top"
