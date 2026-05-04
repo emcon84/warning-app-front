@@ -311,7 +311,10 @@ export default function ComerciosClient({ comercios }: Props) {
         )}
 
         {/* Últimos productos — marquee */}
-        {recentProductos.length > 0 && (
+        {recentProductos.length >= 3 && (() => {
+          const copies = Math.max(2, Math.ceil(12 / recentProductos.length));
+          const marqueeItems = Array.from({ length: copies }, () => recentProductos).flat();
+          return (
           <div className="mb-6 mt-2">
             <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${textMuted}`}>
               Últimos productos y servicios
@@ -319,9 +322,9 @@ export default function ComerciosClient({ comercios }: Props) {
             <div className="overflow-hidden -mx-4">
               <div
                 className="flex gap-3 carousel-marquee"
-                style={{ animationDuration: `${Math.max(18, recentProductos.length * 1.8)}s`, width: "max-content" }}
+                style={{ animationDuration: `${Math.max(20, recentProductos.length * 2.2)}s`, width: "max-content" }}
               >
-                {[...recentProductos, ...recentProductos].map((p, i) => {
+                {marqueeItems.map((p, i) => {
                   const foto = resolvePhoto(p.foto);
                   const logo = resolvePhoto(p.comercio.logo || p.comercio.foto);
                   const esServicio = p.tipo === "servicio";
@@ -357,7 +360,8 @@ export default function ComerciosClient({ comercios }: Props) {
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Header */}
         <div className="mb-4 mt-2">
