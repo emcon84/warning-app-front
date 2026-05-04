@@ -376,14 +376,9 @@ function ProductoModal({
       if (!foundSomething) {
         setAiMessage("No se detectaron datos claros. Podés completar los campos manualmente.");
       } else if (confidence < 0.55) {
-        setAiMessage("Datos completados con baja confianza. Revisalos. Generando imagen de catálogo...");
+        setAiMessage("Datos completados con baja confianza. Revisalos antes de publicar.");
       } else {
-        setAiMessage("Datos completados. Generando imagen de catálogo...");
-      }
-
-      // Generar imagen automáticamente si se detectó un nombre
-      if (extractedNombre) {
-        handleGenerateImage(extractedNombre, extractedDescripcion, extractedTipo, preparedFile);
+        setAiMessage("Datos completados. Revisalos y usá el botón ✨ para generar la imagen de catálogo.");
       }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "No se pudo analizar la foto");
@@ -420,7 +415,13 @@ function ProductoModal({
       const text = await res.text();
       let data: { url?: string; error?: string; message?: string } = {};
       try { data = JSON.parse(text); } catch {}
-      if (!res.ok) throw new Error(data.message || data.error || "No se pudo generar la imagen");
+      if (!res.ok) {
+        if (data.error === "CREDITS_EXHAUSTED") {
+          setImgGenError("⚡ Créditos de IA agotados. Activá el plan Premium para seguir generando imágenes de catálogo.");
+          return;
+        }
+        throw new Error(data.message || data.error || "No se pudo generar la imagen");
+      }
       const fullUrl = data.url!.startsWith("http") ? data.url! : `${API}${data.url}`;
       // Usamos la URL de R2 directamente — sin re-descargar (evita CORS)
       setPhotoPreview(fullUrl);
@@ -575,7 +576,18 @@ function ProductoModal({
               </div>
             </div>
             <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setSelectedPhoto(f); }} />
-            {imgGenError && <p className={`mt-2 text-xs px-2 py-1.5 rounded-lg border ${isDark ? "text-red-400 bg-red-900/20 border-red-800" : "text-red-600 bg-red-50 border-red-200"}`}>{imgGenError}</p>}
+            {imgGenError && (
+              imgGenError.startsWith("⚡") ? (
+                <div className={`mt-2 px-3 py-2 rounded-lg border text-xs ${isDark ? "bg-amber-900/20 border-amber-700 text-amber-300" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
+                  <p className="font-semibold">{imgGenError}</p>
+                  <a href="/comercio/gestionar?upgrade=1" className={`mt-1 inline-block underline font-bold ${isDark ? "text-amber-400" : "text-amber-600"}`}>
+                    Ver planes →
+                  </a>
+                </div>
+              ) : (
+                <p className={`mt-2 text-xs px-2 py-1.5 rounded-lg border ${isDark ? "text-red-400 bg-red-900/20 border-red-800" : "text-red-600 bg-red-50 border-red-200"}`}>{imgGenError}</p>
+              )
+            )}
           </div>
           {aiMessage && <p className={`text-sm px-3 py-2 rounded-xl border ${isDark ? "text-blue-200 bg-blue-950/30 border-blue-900" : "text-blue-800 bg-blue-50 border-blue-100"}`}>{aiMessage}</p>}
           {error && <p className={`text-sm px-3 py-2 rounded-xl border ${isDark ? "text-red-400 bg-red-900/20 border-red-800" : "text-red-600 bg-red-50 border-red-200"}`}>{error}</p>}
