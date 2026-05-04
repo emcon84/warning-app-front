@@ -134,13 +134,14 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
   const showProductos     = tab === "todos" || tab === "productos";
 
   // ── Tab pills config ──────────────────────────────────────────────────────
-  const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: "todos",     label: "Todos",              count: countTodos     },
-    { key: "oficios",   label: "Oficios",            count: countOficios   },
-    { key: "comercios", label: "Comercios",          count: countComercios },
-    { key: "productos", label: "Productos",          count: countProductos },
-    { key: "medicos",   label: "Médicos",            count: countMedicos   },
-  ].filter(t => t.key === "todos" || t.count > 0 || loadingProducts && t.key === "productos");
+  const allTabs: { key: Tab; label: string; count: number }[] = [
+    { key: "todos",     label: "Todos",     count: countTodos     },
+    { key: "oficios",   label: "Oficios",   count: countOficios   },
+    { key: "comercios", label: "Comercios", count: countComercios },
+    { key: "productos", label: "Productos", count: countProductos },
+    { key: "medicos",   label: "Médicos",   count: countMedicos   },
+  ];
+  const tabs = allTabs.filter(t => t.key === "todos" || t.count > 0 || (loadingProducts && t.key === "productos"));
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
