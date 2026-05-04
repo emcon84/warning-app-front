@@ -126,19 +126,19 @@ export default function ParaComerciosPage() {
               Registra tu comercio en minutos y tene tu vidriera digital gratuita. Catalogo de productos, contacto por WhatsApp y un cartel QR listo para imprimir.
             </p>
             <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
-              <Link
+              <a
                 href="/comercio/nuevo"
                 className="inline-flex items-center gap-2 px-7 py-4 bg-amber-500 hover:bg-amber-400 text-gray-950 font-black rounded-2xl transition-colors text-sm"
               >
                 Registrar mi comercio gratis
                 <ChevronRight className="w-4 h-4" />
-              </Link>
-              <Link
+              </a>
+              <a
                 href="/comercios"
                 className="inline-flex items-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-2xl transition-colors text-sm"
               >
                 Ver directorio
-              </Link>
+              </a>
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-600 mt-4">100% gratuito para empezar. Sin tarjeta de credito.</p>
           </div>
