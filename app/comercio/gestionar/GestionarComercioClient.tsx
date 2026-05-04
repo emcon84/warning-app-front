@@ -1680,27 +1680,27 @@ function PlanModal({
     {
       id: "premium",
       name: "Premium",
-      price: "U$20/mes",
+      price: "U$5/mes",
       features: [
         "Hasta 100 productos",
         "20 fotos con IA por día",
         "Perfil destacado",
         "Posición preferente",
-        "Banner personalizado",
+        "Más visibilidad en el listado",
       ],
       popular: true,
     },
     {
       id: "master",
       name: "Master",
-      price: "Consultar",
+      price: "U$10/mes",
       features: [
         "Productos ilimitados",
         "IA ilimitada",
         "Perfil premium",
-        "Posición primera",
+        "Posición primera garantizada",
+        "Insignia Founder permanente",
         "Soporte prioritario",
-        "Herramientas exclusivas",
       ],
     },
   ];

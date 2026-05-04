@@ -3,7 +3,7 @@ import Link from "next/link";
 import {
   Store, ChevronRight, QrCode, Star, MessageCircle,
   Package, MapPin, Phone, Clock, Tag,
-  BarChart3, Users, Smartphone,
+  BarChart3, Users, Smartphone, Check,
 } from "lucide-react";
 import LandingThemeToggle from "../components/LandingThemeToggle";
 
@@ -285,6 +285,124 @@ export default function ParaComerciosPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Planes */}
+      <section className="max-w-6xl mx-auto px-4 py-20">
+        <div className="text-center mb-12">
+          <p className="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3">Planes y precios</p>
+          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">Simple y transparente</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-4 max-w-xl mx-auto">Empeza gratis hoy mismo. Cuando tu comercio crezca, pasate a un plan superior con un mensaje de WhatsApp.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+
+          {/* Gratis */}
+          <div className="flex flex-col rounded-3xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-7">
+            <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mb-1">Gratis</p>
+            <div className="flex items-end gap-1 mb-1">
+              <span className="text-4xl font-black text-gray-900 dark:text-white">$0</span>
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-600 mb-7">Para siempre</p>
+            <ul className="space-y-3 flex-1">
+              {[
+                "Perfil completo del comercio",
+                "Hasta 50 productos en el catálogo",
+                "Contacto directo por WhatsApp",
+                "Kit QR para la vidriera",
+                "2 análisis con IA por día",
+                "Posición estándar en el listado",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400">
+                  <Check className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/comercio/nuevo"
+              className="mt-8 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+            >
+              Empezar gratis
+            </Link>
+          </div>
+
+          {/* Premium — destacado */}
+          <div className="flex flex-col rounded-3xl border-2 border-indigo-500 bg-indigo-600 p-7 relative shadow-xl shadow-indigo-500/25">
+            <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[11px] font-black px-3 py-1 rounded-full bg-white text-indigo-600 shadow-sm whitespace-nowrap">
+              ✦ Más popular
+            </span>
+            <p className="text-sm font-bold text-indigo-200 mb-1">Premium</p>
+            <div className="flex items-end gap-1 mb-1">
+              <span className="text-4xl font-black text-white">U$5</span>
+              <span className="text-indigo-300 text-sm mb-1.5">/mes</span>
+            </div>
+            <p className="text-xs text-indigo-300 mb-7">Cancelás cuando quieras</p>
+            <ul className="space-y-3 flex-1">
+              {[
+                "Todo lo del plan Gratis",
+                "Hasta 100 productos en el catálogo",
+                "20 análisis con IA por día",
+                "5 imágenes de catálogo IA por día",
+                "Posición preferente en el listado",
+                "Más visibilidad en Destacados",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2.5 text-sm text-indigo-100">
+                  <Check className="w-4 h-4 text-indigo-300 shrink-0 mt-0.5" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <a
+              href={`https://wa.me/543482445015?text=${encodeURIComponent("Hola! Quiero activar el plan Premium para mi comercio en Reportes Reconquista.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-sm bg-white text-indigo-600 hover:bg-indigo-50 transition-colors"
+            >
+              Activar Premium
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+
+          {/* Master */}
+          <div className="flex flex-col rounded-3xl border border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/10 p-7">
+            <p className="text-sm font-bold text-amber-600 dark:text-amber-400 mb-1">Master · Founder</p>
+            <div className="flex items-end gap-1 mb-1">
+              <span className="text-4xl font-black text-gray-900 dark:text-white">U$10</span>
+              <span className="text-gray-400 text-sm mb-1.5">/mes</span>
+            </div>
+            <p className="text-xs text-amber-600 dark:text-amber-500 mb-7">★ Insignia permanente</p>
+            <ul className="space-y-3 flex-1">
+              {[
+                "Todo lo del plan Premium",
+                "Productos ilimitados",
+                "IA ilimitada todos los días",
+                "Posición primera garantizada",
+                "Insignia Founder permanente",
+                "Soporte prioritario por WhatsApp",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400">
+                  <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <a
+              href={`https://wa.me/543482445015?text=${encodeURIComponent("Hola! Quiero activar el plan Master para mi comercio en Reportes Reconquista.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 flex items-center justify-center gap-2 w-full py-3 rounded-2xl font-bold text-sm bg-amber-500 hover:bg-amber-400 text-gray-950 transition-colors"
+            >
+              Activar Master
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+
+        </div>
+
+        <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-8">
+          Todos los planes se activan vía WhatsApp en minutos. Sin tarjeta de crédito.
+        </p>
       </section>
 
       {/* CTA final */}
