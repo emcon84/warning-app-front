@@ -28,13 +28,55 @@ interface Props {
   supermarkets: Supermarket[];
 }
 
-const QUICK_ACCESS = [
-  { label: "Oficios",    href: "/oficios", Icon: Wrench,       color: "bg-blue-500/15 text-blue-500"   },
-  { label: "Médicos",    href: "/medicos",        Icon: Stethoscope,  color: "bg-red-500/15 text-red-500"     },
-  { label: "Farmacias",  href: "/app?view=farmacias", Icon: Pill,      color: "bg-green-500/15 text-green-500" },
-  { label: "Comercios",  href: "/comercios",      Icon: Store,        color: "bg-purple-500/15 text-purple-500"},
-  { label: "Ofertas",    href: "/ofertas",         Icon: ShoppingCart, color: "bg-amber-500/15 text-amber-500" },
-  { label: "Mapa",       href: "/app",            Icon: Map,          color: "bg-sky-500/15 text-sky-500"     },
+const SECTION_BANNERS = [
+  {
+    label: "Oficios",
+    sub: "Plomeros, electricistas y más",
+    href: "/oficios",
+    Icon: Wrench,
+    gradient: "from-blue-600 to-indigo-700",
+    glow: "shadow-blue-500/30",
+  },
+  {
+    label: "Comercios",
+    sub: "Catálogos y ofertas locales",
+    href: "/comercios",
+    Icon: Store,
+    gradient: "from-amber-500 to-orange-600",
+    glow: "shadow-amber-500/30",
+  },
+  {
+    label: "Médicos",
+    sub: "IAPOS, PAMI y más",
+    href: "/medicos",
+    Icon: Stethoscope,
+    gradient: "from-cyan-500 to-blue-600",
+    glow: "shadow-cyan-500/30",
+  },
+  {
+    label: "Ofertas",
+    sub: "Supermercados de Reconquista",
+    href: "/ofertas",
+    Icon: ShoppingCart,
+    gradient: "from-yellow-400 to-orange-500",
+    glow: "shadow-yellow-500/30",
+  },
+  {
+    label: "Farmacias",
+    sub: "Turno de hoy",
+    href: "/app?view=farmacias",
+    Icon: Pill,
+    gradient: "from-green-500 to-emerald-600",
+    glow: "shadow-green-500/30",
+  },
+  {
+    label: "Mapa",
+    sub: "Reportes en tiempo real",
+    href: "/app",
+    Icon: Map,
+    gradient: "from-slate-500 to-gray-700",
+    glow: "shadow-slate-500/30",
+  },
 ] as const;
 
 const HOGAR_CATS = [
@@ -240,6 +282,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
   const greeting = user?.firstName ? `¡Hola, ${user.firstName}!` : "¡Hola, Bienvenido!";
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [recentProductos, setRecentProductos] = useState<{ id: string; nombre: string; tipo: string; precio?: string; foto?: string; comercio: { nombre: string; slug: string; logo?: string; foto?: string } }[]>([]);
   const [proSlide, setProSlide] = useState(0);
   const [proDir, setProDir] = useState(1);
   const [comercioSlide, setComercioSlide] = useState(0);
@@ -250,10 +293,14 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
   useEffect(() => {
     fetch("https://api.open-meteo.com/v1/forecast?latitude=-29.15&longitude=-59.64&current=temperature_2m,weather_code&timezone=America/Argentina/Buenos_Aires")
       .then(r => r.json())
-      .then(d => setWeather({
-        temp: Math.round(d.current.temperature_2m),
-        condition: codeToCondition(d.current.weather_code),
-      }))
+      .then(d => setWeather({ temp: Math.round(d.current.temperature_2m), condition: codeToCondition(d.current.weather_code) }))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/productos/recientes?limit=16`)
+      .then(r => r.json())
+      .then(d => Array.isArray(d) && setRecentProductos(d))
       .catch(() => {});
   }, []);
 
@@ -357,28 +404,105 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-32">
 
-        {/* ── 3. Accesos rápidos ────────────────────────────────────────── */}
+        {/* ── 3. Banners de secciones ───────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1, ease: "easeOut" }}
-          className="mb-8"
+          className="mb-6 -mx-4 px-4 overflow-x-auto scrollbar-hide"
         >
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {QUICK_ACCESS.map(({ label, href, Icon, color }) => (
+          <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
+            {SECTION_BANNERS.map(({ label, sub, href, Icon, gradient, glow }) => (
               <Link
                 key={label}
                 href={href}
-                className={`flex flex-col items-center gap-2 p-3 rounded-2xl border text-center transition-all active:scale-[0.97] ${cardBg} ${isDark ? "hover:border-gray-700" : "hover:border-gray-300"}`}
+                className={`flex-shrink-0 w-40 h-[108px] rounded-2xl bg-gradient-to-br ${gradient} shadow-lg ${glow} flex flex-col justify-between p-4 transition-transform active:scale-[0.97] hover:scale-[1.02]`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
-                  <Icon className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
-                <span className={`text-xs font-semibold ${textPrimary}`}>{label}</span>
+                <div>
+                  <p className="text-white font-black text-sm leading-tight">{label}</p>
+                  <p className="text-white/70 text-[10px] mt-0.5 leading-snug">{sub}</p>
+                </div>
               </Link>
             ))}
           </div>
         </motion.div>
+
+        {/* ── 4. Novedades — productos recientes + promo comercios ───────── */}
+        {recentProductos.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.15, ease: "easeOut" }}
+            className="mb-8"
+          >
+            <p className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+              Novedades
+            </p>
+            <div className="-mx-4 px-4 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
+
+                {/* Banner "Sumá tu comercio" — siempre primero */}
+                <Link
+                  href="/para-comercios"
+                  className="flex-shrink-0 w-44 rounded-2xl overflow-hidden relative shadow-lg"
+                  style={{ height: 180 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-600" />
+                  <div className="absolute inset-0 flex flex-col justify-between p-4">
+                    <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                      <Store className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-black text-sm leading-tight">¿Tenés un comercio?</p>
+                      <p className="text-white/80 text-[10px] mt-1 leading-snug">Mostralo en Reconquista. Gratis.</p>
+                      <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-white/20 px-2 py-1 rounded-full">
+                        Registrate →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Productos reales */}
+                {recentProductos.map((p) => {
+                  const foto = p.foto ? (p.foto.startsWith("/uploads/") ? `${API_URL}${p.foto}` : p.foto) : null;
+                  const logo = (p.comercio.logo || p.comercio.foto)
+                    ? ((p.comercio.logo || p.comercio.foto)!.startsWith("/uploads/") ? `${API_URL}${p.comercio.logo || p.comercio.foto}` : (p.comercio.logo || p.comercio.foto))
+                    : null;
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/comercio/${p.comercio.slug}`}
+                      className={`flex-shrink-0 w-36 rounded-2xl border overflow-hidden flex flex-col transition-transform active:scale-[0.97] hover:scale-[1.02] ${cardBg}`}
+                      style={{ height: 180 }}
+                    >
+                      <div className={`w-full flex-1 flex items-center justify-center ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+                        {foto
+                          ? <img src={foto} alt={p.nombre} className="w-full h-full object-cover" />
+                          : <ShoppingCart className={`w-7 h-7 ${isDark ? "text-gray-600" : "text-gray-300"}`} />
+                        }
+                      </div>
+                      <div className="p-2.5 flex-shrink-0">
+                        <p className={`text-[11px] font-bold line-clamp-2 leading-snug ${isDark ? "text-white" : "text-gray-900"}`}>{p.nombre}</p>
+                        {p.precio && <p className="text-[11px] font-black text-green-500 mt-0.5">{p.precio}</p>}
+                        <div className="flex items-center gap-1 mt-1.5">
+                          {logo
+                            ? <img src={logo} alt="" className="w-3.5 h-3.5 rounded-full object-cover flex-shrink-0" />
+                            : <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 flex items-center justify-center text-[7px] font-black ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-600"}`}>{p.comercio.nombre[0]}</div>
+                          }
+                          <p className={`text-[9px] truncate ${isDark ? "text-gray-500" : "text-gray-400"}`}>{p.comercio.nombre}</p>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* ── 4. Farmacia de turno ──────────────────────────────────────── */}
         {turno && turno.farmacias.length > 0 && (
