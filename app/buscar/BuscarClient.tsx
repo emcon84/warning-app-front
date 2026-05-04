@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -11,6 +11,7 @@ import {
   Star,
   ChevronLeft,
   Stethoscope,
+  ShoppingBag,
 } from "lucide-react";
 import { Professional, Comercio, Doctor } from "../types";
 import Navbar from "../components/Navbar";
@@ -24,6 +25,16 @@ function photoUrl(url?: string | null): string | null {
   return url.startsWith("/uploads/") ? `${API_URL}${url}` : url;
 }
 
+interface SearchProducto {
+  id: string;
+  nombre: string;
+  tipo: string;
+  descripcion?: string;
+  precio?: string;
+  foto?: string;
+  comercio: { nombre: string; slug: string; logo?: string; foto?: string; rubro: string };
+}
+
 interface Props {
   professionals: Professional[];
   comercios: Comercio[];
@@ -31,16 +42,19 @@ interface Props {
   initialQuery: string;
 }
 
-type Tab = "todos" | "oficios" | "comercios" | "medicos";
+type Tab = "todos" | "oficios" | "comercios" | "medicos" | "productos";
 
-const SUGGESTIONS = ["plomero", "electricista", "médico IAPOS", "farmacia", "kinesiólogo", "carpintero"];
+const SUGGESTIONS = ["plomero", "electricista", "médico IAPOS", "desarrollo web", "tienda online", "carpintero", "kinesiólogo", "farmacia"];
 
 export default function BuscarClient({ professionals, comercios, doctors, initialQuery }: Props) {
   const router = useRouter();
   const { isDark } = useTheme();
   const [query, setQuery] = useState(initialQuery);
   const [tab, setTab] = useState<Tab>("todos");
+  const [productResults, setProductResults] = useState<SearchProducto[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const bg          = isDark ? "bg-gray-950"   : "bg-gray-50";
   const textPrimary = isDark ? "text-white"    : "text-gray-900";
@@ -49,9 +63,24 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
   const cardBg      = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
 
   // Auto-focus input on mount
-  useEffect(() => {
-    inputRef.current?.focus();
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  // Buscar productos en el servidor con debounce
+  const fetchProductos = useCallback((q: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (q.trim().length < 2) { setProductResults([]); return; }
+    debounceRef.current = setTimeout(async () => {
+      setLoadingProducts(true);
+      try {
+        const res = await fetch(`${API_URL}/api/productos/buscar?q=${encodeURIComponent(q.trim())}`);
+        const data = await res.json();
+        setProductResults(Array.isArray(data) ? data : []);
+      } catch { setProductResults([]); }
+      finally { setLoadingProducts(false); }
+    }, 300);
   }, []);
+
+  useEffect(() => { fetchProductos(query); }, [query, fetchProductos]);
 
   // ── Filtering logic ───────────────────────────────────────────────────────
   const q = query.toLowerCase().trim();
@@ -95,20 +124,23 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
   const countOficios   = filteredProfessionals.length;
   const countComercios = filteredComercios.length;
   const countMedicos   = filteredDoctors.length;
-  const countTodos     = countOficios + countComercios + countMedicos;
+  const countProductos = productResults.length;
+  const countTodos     = countOficios + countComercios + countMedicos + countProductos;
 
   // ── Tab visibility helpers ────────────────────────────────────────────────
   const showProfessionals = tab === "todos" || tab === "oficios";
   const showComercios     = tab === "todos" || tab === "comercios";
   const showMedicos       = tab === "todos" || tab === "medicos";
+  const showProductos     = tab === "todos" || tab === "productos";
 
   // ── Tab pills config ──────────────────────────────────────────────────────
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: "todos",     label: "Todos",     count: countTodos     },
-    { key: "oficios",   label: "Oficios",   count: countOficios   },
-    { key: "comercios", label: "Comercios", count: countComercios },
-    { key: "medicos",   label: "Médicos",   count: countMedicos   },
-  ];
+    { key: "todos",     label: "Todos",              count: countTodos     },
+    { key: "oficios",   label: "Oficios",            count: countOficios   },
+    { key: "comercios", label: "Comercios",          count: countComercios },
+    { key: "productos", label: "Productos",          count: countProductos },
+    { key: "medicos",   label: "Médicos",            count: countMedicos   },
+  ].filter(t => t.key === "todos" || t.count > 0 || loadingProducts && t.key === "productos");
 
   return (
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
@@ -203,7 +235,7 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
         )}
 
         {/* ── No results ─────────────────────────────────────────────────── */}
-        {q !== "" && countTodos === 0 && (
+        {q !== "" && countTodos === 0 && !loadingProducts && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -216,7 +248,7 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
         )}
 
         {/* ── Results ────────────────────────────────────────────────────── */}
-        {q !== "" && countTodos > 0 && (
+        {q !== "" && (countTodos > 0 || loadingProducts) && (
           <div className="space-y-1">
 
             {/* Profesionales / Oficios */}
@@ -400,6 +432,69 @@ export default function BuscarClient({ professionals, comercios, doctors, initia
                     className="text-xs text-blue-500 mt-1 px-1"
                   >
                     Ver los {filteredDoctors.length} resultados
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* Productos y Servicios */}
+            {showProductos && (loadingProducts || productResults.length > 0) && (
+              <>
+                {tab === "todos" && (
+                  <p className={`text-xs font-bold uppercase tracking-wide mt-4 mb-2 ${textMuted}`}>
+                    Productos y Servicios
+                  </p>
+                )}
+                {loadingProducts && productResults.length === 0 && (
+                  <div className="flex gap-2 items-center px-1 py-2">
+                    <div className={`w-4 h-4 rounded-full border-2 border-t-transparent animate-spin ${isDark ? "border-gray-500" : "border-gray-400"}`} />
+                    <span className={`text-xs ${textMuted}`}>Buscando productos...</span>
+                  </div>
+                )}
+                {(tab === "todos" ? productResults.slice(0, 5) : productResults).map((p) => {
+                  const foto = photoUrl(p.foto);
+                  const logo = photoUrl(p.comercio.logo || p.comercio.foto);
+                  const esServicio = p.tipo === "servicio";
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/comercio/${p.comercio.slug}`}
+                      className={`flex items-center gap-3 p-3 rounded-2xl border transition-all active:scale-[0.98] ${cardBg} ${isDark ? "hover:border-gray-700" : "hover:border-gray-300"}`}
+                    >
+                      {/* Thumbnail */}
+                      <div className={`w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+                        {foto
+                          ? <img src={foto} alt={p.nombre} className="w-full h-full object-cover" />
+                          : <ShoppingBag className={`w-5 h-5 ${esServicio ? (isDark ? "text-blue-400" : "text-blue-500") : (isDark ? "text-amber-400" : "text-amber-500")}`} />
+                        }
+                      </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className={`text-sm font-semibold truncate ${textPrimary}`}>{p.nombre}</p>
+                          <span className={`flex-shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md capitalize ${esServicio ? (isDark ? "bg-blue-500/15 text-blue-400" : "bg-blue-50 text-blue-600") : (isDark ? "bg-amber-500/15 text-amber-400" : "bg-amber-50 text-amber-600")}`}>
+                            {p.tipo}
+                          </span>
+                        </div>
+                        {p.precio && <p className="text-xs font-bold text-green-500">{p.precio}</p>}
+                        {p.descripcion && !p.precio && (
+                          <p className={`text-xs truncate ${textSec}`}>{p.descripcion}</p>
+                        )}
+                        {/* Comercio */}
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {logo
+                            ? <img src={logo} alt="" className="w-3.5 h-3.5 rounded-full object-cover flex-shrink-0" />
+                            : <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 flex items-center justify-center text-[7px] font-black ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-600"}`}>{p.comercio.nombre[0]}</div>
+                          }
+                          <span className={`text-xs truncate ${isDark ? "text-purple-400" : "text-purple-600"}`}>{p.comercio.nombre}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+                {tab === "todos" && productResults.length > 5 && (
+                  <button onClick={() => setTab("productos")} className="text-xs text-blue-500 mt-1 px-1">
+                    Ver los {productResults.length} resultados
                   </button>
                 )}
               </>
