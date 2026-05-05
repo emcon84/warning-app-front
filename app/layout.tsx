@@ -11,6 +11,8 @@ import SplashScreen from "./components/SplashScreen";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ViewTransitions } from "next-view-transitions";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { CartProvider } from "./contexts/CartContext";
+import CartDrawer from "./components/CartDrawer";
 import { dark } from "@clerk/themes";
 import { esES } from "@clerk/localizations";
 
@@ -117,12 +119,15 @@ export default function RootLayout({
             <ApiStatusBanner />
             <PWARedirect />
             <ThemeProvider>
-              <SplashScreen />
-              {children}
-              <PostLoginWizard />
-              <MobileBottomNav />
-              <NotificationPrompt />
-              <PWAInstallPrompt />
+              <CartProvider>
+                <SplashScreen />
+                {children}
+                <CartDrawer />
+                <PostLoginWizard />
+                <MobileBottomNav />
+                <NotificationPrompt />
+                <PWAInstallPrompt />
+              </CartProvider>
             </ThemeProvider>
           </ViewTransitions>
         </body>
