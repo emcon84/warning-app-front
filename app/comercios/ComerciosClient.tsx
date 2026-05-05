@@ -25,7 +25,7 @@ import Link from "next/link";
 import { Comercio } from "../types";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
-import { Store, MapPin, Search, X, ChevronRight, Plus, Tag } from "lucide-react";
+import { Store, MapPin, Search, X, ChevronRight, Plus, Tag, ShoppingCart } from "lucide-react";
 
 interface Props { comercios: Comercio[] }
 
@@ -367,6 +367,14 @@ export default function ComerciosClient({ comercios }: Props) {
         <div className="mb-4 mt-2">
           <p className={`text-sm ${textMuted}`}>
             {filtered.length} comercios disponibles
+          </p>
+        </div>
+
+        {/* Feature banner */}
+        <div className={`mb-4 rounded-xl px-4 py-3 flex items-center gap-3 ${isDark ? "bg-amber-500/10 border border-amber-500/20" : "bg-amber-50 border border-amber-200"}`}>
+          <ShoppingCart className={`w-4 h-4 flex-shrink-0 ${isDark ? "text-amber-400" : "text-amber-600"}`} />
+          <p className={`text-xs font-semibold flex-1 ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+            Nuevo: arma tu pedido y mandalo por WhatsApp directamente desde el perfil del comercio
           </p>
         </div>
 

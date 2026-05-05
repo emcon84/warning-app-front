@@ -430,6 +430,25 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
           </div>
         </motion.div>
 
+        {/* WhatsApp Orders Feature Banner */}
+        <section className="px-0 mb-6">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-5">
+            <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 50%, white 0%, transparent 60%)" }} />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                <ShoppingCart className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-white text-base leading-tight">Pedi en tus locales favoritos</p>
+                <p className="text-amber-100 text-xs mt-0.5 leading-snug">Arma tu pedido y mandalo directo al WhatsApp del comercio</p>
+              </div>
+              <Link href="/comercios" className="flex-shrink-0 px-3 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl transition-colors">
+                Ver comercios
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* ── 4. Novedades — productos recientes + promo comercios ───────── */}
         {recentProductos.length > 0 && (
           <motion.div
