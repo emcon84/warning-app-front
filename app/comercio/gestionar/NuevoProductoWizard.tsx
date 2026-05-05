@@ -109,7 +109,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
       if (descripcion) fd.append("descripcion", descripcion);
       if (precio) fd.append("precio", precio);
       if (stock) fd.append("stock", stock);
-      if (photoFile) fd.append("foto", photoFile);
+      if (photoFile) fd.append("photo", photoFile);
       else if (aiGenUrl) fd.append("generatedPhotoUrl", aiGenUrl);
 
       const res = await fetch(`${API}/api/comercios/me/productos`, {
