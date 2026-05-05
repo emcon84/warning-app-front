@@ -40,8 +40,12 @@ function darken(r: number, g: number, b: number, factor: number): string {
   );
 }
 
+function rgba(r: number, g: number, b: number, a: number): string {
+  return `rgba(${r},${g},${b},${a})`;
+}
+
 async function getDominantColor(imageUrl: string): Promise<[number, number, number]> {
-  const FALLBACK: [number, number, number] = [120, 53, 15]; // amber
+  const FALLBACK: [number, number, number] = [120, 53, 15];
   try {
     const fetchUrl = imageUrl.includes("r2.dev") || /\.(webp|avif)$/i.test(imageUrl)
       ? `https://images.weserv.nl/?url=${encodeURIComponent(imageUrl)}&output=jpg&w=80&q=80`
@@ -54,14 +58,13 @@ async function getDominantColor(imageUrl: string): Promise<[number, number, numb
       .removeAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
-
     const buckets: Record<string, number> = {};
     for (let i = 0; i < data.length; i += 3) {
       const r = data[i], g = data[i + 1], b = data[i + 2];
       const brightness = (r + g + b) / 3;
       if (brightness < 25 || brightness > 225) continue;
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
-      if (max - min < 35) continue; // skip low-saturation (grey) pixels
+      if (max - min < 35) continue;
       const key = `${Math.floor(r / 32)},${Math.floor(g / 32)},${Math.floor(b / 32)}`;
       buckets[key] = (buckets[key] || 0) + 1;
     }
@@ -96,86 +99,228 @@ export async function GET(req: NextRequest) {
   const precioFormateado = precioNum ? `$ ${precioNum.toLocaleString("es-AR")}` : "";
   const isServicio = tipo === "servicio";
 
-  const bg1 = darken(dr, dg, db, 0.12);
-  const bg2 = darken(dr, dg, db, 0.32);
-  const bg3 = darken(dr, dg, db, 0.50);
-  const accentHex = toHex(dr, dg, db);
+  const bg1 = darken(dr, dg, db, 0.10);
+  const bg2 = darken(dr, dg, db, 0.28);
+  const bg3 = darken(dr, dg, db, 0.45);
+  const accent = toHex(dr, dg, db);
   const accentLight = toHex(
-    Math.min(255, Math.floor(dr * 1.3 + 40)),
-    Math.min(255, Math.floor(dg * 1.3 + 40)),
-    Math.min(255, Math.floor(db * 1.3 + 40)),
+    Math.min(255, Math.floor(dr * 1.4 + 50)),
+    Math.min(255, Math.floor(dg * 1.4 + 50)),
+    Math.min(255, Math.floor(db * 1.4 + 50)),
   );
+  const orb1 = rgba(dr, dg, db, 0.28);
+  const orb2 = rgba(
+    Math.min(255, Math.floor(dr * 1.2 + 30)),
+    Math.min(255, Math.floor(dg * 1.2 + 30)),
+    Math.min(255, Math.floor(db * 1.2 + 30)),
+    0.15,
+  );
+  const logoInitial = (comercioNombre[0] ?? "C").toUpperCase();
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: `${W}px`, height: `${H}px`,
-          background: `linear-gradient(160deg, ${bg1} 0%, ${bg2} 30%, ${bg3} 60%, ${bg1} 100%)`,
-          display: "flex", flexDirection: "column", alignItems: "center",
-          fontFamily: "system-ui, sans-serif", position: "relative", overflow: "hidden",
+          width: `${W}px`,
+          height: `${H}px`,
+          background: `linear-gradient(160deg, ${bg1} 0%, ${bg2} 35%, ${bg3} 65%, ${bg1} 100%)`,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          fontFamily: "system-ui, sans-serif",
+          position: "relative",
         }}
       >
-        {/* Orbes decorativos */}
-        <div style={{ position: "absolute", top: "-180px", right: "-180px", width: "600px", height: "600px", borderRadius: "50%", background: `radial-gradient(circle, ${accentHex}40 0%, transparent 65%)`, display: "flex" }} />
-        <div style={{ position: "absolute", bottom: "220px", left: "-140px", width: "480px", height: "480px", borderRadius: "50%", background: `radial-gradient(circle, ${accentLight}25 0%, transparent 65%)`, display: "flex" }} />
+        {/* Orb top-right */}
+        <div
+          style={{
+            position: "absolute",
+            top: -160,
+            right: -160,
+            width: 580,
+            height: 580,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${orb1} 0%, transparent 65%)`,
+            display: "flex",
+          }}
+        />
+        {/* Orb bottom-left */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 200,
+            left: -120,
+            width: 460,
+            height: 460,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${orb2} 0%, transparent 65%)`,
+            display: "flex",
+          }}
+        />
 
-        {/* Header comercio */}
-        <div style={{ display: "flex", alignItems: "center", gap: "32px", width: "100%", padding: "80px 72px 48px" }}>
-          {logoData
-            ? <img src={logoData} width={110} height={110} style={{ borderRadius: "50%", objectFit: "cover", border: `5px solid ${accentHex}90` }} />
-            : <div style={{ width: 110, height: 110, borderRadius: "50%", background: `${accentHex}25`, border: `5px solid ${accentHex}60`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ color: accentLight, fontSize: "52px", fontWeight: 800 }}>{(comercioNombre[0] ?? "C").toUpperCase()}</span>
-              </div>
-          }
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <span style={{ color: `${accentLight}aa`, fontSize: "26px", fontWeight: 500 }}>catalogo de</span>
-            <span style={{ color: "#ffffff", fontSize: "46px", fontWeight: 800, lineHeight: 1.1, maxWidth: "750px" }}>{comercioNombre}</span>
+        {/* Comercio header */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 32,
+            width: "100%",
+            padding: "80px 72px 48px",
+          }}
+        >
+          {logoData ? (
+            <img
+              src={logoData}
+              width={110}
+              height={110}
+              style={{ borderRadius: "50%", objectFit: "cover" }}
+            />
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 110,
+                height: 110,
+                borderRadius: "50%",
+                background: rgba(dr, dg, db, 0.25),
+                border: `5px solid ${rgba(dr, dg, db, 0.6)}`,
+              }}
+            >
+              <span style={{ color: accentLight, fontSize: 52, fontWeight: 800 }}>
+                {logoInitial}
+              </span>
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <span style={{ color: rgba(255, 255, 255, 0.5), fontSize: 26, fontWeight: 500 }}>
+              catalogo de
+            </span>
+            <span style={{ color: "#ffffff", fontSize: 46, fontWeight: 800, lineHeight: 1.1 }}>
+              {comercioNombre}
+            </span>
           </div>
         </div>
 
         {/* Foto hero */}
-        <div style={{
-          width: "936px", height: "1000px",
-          borderRadius: "48px", overflow: "hidden",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          background: `${accentHex}18`,
-          border: `2px solid ${accentHex}30`,
-          boxShadow: `0 40px 120px rgba(0,0,0,0.75), 0 0 0 1px ${accentHex}20`,
-          position: "relative",
-        }}>
-          {fotoData
-            ? <img src={fotoData} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            : <span style={{ color: `${accentHex}60`, fontSize: "44px", fontWeight: 600 }}>Sin foto</span>
-          }
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 936,
+            height: 980,
+            borderRadius: 48,
+            overflow: "hidden",
+            background: rgba(dr, dg, db, 0.15),
+            border: `2px solid ${rgba(dr, dg, db, 0.3)}`,
+            position: "relative",
+          }}
+        >
+          {fotoData ? (
+            <img
+              src={fotoData}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : (
+            <span style={{ color: rgba(dr, dg, db, 0.5), fontSize: 44, fontWeight: 600 }}>
+              Sin foto
+            </span>
+          )}
           {isServicio && (
-            <div style={{ position: "absolute", top: "32px", left: "32px", background: "linear-gradient(90deg,#7c3aed,#8b5cf6)", borderRadius: "20px", padding: "16px 36px", display: "flex" }}>
-              <span style={{ color: "#fff", fontSize: "36px", fontWeight: 800, letterSpacing: "1px" }}>SERVICIO</span>
+            <div
+              style={{
+                position: "absolute",
+                top: 32,
+                left: 32,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(90deg,#7c3aed,#8b5cf6)",
+                borderRadius: 20,
+                padding: "16px 36px",
+              }}
+            >
+              <span style={{ color: "#fff", fontSize: 36, fontWeight: 800, letterSpacing: 1 }}>
+                SERVICIO
+              </span>
             </div>
           )}
         </div>
 
         {/* Nombre */}
-        <div style={{ width: "100%", padding: "56px 72px 0" }}>
-          <span style={{ color: "#ffffff", fontSize: "88px", fontWeight: 900, lineHeight: 1.05, display: "flex" }}>{nombre}</span>
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            padding: "52px 72px 0",
+          }}
+        >
+          <span style={{ color: "#ffffff", fontSize: 86, fontWeight: 900, lineHeight: 1.05 }}>
+            {nombre}
+          </span>
         </div>
 
         {/* Precio */}
-        {precioFormateado
-          ? <div style={{ background: accentHex, borderRadius: "999px", padding: "28px 80px", margin: "40px 0 0", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 16px 48px ${accentHex}60` }}>
-              <span style={{ color: "#000000", fontSize: "112px", fontWeight: 900, lineHeight: 1 }}>{precioFormateado}</span>
-            </div>
-          : <div style={{ height: "40px" }} />
-        }
+        {precioFormateado ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: accent,
+              borderRadius: 999,
+              padding: "28px 80px",
+              marginTop: 40,
+            }}
+          >
+            <span style={{ color: "#000000", fontSize: 108, fontWeight: 900, lineHeight: 1 }}>
+              {precioFormateado}
+            </span>
+          </div>
+        ) : (
+          <div style={{ display: "flex", height: 40 }} />
+        )}
 
         {/* Footer */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "44px 0 52px", gap: "16px", marginTop: "auto" }}>
-          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#ffffff30", display: "flex" }} />
-          <span style={{ color: "#ffffff55", fontSize: "30px", fontWeight: 600, letterSpacing: "0.5px" }}>reportesreconquista.com</span>
-          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#ffffff30", display: "flex" }} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 16,
+            marginTop: "auto",
+            paddingBottom: 52,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: rgba(255, 255, 255, 0.25),
+            }}
+          />
+          <span style={{ color: rgba(255, 255, 255, 0.4), fontSize: 30, fontWeight: 600 }}>
+            reportesreconquista.com
+          </span>
+          <div
+            style={{
+              display: "flex",
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: rgba(255, 255, 255, 0.25),
+            }}
+          />
         </div>
       </div>
     ),
-    { width: W, height: H, headers: NO_CACHE }
+    { width: W, height: H, headers: NO_CACHE },
   );
 }
