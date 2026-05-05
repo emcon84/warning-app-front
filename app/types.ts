@@ -220,6 +220,7 @@ export interface Producto {
   precio?: string | null;
   foto?: string | null;
   activo: boolean;
+  stock?: number | null;
   createdAt: string;
 }
 
@@ -243,6 +244,9 @@ export interface Comercio {
   recommendations?: number;
   ratingAvg?: number;
   ratingCount?: number;
+  aceptaEnvios?: boolean;
+  zonaEnvio?: string | null;
+  costoEnvio?: string | null;
   createdAt: string;
   offers?: ComercioOffer[];
   productos?: Producto[];
