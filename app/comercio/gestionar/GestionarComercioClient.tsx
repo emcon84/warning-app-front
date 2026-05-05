@@ -310,6 +310,7 @@ function ProductoModal({
   const [tipo, setTipo] = useState<"producto" | "servicio">(editing?.tipo ?? "producto");
   const [descripcion, setDescripcion] = useState(editing?.descripcion ?? "");
   const [precio, setPrecio] = useState(editing?.precio ?? "");
+  const [stock, setStock] = useState<string>(editing?.stock?.toString() ?? "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(editing?.foto ? photoUrl(editing.foto) : null);
   const [clearPhoto, setClearPhoto] = useState(false);
@@ -447,6 +448,7 @@ function ProductoModal({
       fd.append("tipo", tipo);
       if (descripcion.trim()) fd.append("descripcion", descripcion.trim());
       if (precio.trim()) fd.append("precio", precio.trim());
+      if (stock !== "") fd.append("stock", stock);
       if (photoFile) fd.append("photo", photoFile);
       else if (aiGeneratedUrl) fd.append("generatedPhotoUrl", aiGeneratedUrl);
       if (clearPhoto && !photoFile && !aiGeneratedUrl) fd.append("clearPhoto", "1");
@@ -549,6 +551,18 @@ function ProductoModal({
           <div>
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Precio</label>
             <input value={precio} onChange={(e) => setPrecio(e.target.value)} placeholder="Ej: $1.500" className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`} />
+          </div>
+          <div>
+            <label className={`text-xs mb-1.5 block ${labelCls}`}>Stock disponible</label>
+            <input
+              type="number"
+              min="0"
+              placeholder="Sin limite"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              className={`w-full px-3 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
+            />
+            <p className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-400"}`}>Dejar vacio para producto sin limite de stock</p>
           </div>
           <div>
             <label className={`text-xs mb-1.5 block ${labelCls}`}>Foto del producto</label>
@@ -663,6 +677,9 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const [savingDatos, setSavingDatos] = useState(false);
   const [datosSaved, setDatosSaved] = useState(false);
   const [datosError, setDatosError] = useState("");
+  const [aceptaEnvios, setAceptaEnvios] = useState(comercio.aceptaEnvios ?? false);
+  const [zonaEnvio, setZonaEnvio] = useState(comercio.zonaEnvio ?? "");
+  const [costoEnvio, setCostoEnvio] = useState(comercio.costoEnvio ?? "");
 
   // Fotos
   const [newLogoFile, setNewLogoFile] = useState<File | null>(null);
@@ -704,6 +721,9 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       fd.append("direccion", form.direccion.trim());
       fd.append("horario", form.horario.trim());
       fd.append("descripcion", form.descripcion.trim());
+      fd.append("aceptaEnvios", String(aceptaEnvios));
+      if (zonaEnvio) fd.append("zonaEnvio", zonaEnvio);
+      if (costoEnvio) fd.append("costoEnvio", costoEnvio);
 
       const res = await fetch(`${API}/api/comercios/me`, {
         method: "PUT",
@@ -1043,6 +1063,41 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                   style={{ color: inputColor, backgroundColor: inputBg }}
                   className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none resize-none ${inputCls}`}
                 />
+              </div>
+
+              {/* Envios */}
+              <div className={`rounded-2xl border p-4 ${isDark ? "border-gray-800 bg-gray-900/50" : "border-gray-200 bg-gray-50"}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>Envios a domicilio</p>
+                    <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>Tus clientes veran si hacen envios al armar el pedido</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAceptaEnvios(!aceptaEnvios)}
+                    className={`relative w-11 h-6 rounded-full transition-colors ${aceptaEnvios ? "bg-amber-500" : isDark ? "bg-gray-700" : "bg-gray-300"}`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${aceptaEnvios ? "translate-x-5" : ""}`} />
+                  </button>
+                </div>
+                {aceptaEnvios && (
+                  <div className="flex flex-col gap-2 mt-2">
+                    <input
+                      type="text"
+                      placeholder="Zona de envio (ej: Toda la ciudad, Centro)"
+                      value={zonaEnvio}
+                      onChange={(e) => setZonaEnvio(e.target.value)}
+                      className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Costo de envio (ej: Gratis, $500, A coordinar)"
+                      value={costoEnvio}
+                      onChange={(e) => setCostoEnvio(e.target.value)}
+                      className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
+                    />
+                  </div>
+                )}
               </div>
 
               {datosError && (

@@ -7,13 +7,24 @@ import confetti from "canvas-confetti";
 import { Comercio, ComercioOffer, Producto } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
-import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag, ThumbsUp } from "lucide-react";
+import { useCart } from "../../contexts/CartContext";
+import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag, ThumbsUp, ShoppingCart, Package } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 interface Props {
   comercio: Comercio;
   isOwner?: boolean;
+}
+
+interface CartComercio {
+  id: string;
+  nombre: string;
+  slug: string;
+  whatsapp: string;
+  aceptaEnvios: boolean;
+  zonaEnvio: string | null;
+  costoEnvio: string | null;
 }
 
 const RUBRO_COLORS: Record<string, string> = {
@@ -184,7 +195,18 @@ const WaIcon = () => (
 export default function ComercioProfileClient({ comercio, isOwner }: Props) {
   const router = useRouter();
   const { isDark } = useTheme();
+  const { totalItems, openCart } = useCart();
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
+  const cartComercioData: CartComercio = {
+    id: comercio.id,
+    nombre: comercio.nombre,
+    slug: comercio.slug,
+    whatsapp: comercio.whatsapp,
+    aceptaEnvios: comercio.aceptaEnvios ?? false,
+    zonaEnvio: comercio.zonaEnvio ?? null,
+    costoEnvio: comercio.costoEnvio ?? null,
+  };
 
   useEffect(() => {
     const key = `viewed_comercio_${comercio.slug}`;
@@ -620,6 +642,17 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
               )}
             </div>
 
+            {comercio.aceptaEnvios && (
+              <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded-xl mb-3 ${isDark ? "bg-green-900/20 text-green-400" : "bg-green-50 text-green-700"}`}>
+                <Package className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  Envios a domicilio
+                  {comercio.zonaEnvio ? ` · ${comercio.zonaEnvio}` : ""}
+                  {comercio.costoEnvio ? ` · ${comercio.costoEnvio}` : ""}
+                </span>
+              </div>
+            )}
+
             {activeProductos.length === 0 ? (
               <div className={`py-8 text-center rounded-2xl border ${cardBg}`}>
                 <ShoppingBag className={`w-8 h-8 mx-auto mb-2 ${textMuted}`} />
@@ -634,6 +667,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                     whatsapp={comercio.whatsapp}
                     comercioNombre={comercio.nombre}
                     comercioSlug={comercio.slug}
+                    cartComercio={cartComercioData}
                     isDark={isDark}
                     cardBg={cardBg}
                     textPrimary={textPrimary}
@@ -756,6 +790,19 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           </div>
         </div>
       )}
+
+      {totalItems > 0 && (
+        <button
+          onClick={openCart}
+          className="fixed bottom-20 right-4 z-[1500] w-14 h-14 rounded-full bg-amber-500 hover:bg-amber-400 text-gray-950 shadow-2xl flex items-center justify-center transition-all active:scale-95"
+          aria-label="Ver carrito"
+        >
+          <ShoppingCart className="w-6 h-6" />
+          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gray-950 text-amber-400 text-[10px] font-black flex items-center justify-center">
+            {totalItems}
+          </span>
+        </button>
+      )}
     </div>
   );
 }
@@ -763,29 +810,60 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
 // ─── Producto Card ───────────────────────────────────────────────────────────
 
 function ProductoCard({
-  producto, whatsapp, comercioNombre, comercioSlug, isDark, cardBg, textPrimary, textSec, textMuted,
+  producto, whatsapp, comercioNombre, comercioSlug, cartComercio, isDark, cardBg, textPrimary, textSec, textMuted,
 }: {
   producto: Producto;
   whatsapp: string;
   comercioNombre: string;
   comercioSlug: string;
+  cartComercio: CartComercio;
   isDark: boolean;
   cardBg: string;
   textPrimary: string;
   textSec: string;
   textMuted: string;
 }) {
+  const { addItem, clearCart } = useCart();
+  const [adding, setAdding] = useState<"idle" | "added" | "confirm" | "no_stock">("idle");
+
   const fotoResolved = producto.foto
     ? producto.foto.startsWith("http") ? producto.foto : `${API}${producto.foto}`
     : null;
 
   const esServicio = producto.tipo === "servicio";
+  const sinStock = producto.stock === 0;
   const waMsg = encodeURIComponent(
     esServicio
       ? `Hola ${comercioNombre}! Me interesa el servicio: *${producto.nombre}*${producto.precio ? ` (${producto.precio})` : ""}. ¿Podemos hablar?`
       : `Hola ${comercioNombre}! Me interesa el producto: *${producto.nombre}*${producto.precio ? ` (${producto.precio})` : ""}. ¿Tienen disponibilidad?`
   );
   const waUrl = `https://wa.me/${whatsapp}?text=${waMsg}`;
+
+  function handleAgregar() {
+    const result = addItem({
+      productoId: producto.id,
+      nombre: producto.nombre,
+      precioStr: producto.precio ?? null,
+      foto: producto.foto ?? null,
+      stock: producto.stock ?? null,
+    }, cartComercio);
+
+    if (result === "added") {
+      setAdding("added");
+      setTimeout(() => setAdding("idle"), 1500);
+    } else if (result === "wrong_comercio") {
+      setAdding("confirm");
+    } else if (result === "no_stock") {
+      setAdding("no_stock");
+      setTimeout(() => setAdding("idle"), 2000);
+    }
+  }
+
+  function handleVaciarYAgregar() {
+    clearCart();
+    setAdding("idle");
+    setTimeout(() => handleAgregar(), 0);
+  }
 
   return (
     <div className={`rounded-2xl border overflow-hidden flex flex-col ${cardBg}`}>
@@ -808,7 +886,15 @@ function ProductoCard({
           </span>
         </div>
         {producto.descripcion && <p className={`text-xs leading-snug line-clamp-2 ${textSec}`}>{producto.descripcion}</p>}
-        {producto.precio && <p className={`text-sm font-black text-green-500 dark:text-green-400`}>{producto.precio}</p>}
+        {producto.precio && <p className="text-sm font-black text-green-500 dark:text-green-400">{producto.precio}</p>}
+        {!esServicio && sinStock && (
+          <span className={`text-xs px-2 py-0.5 rounded-full w-fit ${isDark ? "bg-gray-800 text-gray-500" : "bg-gray-100 text-gray-400"}`}>
+            Sin stock
+          </span>
+        )}
+        {!esServicio && typeof producto.stock === "number" && producto.stock > 0 && producto.stock <= 5 && (
+          <p className="text-xs text-amber-500">Ultimas {producto.stock} unidades</p>
+        )}
         <div className="mt-auto flex flex-col gap-1.5">
           <a
             href={`/comercio/${comercioSlug}/producto/${producto.id}`}
@@ -818,15 +904,64 @@ function ProductoCard({
           >
             Ver detalle
           </a>
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            {esServicio ? "Consultar servicio" : "Consultar"}
-          </a>
+          {!esServicio && (
+            adding === "confirm" ? (
+              <div className={`rounded-xl p-2 text-xs ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+                <p className={`mb-1.5 leading-snug ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                  El carrito tiene productos de otro local. Vaciar y agregar este?
+                </p>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={handleVaciarYAgregar}
+                    className="flex-1 py-1 rounded-lg bg-amber-500 text-gray-950 font-semibold text-xs"
+                  >
+                    Vaciar
+                  </button>
+                  <button
+                    onClick={() => setAdding("idle")}
+                    className={`flex-1 py-1 rounded-lg font-semibold text-xs border ${isDark ? "border-gray-700 text-gray-400" : "border-gray-300 text-gray-500"}`}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={handleAgregar}
+                disabled={sinStock}
+                className={`flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  adding === "added"
+                    ? "bg-green-500 text-white"
+                    : adding === "no_stock"
+                    ? isDark ? "bg-gray-800 text-gray-500" : "bg-gray-100 text-gray-400"
+                    : sinStock
+                    ? isDark ? "bg-gray-800 text-gray-600 cursor-not-allowed" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-amber-500 hover:bg-amber-400 text-gray-950"
+                }`}
+              >
+                {adding === "added" ? (
+                  <><Check className="w-3.5 h-3.5" />Agregado</>
+                ) : adding === "no_stock" ? (
+                  "Sin stock"
+                ) : sinStock ? (
+                  "Sin stock"
+                ) : (
+                  <><ShoppingCart className="w-3.5 h-3.5" />Agregar al carrito</>
+                )}
+              </button>
+            )
+          )}
+          {esServicio && (
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-xs font-semibold transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Consultar servicio
+            </a>
+          )}
         </div>
       </div>
     </div>
