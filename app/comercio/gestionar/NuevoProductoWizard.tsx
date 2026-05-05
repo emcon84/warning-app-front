@@ -60,6 +60,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
 
   const [downloading, setDownloading] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [autocompleting, setAutocompleting] = useState(false);
 
   useEffect(() => {
     if (step === 3) fire();
@@ -71,6 +72,31 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
     const reader = new FileReader();
     reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
     reader.readAsDataURL(file);
+    runAutocompletar(file);
+  }
+
+  async function runAutocompletar(file: File) {
+    setAutocompleting(true);
+    try {
+      const token = await getToken();
+      const fd = new FormData();
+      fd.append("photo", file);
+      const res = await fetch(`${API}/api/comercios/me/productos/autocompletar`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.nombre) setNombre(data.nombre);
+      if (data.precio) setPrecio(data.precio);
+      if (data.tipo === "servicio" || data.tipo === "producto") setTipo(data.tipo);
+      if (data.descripcion) setDescripcion(data.descripcion);
+    } catch {
+      // silent — autocompletar es opcional
+    } finally {
+      setAutocompleting(false);
+    }
   }
 
   async function handleGenerateAI() {
@@ -80,7 +106,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
     try {
       const token = await getToken();
       const fd = new FormData();
-      fd.append("foto", photoFile);
+      fd.append("photo", photoFile);
       if (aiGenNombre || nombre) fd.append("nombre", aiGenNombre || nombre);
       const res = await fetch(`${API}/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
@@ -254,6 +280,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
                 stock={stock}
                 submitting={submitting}
                 submitError={submitError}
+                autocompleting={autocompleting}
                 onNombre={setNombre}
                 onTipo={setTipo}
                 onDescripcion={setDescripcion}
@@ -446,7 +473,7 @@ function Step1Foto({
 
 function Step2Datos({
   nombre, tipo, descripcion, precio, stock,
-  submitting, submitError,
+  submitting, submitError, autocompleting,
   onNombre, onTipo, onDescripcion, onPrecio, onStock, onSubmit,
 }: {
   nombre: string;
@@ -456,7 +483,9 @@ function Step2Datos({
   stock: string;
   submitting: boolean;
   submitError: string | null;
+  autocompleting: boolean;
   onNombre: (v: string) => void;
+  autocompleting: boolean;
   onTipo: (v: "producto" | "servicio") => void;
   onDescripcion: (v: string) => void;
   onPrecio: (v: string) => void;
@@ -471,6 +500,13 @@ function Step2Datos({
         <p className="text-lg font-bold text-gray-900 dark:text-white">Los datos</p>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Que es lo que ofreces</p>
       </div>
+
+      {autocompleting && (
+        <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-xl border border-amber-200 dark:border-amber-800">
+          <div className="w-3 h-3 border-2 border-t-transparent border-amber-500 rounded-full animate-spin flex-shrink-0" />
+          Analizando la foto con IA para autocompletar...
+        </div>
+      )}
 
       <div className="flex rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
         {(["producto", "servicio"] as const).map(t => (

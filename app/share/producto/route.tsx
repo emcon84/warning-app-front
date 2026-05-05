@@ -2,6 +2,8 @@ import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 import sharp from "sharp";
 
+export const runtime = "nodejs";
+
 const NO_CACHE = { "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400" };
 
 async function toDataUrl(url: string): Promise<string> {
