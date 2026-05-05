@@ -61,7 +61,7 @@ export default function CartDrawer() {
     if (!comercio) return;
     const whatsappNumber = comercio.whatsapp.replace(/\D/g, "");
     const mensaje = formatearPedido(items, comercio, entrega, direccion);
-    const url = `https://wa.me/54${whatsappNumber}?text=${encodeURIComponent(mensaje)}`;
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensaje)}`;
     window.open(url, "_blank");
     handleClose();
     clearCart();
