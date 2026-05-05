@@ -14,6 +14,7 @@ import {
   Eye, MessageCircle, Package, Camera, Sparkles,
 } from "lucide-react";
 import KitDigitalizacion from "./KitDigitalizacion";
+import NuevoProductoWizard from "./NuevoProductoWizard";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -632,6 +633,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const [productos, setProductos] = useState<Producto[]>(initial.productos ?? []);
   const [showProductoModal, setShowProductoModal] = useState(false);
   const [editingProducto, setEditingProducto] = useState<Producto | undefined>(undefined);
+  const [showWizard, setShowWizard] = useState(false);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
@@ -908,6 +910,24 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             setShowProductoModal(false);
             setEditingProducto(undefined);
           }}
+        />
+      )}
+
+      {showWizard && (
+        <NuevoProductoWizard
+          comercio={{
+            id: comercio.id,
+            nombre: comercio.nombre,
+            slug: comercio.slug,
+            logo: comercio.logo,
+            whatsapp: comercio.whatsapp,
+          }}
+          getToken={getToken}
+          onComplete={(prod) => {
+            setProductos(prev => [{ ...prod, tipo: "producto", activo: true, comercioId: comercio.id, createdAt: new Date().toISOString(), stock: null } as any, ...prev]);
+            setShowWizard(false);
+          }}
+          onClose={() => setShowWizard(false)}
         />
       )}
 
@@ -1321,7 +1341,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               </div>
             ) : (
               <button
-                onClick={() => setShowProductoModal(true)}
+                onClick={() => setShowWizard(true)}
                 className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-semibold text-sm bg-white text-gray-900 hover:bg-gray-100 transition-colors"
               >
                 <Plus className="w-4 h-4" /> Agregar al catálogo
