@@ -485,7 +485,6 @@ function Step2Datos({
   submitError: string | null;
   autocompleting: boolean;
   onNombre: (v: string) => void;
-  autocompleting: boolean;
   onTipo: (v: "producto" | "servicio") => void;
   onDescripcion: (v: string) => void;
   onPrecio: (v: string) => void;
