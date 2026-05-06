@@ -437,7 +437,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
             >
               {comercio.nombre}
             </h1>
-            {/* Pills separadas — con espacio propio, lejos del hero */}
+            {/* ── Stats & Pills ───────────────────────────────────────────────── */}
             <div className="flex items-center gap-2 mb-4 flex-wrap">
               <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${rubroBadge}`}>
                 {comercio.rubro}
@@ -457,6 +457,14 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d={STAR_PATH} /></svg>
                   {(comercio.ratingAvg ?? 0).toFixed(1)}
                   <span className="font-normal opacity-70">({comercio.ratingCount})</span>
+                </span>
+              )}
+              {(comercio._count?.suscriptores ?? 0) > 0 && (
+                <span className={`flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+                  isDark ? "bg-blue-500/20 border border-blue-500/40 text-blue-400" : "bg-blue-50 border border-blue-200 text-blue-600"
+                }`}>
+                  <Users className="w-3 h-3" />
+                  {comercio._count?.suscriptores}
                 </span>
               )}
               {comercio.barrio && (
@@ -710,7 +718,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                 </div>
                 {(comercio._count?.suscriptores ?? 0) > 0 && (
                   <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-                    isDark ? "bg-green-900/40 text-green-400" : "bg-green-100 text-green-700"
+                    isDark ? "bg-blue-500/20 border border-blue-500/40 text-blue-400" : "bg-blue-50 border border-blue-200 text-blue-600"
                   }`}>
                     <Users className="w-3 h-3" />
                     {(comercio._count?.suscriptores ?? 0)} miembros
