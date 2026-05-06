@@ -946,7 +946,16 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                           <div className="flex-1 flex flex-col justify-center gap-2 pr-5 py-5">
                             <div>
                               <p className="text-white font-bold text-lg leading-tight">{comercio.nombre}</p>
-                              <p className="text-purple-300 text-sm mt-0.5">{comercio.rubro}</p>
+                              {(() => {
+                                const rubros = comercio.rubro.split(/\s*\/\s*/);
+                                const shown = rubros.slice(0, 2).join(' / ');
+                                const extra = rubros.length - 2;
+                                return (
+                                  <p className="text-purple-300 text-sm mt-0.5">
+                                    {shown}{extra > 0 && <span className="text-purple-400/60 text-xs"> +{extra} más</span>}
+                                  </p>
+                                );
+                              })()}
                             </div>
                             <div className="flex gap-1.5 flex-wrap">
                               {comercio.isFounder && <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-500/25 text-blue-300 border border-blue-500/30">FOUNDER</span>}
