@@ -4,11 +4,13 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import confetti from "canvas-confetti";
-import { Comercio, ComercioOffer, Producto } from "../../types";
+import { Comercio, ComercioOffer, Producto, ComercioPost } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useCart } from "../../contexts/CartContext";
 import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag, ThumbsUp, ShoppingCart, Package } from "lucide-react";
+import SumateButton from "../../components/SumateButton";
+import ComercioPostCard from "../../components/ComercioPostCard";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -295,6 +297,18 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
     }
   }
 
+  const [posts, setPosts] = useState<ComercioPost[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
+
+  useEffect(() => {
+    setLoadingPosts(true);
+    fetch(`${API}/api/comercios/${comercio.slug}/posts?limit=10`)
+      .then(r => r.json())
+      .then(data => { if (data.posts) setPosts(data.posts); })
+      .catch(() => {})
+      .finally(() => setLoadingPosts(false));
+  }, [comercio.slug]);
+
   const activeOffers = comercio.offers || [];
   const activeProductos = comercio.productos || [];
 
@@ -522,6 +536,9 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
                 Gestionar mi comercio
               </button>
             )}
+            {!isOwner && (
+              <SumateButton slug={comercio.slug} isDark={isDark} />
+            )}
           </div>
         </div>
 
@@ -678,6 +695,49 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
               </div>
             )}
           </div>
+        )}
+
+        {/* ── Comunidad ───────────────────────────────────────────────── */}
+        {(posts.length > 0 || isOwner) && (
+          <section className="mt-6 mx-4">
+            <div className={`flex items-center justify-between mb-3 px-1`}>
+              <div>
+                <p className={`font-black text-base ${textPrimary}`}>Comunidad</p>
+                <p className={`text-xs ${textMuted}`}>
+                  {posts.length > 0 ? `${posts.length} publicaciones` : "Aun no hay publicaciones"}
+                </p>
+              </div>
+              {isOwner && (
+                <button
+                  onClick={() => router.push("/comercio/gestionar?tab=comunidad")}
+                  className={`text-xs px-3 py-1.5 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}
+                >
+                  Publicar
+                </button>
+              )}
+            </div>
+            {loadingPosts && (
+              <div className={`text-xs text-center py-4 ${textMuted}`}>Cargando...</div>
+            )}
+            {!loadingPosts && posts.length === 0 && isOwner && (
+              <div className={`text-center py-6 rounded-2xl border border-dashed ${isDark ? "border-gray-800 text-gray-600" : "border-gray-200 text-gray-400"}`}>
+                <p className="text-sm">Publica novedades, ofertas y sorteos para tu comunidad</p>
+                <button
+                  onClick={() => router.push("/comercio/gestionar?tab=comunidad")}
+                  className="mt-2 text-xs px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-semibold transition-colors"
+                >
+                  Primera publicacion
+                </button>
+              </div>
+            )}
+            {posts.length > 0 && (
+              <div className="flex flex-col gap-3">
+                {posts.map(post => (
+                  <ComercioPostCard key={post.id} post={post} variant="feed" isDark={isDark} />
+                ))}
+              </div>
+            )}
+          </section>
         )}
 
         {/* ── Ofertas ─────────────────────────────────────────────────── */}
