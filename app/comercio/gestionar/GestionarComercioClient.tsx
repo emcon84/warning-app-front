@@ -17,6 +17,7 @@ import ComercioPostCard from "../../components/ComercioPostCard";
 import type { ComercioPost } from "../../types";
 import KitDigitalizacion from "./KitDigitalizacion";
 import NuevoProductoWizard from "./NuevoProductoWizard";
+import NuevoPostWizard from "./NuevoPostWizard";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -643,6 +644,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const [comunidadPosts, setComunidadPosts] = useState<ComercioPost[]>([]);
   const [loadingComunidad, setLoadingComunidad] = useState(false);
   const [showPostForm, setShowPostForm] = useState(false);
+  const [showPostWizard, setShowPostWizard] = useState(false);
   const [postTipo, setPostTipo] = useState<"novedad" | "oferta" | "sorteo">("novedad");
   const [postContenido, setPostContenido] = useState("");
   const [postFoto, setPostFoto] = useState<File | null>(null);
@@ -1529,11 +1531,11 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 Publica novedades, ofertas y sorteos. Tus suscriptores reciben una notificacion.
               </p>
               <button
-                onClick={() => setShowPostForm(v => !v)}
+                onClick={() => setShowPostWizard(true)}
                 className="mt-3 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-sm transition-colors"
               >
                 <Megaphone className="w-4 h-4" />
-                {showPostForm ? "Cancelar" : "Nueva publicacion"}
+                Nueva publicacion
               </button>
             </div>
 
@@ -1698,6 +1700,18 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           currentPlan={planInfo.plan}
           planInfo={planInfo}
           onClose={() => setShowPlanModal(false)}
+        />
+      )}
+
+      {showPostWizard && (
+        <NuevoPostWizard
+          comercio={{ id: comercio.id, nombre: comercio.nombre, slug: comercio.slug }}
+          getToken={getToken}
+          onComplete={(post) => {
+            setComunidadPosts(prev => [post as ComercioPost, ...prev]);
+            setShowPostWizard(false);
+          }}
+          onClose={() => setShowPostWizard(false)}
         />
       )}
     </div>
