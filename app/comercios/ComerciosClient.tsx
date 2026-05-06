@@ -175,7 +175,7 @@ export default function ComerciosClient({ comercios }: Props) {
   }
 
   return (
-    <div className={`min-h-screen ${bg} ${textPrimary}`}>
+    <div className={`min-h-screen overflow-x-hidden ${bg} ${textPrimary}`}>
       <Navbar />
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
