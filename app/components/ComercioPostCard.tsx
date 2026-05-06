@@ -63,7 +63,11 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
 
   const cardCls = variant === "slide"
     ? `rounded-2xl border overflow-hidden flex-shrink-0 w-64 cursor-pointer ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`
-    : `rounded-2xl border overflow-hidden ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`;
+    : `rounded-2xl border overflow-hidden cursor-pointer ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`;
+
+  function handleClick() {
+    router.push(`/post/${post.id}`);
+  }
 
   async function handleLike(e: React.MouseEvent) {
     e.stopPropagation();
@@ -95,7 +99,7 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
 
   if (variant === "slide") {
     return (
-      <div className={cardCls} onClick={() => router.push(`/comercio/${post.comercio?.slug}`)}>
+      <div className={cardCls} onClick={handleClick}>
         {foto && (
           <img src={foto} alt="" className="w-full h-36 object-cover" />
         )}
@@ -144,7 +148,7 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
   }
 
   return (
-    <div className={cardCls}>
+    <div className={cardCls} onClick={handleClick}>
       {foto && (
         <img src={foto} alt="" className="w-full h-48 object-cover" />
       )}
