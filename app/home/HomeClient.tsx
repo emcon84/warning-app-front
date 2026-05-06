@@ -418,9 +418,9 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1, ease: "easeOut" }}
-          className="mb-6 -mx-4 px-4 overflow-x-auto scrollbar-hide"
+          className="mb-6 -mx-4 px-4 overflow-x-auto scrollbar-hide md:overflow-visible"
         >
-          <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
+          <div className="flex gap-3 pb-1 md:flex-wrap" style={{ width: "max-content" }}>
             {SECTION_BANNERS.map(({ label, sub, href, Icon, gradient, glow }) => (
               <Link
                 key={label}
