@@ -377,7 +377,7 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
               onClick={close}
             />
 
-            {/* Card — bottom sheet en mobile, modal centrado en desktop */}
+            {/* Card — centrado en mobile y desktop, flex column */}
             <motion.div
               key="card"
               variants={cardVariants}
@@ -385,20 +385,14 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
               animate="visible"
               exit="exit"
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed z-50
-                inset-x-0 bottom-0 rounded-t-3xl overflow-hidden shadow-2xl max-h-[88svh]
-                md:inset-auto md:bottom-auto md:rounded-3xl md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[440px] md:max-h-none"
+              className="fixed z-50 flex flex-col rounded-3xl overflow-hidden shadow-2xl
+                inset-x-4 top-1/2 -translate-y-1/2 max-h-[85svh]
+                md:inset-x-auto md:w-[440px] md:left-1/2 md:-translate-x-1/2"
             >
-              {/* Handle — solo mobile */}
-              <div className="md:hidden flex justify-center pt-3 pb-1 bg-gray-950">
-                <div className="w-10 h-1 rounded-full bg-gray-700" />
-              </div>
-
-              {/* Área visual con ilustración */}
-              <div className={`relative h-36 md:h-48 bg-gradient-to-br ${current.gradient} overflow-hidden`}>
+              {/* Área visual — flex-shrink-0 para que nunca se comprima */}
+              <div className={`relative flex-shrink-0 h-40 md:h-48 bg-gradient-to-br ${current.gradient} overflow-hidden`}>
                 <current.Illu />
 
-                {/* Barra de progreso */}
                 <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-white/10">
                   <motion.div
                     className="h-full bg-white/50"
@@ -407,12 +401,10 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
                   />
                 </div>
 
-                {/* Paso X/N */}
                 <div className="absolute top-3 left-4 text-[10px] text-white/50 font-semibold tabular-nums">
                   {step + 1} / {STEPS.length}
                 </div>
 
-                {/* Botón cerrar */}
                 <button
                   onClick={close}
                   className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white hover:bg-black/50 transition-colors"
@@ -421,8 +413,8 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
                 </button>
               </div>
 
-              {/* Contenido textual */}
-              <div className="bg-gray-950 px-5 py-4">
+              {/* Contenido textual — flex-1 + overflow-y-auto para que el texto scrollee si hace falta */}
+              <div className="bg-gray-950 flex-1 min-h-0 overflow-y-auto px-5 pt-4 pb-2">
                 <AnimatePresence mode="wait" custom={dir}>
                   <motion.div
                     key={step}
@@ -436,7 +428,7 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border mb-2 ${current.accent}`}>
                       {current.badge}
                     </span>
-                    <h3 className="text-white font-black text-[17px] leading-snug mb-1.5">
+                    <h3 className="text-white font-black text-base md:text-[17px] leading-snug mb-1.5">
                       {current.title}
                     </h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
@@ -444,51 +436,47 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
                     </p>
                   </motion.div>
                 </AnimatePresence>
+              </div>
 
-                {/* Navegación */}
-                <div className="flex items-center justify-between mt-4">
-                  {/* Dots */}
-                  <div className="flex gap-1.5">
-                    {STEPS.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => goTo(i)}
-                        className={`rounded-full transition-all duration-300 ${
-                          i === step
-                            ? "w-5 h-2 bg-white"
-                            : "w-2 h-2 bg-gray-700 hover:bg-gray-500"
-                        }`}
-                      />
-                    ))}
-                  </div>
+              {/* Navegación — flex-shrink-0, siempre visible al fondo */}
+              <div className="bg-gray-950 flex-shrink-0 flex items-center justify-between px-5 pb-5 pt-3 border-t border-white/5">
+                <div className="flex gap-1.5">
+                  {STEPS.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goTo(i)}
+                      className={`rounded-full transition-all duration-300 ${
+                        i === step ? "w-5 h-2 bg-white" : "w-2 h-2 bg-gray-700 hover:bg-gray-500"
+                      }`}
+                    />
+                  ))}
+                </div>
 
-                  {/* Botones */}
-                  <div className="flex items-center gap-2">
-                    {step > 0 && (
-                      <button
-                        onClick={prev}
-                        className="w-9 h-9 rounded-full border border-gray-800 hover:border-gray-700 flex items-center justify-center text-gray-500 hover:text-gray-300 transition-colors"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                    )}
-                    {isLast ? (
-                      <Link
-                        href="/comercio/nuevo"
-                        onClick={close}
-                        className="flex items-center gap-1.5 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-black text-sm rounded-full transition-colors"
-                      >
-                        Registrar mi comercio
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={next}
-                        className="flex items-center gap-1.5 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-full transition-colors"
-                      >
-                        Siguiente <ChevronRight className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
+                <div className="flex items-center gap-2">
+                  {step > 0 && (
+                    <button
+                      onClick={prev}
+                      className="w-9 h-9 rounded-full border border-gray-800 hover:border-gray-700 flex items-center justify-center text-gray-500 hover:text-gray-300 transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                  )}
+                  {isLast ? (
+                    <Link
+                      href="/comercio/nuevo"
+                      onClick={close}
+                      className="flex items-center gap-1.5 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-gray-950 font-black text-sm rounded-full transition-colors"
+                    >
+                      Registrar mi comercio
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={next}
+                      className="flex items-center gap-1.5 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-full transition-colors"
+                    >
+                      Siguiente <ChevronRight className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
