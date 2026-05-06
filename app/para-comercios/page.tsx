@@ -135,10 +135,10 @@ export default function ParaComerciosPage() {
                 <ChevronRight className="w-4 h-4" />
               </a>
               <a
-                href="/demo"
-                className="inline-flex items-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold rounded-2xl transition-colors text-sm"
+                href="/comercios"
+                className="inline-flex items-center gap-2 px-7 py-4 border border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-semibold rounded-2xl transition-colors text-sm"
               >
-                Probar demo interactiva →
+                Ver directorio
               </a>
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-600 mt-4">100% gratuito para empezar. Sin tarjeta de credito.</p>
