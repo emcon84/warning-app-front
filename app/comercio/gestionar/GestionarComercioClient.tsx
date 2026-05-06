@@ -1113,41 +1113,18 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </div>
         )}
 
-        {/* Tabs or Dashboard Grid */}
+        {/* Dashboard Card Grid */}
         {!activeSection && (
-          <>
-            <div className={`flex gap-1 p-1 rounded-2xl mb-6 overflow-x-auto ${isDark ? "bg-gray-900" : "bg-gray-100"}`}>
-              {tabs.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
-                  className={`flex-shrink-0 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl text-sm font-semibold transition-colors ${
-                    tab === t.id
-                      ? isDark ? "bg-white text-gray-900" : "bg-white text-gray-900 shadow-sm"
-                      : isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  {t.icon}
-                  {t.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Dashboard Card Grid */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mb-6"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {SECTION_TABS.map((item) => (
                   <button
                     key={item.section}
-                    onClick={() => {
-                      const url = new URL(window.location.href);
-                      url.searchParams.set("section", item.section);
-                      router.replace(url.search);
-                    }}
+                    onClick={() => router.push(`?section=${item.section}`)}
                     className={`rounded-2xl border p-5 flex flex-col items-center justify-center gap-3 text-center transition-all hover:scale-[1.02] ${
                       isDark ? "bg-gray-900 border-gray-800 hover:border-gray-600" : "bg-white border-gray-200 hover:border-gray-400"
                     }`}
@@ -1163,11 +1140,10 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 ))}
               </div>
             </motion.div>
-          </>
         )}
 
-        {/* ── Tab: Datos ─────────────────────────────────────────────── */}
-        {tab === "datos" && (
+        {/* Section Views */}
+        {activeSection === "datos" && (
           <div className={`rounded-2xl border p-5 ${cardBg}`}>
             <div className="flex flex-col gap-4">
               {[
@@ -1281,8 +1257,8 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </div>
         )}
 
-        {/* ── Tab: Fotos ─────────────────────────────────────────────── */}
-        {tab === "fotos" && (
+        {/* ── Section: Fotos ─────────────────────────────────────────────── */}
+        {(activeSection === "fotos" || tab === "fotos") && (
           <div className="flex flex-col gap-4">
 
             {/* Logo del comercio */}
@@ -1467,8 +1443,8 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </div>
         )}
 
-        {/* ── Tab: Productos ─────────────────────────────────────────── */}
-        {tab === "productos" && (
+        {/* ── Section: Productos ─────────────────────────────────────────── */}
+        {(activeSection === "productos" || tab === "productos") && (
           <div className="flex flex-col gap-3">
             {!initial.isPremium && productos.length >= 10 ? (
               <div className={`rounded-2xl border p-4 flex flex-col gap-2 ${isDark ? "bg-yellow-900/10 border-yellow-800/40" : "bg-yellow-50 border-yellow-200"}`}>
@@ -1518,8 +1494,8 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </div>
         )}
 
-        {/* ── Tab: Stats ─────────────────────────────────────────────── */}
-        {tab === "stats" && (
+        {/* ── Section: Stats ─────────────────────────────────────────────── */}
+        {(activeSection === "stats" || tab === "stats") && (
           <div className="px-4 py-5 space-y-6">
             <div>
               <p className={`text-base font-bold ${textPri}`}>Estadísticas</p>
@@ -1579,7 +1555,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         )}
 
         {/* ── Tab: Kit ───────────────────────────────────────────────── */}
-        {tab === "kit" && (
+        {(activeSection === "kit" || tab === "kit") && (
           <KitDigitalizacion
             comercio={comercio}
             isDark={isDark}
@@ -1591,7 +1567,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         )}
 
         {/* ── Tab: Comunidad ─────────────────────────────────────────── */}
-        {tab === "comunidad" && (
+        {(activeSection === "comunidad" || tab === "comunidad") && (
           <div className="space-y-4 pb-10">
             {/* Header */}
             <div className={`rounded-2xl border p-4 ${isDark ? "border-gray-800 bg-gray-900/50" : "border-gray-200 bg-gray-50"}`}>
@@ -1728,7 +1704,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         )}
 
         {/* ── Tab: Ofertas ───────────────────────────────────────────── */}
-        {tab === "ofertas" && (
+        {(activeSection === "ofertas" || tab === "ofertas") && (
           <div className="flex flex-col gap-3">
             <button
               onClick={() => setShowOfertaModal(true)}
