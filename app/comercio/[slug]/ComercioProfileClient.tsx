@@ -8,7 +8,7 @@ import { Comercio, ComercioOffer, Producto, ComercioPost } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useCart } from "../../contexts/CartContext";
-import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag, ThumbsUp, ShoppingCart, Package } from "lucide-react";
+import { MapPin, Clock, Phone, X, Pencil, Share2, ChevronLeft, ChevronRight, Copy, Check, MessageCircle, ShoppingBag, ThumbsUp, ShoppingCart, Package, Users } from "lucide-react";
 import SumateButton from "../../components/SumateButton";
 import ComercioPostCard from "../../components/ComercioPostCard";
 
@@ -701,11 +701,21 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
         {(posts.length > 0 || isOwner) && (
           <section className="mt-6 mx-4">
             <div className={`flex items-center justify-between mb-3 px-1`}>
-              <div>
-                <p className={`font-black text-base ${textPrimary}`}>Comunidad</p>
-                <p className={`text-xs ${textMuted}`}>
-                  {posts.length > 0 ? `${posts.length} publicaciones` : "Aun no hay publicaciones"}
-                </p>
+              <div className="flex items-center gap-3">
+                <div>
+                  <p className={`font-black text-base ${textPrimary}`}>Comunidad</p>
+                  <p className={`text-xs ${textMuted}`}>
+                    {posts.length > 0 ? `${posts.length} publicaciones` : "Aun no hay publicaciones"}
+                  </p>
+                </div>
+                {(comercio._count?.suscriptores ?? 0) > 0 && (
+                  <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
+                    isDark ? "bg-green-900/40 text-green-400" : "bg-green-100 text-green-700"
+                  }`}>
+                    <Users className="w-3 h-3" />
+                    {(comercio._count?.suscriptores ?? 0)} miembros
+                  </span>
+                )}
               </div>
               {isOwner && (
                 <button
