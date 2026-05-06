@@ -110,7 +110,7 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
             </span>
           </div>
 
-          <p className={`text-xs line-clamp-3 ${isDark ? "text-gray-200" : "text-gray-800"}`}>
+          <p className={`text-xs line-clamp-3 whitespace-pre-wrap ${isDark ? "text-gray-200" : "text-gray-800"}`}>
             {post.contenido}
           </p>
 
@@ -160,7 +160,7 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
           </span>
         </div>
 
-        <p className={`text-sm line-clamp-5 ${isDark ? "text-gray-200" : "text-gray-800"}`}>
+        <p className={`text-sm line-clamp-5 whitespace-pre-wrap ${isDark ? "text-gray-200" : "text-gray-800"}`}>
           {post.contenido}
         </p>
 
