@@ -292,14 +292,14 @@ const STEPS = [
 
 const cardVariants = {
   hidden: { opacity: 0, y: 60, scale: 0.95 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
-  exit:    { opacity: 0, y: 40, scale: 0.97, transition: { duration: 0.2 } },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  exit:    { opacity: 0, y: 40, scale: 0.97 },
 };
 
 const contentVariants = {
   enter: (d: number) => ({ x: d > 0 ? 24 : -24, opacity: 0 }),
-  center: { x: 0, opacity: 1, transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] } },
-  exit:  (d: number) => ({ x: d > 0 ? -24 : 24, opacity: 0, transition: { duration: 0.18 } }),
+  center: { x: 0, opacity: 1 },
+  exit:  (d: number) => ({ x: d > 0 ? -24 : 24, opacity: 0 }),
 };
 
 // ── Componente principal ─────────────────────────────────────────────────────
@@ -384,6 +384,7 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
               initial="hidden"
               animate="visible"
               exit="exit"
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="fixed z-50
                 inset-x-3 bottom-3 rounded-3xl overflow-hidden shadow-2xl
                 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[440px]"
@@ -425,6 +426,7 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
                     initial="enter"
                     animate="center"
                     exit="exit"
+                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                   >
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border mb-2 ${current.accent}`}>
                       {current.badge}
