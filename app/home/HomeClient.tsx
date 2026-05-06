@@ -491,18 +491,18 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                 <motion.div key="comunidad" variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="absolute inset-0 bg-gradient-to-br from-violet-950 via-purple-900 to-indigo-900">
                   <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-purple-500/20 blur-3xl pointer-events-none" />
                   {/* Notificaciones flotantes — visible en todos los dispositivos */}
-                  <div className="absolute right-2 top-3 flex flex-col gap-1 z-10 pointer-events-none">
-                    <div className="flex items-center gap-1.5 bg-white/12 backdrop-blur-sm rounded-xl px-2 py-1.5 w-32">
-                      <span className="text-[11px] flex-shrink-0">🏷️</span>
-                      <div><p className="text-[7px] text-white font-bold leading-none">El Estribo</p><p className="text-[6px] text-white/60 mt-0.5">Nueva oferta publicada</p></div>
+                  <div className="absolute right-2 md:right-6 top-3 md:top-1/2 md:-translate-y-1/2 flex flex-col gap-1 md:gap-2 z-10 pointer-events-none">
+                    <div className="flex items-center gap-1.5 md:gap-2.5 bg-white/12 backdrop-blur-sm rounded-xl px-2 md:px-4 py-1.5 md:py-3 w-32 md:w-52">
+                      <span className="text-[11px] md:text-xl flex-shrink-0">🏷️</span>
+                      <div><p className="text-[7px] md:text-[11px] text-white font-bold leading-none">El Estribo</p><p className="text-[6px] md:text-[9px] text-white/60 mt-0.5">Nueva oferta publicada</p></div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-white/12 backdrop-blur-sm rounded-xl px-2 py-1.5 w-28 ml-3">
-                      <span className="text-[11px] flex-shrink-0">🎁</span>
-                      <div><p className="text-[7px] text-white font-bold leading-none">Bayer Farm.</p><p className="text-[6px] text-white/60 mt-0.5">Sorteo activo</p></div>
+                    <div className="flex items-center gap-1.5 md:gap-2.5 bg-white/12 backdrop-blur-sm rounded-xl px-2 md:px-4 py-1.5 md:py-3 w-28 md:w-44 ml-3 md:ml-6">
+                      <span className="text-[11px] md:text-xl flex-shrink-0">🎁</span>
+                      <div><p className="text-[7px] md:text-[11px] text-white font-bold leading-none">Bayer Farm.</p><p className="text-[6px] md:text-[9px] text-white/60 mt-0.5">Sorteo activo</p></div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-white/12 backdrop-blur-sm rounded-xl px-2 py-1.5 w-24">
-                      <span className="text-[11px] flex-shrink-0">📢</span>
-                      <div><p className="text-[7px] text-white font-bold leading-none">Devcom</p><p className="text-[6px] text-white/60 mt-0.5">Nuevo post</p></div>
+                    <div className="flex items-center gap-1.5 md:gap-2.5 bg-white/12 backdrop-blur-sm rounded-xl px-2 md:px-4 py-1.5 md:py-3 w-24 md:w-48">
+                      <span className="text-[11px] md:text-xl flex-shrink-0">📢</span>
+                      <div><p className="text-[7px] md:text-[11px] text-white font-bold leading-none">Devcom</p><p className="text-[6px] md:text-[9px] text-white/60 mt-0.5">Nuevo post</p></div>
                     </div>
                   </div>
                   <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-1.5 max-w-[62%] md:max-w-[55%]">
@@ -521,33 +521,33 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
                 <motion.div key="sumate" variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-blue-900 to-violet-900">
                   <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />
                   {/* Sumate card mockup — visible en todos los dispositivos */}
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 pointer-events-none">
+                  <div className="absolute right-3 md:right-8 top-1/2 -translate-y-1/2 z-10 flex flex-col items-end gap-1.5 md:gap-3 pointer-events-none">
                     {/* Pasos */}
-                    <div className="flex items-center gap-1 mb-0.5">
+                    <div className="flex items-center gap-1 md:gap-3 mb-0.5">
                       {[{ e: "🔍", l: "Buscá" }, { e: "🏪", l: "Entrá" }, { e: "🔔", l: "Sumate" }].map((s, i) => (
-                        <div key={i} className="flex flex-col items-center gap-0.5">
-                          <div className="w-7 h-7 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-sm">{s.e}</div>
-                          <span className="text-[5.5px] text-white/50 font-semibold">{s.l}</span>
+                        <div key={i} className="flex flex-col items-center gap-0.5 md:gap-1">
+                          <div className="w-7 h-7 md:w-12 md:h-12 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-sm md:text-2xl">{s.e}</div>
+                          <span className="text-[5.5px] md:text-[9px] text-white/50 font-semibold">{s.l}</span>
                         </div>
                       ))}
                     </div>
                     {/* Botón Sumate */}
-                    <div className="relative w-32">
-                      <div className="rounded-xl border border-amber-500/60 bg-amber-500/12 backdrop-blur-sm px-2.5 py-2 flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-amber-500/30 flex items-center justify-center flex-shrink-0">
-                          <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="relative w-32 md:w-52">
+                      <div className="rounded-xl border border-amber-500/60 bg-amber-500/12 backdrop-blur-sm px-2.5 md:px-4 py-2 md:py-3 flex items-center gap-1.5 md:gap-3">
+                        <div className="w-5 h-5 md:w-8 md:h-8 rounded-full bg-amber-500/30 flex items-center justify-center flex-shrink-0">
+                          <svg className="w-3 h-3 md:w-4 md:h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                           </svg>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[8px] text-white font-bold leading-none">Sumate</p>
-                          <p className="text-[6px] text-white/50 mt-0.5">Recibí novedades</p>
+                          <p className="text-[8px] md:text-sm text-white font-bold leading-none">Sumate</p>
+                          <p className="text-[6px] md:text-[10px] text-white/50 mt-0.5">Recibí novedades</p>
                         </div>
-                        <span className="text-amber-400 text-[10px]">›</span>
+                        <span className="text-amber-400 text-[10px] md:text-base">›</span>
                       </div>
                       <div className="absolute -inset-0.5 rounded-xl border border-amber-400/50 animate-ping pointer-events-none" />
                     </div>
-                    <p className="text-[9px] text-amber-300 font-bold">👆 tocá acá</p>
+                    <p className="text-[9px] md:text-xs text-amber-300 font-bold">👆 tocá acá</p>
                   </div>
                   <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-1.5 max-w-[58%] md:max-w-[52%]">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-300/70">ASÍ DE FÁCIL</span>
