@@ -733,7 +733,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
             {posts.length > 0 && (
               <div className="flex flex-col gap-3">
                 {posts.map(post => (
-                  <ComercioPostCard key={post.id} post={post} variant="feed" isDark={isDark} />
+                  <ComercioPostCard key={post.id} post={post} variant="feed" isDark={isDark} comercioWhatsapp={comercio.whatsapp} />
                 ))}
               </div>
             )}
