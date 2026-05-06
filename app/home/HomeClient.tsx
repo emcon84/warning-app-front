@@ -441,28 +441,19 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
         {/* WhatsApp Orders Feature Banner */}
         <section className="px-0 mb-6">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600 via-green-500 to-emerald-600 p-5 md:p-6">
-            {/* Background pattern */}
-            <div className="absolute inset-0 pointer-events-none opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, white 8%, transparent 8%), radial-gradient(circle at 80% 70%, white 6%, transparent 6%)" }} />
-            <div className="absolute inset-0 pointer-events-none opacity-15" style={{ backgroundImage: "linear-gradient(45deg, transparent 45%, white 45%, white 55%, transparent 55%), linear-gradient(-45deg, transparent 45%, white 45%, white 55%, transparent 55%)", backgroundSize: "20px 20px" }} />
-            
-            <div className="relative flex flex-col md:flex-row items-center gap-4 md:gap-6">
-              {/* WhatsAppIcon big */}
-              <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
-                <svg viewBox="0 0 24 24" className="w-10 h-10 text-white" fill="currentColor">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.669.15-.197.297-.767.964-.94 1.162-.173.174-.347.198-.693.074.249-.597 1.108-1.062 2.031-1.867.297-.297.496-.495.693-.347.174.174.348.347.497.546.174.174.198.298.347.495.074.174-.024.471-.074.693-.049.173-.124.347-.248.546-1.192 1.887-2.736 2.977-4.318 3.124-1.478.124-2.508-.274-3.606-.892-.991-.571-1.775-1.634-2.06-2.928-.248-1.194-.248-2.177.173-3.128.372-.835.92-1.62 1.63-2.51.173-.2.248-.347.347-.546l.024-.074c.124-.174.05-.347-.025-.471-.074-.124-.174-.273-.347-.421-.174-.149-.347-.273-.546-.371-.198-.099-.421-.173-.668-.024-.248.173-.595.595-.744.744-.149.173-.298.249-.546.249-.174 0-.347-.024-.497-.074-.149-.049-.371-.124-.595.074zm3.696-3.693c-.547-.024-.992.173-1.342.347-.347.174-.645.347-.968.596-.174.124-.347.174-.521.074-.174-.099-.173-.347.024-.546.174-.174.42-.421.645-.596.224-.174.495-.347.768-.496.273-.149.596-.224.894-.124.297.099.62.248.918.495.298.248.595.596.769.919.174.324.198.695.099 1.042-.099.347-.42.744-.769 1.042-.347.297-.746.496-1.166.596-.42.099-.893-.024-1.315-.371-.42-.347-.818-.744-1.315-.893-.497-.149-1.066-.124-1.538.074-.471.198-.893.546-1.165.918-.273.371-.496.795-.421 1.315.074.52-.024 1.066.174 1.538.198.471.596.893 1.013 1.165.417.273.893.495 1.389.669.495.174 1.066.174 1.586.124.52-.049 1.013-.198 1.487-.546.474-.347.893-.818 1.013-1.389.124-.52.074-1.066-.074-1.612zM12 0C5.373 0 0 5.373 0 12c0 2.11.548 4.082 1.52 5.82l-1.303 3.468 3.544-1.036C8.326 19.91 10.054 20.5 12 20.5c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
-                </svg>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-5">
+            <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: "radial-gradient(circle at 80% 50%, white 0%, transparent 60%)" }} />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                <ShoppingCart className="w-6 h-6 text-white" />
               </div>
-              <div className="flex-1 min-w-0 text-center md:text-left">
-                <p className="font-black text-white text-lg md:text-xl leading-tight">Comprá por WhatsApp</p>
-                <p className="text-green-100 text-xs md:text-sm mt-1 leading-snug">Elegí tus productos y mandá el pedido directo al comercio</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-white text-base leading-tight">Pedi en tus locales favoritos</p>
+                <p className="text-amber-100 text-xs mt-0.5 leading-snug">Arma tu pedido y mandalo directo al WhatsApp del comercio</p>
               </div>
-              <div className="flex gap-2 w-full md:w-auto">
-                <Link href="/comercios" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-green-700 text-sm font-bold rounded-xl transition-colors hover:bg-green-50">
-                  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.669.15-.197.297-.767.964-.94 1.162-.173.174-.347.198-.693.074.249-.597 1.108-1.062 2.031-1.867.297-.297.496-.495.693-.347.174.174.348.347.497.546.174.174.198.298.347.495.074.174-.024.471-.074.693-.049.173-.124.347-.248.546-1.192 1.887-2.736 2.977-4.318 3.124-1.478.124-2.508-.274-3.606-.892-.991-.571-1.775-1.634-2.06-2.928-.248-1.194-.248-2.177.173-3.128.372-.835.92-1.62 1.63-2.51.173-.2.248-.347.347-.546l.024-.074c.124-.174.05-.347-.025-.471-.074-.124-.174-.273-.347-.421-.174-.149-.347-.273-.546-.371-.198-.099-.421-.173-.668-.024-.248.173-.595.595-.744.744-.149.173-.298.249-.546.249-.174 0-.347-.024-.497-.074-.149-.049-.371-.124-.595.074zm3.696-3.693c-.547-.024-.992.173-1.342.347-.347.174-.645.347-.968.596-.174.124-.347.174-.521.074-.174-.099-.173-.347.024-.546.174-.174.42-.421.645-.596.224-.174.495-.347.768-.496.273-.149.596-.224.894-.124.297.099.62.248.918.495.298.248.595.596.769.919.174.324.198.695.099 1.042-.099.347-.42.744-.769 1.042-.347.297-.746.496-1.166.596-.42.099-.893-.024-1.315-.371-.42-.347-.818-.744-1.315-.893-.497-.149-1.066-.124-1.538.074-.471.198-.893.546-1.165.918-.273.371-.496.795-.421 1.315.074.52-.024 1.066.174 1.538.198.471.596.893 1.013 1.165.417.273.893.495 1.389.669.495.174 1.066.174 1.586.124.52-.049 1.013-.198 1.487-.546.474-.347.893-.818 1.013-1.389.124-.52.074-1.066-.074-1.612zM12 0C5.373 0 0 5.373 0 12c0 2.11.548 4.082 1.52 5.82l-1.303 3.468 3.544-1.036C8.326 19.91 10.054 20.5 12 20.5c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
-                  WhatsApp
-                </Link>
-              </div>
+              <Link href="/comercios" className="flex-shrink-0 px-3 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl transition-colors">
+                Ver comercios
+              </Link>
             </div>
           </div>
         </section>
