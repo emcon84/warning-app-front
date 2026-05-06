@@ -443,9 +443,9 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
         <section className="px-0 mb-6">
           <div className="relative overflow-hidden rounded-2xl h-44 md:h-52">
             <img
-              src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop&q=80"
+              src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop&q=80"
               alt=""
-              className="absolute inset-0 w-full h-full object-cover object-right"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/98 via-emerald-950/85 to-emerald-900/50" />
             <div className="relative z-10 h-full flex flex-col justify-center px-5 gap-1.5 w-[90%] md:max-w-[60%]">
