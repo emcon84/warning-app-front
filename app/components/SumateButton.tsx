@@ -20,12 +20,26 @@ export default function SumateButton({ slug, isDark }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/api/comercios/${slug}/sumate`)
-      .then(r => r.json())
-      .then(data => { setSubscribed(!!data.subscribed); setCount(data.count ?? 0); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [slug]);
+    async function checkSubscription() {
+      if (!isSignedIn) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const token = await getToken();
+        const res = await fetch(`${API}/api/comercios/${slug}/sumate`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const data = await res.json();
+        setSubscribed(!!data.subscribed);
+        setCount(data.count ?? 0);
+      } catch {
+      } finally {
+        setLoading(false);
+      }
+    }
+    checkSubscription();
+  }, [slug, isSignedIn, getToken]);
 
   async function handleClick() {
     if (!isSignedIn) { router.push("/sign-in"); return; }
