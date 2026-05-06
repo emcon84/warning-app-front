@@ -386,11 +386,16 @@ export default function ComercioTour({ autoShow = true }: ComercioTourProps) {
               exit="exit"
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="fixed z-50
-                inset-x-3 bottom-3 rounded-3xl overflow-hidden shadow-2xl
-                md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[440px]"
+                inset-x-0 bottom-0 rounded-t-3xl overflow-hidden shadow-2xl max-h-[88svh]
+                md:inset-auto md:bottom-auto md:rounded-3xl md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[440px] md:max-h-none"
             >
+              {/* Handle — solo mobile */}
+              <div className="md:hidden flex justify-center pt-3 pb-1 bg-gray-950">
+                <div className="w-10 h-1 rounded-full bg-gray-700" />
+              </div>
+
               {/* Área visual con ilustración */}
-              <div className={`relative h-44 md:h-48 bg-gradient-to-br ${current.gradient} overflow-hidden`}>
+              <div className={`relative h-36 md:h-48 bg-gradient-to-br ${current.gradient} overflow-hidden`}>
                 <current.Illu />
 
                 {/* Barra de progreso */}
