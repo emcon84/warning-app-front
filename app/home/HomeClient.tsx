@@ -10,7 +10,8 @@ import {
   Zap, Flame, Droplets, HardHat, Settings2, ChevronRight, ChevronLeft,
   Stethoscope, Pill, Map, Trees,
 } from "lucide-react";
-import { Professional, Comercio, TurnoResponse, Supermarket } from "../types";
+import { Professional, Comercio, TurnoResponse, Supermarket, ComercioPost } from "../types";
+import ComercioPostCard from "../components/ComercioPostCard";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -283,6 +284,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [recentProductos, setRecentProductos] = useState<{ id: string; nombre: string; tipo: string; precio?: string; foto?: string; comercio: { nombre: string; slug: string; logo?: string; foto?: string } }[]>([]);
+  const [recentPosts, setRecentPosts] = useState<ComercioPost[]>([]);
   const [proSlide, setProSlide] = useState(0);
   const [proDir, setProDir] = useState(1);
   const [comercioSlide, setComercioSlide] = useState(0);
@@ -301,6 +303,13 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
     fetch(`${API_URL}/api/productos/recientes?limit=16`)
       .then(r => r.json())
       .then(d => Array.isArray(d) && setRecentProductos(d))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/posts/recientes?limit=10`)
+      .then(r => r.json())
+      .then(data => Array.isArray(data) && setRecentPosts(data))
       .catch(() => {});
   }, []);
 
@@ -448,6 +457,32 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
             </div>
           </div>
         </section>
+
+        {/* ── Comunidad ─────────────────────────────────────────────────── */}
+        {recentPosts.length > 0 && (
+          <section className="mb-6">
+            <div className="flex items-center justify-between px-0 mb-3">
+              <div>
+                <p className={`font-black text-base ${isDark ? "text-white" : "text-gray-900"}`}>
+                  En la comunidad
+                </p>
+                <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+                  Lo ultimo de los comercios locales
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 scrollbar-hide">
+              {recentPosts.map(post => (
+                <ComercioPostCard
+                  key={post.id}
+                  post={post}
+                  variant="slide"
+                  isDark={isDark}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── 4. Novedades — productos recientes + promo comercios ───────── */}
         {recentProductos.length > 0 && (
