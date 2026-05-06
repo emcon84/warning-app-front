@@ -124,7 +124,6 @@ export default async function PostPage({ params }: Props) {
           {waUrl && (
             <a
               href={waUrl}
-              onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-400 text-white text-sm font-bold rounded-xl transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
