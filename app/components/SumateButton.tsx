@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { BellPlus, BellRing } from "lucide-react";
+import { BellPlus, BellRing, Check, ChevronRight } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -12,7 +12,7 @@ interface Props {
   isDark?: boolean;
 }
 
-export default function SumateButton({ slug, isDark: _isDark }: Props) {
+export default function SumateButton({ slug, isDark }: Props) {
   const router = useRouter();
   const { isSignedIn, getToken } = useAuth();
   const [subscribed, setSubscribed] = useState(false);
@@ -22,34 +22,23 @@ export default function SumateButton({ slug, isDark: _isDark }: Props) {
   useEffect(() => {
     fetch(`${API}/api/comercios/${slug}/sumate`)
       .then(r => r.json())
-      .then(data => {
-        setSubscribed(!!data.subscribed);
-        setCount(data.count ?? 0);
-      })
+      .then(data => { setSubscribed(!!data.subscribed); setCount(data.count ?? 0); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [slug]);
 
   async function handleClick() {
-    if (!isSignedIn) {
-      router.push("/sign-in");
-      return;
-    }
-
+    if (!isSignedIn) { router.push("/sign-in"); return; }
     setLoading(true);
     try {
       const token = await getToken();
       const method = subscribed ? "DELETE" : "POST";
-      const res = await fetch(`${API}/api/sumate`, {
+      const res = await fetch(`${API}/api/comercios/${slug}/sumate`, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ slug }),
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setSubscribed(!subscribed);
+      setSubscribed(data.subscribed);
       setCount(data.count ?? count);
     } catch {
     } finally {
@@ -57,30 +46,47 @@ export default function SumateButton({ slug, isDark: _isDark }: Props) {
     }
   }
 
+  if (loading) {
+    return (
+      <div className={`mt-2 w-full h-16 rounded-2xl animate-pulse ${isDark ? "bg-gray-800" : "bg-gray-100"}`} />
+    );
+  }
+
+  if (subscribed) {
+    return (
+      <button
+        onClick={handleClick}
+        className={`mt-2 w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all active:scale-[0.98] ${isDark ? "bg-green-900/20 border border-green-800/50" : "bg-green-50 border border-green-200"}`}
+      >
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? "bg-green-900/40" : "bg-green-100"}`}>
+          <BellRing className="w-5 h-5 text-green-500" />
+        </div>
+        <div className="flex-1 text-left">
+          <p className={`text-sm font-bold ${isDark ? "text-green-400" : "text-green-700"}`}>Conectado</p>
+          <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+            Recibirás novedades de este comercio{count > 1 ? ` · ${count} conectados` : ""}
+          </p>
+        </div>
+        <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+      </button>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center">
-      {subscribed ? (
-        <button
-          onClick={handleClick}
-          disabled={loading}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-green-500/40 bg-green-500/10 text-green-600 dark:text-green-400 font-semibold text-sm transition-all active:scale-95 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-        >
-          <BellRing className="w-4 h-4" />
-          Conectado
-        </button>
-      ) : (
-        <button
-          onClick={handleClick}
-          disabled={loading}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-sm transition-all active:scale-95 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-        >
-          <BellPlus className="w-4 h-4" />
-          Sumate
-        </button>
-      )}
-      {count > 0 && (
-        <p className="text-xs text-center text-gray-400 mt-1">{count} conectados</p>
-      )}
-    </div>
+    <button
+      onClick={handleClick}
+      className={`mt-2 w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl border-2 border-dashed transition-all active:scale-[0.98] ${isDark ? "border-amber-500/30 hover:border-amber-500/60 hover:bg-amber-500/5" : "border-amber-400/40 hover:border-amber-500/60 hover:bg-amber-50"}`}
+    >
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${isDark ? "bg-amber-500/15" : "bg-amber-100"}`}>
+        <BellPlus className="w-5 h-5 text-amber-500" />
+      </div>
+      <div className="flex-1 text-left">
+        <p className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-900"}`}>Sumate</p>
+        <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+          Recibí todas las novedades, ofertas y sorteos{count > 0 ? ` · ${count} conectados` : ""}
+        </p>
+      </div>
+      <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isDark ? "text-amber-500" : "text-amber-500"}`} />
+    </button>
   );
 }
