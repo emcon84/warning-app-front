@@ -873,7 +873,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   }
 
   useEffect(() => {
-    if (tab !== "stats" || analytics) return;
+    if ((tab !== "stats" && activeSection !== "stats") || analytics) return;
     setAnalyticsLoading(true);
     getToken()
       .then((token) =>
@@ -888,14 +888,14 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   }, [tab, analytics, getToken]);
 
   useEffect(() => {
-    if (tab !== "comunidad") return;
+    if (tab !== "comunidad" && activeSection !== "comunidad") return;
     setLoadingComunidad(true);
     fetch(`${API}/api/comercios/${comercio.slug}/posts?limit=20`)
       .then(r => r.json())
       .then(d => { if (d.posts) setComunidadPosts(d.posts); })
       .catch(() => {})
       .finally(() => setLoadingComunidad(false));
-  }, [tab, comercio.slug]);
+  }, [tab, activeSection, comercio.slug]);
 
   async function handlePublicarPost() {
     if (!postContenido.trim()) return;
