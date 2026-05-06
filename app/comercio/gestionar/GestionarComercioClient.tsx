@@ -885,7 +885,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       .then((d: AnalyticsData) => setAnalytics(d))
       .catch(() => {})
       .finally(() => setAnalyticsLoading(false));
-  }, [tab, analytics, getToken]);
+  }, [tab, activeSection, analytics, getToken]);
 
   useEffect(() => {
     if (tab !== "comunidad" && activeSection !== "comunidad") return;
@@ -895,7 +895,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       .then(d => { if (d.posts) setComunidadPosts(d.posts); })
       .catch(() => {})
       .finally(() => setLoadingComunidad(false));
-  }, [tab, activeSection, comercio.slug]);
+  }, [tab, activeSection, comercio.slug, getToken]);
 
   async function handlePublicarPost() {
     if (!postContenido.trim()) return;
