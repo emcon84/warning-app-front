@@ -6,6 +6,7 @@ import {
   BarChart3, Users, Smartphone, Check,
 } from "lucide-react";
 import LandingThemeToggle from "../components/LandingThemeToggle";
+import ComercioTour from "../components/ComercioTour";
 
 export const metadata: Metadata = {
   title: "Registra tu comercio | Reportes Reconquista",
@@ -420,6 +421,9 @@ export default function ParaComerciosPage() {
         </Link>
         <p className="text-xs text-gray-400 dark:text-gray-600 mt-4">Sin tarjeta de credito. Sin contratos. 100% gratuito.</p>
       </section>
+
+      {/* Tour interactivo */}
+      <ComercioTour autoShow />
 
       {/* Footer */}
       <footer className="border-t border-gray-200/60 dark:border-gray-800/60">
