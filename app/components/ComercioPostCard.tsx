@@ -66,7 +66,11 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
     : `rounded-2xl border overflow-hidden cursor-pointer ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`;
 
   function handleClick() {
-    router.push(`/post/${post.id}`);
+    // Slide variant goes to post detail, feed variant stays on current page (no navigation)
+    // This way tapping a post in the home feed goes to detail, but tapping in the comercio profile keeps you there
+    if (variant === "slide") {
+      router.push(`/post/${post.id}`);
+    }
   }
 
   async function handleLike(e: React.MouseEvent) {
