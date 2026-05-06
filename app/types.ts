@@ -251,3 +251,28 @@ export interface Comercio {
   offers?: ComercioOffer[];
   productos?: Producto[];
 }
+
+// ─── Comunidad ───────────────────────────────────────────────────────────────
+
+export type PostTipo = "novedad" | "oferta" | "sorteo";
+
+export interface ComercioPost {
+  id: string;
+  comercioId: string;
+  tipo: PostTipo;
+  contenido: string;
+  foto?: string | null;
+  precioAntes?: string | null;
+  precioDespues?: string | null;
+  fechaSorteo?: string | null;
+  activo: boolean;
+  createdAt: string;
+  comercio?: {
+    id: string;
+    nombre: string;
+    slug: string;
+    foto?: string | null;
+    logo?: string | null;
+    rubro: string;
+  };
+}
