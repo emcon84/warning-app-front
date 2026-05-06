@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { useTheme } from "../../contexts/ThemeContext";
 import Navbar from "../../components/Navbar";
 import { Comercio, ComercioOffer, Producto } from "../../types";
@@ -12,6 +13,7 @@ import {
   Plus, Trash2, ToggleLeft, ToggleRight,
   X, Check, Pencil, ExternalLink, Share2,
   Eye, MessageCircle, Package, Camera, Sparkles, Megaphone,
+  ArrowLeft,
 } from "lucide-react";
 import ComercioPostCard from "../../components/ComercioPostCard";
 import type { ComercioPost } from "../../types";
@@ -628,6 +630,10 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const { getToken } = useAuth();
   const { isDark } = useTheme();
   const searchParams = useSearchParams();
+  const sectionParam = searchParams.get("section");
+  const tabParam = searchParams.get("tab") as Tab | null;
+  // section takes precedence over tab for backward compat
+  const activeSection = sectionParam || tabParam;
   const [tab, setTab] = useState<Tab>((searchParams.get("tab") as Tab) ?? "datos");
   const [comercio, setComercio] = useState(initial);
   const [offers, setOffers] = useState<ComercioOffer[]>(initial.offers ?? []);
@@ -947,6 +953,17 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
     { id: "kit",       label: "Mi Kit",    icon: <QrCode className="w-4 h-4" /> },
   ];
 
+  // Section mapping for dashboard cards
+  const SECTION_TABS: { id: Tab; section: string; icon: React.ReactNode; title: string; badge: string }[] = [
+    { id: "datos", section: "datos", icon: <Store className="w-6 h-6" />, title: "Datos", badge: "" },
+    { id: "fotos", section: "fotos", icon: <ImageIcon className="w-6 h-6" />, title: "Fotos", badge: `${comercio.fotos?.length ?? 0} fotos` },
+    { id: "productos", section: "productos", icon: <ShoppingBag className="w-6 h-6" />, title: "Catálogo", badge: `${productos.length} items` },
+    { id: "ofertas", section: "ofertas", icon: <Tag className="w-6 h-6" />, title: "Ofertas", badge: `${offers.length} ofertas` },
+    { id: "comunidad", section: "comunidad", icon: <Megaphone className="w-6 h-6" />, title: "Comunidad", badge: `${comunidadPosts.length} posts` },
+    { id: "stats", section: "stats", icon: <BarChart2 className="w-6 h-6" />, title: "Estadísticas", badge: "" },
+    { id: "kit", section: "kit", icon: <QrCode className="w-6 h-6" />, title: "Mi Kit", badge: "" },
+  ];
+
   const existingFotos = comercio.fotos ?? [];
   const canAddGallery = galleryFiles.length + existingFotos.length < 6;
 
@@ -1010,17 +1027,34 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6 gap-3">
-          <div className="min-w-0 flex-1">
-            <h1 className={`text-xl font-black truncate ${textPri}`}>{comercio.nombre}</h1>
-            <p className={`text-sm truncate ${textSec}`}>{comercio.rubro} · {comercio.barrio}</p>
+          <div className="min-w-0 flex-1 flex items-center gap-3">
+            {activeSection && (
+              <button
+                onClick={() => {
+                  const url = new URL(window.location.href);
+                  url.search = "";
+                  router.replace(url.pathname);
+                }}
+                className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Volver
+              </button>
+            )}
+            <div className="min-w-0 flex-1">
+              <h1 className={`text-xl font-black truncate ${textPri}`}>{comercio.nombre}</h1>
+              <p className={`text-sm truncate ${textSec}`}>{comercio.rubro} · {comercio.barrio}</p>
+            </div>
           </div>
-          <button
-            onClick={() => router.push(`/comercio/${comercio.slug}`)}
-            className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            Ver perfil
-          </button>
+          {!activeSection && (
+            <button
+              onClick={() => router.push(`/comercio/${comercio.slug}`)}
+              className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Ver perfil
+            </button>
+          )}
         </div>
 
         {/* Banner de plan con límites y uso */}
@@ -1079,23 +1113,58 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           </div>
         )}
 
-        {/* Tabs */}
-        <div className={`flex gap-1 p-1 rounded-2xl mb-6 overflow-x-auto ${isDark ? "bg-gray-900" : "bg-gray-100"}`}>
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex-shrink-0 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl text-sm font-semibold transition-colors ${
-                tab === t.id
-                  ? isDark ? "bg-white text-gray-900" : "bg-white text-gray-900 shadow-sm"
-                  : isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"
-              }`}
+        {/* Tabs or Dashboard Grid */}
+        {!activeSection && (
+          <>
+            <div className={`flex gap-1 p-1 rounded-2xl mb-6 overflow-x-auto ${isDark ? "bg-gray-900" : "bg-gray-100"}`}>
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`flex-shrink-0 flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl text-sm font-semibold transition-colors ${
+                    tab === t.id
+                      ? isDark ? "bg-white text-gray-900" : "bg-white text-gray-900 shadow-sm"
+                      : isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  {t.icon}
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Dashboard Card Grid */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mb-6"
             >
-              {t.icon}
-              {t.label}
-            </button>
-          ))}
-        </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {SECTION_TABS.map((item) => (
+                  <button
+                    key={item.section}
+                    onClick={() => {
+                      const url = new URL(window.location.href);
+                      url.searchParams.set("section", item.section);
+                      router.replace(url.search);
+                    }}
+                    className={`rounded-2xl border p-5 flex flex-col items-center justify-center gap-3 text-center transition-all hover:scale-[1.02] ${
+                      isDark ? "bg-gray-900 border-gray-800 hover:border-gray-600" : "bg-white border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    <div className={`p-3 rounded-xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+                      {item.icon}
+                    </div>
+                    <div>
+                      <p className={`font-bold ${textPri}`}>{item.title}</p>
+                      {item.badge && <p className={`text-xs mt-1 ${textMuted}`}>{item.badge}</p>}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
 
         {/* ── Tab: Datos ─────────────────────────────────────────────── */}
         {tab === "datos" && (
