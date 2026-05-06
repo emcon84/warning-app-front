@@ -265,6 +265,7 @@ export interface ComercioPost {
   precioAntes?: string | null;
   precioDespues?: string | null;
   fechaSorteo?: string | null;
+  likes?: number;
   activo: boolean;
   createdAt: string;
   comercio?: {
@@ -274,5 +275,6 @@ export interface ComercioPost {
     foto?: string | null;
     logo?: string | null;
     rubro: string;
+    whatsapp?: string;
   };
 }
