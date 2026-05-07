@@ -18,7 +18,13 @@ function resolvePhoto(url?: string | null): string | null {
   if (!url) return null;
   return url.startsWith("/uploads/") ? `${API_URL}${url}` : url;
 }
-import { motion } from "framer-motion";
+
+const productSlideVariants = {
+  enter: () => ({ scale: 0.92, opacity: 0, filter: "blur(4px)" }),
+  center: { scale: 1, opacity: 1, filter: "blur(0px)" },
+  exit: () => ({ scale: 1.06, opacity: 0, filter: "blur(2px)" }),
+};
+import { motion, AnimatePresence } from "framer-motion";
 import { useTransitionRouter } from "next-view-transitions";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -71,6 +77,8 @@ export default function ComerciosClient({ comercios }: Props) {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const filtersRef  = useRef<HTMLDivElement>(null);
   const dragState   = useRef({ dragging: false, startX: 0, scrollLeft: 0 });
+  const [productSlide, setProductSlide] = useState(0);
+  const productSwipeX = useRef(0);
 
   function onFilterMouseDown(e: ReactMouseEvent<HTMLDivElement>) {
     const el = filtersRef.current;
@@ -147,6 +155,13 @@ export default function ComerciosClient({ comercios }: Props) {
       .then(data => Array.isArray(data) && setRecentProductos(data))
       .catch(() => {});
   }, []);
+
+  const sliderCount = Math.min(recentProductos.length, 8);
+  useEffect(() => {
+    if (sliderCount < 3) return;
+    const id = setInterval(() => setProductSlide(p => (p + 1) % sliderCount), 5000);
+    return () => clearInterval(id);
+  }, [sliderCount]);
 
   useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedRubro, search]);
 
@@ -310,56 +325,71 @@ export default function ComerciosClient({ comercios }: Props) {
           </div>
         )}
 
-        {/* Últimos productos — marquee */}
-        {recentProductos.length >= 3 && (() => {
-          const copies = Math.max(2, Math.ceil(12 / recentProductos.length));
-          const marqueeItems = Array.from({ length: copies }, () => recentProductos).flat();
+        {/* Últimos productos — slider full-screen */}
+        {sliderCount >= 3 && (() => {
+          const sliderProducts = recentProductos.slice(0, sliderCount);
+          const current = sliderProducts[productSlide];
+          if (!current) return null;
+          const foto = resolvePhoto(current.foto);
+          const logo = resolvePhoto(current.comercio.logo || current.comercio.foto);
+          const esServicio = current.tipo === "servicio";
           return (
-          <div className="mb-6 mt-2">
-            <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${textMuted}`}>
-              Últimos productos y servicios
-            </p>
-            <div className="overflow-hidden -mx-4">
+            <div className="mb-6 mt-2">
+              <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${textMuted}`}>
+                Últimos productos y servicios
+              </p>
               <div
-                className="flex gap-3 carousel-marquee"
-                style={{ animationDuration: `${Math.max(20, recentProductos.length * 2.2)}s`, width: "max-content" }}
+                className="relative overflow-hidden rounded-2xl h-52 -mx-4 touch-pan-y"
+                onPointerDown={(e) => { productSwipeX.current = e.clientX; }}
+                onPointerUp={(e) => {
+                  const d = productSwipeX.current - e.clientX;
+                  if (d > 50) setProductSlide(p => (p + 1) % sliderCount);
+                  else if (d < -50) setProductSlide(p => (p - 1 + sliderCount) % sliderCount);
+                }}
               >
-                {marqueeItems.map((p, i) => {
-                  const foto = resolvePhoto(p.foto);
-                  const logo = resolvePhoto(p.comercio.logo || p.comercio.foto);
-                  const esServicio = p.tipo === "servicio";
-                  return (
-                    <a
-                      key={`${p.id}-${i}`}
-                      href={`/comercio/${p.comercio.slug}`}
-                      className={`flex-shrink-0 w-40 rounded-2xl border overflow-hidden flex flex-col transition-transform hover:scale-[1.02] active:scale-95 ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
-                    >
-                      {/* Foto o placeholder */}
-                      <div className={`w-full h-28 flex items-center justify-center flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
-                        {foto
-                          ? <img src={foto} alt={p.nombre} className="w-full h-full object-cover" />
-                          : <span className="text-3xl">{esServicio ? "🔧" : "🛍"}</span>
+                <AnimatePresence mode="wait">
+                  <motion.a
+                    key={`slide-${productSlide}`}
+                    href={`/comercio/${current.comercio.slug}`}
+                    variants={productSlideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0 block"
+                  >
+                    {foto ? (
+                      <img src={foto} alt={current.nombre} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <div className={`absolute inset-0 flex items-center justify-center text-6xl ${isDark ? "bg-gray-800" : "bg-gray-200"}`}>
+                        {esServicio ? "🔧" : "🛍"}
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                      <p className="text-white font-bold text-base leading-tight line-clamp-2 drop-shadow">{current.nombre}</p>
+                      {current.precio && <p className="text-green-400 font-black text-sm mt-1">{current.precio}</p>}
+                      <div className="flex items-center gap-1.5 mt-2">
+                        {logo
+                          ? <img src={logo} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0 ring-1 ring-white/30" />
+                          : <div className="w-5 h-5 rounded-full bg-gray-600 flex items-center justify-center text-[9px] font-black text-white flex-shrink-0">{current.comercio.nombre[0]}</div>
                         }
+                        <p className="text-white/70 text-xs truncate">{current.comercio.nombre}</p>
                       </div>
-                      {/* Info */}
-                      <div className="p-2.5 flex flex-col gap-1 flex-1">
-                        <p className={`text-xs font-bold leading-snug line-clamp-2 ${isDark ? "text-white" : "text-gray-900"}`}>{p.nombre}</p>
-                        {p.precio && <p className="text-xs font-black text-green-500">{p.precio}</p>}
-                        {/* Comercio */}
-                        <div className="flex items-center gap-1.5 mt-auto pt-1.5 border-t border-gray-100 dark:border-gray-800">
-                          {logo
-                            ? <img src={logo} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
-                            : <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-black ${isDark ? "bg-gray-700 text-gray-300" : "bg-gray-200 text-gray-600"}`}>{p.comercio.nombre[0]}</div>
-                          }
-                          <p className={`text-[10px] truncate ${isDark ? "text-gray-400" : "text-gray-500"}`}>{p.comercio.nombre}</p>
-                        </div>
-                      </div>
-                    </a>
-                  );
-                })}
+                    </div>
+                  </motion.a>
+                </AnimatePresence>
+                <div className="absolute bottom-4 right-4 flex gap-1.5 z-20">
+                  {sliderProducts.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={(e) => { e.preventDefault(); setProductSlide(i); }}
+                      className={`rounded-full transition-all duration-300 ${i === productSlide ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/60"}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
           );
         })()}
 
