@@ -350,7 +350,7 @@ export default function ComerciosClient({ comercios }: Props) {
                 <AnimatePresence mode="wait">
                   <motion.a
                     key={`slide-${productSlide}`}
-                    href={`/comercio/${current.comercio.slug}`}
+                    href={`/comercio/${current.comercio.slug}/producto/${current.id}`}
                     variants={productSlideVariants}
                     initial="enter"
                     animate="center"
