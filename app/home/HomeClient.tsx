@@ -432,14 +432,14 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
               <Link
                 key={label}
                 href={href}
-                className={`flex-shrink-0 w-40 h-[108px] rounded-2xl bg-gradient-to-br ${gradient} shadow-lg ${glow} flex flex-col justify-between p-4 transition-transform active:scale-[0.97] hover:scale-[1.02] md:w-auto md:flex-1`}
+                className={`flex-shrink-0 w-40 h-[108px] rounded-2xl bg-gradient-to-br ${gradient} shadow-lg ${glow} flex flex-col p-4 transition-transform active:scale-[0.97] hover:scale-[1.02] md:w-auto md:flex-1`}
               >
                 <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
                   <Icon className="w-5 h-5 text-white" />
                 </div>
-                <div>
+                <div className="mt-auto">
                   <p className="text-white font-black text-sm leading-tight">{label}</p>
-                  <p className="text-white/70 text-[10px] mt-0.5 leading-snug">{sub}</p>
+                  <p className="text-white/70 text-[10px] mt-0.5 leading-snug line-clamp-1">{sub}</p>
                 </div>
               </Link>
             ))}
