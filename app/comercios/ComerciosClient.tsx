@@ -339,7 +339,7 @@ export default function ComerciosClient({ comercios }: Props) {
                 Últimos productos y servicios
               </p>
               <div
-                className="relative overflow-hidden rounded-2xl h-52 -mx-4 touch-pan-y"
+                className="relative overflow-hidden rounded-2xl h-52 touch-pan-y"
                 onPointerDown={(e) => { productSwipeX.current = e.clientX; }}
                 onPointerUp={(e) => {
                   const d = productSwipeX.current - e.clientX;
@@ -365,16 +365,16 @@ export default function ComerciosClient({ comercios }: Props) {
                         {esServicio ? "🔧" : "🛍"}
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-                      <p className="text-white font-bold text-base leading-tight line-clamp-2 drop-shadow">{current.nombre}</p>
-                      {current.precio && <p className="text-green-400 font-black text-sm mt-1">{current.precio}</p>}
+                      <p className="text-white font-bold text-base leading-tight line-clamp-2 [text-shadow:0_2px_8px_rgba(0,0,0,0.9)]">{current.nombre}</p>
+                      {current.precio && <p className="text-green-400 font-black text-sm mt-1 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">{current.precio}</p>}
                       <div className="flex items-center gap-1.5 mt-2">
                         {logo
                           ? <img src={logo} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0 ring-1 ring-white/30" />
                           : <div className="w-5 h-5 rounded-full bg-gray-600 flex items-center justify-center text-[9px] font-black text-white flex-shrink-0">{current.comercio.nombre[0]}</div>
                         }
-                        <p className="text-white/70 text-xs truncate">{current.comercio.nombre}</p>
+                        <p className="text-white/90 text-xs truncate [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]">{current.comercio.nombre}</p>
                       </div>
                     </div>
                   </motion.a>
@@ -500,9 +500,16 @@ export default function ComerciosClient({ comercios }: Props) {
                       </div>
                       <div className="flex items-center gap-1 mt-0.5">
                         <Tag className={`w-3 h-3 flex-shrink-0 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
-                        <p className={`text-xs capitalize truncate ${isDark ? "text-blue-400" : "text-blue-600"}`}>
-                          {comercio.rubro}
-                        </p>
+                        {(() => {
+                          const rubros = comercio.rubro.split(/\s*\/\s*/);
+                          const shown = rubros.slice(0, 2).join(' / ');
+                          const extra = rubros.length - 2;
+                          return (
+                            <p className={`text-xs capitalize ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+                              {shown}{extra > 0 && <span className={`text-xs ${isDark ? "text-blue-400/60" : "text-blue-600/60"}`}> +{extra} más</span>}
+                            </p>
+                          );
+                        })()}
                       </div>
                       {comercio.barrio && (
                         <div className="flex items-center gap-1 mt-1">
