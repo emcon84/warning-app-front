@@ -106,31 +106,30 @@ export default async function PostPage({ params }: Props) {
         </div>
 
         {/* Info del comercio */}
-        <Link
-          href={`/comercio/${post.comercio?.slug}`}
-          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3"
-        >
-          {logoUrl ? (
-            <img src={logoUrl} alt={post.comercio?.nombre} className="w-12 h-12 rounded-xl object-cover" />
-          ) : (
-            <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-              <Store className="w-6 h-6 text-gray-400" />
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
+          <Link href={`/comercio/${post.comercio?.slug}`} className="flex items-center gap-3 flex-1 min-w-0">
+            {logoUrl ? (
+              <img src={logoUrl} alt={post.comercio?.nombre} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
+            ) : (
+              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <Store className="w-6 h-6 text-gray-400" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="font-bold text-gray-900 dark:text-white truncate">{post.comercio?.nombre}</p>
+              <p className="text-xs text-gray-500">{post.comercio?.barrio}</p>
             </div>
-          )}
-          <div className="flex-1">
-            <p className="font-bold text-gray-900 dark:text-white">{post.comercio?.nombre}</p>
-            <p className="text-xs text-gray-500">{post.comercio?.barrio}</p>
-          </div>
+          </Link>
           {waUrl && (
             <a
               href={waUrl}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-400 text-white text-sm font-bold rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-400 text-white text-sm font-bold rounded-xl transition-colors flex-shrink-0"
             >
               <MessageCircle className="w-4 h-4" />
               Contactar
             </a>
           )}
-        </Link>
+        </div>
       </main>
     </div>
   );
