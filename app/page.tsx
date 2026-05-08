@@ -236,26 +236,10 @@ export default function Home() {
         </header>
 
         {/* Hero */}
-        <section className="relative overflow-hidden pt-16">
+        <section className="relative overflow-hidden min-h-screen flex items-center">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(99,102,241,0.06)_0%,_transparent_60%)]" />
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto w-full py-16">
             <HeroCarousel />
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="border-y border-gray-200/60 dark:border-gray-800/60 bg-gray-50 dark:bg-gray-900/30">
-          <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-3 gap-4 sm:gap-8 text-center">
-            {[
-              { value: "500+", label: "Vecinos activos" },
-              { value: "1.200+", label: "Reportes publicados" },
-              { value: "80+", label: "Profesionales" },
-            ].map((s, i) => (
-              <div key={i}>
-                <p className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white">{s.value}</p>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">{s.label}</p>
-              </div>
-            ))}
           </div>
         </section>
 
