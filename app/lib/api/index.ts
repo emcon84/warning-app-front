@@ -6,3 +6,4 @@ export * from "./supermarkets";
 export * from "./employees";
 export * from "./vacancies";
 export * from "./stats";
+export * from "./professionals";
