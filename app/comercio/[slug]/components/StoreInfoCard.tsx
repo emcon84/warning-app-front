@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { MapPin, Clock, Phone, ThumbsUp, Pencil, Users } from "lucide-react";
 import type { Comercio } from "../../../types";
 import type { ThemeClasses } from "./types";
@@ -41,9 +42,11 @@ export function StoreInfoCard({ comercio, theme, rubroBadge, isOwner, recommende
             style={{ viewTransitionName: `co-photo-${comercio.slug}` }}
           >
             {(comercio.logo || comercio.foto) ? (
-              <img
+              <Image
                 src={resolvePhotoUrl((comercio.logo || comercio.foto)!)}
                 alt={comercio.nombre}
+                width={80}
+                height={80}
                 className="w-full h-full object-cover"
               />
             ) : (

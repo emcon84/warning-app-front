@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { resolvePhotoUrl } from "../../../lib/utils/photo";
 
 interface Props {
@@ -12,10 +13,11 @@ export function StoreHero({ comercio, onBack, heroGradient }: Props) {
   return (
     <div className="relative h-48 sm:h-56 w-full overflow-hidden">
       {comercio.foto ? (
-        <img
+        <Image
           src={resolvePhotoUrl(comercio.foto)}
           alt={comercio.nombre}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
       ) : (
         <div className={`w-full h-full bg-gradient-to-br ${heroGradient} flex items-center justify-center`}>
