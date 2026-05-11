@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { ImageIcon, Megaphone, Trash2, X } from "lucide-react";
 import ComercioPostCard from "../../../components/ComercioPostCard";
 import NuevoPostWizard from "../NuevoPostWizard";
@@ -167,10 +168,9 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
           )}
 
           <div>
-            {/* blob: preview from FileReader — must stay plain img */}
             {postFotoPreview ? (
-              <div className="relative">
-                <img src={postFotoPreview} className="w-full h-40 object-cover rounded-xl" alt="preview" />
+              <div className="relative w-full h-40">
+                <Image src={postFotoPreview} alt="preview" fill className="object-cover rounded-xl" unoptimized />
                 <button
                   onClick={() => { setPostFoto(null); setPostFotoPreview(null); }}
                   className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white"

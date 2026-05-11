@@ -38,7 +38,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const sectionParam = searchParams.get("section");
   const tabParam = searchParams.get("tab") as Tab | null;
   const activeSection = sectionParam || tabParam;
-  const [tab] = useState<Tab>((searchParams.get("tab") as Tab) ?? "dados");
+  const [tab] = useState<Tab>((searchParams.get("tab") as Tab) ?? "datos");
 
   const [comercio, setComercio] = useState(initial);
   const [offers, setOffers] = useState<ComercioOffer[]>(initial.offers ?? []);
@@ -112,10 +112,10 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
     } catch { /**/ }
   }
 
-  async function handleToggleProducto(p: Produto) {
+  async function handleToggleProducto(p: Producto) {
     try {
       const token = await getToken();
-      const res = await fetch(`${API}/api/comercios/me/produtos/${p.id}`, {
+      const res = await fetch(`${API}/api/comercios/me/productos/${p.id}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ activo: !p.activo }),
@@ -129,7 +129,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   async function handleDeleteProducto(id: string) {
     try {
       const token = await getToken();
-      await fetch(`${API}/api/comercios/me/produtos/${id}`, {
+      await fetch(`${API}/api/comercios/me/productos/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -138,9 +138,9 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   }
 
   const SECTION_TABS: { id: Tab; section: string; icon: React.ReactNode; title: string; badge: string }[] = [
-    { id: "dados",    section: "dados",    icon: <Store className="w-6 h-6" />,      title: "Dados",          badge: "" },
+    { id: "datos",    section: "datos",    icon: <Store className="w-6 h-6" />,      title: "Dados",          badge: "" },
     { id: "fotos",    section: "fotos",    icon: <ImageIcon className="w-6 h-6" />,  title: "Fotos",          badge: `${comercio.fotos?.length ?? 0} fotos` },
-    { id: "produtos", section: "produtos", icon: <ShoppingBag className="w-6 h-6" />,title: "Catálogo",       badge: `${productos.length} items` },
+    { id: "productos", section: "productos", icon: <ShoppingBag className="w-6 h-6" />,title: "Catálogo",       badge: `${productos.length} items` },
     { id: "ofertas",  section: "ofertas",  icon: <Tag className="w-6 h-6" />,        title: "Ofertas",        badge: `${offers.length} ofertas` },
     { id: "comunidad",section: "comunidad",icon: <Megaphone className="w-6 h-6" />,  title: "Comunidad",      badge: "" },
     { id: "stats",    section: "stats",    icon: <BarChart2 className="w-6 h-6" />,  title: "Estadísticas",   badge: "" },
@@ -247,7 +247,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             <div className="flex-1">
               <p className="text-xs font-bold text-indigo-400">Plan Premium</p>
               <p className={`text-xs ${textMuted}`}>
-                {planInfo.usage.produtos}/{planInfo.limits.totalProducts} productos · {planInfo.limits.dailyAi}/día IA
+                {planInfo.usage.productos}/{planInfo.limits.totalProducts} productos · {planInfo.limits.dailyAi}/día IA
               </p>
             </div>
             <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-indigo-500 text-indigo-400 hover:bg-indigo-500/20 transition-colors flex-shrink-0">
@@ -261,14 +261,14 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               <div className="flex-1">
                 <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
                 <p className={`text-xs ${textMuted}`}>
-                  {planInfo?.usage.produtos ?? 0}/{planInfo?.limits.totalProducts ?? 50} produtos
+                  {planInfo?.usage.productos ?? 0}/{planInfo?.limits.totalProducts ?? 50} productos
                 </p>
               </div>
               <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0">
                 Upgrade
               </button>
             </div>
-            {planInfo?.canUpgrade && planInfo.usage.produtos >= (planInfo.limits.totalProducts as number) - 3 && (
+            {planInfo?.canUpgrade && planInfo.usage.productos >= (planInfo.limits.totalProducts as number) - 3 && (
               <p className="text-xs text-amber-500">¡Casi alcanzás el límite! Considerá pasar a Premium.</p>
             )}
           </div>
@@ -300,7 +300,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         )}
 
         {/* Section views */}
-        {activeSection === "dados" && (
+        {activeSection === "datos" && (
           <StoreDataTab
             comercio={comercio}
             isDark={isDark}
@@ -316,9 +316,9 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
           />
         )}
 
-        {(activeSection === "produtos" || tab === "produtos") && (
+        {(activeSection === "productos" || tab === "productos") && (
           <StoreProductsTab
-            produtos={produtos}
+            productos={productos}
             slug={comercio.slug}
             isPremium={!!(initial as any).isPremium}
             isDark={isDark}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Camera, Check, Instagram, Link } from "lucide-react";
 import { useConfetti } from "../../hooks/useConfetti";
@@ -400,11 +401,13 @@ function Step1Foto({
           <span className="text-sm text-gray-400 dark:text-gray-500">Subí la foto del producto</span>
         </button>
       ) : (
-        <div className="relative">
-          <img
+        <div className="relative w-full aspect-square max-h-72">
+          <Image
             src={photoPreview}
             alt="preview"
-            className="w-full aspect-square max-h-72 rounded-3xl object-cover"
+            fill
+            className="rounded-3xl object-cover"
+            unoptimized
           />
           {aiGenUrl && (
             <div className="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full">
@@ -617,13 +620,15 @@ function Step3Listo({
 
         <div className="flex justify-center">
           <div
-            className="rounded-2xl overflow-hidden shadow-lg"
+            className="relative rounded-2xl overflow-hidden shadow-lg"
             style={{ width: 150, aspectRatio: "9/16" }}
           >
-            <img
+            <Image
               src={`/share/producto?${params}`}
               alt="preview story"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
           </div>
         </div>

@@ -96,9 +96,8 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
             onClick={() => logoRef.current?.click()}
             className="w-20 h-20 rounded-full overflow-hidden border-2 cursor-pointer flex-shrink-0 relative group"
           >
-            {/* blob: preview — must stay plain img */}
             {newLogoPreview ? (
-              <img src={newLogoPreview} alt="logo preview" className="w-full h-full object-cover" />
+              <Image src={newLogoPreview} alt="logo preview" fill className="object-cover" unoptimized />
             ) : logoSrc ? (
               <Image
                 src={resolvePhotoUrl(logoSrc)}
@@ -144,9 +143,8 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
             onClick={() => mainPhotoRef.current?.click()}
             className={`w-32 h-20 rounded-xl overflow-hidden border-2 cursor-pointer flex-shrink-0 relative group ${isDark ? "border-gray-700" : "border-gray-200"}`}
           >
-            {/* blob: preview — must stay plain img */}
             {newMainPreview ? (
-              <img src={newMainPreview} alt="portada preview" className="w-full h-full object-cover" />
+              <Image src={newMainPreview} alt="portada preview" fill className="object-cover" unoptimized />
             ) : comercio.foto ? (
               <Image
                 src={resolvePhotoUrl(comercio.foto)}
@@ -222,7 +220,7 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
           {galleryPreviews.map((src, i) => (
             <div key={`new-${i}`} className="relative aspect-square">
               <div className={`w-full h-full rounded-xl overflow-hidden border-2 border-dashed ${isDark ? "border-blue-700" : "border-blue-300"}`}>
-                <img src={src} alt={`Nueva ${i + 1}`} className="w-full h-full object-cover" />
+                <Image src={src} alt={`Nueva ${i + 1}`} fill className="object-cover" unoptimized />
               </div>
               <button
                 onClick={() => {

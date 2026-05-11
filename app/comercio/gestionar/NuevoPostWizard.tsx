@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Megaphone, Tag, Gift, Camera, ChevronRight } from "lucide-react";
 import { useConfetti } from "../../hooks/useConfetti";
@@ -277,8 +278,8 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
                 )}
 
                 {fotoPreview ? (
-                  <div className="relative">
-                    <img src={fotoPreview} className="w-full h-48 object-cover rounded-2xl" alt="preview" />
+                  <div className="relative w-full h-48">
+                    <Image src={fotoPreview} alt="preview" fill className="object-cover rounded-2xl" unoptimized />
                     <button
                       onClick={() => { setFoto(null); setFotoPreview(null); }}
                       className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { X, ImageIcon } from "lucide-react";
 import type { ComercioOffer } from "../../../types";
@@ -150,8 +151,7 @@ export function StoreOfferModal({ isDark, onClose, onSaved, editing }: Props) {
                 }`}
               >
                 {photoPreview ? (
-                  // blob: preview URL — cannot use next/image for local object URLs
-                  <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
+                  <Image src={photoPreview} alt="preview" fill className="object-cover" unoptimized />
                 ) : (
                   <ImageIcon className={`w-5 h-5 ${isDark ? "text-gray-600" : "text-gray-400"}`} />
                 )}

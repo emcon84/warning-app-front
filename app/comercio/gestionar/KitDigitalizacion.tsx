@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import NextImage from "next/image";
 import { Download, QrCode } from "lucide-react";
 import type { Comercio } from "../../types";
 
@@ -142,8 +143,7 @@ export default function KitDigitalizacion({ comercio, isDark, cardBg, textPri, t
           >
             <div className="bg-blue-600 px-4 py-5 text-center">
               <div className="w-10 h-10 rounded-xl mx-auto mb-2 overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/icon.svg" alt="Logo" className="w-full h-full" />
+                <NextImage src="/icon.svg" alt="Logo" width={40} height={40} className="w-full h-full" />
               </div>
               <p className="text-white font-bold text-xs">Reportes Reconquista</p>
               <p className="text-blue-200" style={{ fontSize: "9px", marginTop: 2 }}>
@@ -161,8 +161,7 @@ export default function KitDigitalizacion({ comercio, isDark, cardBg, textPri, t
               </p>
               <div className="mt-3 flex justify-center">
                 {qrPreview ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={qrPreview} alt="QR Code" className="w-24 h-24" />
+                  <NextImage src={qrPreview} alt="QR Code" width={96} height={96} unoptimized />
                 ) : (
                   <div className="w-24 h-24 bg-gray-100 rounded animate-pulse" />
                 )}
