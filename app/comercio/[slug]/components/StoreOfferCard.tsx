@@ -132,11 +132,12 @@ export function StoreOfferCard({ offer, whatsapp, theme, comercioNombre, comerci
       <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
         <a href={`/comercio/${comercioSlug}/oferta/${offer.id}`} className="block">
           {offer.foto && (
-            <div className="w-full h-44 overflow-hidden">
-              <img
+            <div className="relative w-full h-44 overflow-hidden">
+              <Image
                 src={resolvePhotoUrl(offer.foto)}
                 alt={offer.titulo}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
             </div>
           )}

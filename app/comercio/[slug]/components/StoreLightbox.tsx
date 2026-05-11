@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { resolvePhotoUrl } from "../../../lib/utils/photo";
 
@@ -35,12 +36,14 @@ export function StoreLightbox({ photos, index, onClose, onPrev, onNext }: Props)
         </button>
       )}
 
-      <img
-        src={resolvePhotoUrl(photos[index])}
-        alt="Foto del comercio"
-        className="max-w-[85vw] max-h-[85vh] object-contain rounded-xl"
-        onClick={(e) => e.stopPropagation()}
-      />
+      <div className="relative max-w-[85vw] max-h-[85vh] w-full h-full" onClick={(e) => e.stopPropagation()}>
+        <Image
+          src={resolvePhotoUrl(photos[index])}
+          alt="Foto del comercio"
+          fill
+          className="object-contain rounded-xl"
+        />
+      </div>
 
       {photos.length > 1 && (
         <button

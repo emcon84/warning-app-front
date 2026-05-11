@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { ThemeClasses } from "./types";
 import { resolvePhotoUrl } from "../../../lib/utils/photo";
 
@@ -25,11 +26,14 @@ export function StoreGallery({ photos, theme, onPhotoClick }: Props) {
             onClick={() => onPhotoClick(i)}
             className={`aspect-square rounded-xl overflow-hidden border focus:outline-none group ${isDark ? "border-gray-800" : "border-gray-200"}`}
           >
-            <img
-              src={resolvePhotoUrl(url)}
-              alt={`Foto ${i + 1}`}
-              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-            />
+            <div className="relative w-full h-full">
+              <Image
+                src={resolvePhotoUrl(url)}
+                alt={`Foto ${i + 1}`}
+                fill
+                className="object-cover transition-transform duration-200 group-hover:scale-105"
+              />
+            </div>
           </button>
         ))}
       </div>
