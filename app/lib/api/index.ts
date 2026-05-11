@@ -7,3 +7,4 @@ export * from "./employees";
 export * from "./vacancies";
 export * from "./stats";
 export * from "./professionals";
+export * from "./stores";
