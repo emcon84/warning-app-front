@@ -21,7 +21,7 @@ function resolveImage(foto?: string | null): string {
 
 async function getComercio(slug: string): Promise<Comercio | null> {
   try {
-    const res = await fetch(`/api/comercios/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/comercios/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -117,7 +117,7 @@ async function checkIsOwner(slug: string): Promise<boolean> {
     const { getToken } = await auth();
     const token = await getToken();
     if (!token) return false;
-    const res = await fetch(`/api/comercios/me`, {
+    const res = await fetch(`${API_URL}/api/comercios/me`, {
       cache: "no-store",
       headers: { Authorization: `Bearer ${token}` },
     });

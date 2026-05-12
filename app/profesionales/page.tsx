@@ -64,7 +64,7 @@ const jsonLd = {
 
 async function getProfessionals(): Promise<Professional[]> {
   try {
-    const res = await fetch(`/api/professionals`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/professionals`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

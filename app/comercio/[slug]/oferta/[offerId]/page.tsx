@@ -6,7 +6,7 @@ import { API_URL } from "../../../../lib/api/client";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; offerId: string }> }) {
   const { slug, offerId } = await params;
   try {
-    const res = await fetch(`/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
     if (!res.ok) return {};
     const data = await res.json();
     return {
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function OfertaPage({ params }: { params: Promise<{ slug: string; offerId: string }> }) {
   const { slug, offerId } = await params;
-  const res = await fetch(`/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
+  const res = await fetch(`${API_URL}/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
   if (!res.ok) notFound();
   const data = await res.json();
   return <OfertaDetailClient offer={data} comercio={data.comercio} />;

@@ -6,9 +6,9 @@ import { API_URL } from "../lib/api/client";
 
 async function fetchSearchData() {
   const [professionals, comercios, doctors] = await Promise.all([
-    fetch(`/api/professionals`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
-    fetch(`/api/comercios`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
-    fetch(`/api/doctors`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`${API_URL}/api/professionals`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`${API_URL}/api/comercios`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`${API_URL}/api/doctors`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
   ]);
   return {
     professionals: professionals as Professional[],
