@@ -3,196 +3,21 @@
 import { useEffect, useState } from "react";
 import { useUser, useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Instagram, X, Download, Copy, Check, MessageSquare, RefreshCw, KeyRound, Eye, EyeOff } from "lucide-react";
 import Navbar from "../components/Navbar";
+import { resolvePhotoUrl } from "../lib/utils/photo";
+import type { Professional, Report, Review, Comercio, Tab, ShareTarget } from "./types";
+import { ShareModal } from "./components/ShareModal";
+import { PinModal } from "./components/PinModal";
+import { AdminProfessionalsTab } from "./components/AdminProfessionalsTab";
+import { AdminReportsTab } from "./components/AdminReportsTab";
+import { AdminComerciosTab } from "./components/AdminComerciosTab";
+import { AdminReviewsTab } from "./components/AdminReviewsTab";
+import { AdminOutreachTab } from "./components/AdminOutreachTab";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const ADMIN_CLERK_IDS = (process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
 
-interface Professional {
-  id: string;
-  nombre: string;
-  apellido: string;
-  slug: string;
-  oficios: string[];
-  barrio: string;
-  foto?: string | null;
-  activo: boolean;
-  ratingAvg: number;
-  ratingCount: number;
-  createdAt: string;
-}
-
-interface Report {
-  id: string;
-  category: string;
-  description: string;
-  barrio: string;
-  direccion: string;
-  isUrgent: boolean;
-  createdAt: string;
-}
-
-interface Review {
-  id: string;
-  reviewerName: string;
-  score: number;
-  comment: string;
-  createdAt: string;
-  professional: { nombre: string; apellido: string; slug: string };
-}
-
-interface Comercio {
-  id: string;
-  nombre: string;
-  rubro: string;
-  slug: string;
-  barrio: string;
-  foto?: string | null;
-  logo?: string | null;
-  activo: boolean;
-  isPremium: boolean;
-  isFounder: boolean;
-  createdAt: string;
-}
-
-type Tab = "professionals" | "reports" | "reviews" | "comercios" | "outreach";
-type ShareFormat = "story" | "feed";
-
-interface ShareTarget {
-  type: "comercio" | "profesional";
-  shareUrl: string;
-  profileUrl: string;
-  label: string;
-}
-
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
-function resolvePhoto(path?: string | null): string {
-  if (!path) return "";
-  if (path.startsWith("http")) return path;
-  return `${NEXT_PUBLIC_API_URL}${path}`;
-}
-
-async function downloadAndShare(imageUrl: string, filename: string) {
-  const res = await fetch(imageUrl);
-  const blob = await res.blob();
-  const file = new File([blob], filename, { type: blob.type || "image/png" });
-
-  if (typeof navigator !== "undefined" && navigator.canShare && navigator.canShare({ files: [file] })) {
-    await navigator.share({ files: [file] });
-    return;
-  }
-
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function ShareModal({ target, onClose }: { target: ShareTarget; onClose: () => void }) {
-  const [loading, setLoading] = useState<ShareFormat | null>(null);
-  const [copied, setCopied] = useState(false);
-
-  async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(target.profileUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* fallback: select text */
-    }
-  }
-
-  async function handle(format: ShareFormat) {
-    setLoading(format);
-    const url = `${target.shareUrl}&format=${format}`;
-    const filename = `${target.type}-${format}.png`;
-    try {
-      await downloadAndShare(url, filename);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(null);
-    }
-  }
-
-  return (
-    <div
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ zIndex: 1300, backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base font-bold text-white">Compartir en Instagram</h3>
-            <p className="text-xs text-gray-500 mt-0.5 truncate max-w-[220px]">{target.label}</p>
-          </div>
-          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <p className="text-xs text-gray-600 mb-5">Elegí el formato para generar la imagen:</p>
-
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => handle("story")}
-            disabled={!!loading}
-            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-700 hover:border-gray-500 hover:bg-gray-800 transition-colors disabled:opacity-40"
-          >
-            <div className="w-10 h-16 rounded-lg border-2 border-gray-600 bg-gray-800 flex items-center justify-center">
-              {loading === "story" ? (
-                <div className="w-4 h-4 border-2 border-gray-500 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Instagram className="w-4 h-4 text-gray-400" />
-              )}
-            </div>
-            <span className="text-xs font-semibold text-gray-300">Story</span>
-            <span className="text-[10px] text-gray-600">1080 x 1920</span>
-          </button>
-
-          <button
-            onClick={() => handle("feed")}
-            disabled={!!loading}
-            className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-700 hover:border-gray-500 hover:bg-gray-800 transition-colors disabled:opacity-40"
-          >
-            <div className="w-14 h-14 rounded-lg border-2 border-gray-600 bg-gray-800 flex items-center justify-center">
-              {loading === "feed" ? (
-                <div className="w-4 h-4 border-2 border-gray-500 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Instagram className="w-4 h-4 text-gray-400" />
-              )}
-            </div>
-            <span className="text-xs font-semibold text-gray-300">Feed</span>
-            <span className="text-[10px] text-gray-600">1080 x 1080</span>
-          </button>
-        </div>
-
-        <div className="mt-4 border-t border-gray-800 pt-4">
-          <button
-            onClick={copyLink}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-700 hover:border-gray-500 hover:bg-gray-800 transition-colors text-sm font-semibold text-gray-300"
-          >
-            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
-            {copied ? "¡Link copiado!" : "Copiar link del perfil"}
-          </button>
-        </div>
-
-        <p className="text-[10px] text-gray-700 text-center mt-3 flex items-center justify-center gap-1">
-          <Download className="w-3 h-3" />
-          En desktop descarga la imagen. En mobile abre el selector del sistema.
-        </p>
-      </div>
-    </div>
-  );
-}
+const TAB_ORDER: Tab[] = ["professionals", "comercios", "reports", "reviews", "outreach"];
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
@@ -208,20 +33,6 @@ export default function AdminPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
   const [pinTarget, setPinTarget] = useState<Professional | null>(null);
-  const [pinValue, setPinValue] = useState("");
-  const [pinConfirm, setPinConfirm] = useState("");
-  const [showPinVal, setShowPinVal] = useState(false);
-  const [savingPin, setSavingPin] = useState(false);
-  const [pinSaved, setPinSaved] = useState(false);
-
-  // Outreach state
-  const [outreachDestinatario, setOutreachDestinatario] = useState<"comercio" | "profesional">("comercio");
-  const [outreachTipo, setOutreachTipo] = useState<"visita" | "registro">("visita");
-  const [outreachNombre, setOutreachNombre] = useState("");
-  const [outreachRubro, setOutreachRubro] = useState("");
-  const [outreachContacto, setOutreachContacto] = useState("");
-  const [outreachMensaje, setOutreachMensaje] = useState("");
-  const [outreachCopied, setOutreachCopied] = useState(false);
 
   const isAdmin = isLoaded && user && ADMIN_CLERK_IDS.includes(user.id);
 
@@ -256,10 +67,7 @@ export default function AdminPage() {
     if (!confirm("¿Seguro que querés eliminar este profesional? Se van a borrar también sus conversaciones y reseñas.")) return;
     setDeletingId(id);
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/professionals/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(`${API}/api/admin/professionals/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) setProfessionals(prev => prev.filter(p => p.id !== id));
     setDeletingId(null);
   }
@@ -268,11 +76,26 @@ export default function AdminPage() {
     if (!confirm("¿Eliminar este reporte?")) return;
     setDeletingId(id);
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/reports/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(`${API}/api/admin/reports/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) setReports(prev => prev.filter(r => r.id !== id));
+    setDeletingId(null);
+  }
+
+  async function deleteReview(id: string) {
+    if (!confirm("¿Eliminar esta reseña?")) return;
+    setDeletingId(id);
+    const token = await getToken();
+    const res = await fetch(`${API}/api/admin/reviews/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    if (res.ok) setReviews(prev => prev.filter(r => r.id !== id));
+    setDeletingId(null);
+  }
+
+  async function deleteComerco(id: string) {
+    if (!confirm("¿Seguro que querés eliminar este comercio? Se van a borrar también sus ofertas y vacantes.")) return;
+    setDeletingId(id);
+    const token = await getToken();
+    const res = await fetch(`${API}/api/admin/comercios/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    if (res.ok) setComercios(prev => prev.filter(c => c.id !== id));
     setDeletingId(null);
   }
 
@@ -296,62 +119,14 @@ export default function AdminPage() {
     if (res.ok) setComercios(prev => prev.map(c => c.id === com.id ? { ...c, isFounder: !com.isFounder } : c));
   }
 
-  async function deleteComerco(id: string) {
-    if (!confirm("¿Seguro que querés eliminar este comercio? Se van a borrar también sus ofertas y vacantes.")) return;
-    setDeletingId(id);
-    const token = await getToken();
-    const res = await fetch(`${API}/api/admin/comercios/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) setComercios(prev => prev.filter(c => c.id !== id));
-    setDeletingId(null);
-  }
-
-  async function deleteReview(id: string) {
-    if (!confirm("¿Eliminar esta reseña?")) return;
-    setDeletingId(id);
-    const token = await getToken();
-    const res = await fetch(`${API}/api/admin/reviews/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) setReviews(prev => prev.filter(r => r.id !== id));
-    setDeletingId(null);
-  }
-
-  async function savePin() {
-    if (!pinTarget || pinValue.length !== 4 || pinValue !== pinConfirm) return;
-    setSavingPin(true);
-    try {
-      const token = await getToken();
-      const res = await fetch(`${API}/api/admin/professionals/${pinTarget.id}/pin`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ pin: pinValue }),
-      });
-      if (res.ok) {
-        setPinSaved(true);
-        setTimeout(() => {
-          setPinSaved(false);
-          setPinTarget(null);
-          setPinValue("");
-          setPinConfirm("");
-        }, 1500);
-      }
-    } finally {
-      setSavingPin(false);
-    }
-  }
-
   function openShareComercio(com: Comercio) {
     const params = new URLSearchParams({
       nombre: com.nombre,
       rubro: com.rubro,
       barrio: com.barrio ?? "",
       slug: com.slug,
-      foto: resolvePhoto(com.foto),
-      logo: resolvePhoto(com.logo),
+      foto: resolvePhotoUrl(com.foto),
+      logo: resolvePhotoUrl(com.logo),
     });
     setShareTarget({
       type: "comercio",
@@ -368,7 +143,7 @@ export default function AdminPage() {
       oficios: pro.oficios.join(", "),
       barrio: pro.barrio ?? "",
       slug: pro.slug,
-      foto: resolvePhoto(pro.foto),
+      foto: resolvePhotoUrl(pro.foto),
     });
     setShareTarget({
       type: "profesional",
@@ -377,6 +152,14 @@ export default function AdminPage() {
       label: `${pro.nombre} ${pro.apellido}`,
     });
   }
+
+  const tabLabels: Record<Tab, string> = {
+    professionals: `Profesionales (${professionals.length})`,
+    reports: `Reportes (${reports.length})`,
+    reviews: `Reseñas (${reviews.length})`,
+    comercios: `Comercios (${comercios.length})`,
+    outreach: "Mensajes",
+  };
 
   if (!isLoaded || !user) {
     return (
@@ -388,85 +171,6 @@ export default function AdminPage() {
 
   if (!isAdmin) return null;
 
-  function generateOutreach() {
-    const nombre = outreachNombre.trim();
-    const rubro = outreachRubro.trim();
-    const contacto = outreachContacto.trim();
-    if (!nombre) return;
-
-    const saludo = contacto ? `Hola ${contacto}!` : "Hola!";
-
-    if (outreachDestinatario === "comercio") {
-      if (outreachTipo === "visita") {
-        const rubros = rubro ? `que buscan ${rubro.toLowerCase()}` : "que buscan un comercio local";
-        setOutreachMensaje(
-`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
-
-Es una herramienta para que los vecinos de Reconquista ${rubros} te encuentren a vos: perfil con fotos, catálogo y WhatsApp directo. 100% gratis.
-
-En las próximas semanas vamos a tener el apoyo de empresas como Elías Yapur y otras para darle visibilidad a la plataforma. Los comercios que se registren ahora van a quedar como Comercios Fundadores, con un emblema especial y posicionados primeros en el listado, antes de que eso pase.
-
-¿Te viene bien que esta semana pase por el local a mostrártela en persona?
-
-https://reportesreconquista.com`
-        );
-      } else {
-        const rubroStr = rubro ? ` Si alguien en Reconquista busca ${rubro.toLowerCase()}, aparecés vos.` : "";
-        setOutreachMensaje(
-`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
-
-Estamos armando el directorio digital de comercios locales y me gustaría invitarte a registrar ${nombre}. En dos minutos cargás tu perfil con foto, descripción, catálogo de productos con precios y un botón de WhatsApp directo para que los clientes te contacten sin vueltas.
-
-La diferencia con Instagram es clave: acá la gente no "pasa el tiempo", sino que busca activamente lo que necesita.${rubroStr} Sin depender del algoritmo, sin que tu publicación se pierda en el feed.
-
-Además te damos un QR imprimible para la vidriera. Todo gratis, el registro tarda menos de 5 minutos:
-
-https://reportesreconquista.com/comercio/nuevo`
-        );
-      }
-    } else {
-      const oficioStr = rubro ? ` Los vecinos que buscan ${rubro.toLowerCase()} en Reconquista te pueden encontrar a vos.` : "";
-      const oficioNec = rubro ? ` Si alguien en Reconquista necesita ${rubro.toLowerCase()}, aparecés vos.` : "";
-      if (outreachTipo === "visita") {
-        setOutreachMensaje(
-`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
-
-Estamos armando el directorio de profesionales de oficio de la ciudad y me gustaría mostrarte la plataforma.${oficioStr} Ver tu perfil y contactarte directo por chat, sin algoritmo, sin tener que publicar todos los días.
-
-Los profesionales que se registren ahora van a quedar primeros en el listado antes de que la plataforma crezca.
-
-¿Te viene bien que esta semana pase a mostrártela en persona?
-
-https://reportesreconquista.com`
-        );
-      } else {
-        setOutreachMensaje(
-`${saludo} Soy el creador de reportesreconquista.com, la app gratuita de Reconquista.
-
-Estamos armando el directorio de profesionales de la ciudad y me gustaría invitarte a registrarte como ${nombre}. En dos minutos cargás tu perfil con tu oficio, zona de trabajo y un chat directo para que los clientes te encuentren a vos.${oficioNec} Sin depender del algoritmo.
-
-El registro es gratuito y tarda menos de 5 minutos:
-
-https://reportesreconquista.com/profesional/nuevo`
-        );
-      }
-    }
-  }
-
-  async function copyOutreach() {
-    await navigator.clipboard.writeText(outreachMensaje);
-    setOutreachCopied(true);
-    setTimeout(() => setOutreachCopied(false), 2000);
-  }
-
-  const TAB_LABELS: Record<Tab, string> = {
-    professionals: `Profesionales (${professionals.length})`,
-    reports: `Reportes (${reports.length})`,
-    reviews: `Reseñas (${reviews.length})`,
-    comercios: `Comercios (${comercios.length})`,
-    outreach: "Mensajes",
-  };
-
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar mapView="profesionales" />
@@ -477,19 +181,16 @@ https://reportesreconquista.com/profesional/nuevo`
           <p className="text-sm text-gray-500 mt-0.5">Moderación de contenido</p>
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-          {(["professionals", "comercios", "reports", "reviews", "outreach"] as Tab[]).map((t) => (
+          {TAB_ORDER.map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                tab === t
-                  ? "bg-white text-gray-950"
-                  : "bg-gray-900 border border-gray-800 text-gray-400 hover:text-white"
+                tab === t ? "bg-white text-gray-950" : "bg-gray-900 border border-gray-800 text-gray-400 hover:text-white"
               }`}
             >
-              {TAB_LABELS[t]}
+              {tabLabels[t]}
             </button>
           ))}
         </div>
@@ -501,380 +202,33 @@ https://reportesreconquista.com/profesional/nuevo`
             ))}
           </div>
         ) : tab === "professionals" ? (
-          <div className="flex flex-col gap-2">
-            {professionals.length === 0 && (
-              <p className="text-sm text-gray-600 text-center py-8">No hay profesionales.</p>
-            )}
-            {professionals.map(pro => (
-              <div key={pro.id} className="flex items-center gap-3 p-4 rounded-2xl bg-gray-900 border border-gray-800">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Link href={`/profesional/${pro.slug}`} className="font-semibold text-sm text-white hover:underline">
-                      {pro.nombre} {pro.apellido}
-                    </Link>
-                    {!pro.activo && (
-                      <span className="text-xs bg-red-900/40 text-red-400 border border-red-800 px-1.5 py-0.5 rounded-full">Inactivo</span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-400 capitalize">{pro.oficios.join(", ")} · {pro.barrio}</p>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    {pro.ratingCount > 0 ? `★ ${pro.ratingAvg.toFixed(1)} (${pro.ratingCount})` : "Sin reseñas"} ·
-                    {" "}{new Date(pro.createdAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => { setPinTarget(pro); setPinValue(""); setPinConfirm(""); setPinSaved(false); }}
-                    className="px-3 py-1.5 rounded-xl bg-amber-900/30 text-amber-400 border border-amber-800/50 hover:bg-amber-900/60 text-xs font-medium transition-colors flex items-center gap-1.5"
-                    title="Asignar / resetear PIN"
-                  >
-                    <KeyRound className="w-3.5 h-3.5" />
-                    PIN
-                  </button>
-                  <button
-                    onClick={() => openShareProfesional(pro)}
-                    className="px-3 py-1.5 rounded-xl bg-blue-900/30 text-blue-400 border border-blue-800/50 hover:bg-blue-900/60 text-xs font-medium transition-colors flex items-center gap-1.5"
-                  >
-                    <Instagram className="w-3.5 h-3.5" />
-                    Compartir
-                  </button>
-                  <button
-                    onClick={() => deleteProfessional(pro.id)}
-                    disabled={deletingId === pro.id}
-                    className="px-3 py-1.5 rounded-xl bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-900/60 text-xs font-medium transition-colors disabled:opacity-40"
-                  >
-                    {deletingId === pro.id ? "..." : "Eliminar"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <AdminProfessionalsTab
+            professionals={professionals}
+            deletingId={deletingId}
+            onDelete={deleteProfessional}
+            onShare={openShareProfesional}
+            onSetPin={setPinTarget}
+          />
         ) : tab === "reports" ? (
-          <div className="flex flex-col gap-2">
-            {reports.length === 0 && (
-              <p className="text-sm text-gray-600 text-center py-8">No hay reportes.</p>
-            )}
-            {reports.map(rep => (
-              <div key={rep.id} className="flex items-start gap-3 p-4 rounded-2xl bg-gray-900 border border-gray-800">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-semibold text-white capitalize">{rep.category.replace(/_/g, " ")}</span>
-                    {rep.isUrgent && <span className="text-xs bg-red-900/40 text-red-400 border border-red-800 px-1.5 py-0.5 rounded-full">Urgente</span>}
-                  </div>
-                  <p className="text-xs text-gray-400 truncate">{rep.description}</p>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    {rep.barrio} · {rep.direccion} ·{" "}
-                    {new Date(rep.createdAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                </div>
-                <button
-                  onClick={() => deleteReport(rep.id)}
-                  disabled={deletingId === rep.id}
-                  className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-900/60 text-xs font-medium transition-colors disabled:opacity-40"
-                >
-                  {deletingId === rep.id ? "..." : "Eliminar"}
-                </button>
-              </div>
-            ))}
-          </div>
+          <AdminReportsTab reports={reports} deletingId={deletingId} onDelete={deleteReport} />
         ) : tab === "comercios" ? (
-          <div className="flex flex-col gap-2">
-            {comercios.length === 0 && (
-              <p className="text-sm text-gray-600 text-center py-8">No hay comercios.</p>
-            )}
-            {comercios.map(com => (
-              <div key={com.id} className="flex items-center gap-3 p-4 rounded-2xl bg-gray-900 border border-gray-800">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Link href={`/comercio/${com.slug}`} className="font-semibold text-sm text-white hover:underline">
-                      {com.nombre}
-                    </Link>
-                    {!com.activo && (
-                      <span className="text-xs bg-red-900/40 text-red-400 border border-red-800 px-1.5 py-0.5 rounded-full">Inactivo</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <p className="text-xs text-gray-400">{com.rubro} · {com.barrio}</p>
-                    {com.isFounder && <span className="text-[10px] font-bold px-1 py-0.5 rounded bg-amber-900/40 text-amber-400 border border-amber-800/50">FOUNDER</span>}
-                    {com.isPremium && !com.isFounder && <span className="text-[10px] font-bold px-1 py-0.5 rounded bg-indigo-900/40 text-indigo-400 border border-indigo-800/50">PREMIUM</span>}
-                  </div>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    {new Date(com.createdAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => toggleFounder(com)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border ${
-                      com.isFounder
-                        ? "bg-amber-900/30 text-amber-400 border-amber-800/50 hover:bg-amber-900/60"
-                        : "bg-gray-800 text-gray-500 border-gray-700 hover:bg-gray-700"
-                    }`}
-                  >
-                    {com.isFounder ? "★ Founder" : "Founder"}
-                  </button>
-                  <button
-                    onClick={() => togglePremium(com)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border ${
-                      com.isPremium
-                        ? "bg-indigo-900/30 text-indigo-400 border-indigo-800/50 hover:bg-indigo-900/60"
-                        : "bg-gray-800 text-gray-500 border-gray-700 hover:bg-gray-700"
-                    }`}
-                  >
-                    {com.isPremium ? "✦ Premium" : "Premium"}
-                  </button>
-                  <button
-                    onClick={() => openShareComercio(com)}
-                    className="px-3 py-1.5 rounded-xl bg-green-900/30 text-green-400 border border-green-800/50 hover:bg-green-900/60 text-xs font-medium transition-colors flex items-center gap-1.5"
-                  >
-                    <Instagram className="w-3.5 h-3.5" />
-                    Compartir
-                  </button>
-                  <button
-                    onClick={() => deleteComerco(com.id)}
-                    disabled={deletingId === com.id}
-                    className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-900/60 text-xs font-medium transition-colors disabled:opacity-40"
-                  >
-                    {deletingId === com.id ? "..." : "Eliminar"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <AdminComerciosTab
+            comercios={comercios}
+            deletingId={deletingId}
+            onDelete={deleteComerco}
+            onTogglePremium={togglePremium}
+            onToggleFounder={toggleFounder}
+            onShare={openShareComercio}
+          />
         ) : tab === "outreach" ? (
-          <div className="flex flex-col gap-4">
-            <div className="p-5 rounded-2xl bg-gray-900 border border-gray-800">
-              <div className="flex items-center gap-2 mb-4">
-                <MessageSquare className="w-4 h-4 text-blue-400" />
-                <p className="text-sm font-bold text-white">Generador de mensajes de captacion</p>
-              </div>
-
-              {/* Switch destinatario */}
-              <div className="flex rounded-xl bg-gray-800 p-1 mb-3">
-                <button
-                  onClick={() => { setOutreachDestinatario("comercio"); setOutreachMensaje(""); }}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                    outreachDestinatario === "comercio" ? "bg-amber-600 text-white" : "text-gray-500 hover:text-gray-300"
-                  }`}
-                >
-                  Comercio
-                </button>
-                <button
-                  onClick={() => { setOutreachDestinatario("profesional"); setOutreachMensaje(""); }}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                    outreachDestinatario === "profesional" ? "bg-purple-600 text-white" : "text-gray-500 hover:text-gray-300"
-                  }`}
-                >
-                  Profesional
-                </button>
-              </div>
-
-              {/* Switch tipo */}
-              <div className="flex rounded-xl bg-gray-800 p-1 mb-5">
-                <button
-                  onClick={() => { setOutreachTipo("visita"); setOutreachMensaje(""); }}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                    outreachTipo === "visita" ? "bg-blue-600 text-white" : "text-gray-500 hover:text-gray-300"
-                  }`}
-                >
-                  Solicitar visita
-                </button>
-                <button
-                  onClick={() => { setOutreachTipo("registro"); setOutreachMensaje(""); }}
-                  className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                    outreachTipo === "registro" ? "bg-blue-600 text-white" : "text-gray-500 hover:text-gray-300"
-                  }`}
-                >
-                  Invitar a registrarse
-                </button>
-              </div>
-
-              <p className="text-xs text-gray-500 mb-5">
-                {outreachTipo === "visita"
-                  ? outreachDestinatario === "comercio" ? "Para cerrar una visita presencial al local." : "Para cerrar una visita con el profesional."
-                  : outreachDestinatario === "comercio" ? "Para cuando quieren registrarse solos desde el link." : "Para que se registren solos como profesional."}
-              </p>
-
-              <div className="flex flex-col gap-3">
-                <div>
-                  <label className="text-xs text-gray-500 mb-1.5 block">
-                    {outreachDestinatario === "comercio" ? "Nombre del comercio" : "Nombre / apellido"} *
-                  </label>
-                  <input
-                    value={outreachNombre}
-                    onChange={e => setOutreachNombre(e.target.value)}
-                    placeholder={outreachDestinatario === "comercio" ? "Ej: Fiambrería Don Luis" : "Ej: Juan García"}
-                    className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-gray-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 mb-1.5 block">
-                    {outreachDestinatario === "comercio" ? "Rubro" : "Oficio"} <span className="text-gray-700">(opcional)</span>
-                  </label>
-                  <input
-                    value={outreachRubro}
-                    onChange={e => setOutreachRubro(e.target.value)}
-                    placeholder={outreachDestinatario === "comercio" ? "Ej: Almacén, Peluquería, Ferretería..." : "Ej: Plomero, Electricista, Pintor..."}
-                    className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-gray-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 mb-1.5 block">Nombre del contacto <span className="text-gray-700">(opcional)</span></label>
-                  <input
-                    value={outreachContacto}
-                    onChange={e => setOutreachContacto(e.target.value)}
-                    placeholder="Ej: Luis, María..."
-                    className="w-full px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-gray-500"
-                  />
-                </div>
-
-                <button
-                  onClick={generateOutreach}
-                  disabled={!outreachNombre.trim()}
-                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
-                >
-                  <MessageSquare className="w-4 h-4" /> Generar mensaje
-                </button>
-              </div>
-            </div>
-
-            {outreachMensaje && (
-              <div className="p-5 rounded-2xl bg-gray-900 border border-gray-800">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-semibold text-gray-400">Mensaje generado</p>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={generateOutreach}
-                      className="p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-                      title="Regenerar"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={copyOutreach}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-900/40 hover:bg-green-900/70 text-green-400 border border-green-800/50 text-xs font-semibold transition-colors"
-                    >
-                      {outreachCopied ? <><Check className="w-3.5 h-3.5" /> Copiado!</> : <><Copy className="w-3.5 h-3.5" /> Copiar</>}
-                    </button>
-                  </div>
-                </div>
-                <textarea
-                  value={outreachMensaje}
-                  onChange={e => setOutreachMensaje(e.target.value)}
-                  rows={7}
-                  className="w-full px-3 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-sm resize-none focus:outline-none focus:border-gray-500 leading-relaxed"
-                />
-                <p className="text-xs text-gray-700 mt-2">Podés editar el texto antes de copiarlo.</p>
-              </div>
-            )}
-          </div>
+          <AdminOutreachTab />
         ) : (
-          <div className="flex flex-col gap-2">
-            {reviews.length === 0 && (
-              <p className="text-sm text-gray-600 text-center py-8">No hay reseñas.</p>
-            )}
-            {reviews.map(rev => (
-              <div key={rev.id} className="flex items-start gap-3 p-4 rounded-2xl bg-gray-900 border border-gray-800">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-xs font-semibold text-white">{rev.reviewerName}</span>
-                    <span className="text-xs text-yellow-400">{"★".repeat(Math.round(rev.score))} {rev.score.toFixed(1)}</span>
-                  </div>
-                  <p className="text-xs text-gray-400 truncate">{rev.comment}</p>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    Para:{" "}
-                    <Link href={`/profesional/${rev.professional.slug}`} className="hover:underline">
-                      {rev.professional.nombre} {rev.professional.apellido}
-                    </Link>
-                    {" "}·{" "}
-                    {new Date(rev.createdAt).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                </div>
-                <button
-                  onClick={() => deleteReview(rev.id)}
-                  disabled={deletingId === rev.id}
-                  className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-red-900/30 text-red-400 border border-red-800/50 hover:bg-red-900/60 text-xs font-medium transition-colors disabled:opacity-40"
-                >
-                  {deletingId === rev.id ? "..." : "Eliminar"}
-                </button>
-              </div>
-            ))}
-          </div>
+          <AdminReviewsTab reviews={reviews} deletingId={deletingId} onDelete={deleteReview} />
         )}
       </div>
 
-      {shareTarget && (
-        <ShareModal target={shareTarget} onClose={() => setShareTarget(null)} />
-      )}
-
-      {/* Modal asignar PIN */}
-      {pinTarget && (
-        <div
-          className="fixed inset-0 flex items-center justify-center p-4"
-          style={{ zIndex: 1300, backgroundColor: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-          onClick={() => setPinTarget(null)}
-        >
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <KeyRound className="w-4 h-4 text-amber-400" />
-                  Asignar PIN
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">{pinTarget.nombre} {pinTarget.apellido}</p>
-              </div>
-              <button onClick={() => setPinTarget(null)} className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-500 mb-4">
-              Asigná un PIN de 4 dígitos. El profesional lo va a usar junto a su WhatsApp para acceder a su panel.
-            </p>
-
-            <div className="flex flex-col gap-3">
-              <div className="relative">
-                <input
-                  value={pinValue}
-                  onChange={e => setPinValue(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                  placeholder="PIN"
-                  type={showPinVal ? "text" : "password"}
-                  inputMode="numeric"
-                  maxLength={4}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-amber-500 pr-12"
-                />
-                <button type="button" onClick={() => setShowPinVal(v => !v)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
-                  {showPinVal ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              <input
-                value={pinConfirm}
-                onChange={e => setPinConfirm(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                placeholder="Confirmar PIN"
-                type={showPinVal ? "text" : "password"}
-                inputMode="numeric"
-                maxLength={4}
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-amber-500"
-              />
-              {pinValue.length === 4 && pinConfirm.length === 4 && (
-                <p className={`text-xs text-center ${pinValue === pinConfirm ? "text-green-400" : "text-red-400"}`}>
-                  {pinValue === pinConfirm ? "Los PINs coinciden" : "Los PINs no coinciden"}
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={savePin}
-              disabled={pinValue.length !== 4 || pinValue !== pinConfirm || savingPin}
-              className="mt-4 w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
-            >
-              {pinSaved
-                ? <><Check className="w-4 h-4 text-green-300" /> PIN guardado!</>
-                : savingPin ? "Guardando..." : "Asignar PIN"}
-            </button>
-          </div>
-        </div>
-      )}
+      {shareTarget && <ShareModal target={shareTarget} onClose={() => setShareTarget(null)} />}
+      {pinTarget && <PinModal target={pinTarget} getToken={getToken} onClose={() => setPinTarget(null)} />}
     </div>
   );
 }
