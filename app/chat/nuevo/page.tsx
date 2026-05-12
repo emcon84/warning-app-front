@@ -6,7 +6,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 function getOrCreateAnonymousToken(): string {
   const existing = localStorage.getItem("clientToken");
@@ -32,7 +32,7 @@ function NuevoChat() {
 
   useEffect(() => {
     if (!professionalId) return;
-    fetch(`${API}/api/professionals/id/${professionalId}`)
+    fetch(`/api/professionals/id/${professionalId}`)
       .then((r) => r.json())
       .then((d) => { if (d.nombre) setProfessional(d); })
       .catch(() => {});
@@ -59,7 +59,7 @@ function NuevoChat() {
         clientToken = getOrCreateAnonymousToken();
       }
 
-      const res = await fetch(`${API}/api/conversations`, {
+      const res = await fetch(`/api/conversations`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({ professionalId, clientToken, firstMessage: message.trim(), clientName }),

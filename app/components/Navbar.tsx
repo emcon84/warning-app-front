@@ -7,7 +7,7 @@ import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 type MapView = "doctors" | "reports" | "farmacias" | "ofertas" | "profesionales";
 
@@ -74,7 +74,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     async function fetchUnread() {
       const token = await getToken();
       if (!token || cancelled) return;
-      const res = await fetch(`${API}/api/conversations/unread-count`, {
+      const res = await fetch(`/api/conversations/unread-count`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok && !cancelled) {
@@ -86,7 +86,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     async function checkProfessionalProfile() {
       const token = await getToken();
       if (!token || cancelled) return;
-      const res = await fetch(`${API}/api/professionals/me`, {
+      const res = await fetch(`/api/professionals/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok && !cancelled) setHasProfessionalProfile(true);
@@ -115,7 +115,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     if (!token) return;
     setLoadingConversations(true);
     try {
-      const res = await fetch(`${API}/api/conversations/professional`, {
+      const res = await fetch(`/api/conversations/professional`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return;

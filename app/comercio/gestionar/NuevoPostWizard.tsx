@@ -7,7 +7,7 @@ import { X, Check, Megaphone, Tag, Gift, Camera, ChevronRight } from "lucide-rea
 import { useConfetti } from "../../hooks/useConfetti";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 const TOTAL = 3;
 
@@ -72,7 +72,7 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
         if (precioDespues) fd.append("precioDespues", precioDespues);
       }
       if (tipo === "sorteo" && fechaSorteo) fd.append("fechaSorteo", fechaSorteo);
-      const res = await fetch(`${API}/api/comercios/${comercio.slug}/posts`, {
+      const res = await fetch(`/api/comercios/${comercio.slug}/posts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ProfessionalDetail } from "../../types";
 import ProfileClient from "./ProfileClient";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
 function resolveImage(foto?: string | null): string {
@@ -14,7 +14,7 @@ function resolveImage(foto?: string | null): string {
 
 async function getProfessional(slug: string): Promise<ProfessionalDetail | null> {
   try {
-    const res = await fetch(`${API}/api/professionals/${slug}`, { cache: "no-store" });
+    const res = await fetch(`/api/professionals/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

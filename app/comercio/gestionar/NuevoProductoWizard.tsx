@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Camera, Check, Instagram, Link } from "lucide-react";
 import { useConfetti } from "../../hooks/useConfetti";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 interface Props {
   comercio: {
@@ -82,7 +82,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
       const token = await getToken();
       const fd = new FormData();
       fd.append("photo", file);
-      const res = await fetch(`${API}/api/comercios/me/productos/autocompletar`, {
+      const res = await fetch(`/api/comercios/me/productos/autocompletar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -109,7 +109,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
       const fd = new FormData();
       fd.append("photo", photoFile);
       if (aiGenNombre || nombre) fd.append("nombre", aiGenNombre || nombre);
-      const res = await fetch(`${API}/api/comercios/me/productos/generar-imagen`, {
+      const res = await fetch(`/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -139,7 +139,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
       if (aiGenUrl) fd.append("generatedPhotoUrl", aiGenUrl);
       else if (photoFile) fd.append("photo", photoFile);
 
-      const res = await fetch(`${API}/api/comercios/me/productos`, {
+      const res = await fetch(`/api/comercios/me/productos`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -158,11 +158,11 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
   async function handleDownloadShare() {
     const fotoRaw = createdProduct?.foto ?? "";
     const foto = fotoRaw
-      ? fotoRaw.startsWith("http") ? fotoRaw : `${API}${fotoRaw}`
+      ? fotoRaw.startsWith("http") ? fotoRaw : `${fotoRaw}`
       : "";
     const logoRaw = comercio.logo ?? "";
     const logo = logoRaw
-      ? logoRaw.startsWith("http") ? logoRaw : `${API}${logoRaw}`
+      ? logoRaw.startsWith("http") ? logoRaw : `${logoRaw}`
       : "";
     const params = new URLSearchParams({
       nombre: createdProduct?.nombre ?? "",
@@ -223,7 +223,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
 
   const fotoPreviewUrl = aiGenUrl ?? photoPreview;
   const logoUrl = comercio.logo
-    ? comercio.logo.startsWith("http") ? comercio.logo : `${API}${comercio.logo}`
+    ? comercio.logo.startsWith("http") ? comercio.logo : `${comercio.logo}`
     : null;
 
   return (
@@ -581,7 +581,6 @@ function Step3Listo({
   onDownloadShare: () => void;
   onCopyLink: () => void;
 }) {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   const fotoRaw = createdProduct?.foto ?? "";
   const foto = fotoRaw ? (fotoRaw.startsWith("http") ? fotoRaw : `${API_URL}${fotoRaw}`) : "";
   const logo = logoUrl ?? "";

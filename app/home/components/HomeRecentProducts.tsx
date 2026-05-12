@@ -8,7 +8,7 @@ import { Store, ShoppingCart } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { resolvePhotoUrl } from "../../lib/utils/photo";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 interface RecentProduct {
   id: string;

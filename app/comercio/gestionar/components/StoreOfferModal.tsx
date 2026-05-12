@@ -7,7 +7,7 @@ import { X, ImageIcon } from "lucide-react";
 import type { ComercioOffer } from "../../../types";
 import { resolvePhotoUrl } from "../../../lib/utils/photo";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../../lib/api/client";
 
 interface Props {
   isDark: boolean;
@@ -56,8 +56,8 @@ export function StoreOfferModal({ isDark, onClose, onSaved, editing }: Props) {
       if (clearPhoto && !photoFile) fd.append("clearPhoto", "1");
 
       const url = editing
-        ? `${API}/api/comercios/me/offers/${editing.id}`
-        : `${API}/api/comercios/me/offers`;
+        ? `/api/comercios/me/offers/${editing.id}`
+        : `/api/comercios/me/offers`;
       const res = await fetch(url, {
         method: editing ? "PATCH" : "POST",
         headers: { Authorization: `Bearer ${token}` },

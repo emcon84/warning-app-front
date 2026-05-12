@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 interface RecentProducto {
   id: string;
@@ -183,7 +183,7 @@ export default function ComerciosClient({ comercios }: Props) {
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  import { API_URL } from "../lib/api/client";
   function photoUrl(url?: string | null) {
     if (!url) return null;
     return url.startsWith("/uploads/") ? `${API_URL}${url}` : url;

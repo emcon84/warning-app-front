@@ -7,7 +7,7 @@ import { X, ImageIcon, Camera, Sparkles } from "lucide-react";
 import type { Producto } from "../../../types";
 import { compressImageForAi } from "../../../lib/utils/imageUtils";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../../lib/api/client";
 
 interface Props {
   isDark: boolean;
@@ -25,7 +25,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
   const [stock, setStock] = useState<string>(editing?.stock?.toString() ?? "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(
-    editing?.foto ? (editing.foto.startsWith("/uploads/") ? `${API}${editing.foto}` : editing.foto) : null
+    editing?.foto ? (editing.foto.startsWith("/uploads/") ? `${editing.foto}` : editing.foto) : null
   );
   const [clearPhoto, setClearPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,7 +60,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
       const token = await getToken();
       const fd = new FormData();
       fd.append("photo", preparedFile);
-      const res = await fetch(`${API}/api/comercios/me/productos/autocompletar`, {
+      const res = await fetch(`/api/comercios/me/productos/autocompletar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -123,7 +123,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
       fd.append("nombre", nombreVal.trim());
       fd.append("descripcion", descripcionVal);
       fd.append("tipo", tipoVal);
-      const res = await fetch(`${API}/api/comercios/me/productos/generar-imagen`, {
+      const res = await fetch(`/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -138,7 +138,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
         }
         throw new Error(data.message || data.error || "No se pudo generar la imagen");
       }
-      const fullUrl = data.url!.startsWith("http") ? data.url! : `${API}${data.url}`;
+      const fullUrl = data.url!.startsWith("http") ? data.url! : `${data.url}`;
       setPhotoPreview(fullUrl);
       setPhotoFile(null);
       setClearPhoto(false);
@@ -168,8 +168,8 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
       if (clearPhoto && !photoFile && !aiGeneratedUrl) fd.append("clearPhoto", "1");
 
       const url = editing
-        ? `${API}/api/comercios/me/productos/${editing.id}`
-        : `${API}/api/comercios/me/productos`;
+        ? `/api/comercios/me/productos/${editing.id}`
+        : `/api/comercios/me/productos`;
       const res = await fetch(url, {
         method: editing ? "PATCH" : "POST",
         headers: { Authorization: `Bearer ${token}` },

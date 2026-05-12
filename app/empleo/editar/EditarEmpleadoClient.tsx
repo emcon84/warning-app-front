@@ -8,7 +8,7 @@ import { Empleado } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 const BARRIOS = [
   "Centro",
@@ -79,7 +79,7 @@ export default function EditarEmpleadoClient() {
     getToken().then(async (token) => {
       if (!token) return;
       try {
-        const res = await fetch(`${API}/api/empleados/me`, {
+        const res = await fetch(`/api/empleados/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
@@ -146,7 +146,7 @@ export default function EditarEmpleadoClient() {
       fd.append("disponible", String(disponible));
       if (foto) fd.append("photo", foto);
 
-      const res = await fetch(`${API}/api/empleados/me`, {
+      const res = await fetch(`/api/empleados/me`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

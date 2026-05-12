@@ -2,14 +2,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Store, MapPin, Clock, MessageCircle } from "lucide-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 async function getPost(id: string) {
-  const res = await fetch(`${API}/api/posts/${id}`, { cache: "no-store" });
+  const res = await fetch(`/api/posts/${id}`, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
 }
@@ -21,12 +21,12 @@ export default async function PostPage({ params }: Props) {
   if (!post) return notFound();
 
   const foto = post.foto?.startsWith("/uploads/") 
-    ? `${API}${post.foto}` 
+    ? `${post.foto}` 
     : post.foto;
 
   const comercioLogo = post.comercio?.logo || post.comercio?.foto;
   const logoUrl = comercioLogo?.startsWith("/uploads/") 
-    ? `${API}${comercioLogo}` 
+    ? `${comercioLogo}` 
     : comercioLogo;
 
   const tipoConfig: Record<string, { label: string; cls: string; icon: string }> = {

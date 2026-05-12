@@ -8,7 +8,7 @@ import Navbar from "../../components/Navbar";
 import { CheckCircle, User, Briefcase, MapPin } from "lucide-react";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 const BARRIOS = [
   "Centro",
@@ -126,7 +126,7 @@ export default function NuevoEmpleadoClient() {
       fd.append("disponible", String(disponible));
       if (foto) fd.append("photo", foto);
 
-      const res = await fetch(`${API}/api/empleados`, {
+      const res = await fetch(`/api/empleados`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

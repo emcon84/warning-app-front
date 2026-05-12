@@ -17,7 +17,7 @@ import Navbar from "../../components/Navbar";
 import { useConfetti } from "../../hooks/useConfetti";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 
 const HABILIDADES_SUGERIDAS = [
@@ -119,7 +119,7 @@ export default function NuevaVacanteClient() {
     async function checkComercio() {
       try {
         const token = await getToken();
-        const res = await fetch(`${API}/api/comercios/me`, {
+        const res = await fetch(`/api/comercios/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setHasComercio(res.ok);
@@ -170,7 +170,7 @@ export default function NuevaVacanteClient() {
     try {
       const token = await getToken();
       if (!token) throw new Error("No autorizado");
-      const res = await fetch(`${API}/api/vacantes`, {
+      const res = await fetch(`/api/vacantes`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

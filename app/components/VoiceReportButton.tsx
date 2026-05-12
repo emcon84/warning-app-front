@@ -9,7 +9,7 @@ interface VoiceReportButtonProps {
 
 const RECONQUISTA_CENTER = { lat: -29.15, lng: -59.65 };
 const MAX_RECORDING_SEC = 30;
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 type State = "idle" | "listening" | "processing" | "success" | "error";
 
@@ -118,7 +118,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       form.append("lng", String(position.lng));
 
       try {
-        const res = await fetch(`${API}/api/voice/report`, {
+        const res = await fetch(`/api/voice/report`, {
           method: "POST",
           body: form,
         });

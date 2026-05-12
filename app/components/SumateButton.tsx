@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { BellPlus, BellRing, Check, ChevronRight } from "lucide-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 interface Props {
   slug: string;
@@ -27,7 +27,7 @@ export default function SumateButton({ slug, isDark }: Props) {
       }
       try {
         const token = await getToken();
-        const res = await fetch(`${API}/api/comercios/${slug}/sumate`, {
+        const res = await fetch(`/api/comercios/${slug}/sumate`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();
@@ -47,7 +47,7 @@ export default function SumateButton({ slug, isDark }: Props) {
     try {
       const token = await getToken();
       const method = subscribed ? "DELETE" : "POST";
-      const res = await fetch(`${API}/api/comercios/${slug}/sumate`, {
+      const res = await fetch(`/api/comercios/${slug}/sumate`, {
         method,
         headers: { Authorization: `Bearer ${token}` },
       });

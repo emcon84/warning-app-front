@@ -16,7 +16,7 @@ import { StepInfo } from "./components/StepInfo";
 import { StepFotos } from "./components/StepFotos";
 import { StepNotificaciones } from "./components/StepNotificaciones";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 export default function NuevoComercioClient() {
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function NuevoComercioClient() {
     setAiLoading(true);
     try {
       const token = await getToken();
-      const res = await fetch(`${API}/api/ai/generate-description`, {
+      const res = await fetch(`/api/ai/generate-description`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ rubro: form.rubro, nombre: form.nombre, barrio: form.barrio, zona: aiExtra.zona || undefined }),
@@ -136,7 +136,7 @@ export default function NuevoComercioClient() {
       if (mainPhoto) fd.append("photo", mainPhoto);
       gallery.forEach((f, i) => fd.append(`photo${i}`, f));
 
-      const res = await fetch(`${API}/api/comercios`, {
+      const res = await fetch(`/api/comercios`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

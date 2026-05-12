@@ -7,15 +7,15 @@ import { useTheme } from "../../../../contexts/ThemeContext";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarDays, FileText } from "lucide-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../../../lib/api/client";
 
 function photoUrl(url?: string | null) {
   if (!url) return null;
-  return url.startsWith("/uploads/") ? `${API}${url}` : url;
+  return url.startsWith("/uploads/") ? `${url}` : url;
 }
 
 function trackEvent(slug: string, type: string) {
-  fetch(`${API}/api/comercios/${slug}/track`, {
+  fetch(`/api/comercios/${slug}/track`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ type }),

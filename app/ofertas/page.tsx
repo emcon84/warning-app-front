@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Supermarket } from "../types";
 import OfertasPageClient from "./OfertasPageClient";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 export const metadata: Metadata = {
   title: "Ofertas de Supermercados en Reconquista, Santa Fe",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 async function getSupermarkets(): Promise<Supermarket[]> {
   try {
-    const res = await fetch(`${API}/api/supermarkets`, { cache: "no-store" });
+    const res = await fetch(`/api/supermarkets`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {
