@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Store, MapPin, Clock, MessageCircle } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Store, MessageCircle } from "lucide-react";
 
 import { API_URL } from "../../lib/api/client";
 
@@ -9,9 +10,14 @@ interface Props {
 }
 
 async function getPost(id: string) {
-  const res = await fetch(`/api/posts/${id}`, { cache: "no-store" });
+  const res = await fetch(`${API_URL}/api/posts/${id}`, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
+}
+
+function resolveUrl(url?: string | null): string | null {
+  if (!url) return null;
+  return url.startsWith("/uploads/") ? `${API_URL}${url}` : url;
 }
 
 export default async function PostPage({ params }: Props) {
@@ -20,14 +26,9 @@ export default async function PostPage({ params }: Props) {
 
   if (!post) return notFound();
 
-  const foto = post.foto?.startsWith("/uploads/") 
-    ? `${post.foto}` 
-    : post.foto;
-
+  const foto = resolveUrl(post.foto);
   const comercioLogo = post.comercio?.logo || post.comercio?.foto;
-  const logoUrl = comercioLogo?.startsWith("/uploads/") 
-    ? `${comercioLogo}` 
-    : comercioLogo;
+  const logoUrl = resolveUrl(comercioLogo);
 
   const tipoConfig: Record<string, { label: string; cls: string; icon: string }> = {
     novedad: { label: "Novedad", cls: "bg-amber-500/15 text-amber-600", icon: "megaphone" },
@@ -63,8 +64,8 @@ export default async function PostPage({ params }: Props) {
 
         {/* Foto del post */}
         {foto && (
-          <div className="mb-4">
-            <img src={foto} alt="" className="w-full h-64 object-cover rounded-2xl" />
+          <div className="relative mb-4 w-full h-64 rounded-2xl overflow-hidden">
+            <Image src={foto} alt="" fill className="object-cover" unoptimized />
           </div>
         )}
 
@@ -109,7 +110,9 @@ export default async function PostPage({ params }: Props) {
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
           <Link href={`/comercio/${post.comercio?.slug}`} className="flex items-center gap-3 flex-1 min-w-0">
             {logoUrl ? (
-              <img src={logoUrl} alt={post.comercio?.nombre} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                <Image src={logoUrl} alt={post.comercio?.nombre ?? ""} fill className="object-cover" unoptimized />
+              </div>
             ) : (
               <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                 <Store className="w-6 h-6 text-gray-400" />
