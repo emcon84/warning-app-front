@@ -10,7 +10,7 @@ export async function generateMetadata({
 }) {
   const { slug, productoId } = await params;
   try {
-    const res = await fetch(`/api/comercios/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/comercios/${slug}`, { cache: "no-store" });
     if (!res.ok) return {};
     const data = await res.json();
     const producto = (data.productos ?? []).find((p: { id: string }) => p.id === productoId);
@@ -45,7 +45,7 @@ export default async function ProductoPage({
   params: Promise<{ slug: string; productoId: string }>;
 }) {
   const { slug, productoId } = await params;
-  const res = await fetch(`/api/comercios/${slug}`, { cache: "no-store" });
+  const res = await fetch(`${API_URL}/api/comercios/${slug}`, { cache: "no-store" });
   if (!res.ok) notFound();
   const data = await res.json();
   const producto = (data.productos ?? []).find((p: { id: string }) => p.id === productoId);

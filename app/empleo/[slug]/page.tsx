@@ -8,7 +8,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquist
 
 async function getEmpleado(slug: string): Promise<Empleado | null> {
   try {
-    const res = await fetch(`/api/empleados/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/empleados/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

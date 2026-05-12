@@ -11,7 +11,7 @@ export default async function GestionarComercioPage() {
   const token = await getToken();
   if (!token) redirect("/sign-in");
 
-  const res = await fetch(`/api/comercios/me`, {
+  const res = await fetch(`${API_URL}/api/comercios/me`, {
     cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });

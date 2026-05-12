@@ -8,7 +8,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquist
 
 async function getVacante(id: string): Promise<Vacante | null> {
   try {
-    const res = await fetch(`/api/vacantes/${id}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/vacantes/${id}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

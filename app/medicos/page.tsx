@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 async function getDoctors(): Promise<Doctor[]> {
   try {
-    const res = await fetch(`/api/doctors`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API_URL}/api/doctors`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
     return res.json();
   } catch {

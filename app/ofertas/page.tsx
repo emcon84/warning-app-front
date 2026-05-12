@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 async function getSupermarkets(): Promise<Supermarket[]> {
   try {
-    const res = await fetch(`/api/supermarkets`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/supermarkets`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

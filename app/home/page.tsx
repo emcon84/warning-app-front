@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 
 async function fetchHomeData() {
   const [professionals, comercios, turno, supermarkets] = await Promise.all([
-    fetch(`/api/professionals`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
-    fetch(`/api/comercios`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
-    fetch(`/api/farmacias/turno`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch(`/api/supermarkets`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`${API_URL}/api/professionals`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`${API_URL}/api/comercios`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`${API_URL}/api/farmacias/turno`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch(`${API_URL}/api/supermarkets`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
   ]);
   return {
     professionals: professionals as Professional[],

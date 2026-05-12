@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 async function getData(): Promise<{ empleados: Empleado[]; vacantes: Vacante[] }> {
   try {
     const [eRes, vRes] = await Promise.all([
-      fetch(`/api/empleados`, { next: { revalidate: 300 } }),
-      fetch(`/api/vacantes`, { next: { revalidate: 300 } }),
+      fetch(`${API_URL}/api/empleados`, { next: { revalidate: 300 } }),
+      fetch(`${API_URL}/api/vacantes`, { next: { revalidate: 300 } }),
     ]);
     const empleados: Empleado[] = eRes.ok ? await eRes.json() : [];
     const vacantes: Vacante[]   = vRes.ok ? await vRes.json() : [];
