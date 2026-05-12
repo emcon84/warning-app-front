@@ -4,7 +4,7 @@ import { useState } from "react";
 import { KeyRound, X, Eye, EyeOff, Check } from "lucide-react";
 import type { Professional } from "../types";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 interface Props {
   target: Professional;
@@ -24,7 +24,7 @@ export function PinModal({ target, getToken, onClose }: Props) {
     setSavingPin(true);
     try {
       const token = await getToken();
-      const res = await fetch(`${API}/api/admin/professionals/${target.id}/pin`, {
+      const res = await fetch(`/api/admin/professionals/${target.id}/pin`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ pin: pinValue }),

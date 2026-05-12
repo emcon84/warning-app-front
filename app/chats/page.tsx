@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 const LIMIT = 20;
 
 interface Conversation {
@@ -33,7 +33,7 @@ const STATUS_MAP: Record<string, { label: string; dot: string }> = {
 
 function fotoUrl(foto?: string) {
   if (!foto) return undefined;
-  return foto.startsWith("/uploads/") ? `${API}${foto}` : foto;
+  return foto.startsWith("/uploads/") ? `${foto}` : foto;
 }
 
 function ProAvatar({ foto, nombre }: { foto?: string; nombre: string }) {
@@ -78,7 +78,7 @@ function ConvCard({
         const token = await getToken();
         if (token) headers["Authorization"] = `Bearer ${token}`;
       }
-      const res = await fetch(`${API}/api/conversations/${conv.id}${params}`, { method: "DELETE", headers });
+      const res = await fetch(`/api/conversations/${conv.id}${params}`, { method: "DELETE", headers });
       if (res.ok) onDelete(conv.id);
     } finally {
       setDeleting(false);
@@ -217,8 +217,8 @@ export default function ChatsPage() {
         const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
         const [proRes, clientRes] = await Promise.all([
-          fetch(`${API}/api/conversations/professional?limit=${LIMIT}`, { headers: authHeaders }),
-          userId ? fetch(`${API}/api/conversations/client/${userId}?limit=${LIMIT}`) : Promise.resolve(null),
+          fetch(`/api/conversations/professional?limit=${LIMIT}`, { headers: authHeaders }),
+          userId ? fetch(`/api/conversations/client/${userId}?limit=${LIMIT}`) : Promise.resolve(null),
         ]);
 
         if (proRes.ok) {
@@ -241,7 +241,7 @@ export default function ChatsPage() {
         setIsAnon(true);
 
         if (clientToken) {
-          const res = await fetch(`${API}/api/conversations/client/${clientToken}?limit=${LIMIT}`);
+          const res = await fetch(`/api/conversations/client/${clientToken}?limit=${LIMIT}`);
           if (res.ok) {
             const paged = parsePagedResponse(await res.json());
             clientHasMoreRef.current  = paged.hasMore;
@@ -275,7 +275,7 @@ export default function ChatsPage() {
 
         if (proHasMoreRef.current && proCursorRef.current) {
           fetches.push(
-            fetch(`${API}/api/conversations/professional?limit=${LIMIT}&cursor=${proCursorRef.current}`, { headers: authHeaders })
+            fetch(`/api/conversations/professional?limit=${LIMIT}&cursor=${proCursorRef.current}`, { headers: authHeaders })
               .then((r) => r.ok ? r.json() : null)
               .then((data) => {
                 if (!data) return;
@@ -289,7 +289,7 @@ export default function ChatsPage() {
 
         if (clientHasMoreRef.current && clientCursorRef.current && userId) {
           fetches.push(
-            fetch(`${API}/api/conversations/client/${userId}?limit=${LIMIT}&cursor=${clientCursorRef.current}`)
+            fetch(`/api/conversations/client/${userId}?limit=${LIMIT}&cursor=${clientCursorRef.current}`)
               .then((r) => r.ok ? r.json() : null)
               .then((data) => {
                 if (!data) return;
@@ -305,7 +305,7 @@ export default function ChatsPage() {
       } else {
         const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
         if (clientToken && clientHasMoreRef.current && clientCursorRef.current) {
-          const res = await fetch(`${API}/api/conversations/client/${clientToken}?limit=${LIMIT}&cursor=${clientCursorRef.current}`);
+          const res = await fetch(`/api/conversations/client/${clientToken}?limit=${LIMIT}&cursor=${clientCursorRef.current}`);
           if (res.ok) {
             const paged = parsePagedResponse(await res.json());
             clientHasMoreRef.current = paged.hasMore;

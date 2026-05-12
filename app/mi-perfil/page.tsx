@@ -8,7 +8,7 @@ import Navbar from "../components/Navbar";
 import { MapPin, Phone, MessageCircle, Bell, Store } from "lucide-react";
 import { useNotifications } from "../hooks/useNotifications";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 const ADMIN_CLERK_IDS = (process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
 
 interface Conversation {
@@ -60,7 +60,7 @@ const STATUS_MAP: Record<string, { label: string; dot: string }> = {
 
 function fotoUrl(foto?: string) {
   if (!foto) return undefined;
-  return foto.startsWith("/uploads/") ? `${API}${foto}` : foto;
+  return foto.startsWith("/uploads/") ? `${foto}` : foto;
 }
 
 function ProAvatar({ foto, nombre, size = "md" }: { foto?: string; nombre: string; size?: "sm" | "md" }) {
@@ -167,7 +167,7 @@ function ProfessionalProfileSection({
     setSaveError(null);
     try {
       const token = await getToken();
-      const res = await fetch(`${API}/api/professionals/me`, {
+      const res = await fetch(`/api/professionals/me`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -194,7 +194,7 @@ function ProfessionalProfileSection({
       const token = await getToken();
       const form = new FormData();
       form.append("photo", file);
-      const res = await fetch(`${API}/api/professionals/me/photo`, {
+      const res = await fetch(`/api/professionals/me/photo`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: form,
@@ -413,7 +413,7 @@ function ComercioProfileSection({ profile }: { profile: ComercioProfile }) {
       <div className="flex items-center gap-4 px-5 py-4">
         <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-700 bg-gray-800 flex items-center justify-center font-bold text-gray-300 text-xl">
           {profile.foto
-            ? <img src={`${API}${profile.foto}`} alt={profile.nombre} className="w-full h-full object-cover" />
+            ? <img src={`${profile.foto}`} alt={profile.nombre} className="w-full h-full object-cover" />
             : profile.nombre[0].toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
@@ -457,10 +457,10 @@ export default function MiPerfilPage() {
       const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
       const [proConvsRes, favRes, meRes, meComercioRes] = await Promise.all([
-        fetch(`${API}/api/conversations/professional`, { headers: authHeaders }),
-        fetch(`${API}/api/favorites`, { headers: authHeaders }),
-        fetch(`${API}/api/professionals/me`, { headers: authHeaders }),
-        fetch(`${API}/api/comercios/me`, { headers: authHeaders }),
+        fetch(`/api/conversations/professional`, { headers: authHeaders }),
+        fetch(`/api/favorites`, { headers: authHeaders }),
+        fetch(`/api/professionals/me`, { headers: authHeaders }),
+        fetch(`/api/comercios/me`, { headers: authHeaders }),
       ]);
 
       const proConvs: Conversation[] = proConvsRes.ok ? await proConvsRes.json() : [];
@@ -487,7 +487,7 @@ export default function MiPerfilPage() {
       // Chats como cliente (identificado por userId de Clerk)
       let clientConvs: Conversation[] = [];
       if (userId) {
-        const cRes = await fetch(`${API}/api/conversations/client/${userId}`);
+        const cRes = await fetch(`/api/conversations/client/${userId}`);
         if (cRes.ok) clientConvs = await cRes.json();
       }
 

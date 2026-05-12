@@ -7,7 +7,7 @@ import ComercioPostCard from "../../../components/ComercioPostCard";
 import NuevoPostWizard from "../NuevoPostWizard";
 import type { ComercioPost } from "../../../types";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../../lib/api/client";
 
 interface Props {
   comercio: { id: string; nombre: string; slug: string };
@@ -36,7 +36,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${API}/api/comercios/${comercio.slug}/posts?limit=20`)
+    fetch(`/api/comercios/${comercio.slug}/posts?limit=20`)
       .then((r) => r.json())
       .then((d) => { if (d.posts) setPosts(d.posts); })
       .catch(() => { /**/ })
@@ -58,7 +58,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
         if (postPrecioDespues) fd.append("precioDespues", postPrecioDespues);
       }
       if (postTipo === "sorteo" && postFechaSorteo) fd.append("fechaSorteo", postFechaSorteo);
-      const res = await fetch(`${API}/api/comercios/${comercio.slug}/posts`, {
+      const res = await fetch(`/api/comercios/${comercio.slug}/posts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -82,7 +82,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
 
   async function handleDeletePost(postId: string) {
     const token = await getToken();
-    await fetch(`${API}/api/comercios/${comercio.slug}/posts/${postId}`, {
+    await fetch(`/api/comercios/${comercio.slug}/posts/${postId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

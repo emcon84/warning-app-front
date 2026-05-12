@@ -14,7 +14,7 @@ import { ProfileReviews } from "./components/ProfileReviews";
 import { ReviewForm } from "./components/ReviewForm";
 import { ProfileActions } from "./components/ProfileActions";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 const SITE_URL =
   typeof window !== "undefined"
     ? window.location.origin
@@ -62,7 +62,7 @@ export default function ProfileClient({ pro, slug }: Props) {
     if (!isSignedIn) return;
     getToken().then((token) => {
       if (!token) return;
-      fetch(`${API}/api/favorites`, { headers: { Authorization: `Bearer ${token}` } })
+      fetch(`/api/favorites`, { headers: { Authorization: `Bearer ${token}` } })
         .then((r) => r.json())
         .then((favs: { Professional: { slug: string } }[]) => {
           setIsFav(favs.some((f) => f.Professional?.slug === slug));
@@ -72,7 +72,7 @@ export default function ProfileClient({ pro, slug }: Props) {
   }, [isSignedIn, slug]);
 
   useEffect(() => {
-    fetch(`${API}/api/professionals/${slug}/reviews`)
+    fetch(`/api/professionals/${slug}/reviews`)
       .then((r) => r.json())
       .then((data) => { if (Array.isArray(data)) setReviews(data); })
       .catch(() => {})
@@ -94,8 +94,8 @@ export default function ProfileClient({ pro, slug }: Props) {
       if (!token) { setIsFav(!wasAdding); return; }
       const headers: Record<string, string> = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
       const res = wasAdding
-        ? await fetch(`${API}/api/favorites`, { method: "POST", headers, body: JSON.stringify({ professionalId: pro.id }) })
-        : await fetch(`${API}/api/favorites/${pro.id}`, { method: "DELETE", headers });
+        ? await fetch(`/api/favorites`, { method: "POST", headers, body: JSON.stringify({ professionalId: pro.id }) })
+        : await fetch(`/api/favorites/${pro.id}`, { method: "DELETE", headers });
       if (!res.ok) setIsFav(!wasAdding);
     } catch {
       setIsFav(!wasAdding);
@@ -111,7 +111,7 @@ export default function ProfileClient({ pro, slug }: Props) {
     try {
       const clerkToken = await getToken();
       const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
-      const res = await fetch(`${API}/api/professionals/${slug}/reviews`, {
+      const res = await fetch(`/api/professionals/${slug}/reviews`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +141,7 @@ export default function ProfileClient({ pro, slug }: Props) {
     if (reportedIds.has(reviewId)) return;
     try {
       const clerkToken = await getToken();
-      await fetch(`${API}/api/professionals/${slug}/reviews/${reviewId}/report`, {
+      await fetch(`/api/professionals/${slug}/reviews/${reviewId}/report`, {
         method: "POST",
         headers: { ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}) },
       });

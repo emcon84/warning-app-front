@@ -18,7 +18,7 @@ import Navbar from "../components/Navbar";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { useTheme } from "../contexts/ThemeContext";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 function photoUrl(url?: string | null): string | null {
   if (!url) return null;

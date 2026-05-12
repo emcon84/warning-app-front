@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 import type { Comercio } from "../../../types";
 import { RUBROS, BARRIOS } from "../../../lib/constants/storeConstants";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../../lib/api/client";
 
 interface Props {
   comercio: Comercio;
@@ -61,7 +61,7 @@ export function StoreDataTab({ comercio, isDark, onComercioUpdate }: Props) {
       if (zonaEnvio) fd.append("zonaEnvio", zonaEnvio);
       if (costoEnvio) fd.append("costoEnvio", costoEnvio);
 
-      const res = await fetch(`${API}/api/comercios/me`, {
+      const res = await fetch(`/api/comercios/me`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

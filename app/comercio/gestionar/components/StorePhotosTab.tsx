@@ -7,7 +7,7 @@ import { Plus, X, Pencil } from "lucide-react";
 import type { Comercio } from "../../../types";
 import { resolvePhotoUrl } from "../../../lib/utils/photo";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../../lib/api/client";
 
 interface Props {
   comercio: Comercio;
@@ -47,7 +47,7 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
       if (newMainFile) fd.append("photo", newMainFile);
       galleryFiles.forEach((f, i) => fd.append(`photo${i}`, f));
 
-      const res = await fetch(`${API}/api/comercios/me`, {
+      const res = await fetch(`/api/comercios/me`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -74,7 +74,7 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
   async function handleDeleteFoto(url: string) {
     try {
       const token = await getToken();
-      await fetch(`${API}/api/comercios/me/fotos`, {
+      await fetch(`/api/comercios/me/fotos`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ url }),

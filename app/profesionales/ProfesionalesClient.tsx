@@ -21,7 +21,7 @@ import {
   VacancyResultCard,
 } from "./components";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 type Pill = "profesionales" | "comercios" | "oficios" | "empleados";
 type EmpleoTab = "cvs" | "vacantes";
@@ -60,9 +60,9 @@ export default function ProfesionalesClient({ professionals }: Props) {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${API}/api/comercios`).then((r) => r.json()),
-      fetch(`${API}/api/empleados`).then((r) => r.json()),
-      fetch(`${API}/api/vacantes`).then((r) => r.json()),
+      fetch(`/api/comercios`).then((r) => r.json()),
+      fetch(`/api/empleados`).then((r) => r.json()),
+      fetch(`/api/vacantes`).then((r) => r.json()),
     ]).then(([stores, employees, jobs]) => {
       setComercios(stores);
       setEmpleados(employees);
@@ -83,7 +83,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
     let mounted = true;
     getToken().then((token) => {
       if (!token || !mounted) return;
-      fetch(`${API}/api/favorites`, { headers: { Authorization: `Bearer ${token}` } })
+      fetch(`/api/favorites`, { headers: { Authorization: `Bearer ${token}` } })
         .then((r) => r.json())
         .then((favs: { professionalId: string }[]) => {
           if (mounted) setFavIds(new Set(favs.map((f) => f.professionalId)));

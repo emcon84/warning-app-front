@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import HomeClient from "./HomeClient";
 import { Professional, Comercio, Supermarket, TurnoResponse } from "../types";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 export const metadata: Metadata = {
   title: "Inicio | Reportes Reconquista",
@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 
 async function fetchHomeData() {
   const [professionals, comercios, turno, supermarkets] = await Promise.all([
-    fetch(`${API}/api/professionals`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
-    fetch(`${API}/api/comercios`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
-    fetch(`${API}/api/farmacias/turno`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch(`${API}/api/supermarkets`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`/api/professionals`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`/api/comercios`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`/api/farmacias/turno`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch(`/api/supermarkets`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
   ]);
   return {
     professionals: professionals as Professional[],

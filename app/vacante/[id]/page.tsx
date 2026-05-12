@@ -3,12 +3,12 @@ import { notFound } from "next/navigation";
 import { Vacante } from "../../types";
 import VacanteDetailClient from "./VacanteDetailClient";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
 async function getVacante(id: string): Promise<Vacante | null> {
   try {
-    const res = await fetch(`${API}/api/vacantes/${id}`, { cache: "no-store" });
+    const res = await fetch(`/api/vacantes/${id}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

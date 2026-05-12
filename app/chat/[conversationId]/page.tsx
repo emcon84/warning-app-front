@@ -8,7 +8,7 @@ import Link from "next/link";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
 
 interface Message {
@@ -238,7 +238,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
         resolvedToken = clerkToken;
       }
 
-      const res = await fetch(`${API}/api/conversations/${conversationId}`, { headers });
+      const res = await fetch(`/api/conversations/${conversationId}`, { headers });
       if (!res.ok) { router.push("/profesionales"); return; }
       const data: Conversation = await res.json();
       setConversation(data);

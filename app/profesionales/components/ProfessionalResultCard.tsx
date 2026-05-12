@@ -8,7 +8,7 @@ import { StarRating } from "./StarRating";
 import { HeartIcon } from "./HeartIcon";
 import { ProfessionalAvatar } from "./ProfessionalAvatar";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 interface Props {
   pro: Professional;
@@ -38,8 +38,8 @@ export function ProfessionalResultCard({ pro, dark, favIds, onToggleFav }: Props
         "Content-Type": "application/json",
       };
       const res = wasAdding
-        ? await fetch(`${API}/api/favorites`, { method: "POST", headers, body: JSON.stringify({ professionalId: pro.id }) })
-        : await fetch(`${API}/api/favorites/${pro.id}`, { method: "DELETE", headers });
+        ? await fetch(`/api/favorites`, { method: "POST", headers, body: JSON.stringify({ professionalId: pro.id }) })
+        : await fetch(`/api/favorites/${pro.id}`, { method: "DELETE", headers });
       if (!res.ok) onToggleFav(pro.id, !wasAdding);
     } catch {
       onToggleFav(pro.id, !wasAdding);

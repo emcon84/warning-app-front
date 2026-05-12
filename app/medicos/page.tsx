@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import MedicosClient from "./MedicosClient";
 import { Doctor } from "../types";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 export const metadata: Metadata = {
   title: "Médicos en Reconquista | Reportes Reconquista",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 async function getDoctors(): Promise<Doctor[]> {
   try {
-    const res = await fetch(`${API}/api/doctors`, { next: { revalidate: 300 } });
+    const res = await fetch(`/api/doctors`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
     return res.json();
   } catch {

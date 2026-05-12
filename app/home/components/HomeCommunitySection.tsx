@@ -5,7 +5,7 @@ import ComercioPostCard from "../../components/ComercioPostCard";
 import { useTheme } from "../../contexts/ThemeContext";
 import type { ComercioPost } from "../../types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 export function HomeCommunitySection() {
   const { isDark } = useTheme();

@@ -14,7 +14,7 @@ import { AdminComerciosTab } from "./components/AdminComerciosTab";
 import { AdminReviewsTab } from "./components/AdminReviewsTab";
 import { AdminOutreachTab } from "./components/AdminOutreachTab";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 const ADMIN_CLERK_IDS = (process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
 
 const TAB_ORDER: Tab[] = ["professionals", "comercios", "reports", "reviews", "outreach"];
@@ -49,10 +49,10 @@ export default function AdminPage() {
       const token = await getToken();
       const headers = { Authorization: `Bearer ${token}` };
       const [proRes, repRes, revRes, comRes] = await Promise.all([
-        fetch(`${API}/api/admin/professionals`, { headers }),
-        fetch(`${API}/api/admin/reports`, { headers }),
-        fetch(`${API}/api/admin/reviews`, { headers }),
-        fetch(`${API}/api/admin/comercios`, { headers }),
+        fetch(`/api/admin/professionals`, { headers }),
+        fetch(`/api/admin/reports`, { headers }),
+        fetch(`/api/admin/reviews`, { headers }),
+        fetch(`/api/admin/comercios`, { headers }),
       ]);
       if (proRes.ok) setProfessionals(await proRes.json());
       if (repRes.ok) setReports(await repRes.json());
@@ -67,7 +67,7 @@ export default function AdminPage() {
     if (!confirm("¿Seguro que querés eliminar este profesional? Se van a borrar también sus conversaciones y reseñas.")) return;
     setDeletingId(id);
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/professionals/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`/api/admin/professionals/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) setProfessionals(prev => prev.filter(p => p.id !== id));
     setDeletingId(null);
   }
@@ -76,7 +76,7 @@ export default function AdminPage() {
     if (!confirm("¿Eliminar este reporte?")) return;
     setDeletingId(id);
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/reports/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`/api/admin/reports/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) setReports(prev => prev.filter(r => r.id !== id));
     setDeletingId(null);
   }
@@ -85,7 +85,7 @@ export default function AdminPage() {
     if (!confirm("¿Eliminar esta reseña?")) return;
     setDeletingId(id);
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/reviews/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`/api/admin/reviews/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) setReviews(prev => prev.filter(r => r.id !== id));
     setDeletingId(null);
   }
@@ -94,14 +94,14 @@ export default function AdminPage() {
     if (!confirm("¿Seguro que querés eliminar este comercio? Se van a borrar también sus ofertas y vacantes.")) return;
     setDeletingId(id);
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/comercios/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch(`/api/admin/comercios/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
     if (res.ok) setComercios(prev => prev.filter(c => c.id !== id));
     setDeletingId(null);
   }
 
   async function togglePremium(com: Comercio) {
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/comercios/${com.id}`, {
+    const res = await fetch(`/api/admin/comercios/${com.id}`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ isPremium: !com.isPremium }),
@@ -111,7 +111,7 @@ export default function AdminPage() {
 
   async function toggleFounder(com: Comercio) {
     const token = await getToken();
-    const res = await fetch(`${API}/api/admin/comercios/${com.id}`, {
+    const res = await fetch(`/api/admin/comercios/${com.id}`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ isFounder: !com.isFounder }),

@@ -14,7 +14,7 @@ import { DEMO_COMERCIO, DEMO_SLUG } from "../../mocks/data";
 import { buildDemoTour, type DemoTab } from "./tour";
 import "driver.js/dist/driver.css";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 function WaIcon({ className }: { className?: string }) {
   return (
@@ -36,7 +36,7 @@ function ProductoModal({ onClose, onSaved }: { onClose: () => void; onSaved: (p:
     e.preventDefault();
     if (!nombre.trim()) return;
     setSaving(true);
-    const res = await fetch(`${API}/api/comercios/me/productos`, {
+    const res = await fetch(`/api/comercios/me/productos`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer demo-token" },
       body: JSON.stringify({ nombre: nombre.trim(), precio: precio.trim() || null, descripcion: descripcion.trim() || null, tipo: "producto" }),
@@ -118,7 +118,7 @@ function PostModal({ onClose, onSaved }: { onClose: () => void; onSaved: (p: Com
     e.preventDefault();
     if (!contenido.trim()) return;
     setSaving(true);
-    const res = await fetch(`${API}/api/comercios/${DEMO_SLUG}/posts`, {
+    const res = await fetch(`/api/comercios/${DEMO_SLUG}/posts`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer demo-token" },
       body: JSON.stringify({ tipo, contenido: contenido.trim() }),
@@ -192,7 +192,7 @@ function OfertaModal({ onClose, onSaved }: { onClose: () => void; onSaved: (o: C
     e.preventDefault();
     if (!titulo.trim()) return;
     setSaving(true);
-    const res = await fetch(`${API}/api/comercios/me/offers`, {
+    const res = await fetch(`/api/comercios/me/offers`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer demo-token" },
       body: JSON.stringify({ titulo: titulo.trim(), descripcion: descripcion.trim() || null }),
@@ -548,7 +548,7 @@ export default function DemoApp() {
 
   // Cargar posts iniciales desde MSW
   useEffect(() => {
-    fetch(`${API}/api/comercios/${DEMO_SLUG}/posts`, {
+    fetch(`/api/comercios/${DEMO_SLUG}/posts`, {
       headers: { Authorization: "Bearer demo-token" },
     })
       .then(r => r.json())
@@ -576,7 +576,7 @@ export default function DemoApp() {
 
   async function handleSumate() {
     if (sumado) return;
-    await fetch(`${API}/api/comercios/${DEMO_SLUG}/sumate`, {
+    await fetch(`/api/comercios/${DEMO_SLUG}/sumate`, {
       method: "POST",
       headers: { Authorization: "Bearer demo-token" },
     });
@@ -584,7 +584,7 @@ export default function DemoApp() {
   }
 
   async function handleDeleteProducto(id: string) {
-    await fetch(`${API}/api/comercios/me/productos/${id}`, {
+    await fetch(`/api/comercios/me/productos/${id}`, {
       method: "DELETE",
       headers: { Authorization: "Bearer demo-token" },
     });
@@ -592,7 +592,7 @@ export default function DemoApp() {
   }
 
   async function handleDeletePost(id: string) {
-    await fetch(`${API}/api/comercios/${DEMO_SLUG}/posts/${id}`, {
+    await fetch(`/api/comercios/${DEMO_SLUG}/posts/${id}`, {
       method: "DELETE",
       headers: { Authorization: "Bearer demo-token" },
     });
@@ -600,7 +600,7 @@ export default function DemoApp() {
   }
 
   async function handleDeleteOferta(id: string) {
-    await fetch(`${API}/api/comercios/me/offers/${id}`, {
+    await fetch(`/api/comercios/me/offers/${id}`, {
       method: "DELETE",
       headers: { Authorization: "Bearer demo-token" },
     });
