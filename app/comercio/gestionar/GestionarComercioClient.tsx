@@ -247,7 +247,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             <div className="flex-1">
               <p className="text-xs font-bold text-indigo-400">Plan Premium</p>
               <p className={`text-xs ${textMuted}`}>
-                {planInfo.usage.productos}/{planInfo.limits.totalProducts} productos · {planInfo.limits.dailyAi}/día IA
+                {planInfo?.usage?.productos ?? 0}/{planInfo?.limits?.totalProducts ?? 100} productos · {planInfo?.limits?.dailyAi ?? 0}/día IA
               </p>
             </div>
             <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-indigo-500 text-indigo-400 hover:bg-indigo-500/20 transition-colors flex-shrink-0">
@@ -261,14 +261,14 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               <div className="flex-1">
                 <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
                 <p className={`text-xs ${textMuted}`}>
-                  {planInfo?.usage.productos ?? 0}/{planInfo?.limits.totalProducts ?? 50} productos
+                  {planInfo?.usage?.productos ?? 0}/{planInfo?.limits?.totalProducts ?? 50} productos
                 </p>
               </div>
               <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0">
                 Upgrade
               </button>
             </div>
-            {planInfo?.canUpgrade && planInfo.usage.productos >= (planInfo.limits.totalProducts as number) - 3 && (
+            {planInfo?.canUpgrade && (planInfo?.usage?.productos ?? 0) >= ((planInfo?.limits?.totalProducts as number) ?? 50) - 3 && (
               <p className="text-xs text-amber-500">¡Casi alcanzás el límite! Considerá pasar a Premium.</p>
             )}
           </div>
