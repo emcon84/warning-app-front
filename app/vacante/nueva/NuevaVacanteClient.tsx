@@ -16,41 +16,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import { useConfetti } from "../../hooks/useConfetti";
 import { useTheme } from "../../contexts/ThemeContext";
-
-import { API_URL } from "../../lib/api/client";
-
-
-const HABILIDADES_SUGERIDAS = [
-  "Administración",
-  "Atención al cliente",
-  "Caja y cobranzas",
-  "Cocina",
-  "Contabilidad",
-  "Diseño gráfico",
-  "Electricidad",
-  "Enfermería",
-  "Gastronomía",
-  "Informática",
-  "Limpieza",
-  "Logística",
-  "Mantenimiento",
-  "Marketing",
-  "Mecánica",
-  "Panadería",
-  "Plomería",
-  "Recepción",
-  "Seguridad",
-  "Ventas",
-];
-
-const MODALIDADES = [
-  "Presencial",
-  "A domicilio",
-  "Part-time",
-  "Full-time",
-  "Por horas",
-  "Temporal",
-];
+import StepPuesto from "./components/StepPuesto";
+import StepDetalles from "./components/StepDetalles";
 
 const TOTAL_STEPS = 2;
 
@@ -342,36 +309,15 @@ export default function NuevaVacanteClient() {
       title: "¿Qué puesto buscas?",
       subtitle: "Describilo con claridad para atraer buenos candidatos",
       content: (
-        <div className="flex flex-col gap-5">
-          <div>
-            <label className={`text-xs mb-1.5 block ${textSec}`}>
-              Título del puesto
-            </label>
-            <input
-              type="text"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Ej: Vendedor/a, Cocinero/a, Administrativo/a..."
-              maxLength={150}
-              className={INPUT_CLS}
-            />
-          </div>
-
-          <div>
-            <label className={`text-xs mb-1.5 flex items-center justify-between ${textSec}`}>
-              <span>Descripción</span>
-              <span className={textMut}>{descripcion.length}/1000</span>
-            </label>
-            <textarea
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              placeholder="Descripción del puesto, tareas principales, requisitos, condiciones de trabajo..."
-              rows={6}
-              maxLength={1000}
-              className={`w-full px-4 py-3.5 rounded-2xl border ${inputCls} text-base focus:outline-none transition-colors resize-none`}
-            />
-          </div>
-        </div>
+        <StepPuesto
+          titulo={titulo}
+          descripcion={descripcion}
+          onTitulo={setTitulo}
+          onDescripcion={setDescripcion}
+          inputCls={inputCls}
+          textSec={textSec}
+          textMut={textMut}
+        />
       ),
       canContinue: titulo.trim().length > 0 && descripcion.trim().length > 0,
       onContinue: goNext,
@@ -382,122 +328,25 @@ export default function NuevaVacanteClient() {
       title: "Un poco más...",
       subtitle: "Todo esto es opcional pero ayuda a filtrar candidatos",
       content: (
-        <div className="flex flex-col gap-5">
-          {/* Habilidades */}
-          <div>
-            <label className={`text-xs mb-1.5 block ${textSec}`}>
-              Habilidades buscadas
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={habilidadInput}
-                onChange={(e) => setHabilidadInput(e.target.value)}
-                onKeyDown={handleHabilidadKeyDown}
-                placeholder="Escribí una y Enter"
-                className={`flex-1 px-4 py-3 rounded-2xl border ${inputCls} text-sm focus:outline-none transition-colors`}
-              />
-              <button
-                onClick={() => {
-                  addHabilidad(habilidadInput);
-                  setHabilidadInput("");
-                }}
-                className={`px-4 py-3 rounded-2xl border ${chipBase} text-sm transition-colors`}
-              >
-                +
-              </button>
-            </div>
-
-            {habilidades.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {habilidades.map((h) => (
-                  <span
-                    key={h}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-sm ${chipSel}`}
-                  >
-                    {h}
-                    <button
-                      onClick={() => removeHabilidad(h)}
-                      className="hover:opacity-70"
-                    >
-                      ✕
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              {HABILIDADES_SUGERIDAS.filter((h) => !habilidades.includes(h))
-                .slice(0, 10)
-                .map((h) => (
-                  <button
-                    key={h}
-                    onClick={() => addHabilidad(h)}
-                    className={`px-3 py-1.5 rounded-full text-xs border ${chipBase} transition-colors`}
-                  >
-                    + {h}
-                  </button>
-                ))}
-            </div>
-          </div>
-
-          {/* Horario */}
-          <div>
-            <label className={`text-xs mb-1.5 block ${textSec}`}>
-              Horario (opcional)
-            </label>
-            <input
-              type="text"
-              value={horario}
-              onChange={(e) => setHorario(e.target.value)}
-              placeholder="Ej: Lunes a viernes 9 a 18hs"
-              maxLength={150}
-              className={INPUT_CLS}
-            />
-          </div>
-
-          {/* Salario */}
-          <div>
-            <label className={`text-xs mb-1.5 block ${textSec}`}>
-              Remuneración (opcional)
-            </label>
-            <input
-              type="text"
-              value={salario}
-              onChange={(e) => setSalario(e.target.value)}
-              placeholder="Ej: A convenir, $500.000, Sueldo en blanco..."
-              maxLength={80}
-              className={INPUT_CLS}
-            />
-          </div>
-
-          {/* Modalidad */}
-          <div>
-            <label className={`text-xs mb-1.5 block ${textSec}`}>
-              Modalidad (opcional)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {MODALIDADES.map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setModalidad(modalidad === m ? "" : m)}
-                  className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
-                    modalidad === m ? chipSel : chipBase
-                  }`}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {error && (
-            <div className="px-4 py-3 rounded-2xl bg-red-900/30 border border-red-800 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-        </div>
+        <StepDetalles
+          habilidades={habilidades}
+          habilidadInput={habilidadInput}
+          horario={horario}
+          salario={salario}
+          modalidad={modalidad}
+          error={error}
+          inputCls={inputCls}
+          chipBase={chipBase}
+          chipSel={chipSel}
+          textSec={textSec}
+          onHabilidadInputChange={setHabilidadInput}
+          onHabilidadKeyDown={handleHabilidadKeyDown}
+          onAddHabilidad={addHabilidad}
+          onRemoveHabilidad={removeHabilidad}
+          onHorario={setHorario}
+          onSalario={setSalario}
+          onModalidad={setModalidad}
+        />
       ),
       canContinue: !loading,
       onContinue: handleSubmit,
