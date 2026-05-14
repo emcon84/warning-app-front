@@ -80,7 +80,7 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
     setLikeCount(c => wasLiked ? Math.max(0, c - 1) : c + 1);
     if (wasLiked) localStorage.removeItem(storageKey);
     else localStorage.setItem(storageKey, "1");
-    fetch(`/api/posts/${post.id}/like`, {
+    fetch(`${API_URL}/api/posts/${post.id}/like`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ unlike: wasLiked }),

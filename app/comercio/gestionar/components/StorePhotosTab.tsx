@@ -47,7 +47,7 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
       if (newMainFile) fd.append("photo", newMainFile);
       galleryFiles.forEach((f, i) => fd.append(`photo${i}`, f));
 
-      const res = await fetch(`/api/comercios/me`, {
+      const res = await fetch(`${API_URL}/api/comercios/me`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -74,7 +74,7 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
   async function handleDeleteFoto(url: string) {
     try {
       const token = await getToken();
-      await fetch(`/api/comercios/me/fotos`, {
+      await fetch(`${API_URL}/api/comercios/me/fotos`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ url }),

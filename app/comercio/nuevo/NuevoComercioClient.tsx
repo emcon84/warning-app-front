@@ -86,7 +86,7 @@ export default function NuevoComercioClient() {
     setAiLoading(true);
     try {
       const token = await getToken();
-      const res = await fetch(`/api/ai/generate-description`, {
+      const res = await fetch(`${API_URL}/api/ai/generate-description`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ rubro: form.rubro, nombre: form.nombre, barrio: form.barrio, zona: aiExtra.zona || undefined }),
@@ -136,7 +136,7 @@ export default function NuevoComercioClient() {
       if (mainPhoto) fd.append("photo", mainPhoto);
       gallery.forEach((f, i) => fd.append(`photo${i}`, f));
 
-      const res = await fetch(`/api/comercios`, {
+      const res = await fetch(`${API_URL}/api/comercios`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

@@ -1,4 +1,5 @@
 "use client";
+import { API_URL } from "../../lib/api/client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -86,7 +87,7 @@ export default function NuevaVacanteClient() {
     async function checkComercio() {
       try {
         const token = await getToken();
-        const res = await fetch(`/api/comercios/me`, {
+        const res = await fetch(`${API_URL}/api/comercios/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setHasComercio(res.ok);
@@ -137,7 +138,7 @@ export default function NuevaVacanteClient() {
     try {
       const token = await getToken();
       if (!token) throw new Error("No autorizado");
-      const res = await fetch(`/api/vacantes`, {
+      const res = await fetch(`${API_URL}/api/vacantes`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

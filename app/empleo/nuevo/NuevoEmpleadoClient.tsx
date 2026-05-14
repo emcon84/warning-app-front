@@ -1,4 +1,5 @@
 "use client";
+import { API_URL } from "../../lib/api/client";
 
 import { useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
@@ -90,7 +91,7 @@ export default function NuevoEmpleadoClient() {
       fd.append("disponible", String(disponible));
       if (foto) fd.append("photo", foto);
 
-      const res = await fetch(`/api/empleados`, {
+      const res = await fetch(`${API_URL}/api/empleados`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

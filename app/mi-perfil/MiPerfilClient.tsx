@@ -1,4 +1,5 @@
 "use client";
+import { API_URL } from "../lib/api/client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -170,7 +171,7 @@ function ProfessionalProfileSection({
     setSaveError(null);
     try {
       const token = await getToken();
-      const res = await fetch(`/api/professionals/me`, {
+      const res = await fetch(`${API_URL}/api/professionals/me`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -197,7 +198,7 @@ function ProfessionalProfileSection({
       const token = await getToken();
       const form = new FormData();
       form.append("photo", file);
-      const res = await fetch(`/api/professionals/me/photo`, {
+      const res = await fetch(`${API_URL}/api/professionals/me/photo`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: form,
@@ -441,10 +442,10 @@ export default function MiPerfilClient() {
       const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
       const [proConvsRes, favRes, meRes, meComercioRes] = await Promise.all([
-        fetch(`/api/conversations/professional`, { headers: authHeaders }),
-        fetch(`/api/favorites`, { headers: authHeaders }),
-        fetch(`/api/professionals/me`, { headers: authHeaders }),
-        fetch(`/api/comercios/me`, { headers: authHeaders }),
+        fetch(`${API_URL}/api/conversations/professional`, { headers: authHeaders }),
+        fetch(`${API_URL}/api/favorites`, { headers: authHeaders }),
+        fetch(`${API_URL}/api/professionals/me`, { headers: authHeaders }),
+        fetch(`${API_URL}/api/comercios/me`, { headers: authHeaders }),
       ]);
 
       const proConvs: Conversation[] = proConvsRes.ok ? await proConvsRes.json() : [];
@@ -470,7 +471,7 @@ export default function MiPerfilClient() {
 
       let clientConvs: Conversation[] = [];
       if (userId) {
-        const cRes = await fetch(`/api/conversations/client/${userId}`);
+        const cRes = await fetch(`${API_URL}/api/conversations/client/${userId}`);
         if (cRes.ok) clientConvs = await cRes.json();
       }
 

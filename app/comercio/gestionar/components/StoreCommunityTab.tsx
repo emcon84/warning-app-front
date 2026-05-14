@@ -36,7 +36,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/comercios/${comercio.slug}/posts?limit=20`)
+    fetch(`${API_URL}/api/comercios/${comercio.slug}/posts?limit=20`)
       .then((r) => r.json())
       .then((d) => { if (d.posts) setPosts(d.posts); })
       .catch(() => { /**/ })
@@ -58,7 +58,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
         if (postPrecioDespues) fd.append("precioDespues", postPrecioDespues);
       }
       if (postTipo === "sorteo" && postFechaSorteo) fd.append("fechaSorteo", postFechaSorteo);
-      const res = await fetch(`/api/comercios/${comercio.slug}/posts`, {
+      const res = await fetch(`${API_URL}/api/comercios/${comercio.slug}/posts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -82,7 +82,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
 
   async function handleDeletePost(postId: string) {
     const token = await getToken();
-    await fetch(`/api/comercios/${comercio.slug}/posts/${postId}`, {
+    await fetch(`${API_URL}/api/comercios/${comercio.slug}/posts/${postId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

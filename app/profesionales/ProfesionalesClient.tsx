@@ -60,9 +60,9 @@ export default function ProfesionalesClient({ professionals }: Props) {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/comercios`).then((r) => r.json()),
-      fetch(`/api/empleados`).then((r) => r.json()),
-      fetch(`/api/vacantes`).then((r) => r.json()),
+      fetch(`${API_URL}/api/comercios`).then((r) => r.json()),
+      fetch(`${API_URL}/api/empleados`).then((r) => r.json()),
+      fetch(`${API_URL}/api/vacantes`).then((r) => r.json()),
     ]).then(([stores, employees, jobs]) => {
       setComercios(stores);
       setEmpleados(employees);
@@ -83,7 +83,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
     let mounted = true;
     getToken().then((token) => {
       if (!token || !mounted) return;
-      fetch(`/api/favorites`, { headers: { Authorization: `Bearer ${token}` } })
+      fetch(`${API_URL}/api/favorites`, { headers: { Authorization: `Bearer ${token}` } })
         .then((r) => r.json())
         .then((favs: { professionalId: string }[]) => {
           if (mounted) setFavIds(new Set(favs.map((f) => f.professionalId)));

@@ -1,4 +1,5 @@
 "use client";
+import { API_URL } from "../lib/api/client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
@@ -80,7 +81,7 @@ function ConvCard({
         const token = await getToken();
         if (token) headers["Authorization"] = `Bearer ${token}`;
       }
-      const res = await fetch(`/api/conversations/${conv.id}${params}`, { method: "DELETE", headers });
+      const res = await fetch(`${API_URL}/api/conversations/${conv.id}${params}`, { method: "DELETE", headers });
       if (res.ok) onDelete(conv.id);
     } finally {
       setDeleting(false);
@@ -207,8 +208,8 @@ export default function ChatsClient() {
         const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
         const [proRes, clientRes] = await Promise.all([
-          fetch(`/api/conversations/professional?limit=${LIMIT}`, { headers: authHeaders }),
-          userId ? fetch(`/api/conversations/client/${userId}?limit=${LIMIT}`) : Promise.resolve(null),
+          fetch(`${API_URL}/api/conversations/professional?limit=${LIMIT}`, { headers: authHeaders }),
+          userId ? fetch(`${API_URL}/api/conversations/client/${userId}?limit=${LIMIT}`) : Promise.resolve(null),
         ]);
 
         if (proRes.ok) {
@@ -230,7 +231,7 @@ export default function ChatsClient() {
         setIsAnon(true);
 
         if (clientToken) {
-          const res = await fetch(`/api/conversations/client/${clientToken}?limit=${LIMIT}`);
+          const res = await fetch(`${API_URL}/api/conversations/client/${clientToken}?limit=${LIMIT}`);
           if (res.ok) {
             const paged = parsePagedResponse(await res.json());
             clientHasMoreRef.current  = paged.hasMore;
@@ -262,7 +263,7 @@ export default function ChatsClient() {
 
         if (proHasMoreRef.current && proCursorRef.current) {
           fetches.push(
-            fetch(`/api/conversations/professional?limit=${LIMIT}&cursor=${proCursorRef.current}`, { headers: authHeaders })
+            fetch(`${API_URL}/api/conversations/professional?limit=${LIMIT}&cursor=${proCursorRef.current}`, { headers: authHeaders })
               .then((r) => r.ok ? r.json() : null)
               .then((data) => {
                 if (!data) return;
@@ -276,7 +277,7 @@ export default function ChatsClient() {
 
         if (clientHasMoreRef.current && clientCursorRef.current && userId) {
           fetches.push(
-            fetch(`/api/conversations/client/${userId}?limit=${LIMIT}&cursor=${clientCursorRef.current}`)
+            fetch(`${API_URL}/api/conversations/client/${userId}?limit=${LIMIT}&cursor=${clientCursorRef.current}`)
               .then((r) => r.ok ? r.json() : null)
               .then((data) => {
                 if (!data) return;
@@ -292,7 +293,7 @@ export default function ChatsClient() {
       } else {
         const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
         if (clientToken && clientHasMoreRef.current && clientCursorRef.current) {
-          const res = await fetch(`/api/conversations/client/${clientToken}?limit=${LIMIT}&cursor=${clientCursorRef.current}`);
+          const res = await fetch(`${API_URL}/api/conversations/client/${clientToken}?limit=${LIMIT}&cursor=${clientCursorRef.current}`);
           if (res.ok) {
             const paged = parsePagedResponse(await res.json());
             clientHasMoreRef.current = paged.hasMore;

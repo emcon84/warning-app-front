@@ -72,7 +72,7 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
         if (precioDespues) fd.append("precioDespues", precioDespues);
       }
       if (tipo === "sorteo" && fechaSorteo) fd.append("fechaSorteo", fechaSorteo);
-      const res = await fetch(`/api/comercios/${comercio.slug}/posts`, {
+      const res = await fetch(`${API_URL}/api/comercios/${comercio.slug}/posts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

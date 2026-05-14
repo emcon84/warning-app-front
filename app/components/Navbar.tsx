@@ -74,7 +74,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     async function fetchUnread() {
       const token = await getToken();
       if (!token || cancelled) return;
-      const res = await fetch(`/api/conversations/unread-count`, {
+      const res = await fetch(`${API_URL}/api/conversations/unread-count`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok && !cancelled) {
@@ -86,7 +86,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     async function checkProfessionalProfile() {
       const token = await getToken();
       if (!token || cancelled) return;
-      const res = await fetch(`/api/professionals/me`, {
+      const res = await fetch(`${API_URL}/api/professionals/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok && !cancelled) setHasProfessionalProfile(true);
@@ -115,7 +115,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     if (!token) return;
     setLoadingConversations(true);
     try {
-      const res = await fetch(`/api/conversations/professional`, {
+      const res = await fetch(`${API_URL}/api/conversations/professional`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return;

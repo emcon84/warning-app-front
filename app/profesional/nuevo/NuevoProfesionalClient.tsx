@@ -81,7 +81,7 @@ export default function NuevoProfesionalClient() {
       const token = await getToken();
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(`/api/ai/generate-description`, {
+      const res = await fetch(`${API_URL}/api/ai/generate-description`, {
         method: "POST",
         headers,
         body: JSON.stringify({ oficios: form.oficios, nombre: form.nombre, anios: aiForm.anios || undefined, zona: aiForm.zona || undefined }),
@@ -117,7 +117,7 @@ export default function NuevoProfesionalClient() {
       const token = await getToken();
       const authHeaders: Record<string, string> = { "Content-Type": "application/json" };
       if (token) authHeaders["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(`/api/professionals`, {
+      const res = await fetch(`${API_URL}/api/professionals`, {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({

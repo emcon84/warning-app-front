@@ -131,7 +131,7 @@ export default function MedicoClient({ doctor: initial }: Props) {
     try {
       const body: Record<string, any> = { obrasSociales: editOS, iapos: editIapos };
       if (editLat !== null && editLng !== null) { body.lat = editLat; body.lng = editLng; }
-      const res = await fetch(`/api/doctors/${doctor.id}`, {
+      const res = await fetch(`${API_URL}/api/doctors/${doctor.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

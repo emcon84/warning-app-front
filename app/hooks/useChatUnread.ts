@@ -22,7 +22,7 @@ export function useChatUnread() {
 
           // Mensajes no leídos como profesional (clientes que escribieron)
           if (token) {
-            const res = await fetch(`/api/conversations/unread-count`, {
+            const res = await fetch(`${API_URL}/api/conversations/unread-count`, {
               headers: { Authorization: `Bearer ${token}` },
             });
             if (res.ok) {
@@ -33,7 +33,7 @@ export function useChatUnread() {
 
           // Mensajes no leídos como cliente (profesionales que respondieron)
           if (userId) {
-            const res = await fetch(`/api/conversations/client/${userId}`);
+            const res = await fetch(`${API_URL}/api/conversations/client/${userId}`);
             if (res.ok) {
               const convs: { Message?: { senderType: string; read: boolean }[] }[] = await res.json();
               for (const conv of convs) {
@@ -47,7 +47,7 @@ export function useChatUnread() {
           // Usuario anónimo
           const clientToken = typeof window !== "undefined" ? localStorage.getItem("clientToken") : null;
           if (clientToken) {
-            const res = await fetch(`/api/conversations/client/${clientToken}`);
+            const res = await fetch(`${API_URL}/api/conversations/client/${clientToken}`);
             if (res.ok) {
               const convs: { Message?: { senderType: string; read: boolean }[] }[] = await res.json();
               for (const conv of convs) {

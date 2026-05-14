@@ -60,7 +60,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
       const token = await getToken();
       const fd = new FormData();
       fd.append("photo", preparedFile);
-      const res = await fetch(`/api/comercios/me/productos/autocompletar`, {
+      const res = await fetch(`${API_URL}/api/comercios/me/productos/autocompletar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -123,7 +123,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
       fd.append("nombre", nombreVal.trim());
       fd.append("descripcion", descripcionVal);
       fd.append("tipo", tipoVal);
-      const res = await fetch(`/api/comercios/me/productos/generar-imagen`, {
+      const res = await fetch(`${API_URL}/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

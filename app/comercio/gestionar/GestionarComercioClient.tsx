@@ -67,7 +67,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   useEffect(() => {
     async function fetchPlan() {
       const token = await getToken();
-      const res = await fetch(`/api/comercios/me/plan`, {
+      const res = await fetch(`${API_URL}/api/comercios/me/plan`, {
         headers: { Authorization: `Bearer ${token ?? ""}` },
       });
       if (res.ok) setPlanInfo(await res.json());
@@ -80,7 +80,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
     if ((tab !== "stats" && activeSection !== "stats") || analytics) return;
     setAnalyticsLoading(true);
     getToken()
-      .then((token) => fetch(`/api/comercios/me/analytics`, { headers: { Authorization: `Bearer ${token}` } }))
+      .then((token) => fetch(`${API_URL}/api/comercios/me/analytics`, { headers: { Authorization: `Bearer ${token}` } }))
       .then((r) => r.json())
       .then((d: AnalyticsData) => setAnalytics(d))
       .catch(() => { /**/ })
@@ -90,7 +90,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   async function handleToggleOffer(offer: ComercioOffer) {
     try {
       const token = await getToken();
-      const res = await fetch(`/api/comercios/me/offers/${offer.id}`, {
+      const res = await fetch(`${API_URL}/api/comercios/me/offers/${offer.id}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ activa: !offer.activa }),
@@ -104,7 +104,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   async function handleDeleteOffer(offerId: string) {
     try {
       const token = await getToken();
-      await fetch(`/api/comercios/me/offers/${offerId}`, {
+      await fetch(`${API_URL}/api/comercios/me/offers/${offerId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -115,7 +115,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   async function handleToggleProducto(p: Producto) {
     try {
       const token = await getToken();
-      const res = await fetch(`/api/comercios/me/productos/${p.id}`, {
+      const res = await fetch(`${API_URL}/api/comercios/me/productos/${p.id}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ activo: !p.activo }),
@@ -129,7 +129,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   async function handleDeleteProducto(id: string) {
     try {
       const token = await getToken();
-      await fetch(`/api/comercios/me/productos/${id}`, {
+      await fetch(`${API_URL}/api/comercios/me/productos/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

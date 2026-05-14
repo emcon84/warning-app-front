@@ -27,7 +27,7 @@ export default function SumateButton({ slug, isDark }: Props) {
       }
       try {
         const token = await getToken();
-        const res = await fetch(`/api/comercios/${slug}/sumate`, {
+        const res = await fetch(`${API_URL}/api/comercios/${slug}/sumate`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const data = await res.json();
@@ -47,7 +47,7 @@ export default function SumateButton({ slug, isDark }: Props) {
     try {
       const token = await getToken();
       const method = subscribed ? "DELETE" : "POST";
-      const res = await fetch(`/api/comercios/${slug}/sumate`, {
+      const res = await fetch(`${API_URL}/api/comercios/${slug}/sumate`, {
         method,
         headers: { Authorization: `Bearer ${token}` },
       });

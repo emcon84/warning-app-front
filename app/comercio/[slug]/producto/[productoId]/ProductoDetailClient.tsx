@@ -15,7 +15,7 @@ function photoUrl(url?: string | null) {
 }
 
 function trackEvent(slug: string, type: string) {
-  fetch(`/api/comercios/${slug}/track`, {
+  fetch(`${API_URL}/api/comercios/${slug}/track`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ type }),

@@ -118,7 +118,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       form.append("lng", String(position.lng));
 
       try {
-        const res = await fetch(`/api/voice/report`, {
+        const res = await fetch(`${API_URL}/api/voice/report`, {
           method: "POST",
           body: form,
         });

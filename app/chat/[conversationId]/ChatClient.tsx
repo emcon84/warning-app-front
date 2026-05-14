@@ -1,4 +1,5 @@
 "use client";
+import { API_URL } from "../../lib/api/client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -229,7 +230,7 @@ export default function ChatClient({ conversationId }: Props) {
         resolvedToken = clerkToken;
       }
 
-      const res = await fetch(`/api/conversations/${conversationId}`, { headers });
+      const res = await fetch(`${API_URL}/api/conversations/${conversationId}`, { headers });
       if (!res.ok) { router.push("/profesionales"); return; }
       const data: Conversation = await res.json();
       setConversation(data);

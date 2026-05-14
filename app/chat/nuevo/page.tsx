@@ -32,7 +32,7 @@ function NuevoChat() {
 
   useEffect(() => {
     if (!professionalId) return;
-    fetch(`/api/professionals/id/${professionalId}`)
+    fetch(`${API_URL}/api/professionals/id/${professionalId}`)
       .then((r) => r.json())
       .then((d) => { if (d.nombre) setProfessional(d); })
       .catch(() => {});
@@ -59,7 +59,7 @@ function NuevoChat() {
         clientToken = getOrCreateAnonymousToken();
       }
 
-      const res = await fetch(`/api/conversations`, {
+      const res = await fetch(`${API_URL}/api/conversations`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({ professionalId, clientToken, firstMessage: message.trim(), clientName }),

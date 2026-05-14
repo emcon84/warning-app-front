@@ -79,7 +79,7 @@ export default function EditarEmpleadoClient() {
     getToken().then(async (token) => {
       if (!token) return;
       try {
-        const res = await fetch(`/api/empleados/me`, {
+        const res = await fetch(`${API_URL}/api/empleados/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
@@ -146,7 +146,7 @@ export default function EditarEmpleadoClient() {
       fd.append("disponible", String(disponible));
       if (foto) fd.append("photo", foto);
 
-      const res = await fetch(`/api/empleados/me`, {
+      const res = await fetch(`${API_URL}/api/empleados/me`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

@@ -93,7 +93,7 @@ export default function GestionarProfesionalClient() {
   async function loadProfile(accessCode: string) {
     setLoading(true);
     try {
-      const res = await fetch(`/api/professionals/me`, {
+      const res = await fetch(`${API_URL}/api/professionals/me`, {
         headers: proHeaders(accessCode),
       });
       if (!res.ok) {
@@ -120,7 +120,7 @@ export default function GestionarProfesionalClient() {
     setAuthLoading(true);
     setAuthError("");
     try {
-      const res = await fetch(`/api/professionals/auth`, {
+      const res = await fetch(`${API_URL}/api/professionals/auth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ whatsapp: wa, pin }),
@@ -142,7 +142,7 @@ export default function GestionarProfesionalClient() {
     if (!pro || !code) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/professionals/me`, {
+      const res = await fetch(`${API_URL}/api/professionals/me`, {
         method: "PUT",
         headers: { ...proHeaders(code), "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -167,7 +167,7 @@ export default function GestionarProfesionalClient() {
     if (!pro || !code) return;
     setSavingDisponible(true);
     try {
-      const res = await fetch(`/api/professionals/me`, {
+      const res = await fetch(`${API_URL}/api/professionals/me`, {
         method: "PUT",
         headers: { ...proHeaders(code), "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -188,7 +188,7 @@ export default function GestionarProfesionalClient() {
     try {
       const fd = new FormData();
       fd.append("photo", file);
-      const res = await fetch(`/api/professionals/me/photo`, {
+      const res = await fetch(`${API_URL}/api/professionals/me/photo`, {
         method: "POST", headers: proHeaders(code), body: fd,
       });
       if (res.ok) {
@@ -206,7 +206,7 @@ export default function GestionarProfesionalClient() {
     try {
       const fd = new FormData();
       fd.append("photo", file);
-      const res = await fetch(`/api/professionals/me/fotos`, {
+      const res = await fetch(`${API_URL}/api/professionals/me/fotos`, {
         method: "POST", headers: proHeaders(code), body: fd,
       });
       if (res.ok) {
@@ -222,7 +222,7 @@ export default function GestionarProfesionalClient() {
     if (!code) return;
     setDeletingFoto(fotoUrl);
     try {
-      const res = await fetch(`/api/professionals/me/fotos`, {
+      const res = await fetch(`${API_URL}/api/professionals/me/fotos`, {
         method: "DELETE",
         headers: { ...proHeaders(code), "Content-Type": "application/json" },
         body: JSON.stringify({ fotoUrl }),

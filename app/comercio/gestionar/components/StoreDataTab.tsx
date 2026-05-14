@@ -61,7 +61,7 @@ export function StoreDataTab({ comercio, isDark, onComercioUpdate }: Props) {
       if (zonaEnvio) fd.append("zonaEnvio", zonaEnvio);
       if (costoEnvio) fd.append("costoEnvio", costoEnvio);
 
-      const res = await fetch(`/api/comercios/me`, {
+      const res = await fetch(`${API_URL}/api/comercios/me`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,

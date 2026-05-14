@@ -44,7 +44,7 @@ function PostularModal({ vacante, isDark, onClose, onSent }: PostularModalProps)
     setError(null);
     try {
       const clientToken = getOrCreateClientToken();
-      const res = await fetch(`/api/vacantes/${vacante.id}/conversaciones`, {
+      const res = await fetch(`${API_URL}/api/vacantes/${vacante.id}/conversaciones`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clientToken, clientName: nombre.trim() || undefined, mensaje: mensaje.trim() }),

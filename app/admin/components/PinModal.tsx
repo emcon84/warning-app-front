@@ -24,7 +24,7 @@ export function PinModal({ target, getToken, onClose }: Props) {
     setSavingPin(true);
     try {
       const token = await getToken();
-      const res = await fetch(`/api/admin/professionals/${target.id}/pin`, {
+      const res = await fetch(`${API_URL}/api/admin/professionals/${target.id}/pin`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ pin: pinValue }),

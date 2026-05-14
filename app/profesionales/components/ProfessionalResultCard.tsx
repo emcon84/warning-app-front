@@ -38,8 +38,8 @@ export function ProfessionalResultCard({ pro, dark, favIds, onToggleFav }: Props
         "Content-Type": "application/json",
       };
       const res = wasAdding
-        ? await fetch(`/api/favorites`, { method: "POST", headers, body: JSON.stringify({ professionalId: pro.id }) })
-        : await fetch(`/api/favorites/${pro.id}`, { method: "DELETE", headers });
+        ? await fetch(`${API_URL}/api/favorites`, { method: "POST", headers, body: JSON.stringify({ professionalId: pro.id }) })
+        : await fetch(`${API_URL}/api/favorites/${pro.id}`, { method: "DELETE", headers });
       if (!res.ok) onToggleFav(pro.id, !wasAdding);
     } catch {
       onToggleFav(pro.id, !wasAdding);
