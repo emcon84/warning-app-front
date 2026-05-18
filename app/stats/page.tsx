@@ -90,15 +90,15 @@ export default function StatsPage() {
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/analytics`)
-      .then((r) => r.json())
+      .then((r) => r.ok ? r.json() : Promise.reject())
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
 
-  const maxSectionVisits = data ? Math.max(...data.topSections.map((s) => s.visits), 1) : 1;
-  const maxCategoryCount = data ? Math.max(...data.reportsByCategory.map((r) => r.count), 1) : 1;
-  const maxBarrioCount = data ? Math.max(...data.topBarrios.map((b) => b.count), 1) : 1;
+  const maxSectionVisits = data ? Math.max(...(data.topSections ?? []).map((s) => s.visits), 1) : 1;
+  const maxCategoryCount = data ? Math.max(...(data.reportsByCategory ?? []).map((r) => r.count), 1) : 1;
+  const maxBarrioCount = data ? Math.max(...(data.topBarrios ?? []).map((b) => b.count), 1) : 1;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
