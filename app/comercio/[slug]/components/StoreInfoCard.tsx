@@ -85,12 +85,12 @@ export function StoreInfoCard({ comercio, theme, rubroBadge, isOwner, recommende
               <span className="font-normal opacity-70">({comercio.ratingCount})</span>
             </span>
           )}
-          {(comercio._count?.suscriptores ?? 0) > 0 && (
+          {(comercio._count?.subscripciones ?? 0) > 0 && (
             <span className={`flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-semibold ${
               isDark ? "bg-blue-500/20 border border-blue-500/40 text-blue-400" : "bg-blue-50 border border-blue-200 text-blue-600"
             }`}>
               <Users className="w-3 h-3" />
-              {comercio._count?.suscriptores}
+              {comercio._count?.subscripciones}
             </span>
           )}
           {comercio.barrio && (

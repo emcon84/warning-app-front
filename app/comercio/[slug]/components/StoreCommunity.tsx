@@ -29,12 +29,12 @@ export function StoreCommunity({ comercio, posts, loading, theme, isOwner, onPub
               {posts.length > 0 ? `${posts.length} publicaciones` : "Aun no hay publicaciones"}
             </p>
           </div>
-          {(comercio._count?.suscriptores ?? 0) > 0 && (
+          {(comercio._count?.subscripciones ?? 0) > 0 && (
             <span className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
               isDark ? "bg-blue-500/20 border border-blue-500/40 text-blue-400" : "bg-blue-50 border border-blue-200 text-blue-600"
             }`}>
               <Users className="w-3 h-3" />
-              {(comercio._count?.suscriptores ?? 0)} miembros
+              {(comercio._count?.subscripciones ?? 0)} miembros
             </span>
           )}
         </div>
