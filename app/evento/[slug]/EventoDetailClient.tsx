@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send } from "lucide-react";
+import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send, Pencil } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import type { Evento, EventoComentario } from "@/lib/types/evento";
 import { CATEGORIA_EMOJI } from "@/lib/types/evento";
 import { resolvePhotoUrl } from "@/lib/utils/photo";
 import { API_URL } from "@/lib/api/client";
+import { EventoEditSheet } from "./EventoEditSheet";
 
 function formatFechaLarga(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", {
@@ -18,11 +19,14 @@ function formatFechaLarga(iso: string) {
   });
 }
 
-export default function EventoDetailClient({ evento }: { evento: Evento }) {
+export default function EventoDetailClient({ evento: inicial }: { evento: Evento }) {
   const { isDark } = useTheme();
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
+  const [evento, setEvento] = useState(inicial);
   const [shared, setShared] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const [comentarios, setComentarios] = useState<EventoComentario[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
   const [texto, setTexto] = useState("");
@@ -43,6 +47,17 @@ export default function EventoDetailClient({ evento }: { evento: Evento }) {
       .catch(() => setComentarios([]))
       .finally(() => setLoadingComments(false));
   }, [evento.slug]);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+    getToken().then(token => {
+      if (!token) return;
+      fetch(`${API_URL}/api/eventos/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : [])
+        .then((mis: Evento[]) => setIsOwner(mis.some(e => e.slug === evento.slug)))
+        .catch(() => {});
+    });
+  }, [isSignedIn, evento.slug]);
 
   async function handleShare() {
     const url = window.location.href;
@@ -99,10 +114,17 @@ export default function EventoDetailClient({ evento }: { evento: Evento }) {
           <Link href="/eventos" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 text-white text-sm backdrop-blur-sm hover:bg-black/60 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Eventos
           </Link>
-          <button onClick={handleShare} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 text-white text-sm backdrop-blur-sm hover:bg-black/60 transition-colors">
-            {shared ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
-            {shared ? "Copiado" : "Compartir"}
-          </button>
+          <div className="flex items-center gap-2">
+            {isOwner && (
+              <button onClick={() => setShowEdit(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 text-white text-sm backdrop-blur-sm hover:bg-black/60 transition-colors">
+                <Pencil className="w-4 h-4" /> Editar
+              </button>
+            )}
+            <button onClick={handleShare} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 text-white text-sm backdrop-blur-sm hover:bg-black/60 transition-colors">
+              {shared ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+              {shared ? "Copiado" : "Compartir"}
+            </button>
+          </div>
         </div>
 
         {/* Countdown badge */}
@@ -231,5 +253,16 @@ export default function EventoDetailClient({ evento }: { evento: Evento }) {
         </div>
       </div>
     </div>
-  );
+
+    {showEdit && (
+      <EventoEditSheet
+        evento={evento}
+        getToken={getToken}
+        isDark={isDark}
+        onClose={() => setShowEdit(false)}
+        onSaved={(updated) => { setEvento(updated); setShowEdit(false); }}
+      />
+    )}
+  </div>
+);
 }
