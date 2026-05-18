@@ -12,7 +12,7 @@ interface Props {
   cardBg: string;
   textPri: string;
   textMuted: string;
-  comercio?: { recommendations?: number; ratingAvg?: number; ratingCount?: number; _count?: { suscriptores?: number } };
+  comercio?: { recommendations?: number; ratingAvg?: number; ratingCount?: number; _count?: { subscripciones?: number } };
 }
 
 type Period = "7d" | "30d";
@@ -213,7 +213,7 @@ export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, tex
           <p className={`text-xs font-semibold uppercase tracking-wider mb-4 ${textMuted}`}>Prueba social</p>
           <div className="grid grid-cols-3 gap-3 mb-4">
             {[
-              {Icon:Users,    val:comercio?._count?.suscriptores??0,                                 label:"Suscriptores",    c:"text-blue-400",   bg:isDark?"bg-blue-500/10":"bg-blue-50"},
+              {Icon:Users,    val:comercio?._count?.subscripciones??0,                                 label:"Suscriptores",    c:"text-blue-400",   bg:isDark?"bg-blue-500/10":"bg-blue-50"},
               {Icon:ThumbsUp, val:comercio?.recommendations??0,                                     label:"Recomendaciones", c:"text-amber-400",  bg:isDark?"bg-amber-500/10":"bg-amber-50"},
               {Icon:Star,     val:comercio?.ratingAvg?parseFloat(comercio.ratingAvg.toFixed(1)):0, label:comercio?.ratingCount?`${comercio.ratingCount} reseñas`:"Sin reseñas", c:"text-yellow-400", bg:isDark?"bg-yellow-500/10":"bg-yellow-50"},
             ].map(({Icon,val,label,c,bg})=>(
