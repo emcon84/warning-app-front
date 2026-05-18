@@ -26,7 +26,7 @@ export const DEMO_COMERCIO: Comercio & { offers: ComercioOffer[]; productos: Pro
   zonaEnvio: null,
   costoEnvio: null,
   createdAt: new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString(),
-  _count: { suscriptores: 23 },
+  _count: { subscripciones: 23 },
   offers: [
     {
       id: "offer-001",
