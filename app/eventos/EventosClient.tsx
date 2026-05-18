@@ -3,12 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, MapPin, Ticket, Plus, Filter } from "lucide-react";
+import {
+  Calendar, MapPin, Ticket, Plus, LayoutGrid,
+  Music, UtensilsCrossed, Trophy, Mic2, Palette,
+  PartyPopper, ShoppingBag, GraduationCap, Heart, Tag,
+} from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import type { Evento, CategoriaEvento } from "@/lib/types/evento";
 import { CATEGORIAS_EVENTO, CATEGORIA_EMOJI } from "@/lib/types/evento";
 import { resolvePhotoUrl } from "@/lib/utils/photo";
+
+const CATEGORIA_ICON: Record<string, React.ElementType> = {
+  "Todos":       LayoutGrid,
+  "Música":      Music,
+  "Gastronomía": UtensilsCrossed,
+  "Deportes":    Trophy,
+  "Teatro":      Mic2,
+  "Arte":        Palette,
+  "Fiesta":      PartyPopper,
+  "Feria":       ShoppingBag,
+  "Educación":   GraduationCap,
+  "Solidario":   Heart,
+  "Otro":        Tag,
+};
 
 function formatFecha(iso: string) {
   const d = new Date(iso);
@@ -96,21 +114,24 @@ export default function EventosClient({ eventosIniciales }: { eventosIniciales: 
           </Link>
         </div>
 
-        {/* Filtro categorías */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
-          {(["Todos", ...CATEGORIAS_EVENTO] as const).map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFiltro(cat as any)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                filtro === cat
-                  ? "bg-indigo-500 text-white"
-                  : isDark ? "bg-gray-800 text-gray-400 hover:bg-gray-700" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              {cat !== "Todos" && CATEGORIA_EMOJI[cat]} {cat}
-            </button>
-          ))}
+        {/* Filtro categorías — scroll en mobile, wrap en desktop */}
+        <div className="flex gap-2 overflow-x-auto md:overflow-visible md:flex-wrap pb-2 mb-6 scrollbar-hide">
+          {(["Todos", ...CATEGORIAS_EVENTO] as const).map(cat => {
+            const Icon = CATEGORIA_ICON[cat] ?? Tag;
+            return (
+              <button
+                key={cat}
+                onClick={() => setFiltro(cat as any)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  filtro === cat
+                    ? "bg-indigo-500 text-white"
+                    : isDark ? "bg-gray-800 text-gray-400 hover:bg-gray-700" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" /> {cat}
+              </button>
+            );
+          })}
         </div>
 
         {/* Grid */}
