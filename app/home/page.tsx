@@ -10,28 +10,31 @@ export const metadata: Metadata = {
 };
 
 async function fetchHomeData() {
-  const [professionals, comercios, turno, supermarkets] = await Promise.all([
+  const [professionals, comercios, turno, supermarkets, eventos] = await Promise.all([
     fetch(`${API_URL}/api/professionals`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
     fetch(`${API_URL}/api/comercios`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
     fetch(`${API_URL}/api/farmacias/turno`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch(`${API_URL}/api/supermarkets`, { cache: "no-store" }).then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch(`${API_URL}/api/eventos/destacados?limit=5`, { next: { revalidate: 300 } }).then(r => r.ok ? r.json() : []).catch(() => []),
   ]);
   return {
     professionals: professionals as Professional[],
     comercios: comercios as Comercio[],
     turno: turno as TurnoResponse | null,
     supermarkets: supermarkets as Supermarket[],
+    eventos,
   };
 }
 
 export default async function HomePage() {
-  const { professionals, comercios, turno, supermarkets } = await fetchHomeData();
+  const { professionals, comercios, turno, supermarkets, eventos } = await fetchHomeData();
   return (
     <HomeClient
       professionals={professionals}
       comercios={comercios}
       turno={turno}
       supermarkets={supermarkets}
+      eventos={eventos}
     />
   );
 }
