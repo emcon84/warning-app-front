@@ -267,7 +267,7 @@ function TabPerfil({ sumado, onSumate }: { sumado: boolean; onSumate: () => void
           </div>
           <div className="flex gap-1 flex-wrap mb-4">
             {c.isFounder && <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">★ FOUNDER</span>}
-            <span className="text-xs px-2 py-0.5 rounded-md bg-gray-800 text-gray-400">{c._count?.suscriptores} seguidores</span>
+            <span className="text-xs px-2 py-0.5 rounded-md bg-gray-800 text-gray-400">{c._count?.subscripciones} seguidores</span>
           </div>
           <a
             data-tour="whatsapp-btn"
