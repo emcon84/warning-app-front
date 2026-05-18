@@ -351,8 +351,8 @@ export default function NuevoEventoPage() {
       <Navbar />
 
       {/* Wizard card — full screen mobile, centered card desktop */}
-      <div className="fixed inset-0 md:relative md:inset-auto md:flex md:items-start md:justify-center md:pt-24 md:pb-10 md:px-4 z-10">
-        <div className={`flex flex-col w-full h-full md:h-auto md:max-h-[90vh] md:w-full md:max-w-lg md:rounded-2xl md:shadow-2xl overflow-hidden ${isDark ? "bg-gray-950 md:bg-gray-900" : "bg-white"}`}>
+      <div className="fixed inset-0 md:flex md:items-center md:justify-center md:bg-black/60 md:p-6 z-10">
+        <div className={`flex flex-col w-full h-full md:h-[640px] md:max-h-[90vh] md:max-w-lg md:rounded-2xl md:shadow-2xl overflow-hidden ${isDark ? "bg-gray-950" : "bg-white"}`}>
 
           {/* Header */}
           <div className={`flex items-center justify-between px-4 pt-safe-top pt-4 pb-3 border-b flex-shrink-0 ${isDark ? "border-gray-800" : "border-gray-100"}`}>
