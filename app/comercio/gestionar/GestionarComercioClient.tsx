@@ -371,6 +371,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             cardBg={cardBg}
             textPri={textPri}
             textMuted={textMuted}
+            comercio={comercio}
           />
         )}
 
