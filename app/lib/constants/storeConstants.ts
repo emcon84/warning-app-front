@@ -17,11 +17,28 @@ export const BARRIOS = [
 
 export type Tab = "datos" | "fotos" | "ofertas" | "productos" | "kit" | "stats" | "comunidad";
 
+export interface ProfileScoreItem {
+  label: string;
+  done: boolean;
+  points: number;
+}
+
 export interface AnalyticsData {
   thisMonth: Record<string, number>;
   lastMonth: Record<string, number>;
   last30: Record<string, number>;
   dailyLast30: Record<string, Record<string, number>>;
+  dayOfWeek: { day: string; total: number }[];
+  weeklyData: { week: string; total: number }[];
+  conversionRate: number;
+  profileScore: { score: number; items: ProfileScoreItem[] };
+}
+
+export interface AiRecommendation {
+  prioridad: "urgente" | "recomendado" | "opcional";
+  titulo: string;
+  accion: string;
+  impacto: string;
 }
 
 export interface PlanInfo {

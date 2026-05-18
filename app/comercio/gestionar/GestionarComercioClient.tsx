@@ -92,9 +92,9 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
     setAnalyticsLoading(true);
     getToken()
       .then((token) => fetch(`${API_URL}/api/comercios/me/analytics`, { headers: { Authorization: `Bearer ${token}` } }))
-      .then((r) => r.ok ? r.json() : null)
-      .then((d: AnalyticsData | null) => { if (d?.thisMonth) setAnalytics(d); })
-      .catch(() => { /**/ })
+      .then((r) => { if (!r.ok) { r.json().then(e => console.error("[analytics]", e)).catch(() => {}); return null; } return r.json(); })
+      .then((d: AnalyticsData | null) => { if (d && !("error" in d)) setAnalytics(d); })
+      .catch((e) => { console.error("[analytics fetch]", e); })
       .finally(() => setAnalyticsLoading(false));
   }, [tab, activeSection, analytics, getToken]);
 
@@ -371,6 +371,8 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             cardBg={cardBg}
             textPri={textPri}
             textMuted={textMuted}
+            comercio={comercio}
+            getToken={getToken}
           />
         )}
 
