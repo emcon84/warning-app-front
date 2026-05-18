@@ -82,7 +82,7 @@ export default function NuevoEventoPage() {
   function goNext() { setDir(1);  setStep(s => s + 1); }
   function goBack() { setDir(-1); setStep(s => s - 1); }
 
-  useEffect(() => { if (step === 3) fire(); }, [step]);
+  useEffect(() => { if (createdSlug) fire(); }, [createdSlug]);
 
   function handleImg(file: File | null, setFile: (f: File | null) => void, setPrev: (u: string | null) => void) {
     if (!file) return;
@@ -124,7 +124,6 @@ export default function NuevoEventoPage() {
       }
       const data = await res.json();
       setCreatedSlug(data.slug);
-      goNext();
     } catch (e: any) {
       setError(e.message);
     } finally {
