@@ -13,6 +13,7 @@ import { resolvePhotoUrl } from "@/lib/utils/photo";
 import { API_URL } from "@/lib/api/client";
 import { EventoEditSheet } from "./EventoEditSheet";
 import { EventoFotosFeed } from "./EventoFotosFeed";
+import { EventoSorteo }    from "./EventoSorteo";
 
 function formatFechaLarga(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", {
@@ -322,6 +323,14 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
             </button>
           </div>
         </div>
+
+        {/* Sorteo */}
+        <EventoSorteo
+          slug={evento.slug}
+          eventoNombre={evento.nombre}
+          isOwner={isOwner}
+          isDark={isDark}
+        />
 
         {/* Feed social de fotos */}
         <EventoFotosFeed slug={evento.slug} isDark={isDark} />
