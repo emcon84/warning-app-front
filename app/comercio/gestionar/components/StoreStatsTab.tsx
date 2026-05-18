@@ -73,7 +73,7 @@ function insights(a: AnalyticsData): string[] {
   const offers = a.thisMonth["offer_view"] ?? 0;
   if (a.conversionRate >= 10) out.push("Tu tasa de conversión es excelente — muchos visitantes te contactan directamente.");
   else if (a.conversionRate > 0 && a.conversionRate < 5) out.push("Conversión baja — mejorá tu descripción y agregá más productos.");
-  const best = [...a.dayOfWeek].sort((x, y) => y.total - x.total)[0];
+  const best = [...(a.dayOfWeek ?? [])].sort((x, y) => y.total - x.total)[0];
   if (best?.total > 0) { const m: Record<string,string> = {Lun:"lunes",Mar:"martes",Mié:"miércoles",Jue:"jueves",Vie:"viernes",Sáb:"sábados",Dom:"domingos"}; out.push(`Los ${m[best.day]??best.day} tenés más actividad — ideal para publicar novedades.`); }
   if (offers === 0 && views > 0) out.push("Tus ofertas tienen 0 vistas — publicá una oferta llamativa.");
   if (a.profileScore.score < 60) out.push("Completá tu perfil para aparecer mejor en búsquedas.");
