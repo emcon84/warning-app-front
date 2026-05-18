@@ -327,17 +327,16 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
           )}
         </div>
       </div>
-    </div>
 
-    {showEdit && (
-      <EventoEditSheet
-        evento={evento}
-        getToken={getToken}
-        isDark={isDark}
-        onClose={() => setShowEdit(false)}
-        onSaved={(updated) => { setEvento(updated); setShowEdit(false); }}
-      />
-    )}
-  </div>
-);
+      {showEdit && (
+        <EventoEditSheet
+          evento={evento}
+          getToken={getToken}
+          isDark={isDark}
+          onClose={() => setShowEdit(false)}
+          onSaved={(updated) => { setEvento(updated); setShowEdit(false); }}
+        />
+      )}
+    </div>
+  );
 }
