@@ -372,6 +372,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             textPri={textPri}
             textMuted={textMuted}
             comercio={comercio}
+            getToken={getToken}
           />
         )}
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { Eye, MessageCircle, Package, Tag, TrendingUp, TrendingDown, Minus, Users, ThumbsUp, Star, CheckCircle, Circle, Zap, Sparkles, AlertTriangle, Info, Loader2 } from "lucide-react";
 import type { AnalyticsData, ProfileScoreItem, AiRecommendation } from "@/lib/constants/storeConstants";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   analytics: AnalyticsData | null;
@@ -13,6 +14,7 @@ interface Props {
   textPri: string;
   textMuted: string;
   comercio?: { recommendations?: number; ratingAvg?: number; ratingCount?: number; _count?: { subscripciones?: number } };
+  getToken: () => Promise<string | null>;
 }
 
 type Period = "7d" | "30d";
@@ -84,7 +86,7 @@ const PRIORITY_CONFIG = {
   opcional:    { label: "Opcional",    icon: Info,          color: "text-blue-400",   bg: (dark: boolean) => dark ? "bg-blue-500/10 border-blue-500/20"   : "bg-blue-50 border-blue-100"   },
 } as const;
 
-export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, textPri, textMuted, comercio }: Props) {
+export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, textPri, textMuted, comercio, getToken }: Props) {
   const [period, setPeriod] = useState<Period>("30d");
   const [aiRecs, setAiRecs] = useState<AiRecommendation[] | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -94,7 +96,11 @@ export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, tex
     setAiLoading(true);
     setAiError(null);
     try {
-      const res = await fetch("/api/comercios/me/recommendations", { method: "POST" });
+      const token = await getToken();
+      const res = await fetch(`${API_URL}/api/comercios/me/recommendations`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token ?? ""}` },
+      });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error((data as any).error ?? "Error al generar recomendaciones");
