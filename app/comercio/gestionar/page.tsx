@@ -17,7 +17,8 @@ export default async function GestionarComercioPage() {
   });
 
   if (res.status === 404) redirect("/comercio/nuevo");
-  if (!res.ok) redirect("/");
+  if (res.status === 401 || res.status === 403) redirect("/sign-in");
+  if (!res.ok) redirect("/comercio/gestionar");
 
   const comercio = await res.json();
 

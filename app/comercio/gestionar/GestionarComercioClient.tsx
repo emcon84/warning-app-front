@@ -35,9 +35,20 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   const { getToken } = useAuth();
   const { isDark } = useTheme();
   const searchParams = useSearchParams();
-  const sectionParam = searchParams.get("section");
-  const tabParam = searchParams.get("tab") as Tab | null;
-  const activeSection = sectionParam || tabParam;
+
+  const initialSection = searchParams.get("section") || searchParams.get("tab") || null;
+  const [activeSection, setActiveSection] = useState<string | null>(initialSection);
+
+  function goToSection(section: string) {
+    setActiveSection(section);
+    window.history.pushState({}, "", `?section=${section}`);
+  }
+
+  function goToDashboard() {
+    setActiveSection(null);
+    window.history.pushState({}, "", window.location.pathname);
+  }
+
   const [tab] = useState<Tab>((searchParams.get("tab") as Tab) ?? "datos");
 
   const [comercio, setComercio] = useState(initial);
@@ -81,8 +92,8 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
     setAnalyticsLoading(true);
     getToken()
       .then((token) => fetch(`${API_URL}/api/comercios/me/analytics`, { headers: { Authorization: `Bearer ${token}` } }))
-      .then((r) => r.json())
-      .then((d: AnalyticsData) => setAnalytics(d))
+      .then((r) => r.ok ? r.json() : null)
+      .then((d: AnalyticsData | null) => { if (d?.thisMonth) setAnalytics(d); })
       .catch(() => { /**/ })
       .finally(() => setAnalyticsLoading(false));
   }, [tab, activeSection, analytics, getToken]);
@@ -193,18 +204,14 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         />
       )}
 
-      <div className="flex-1 max-w-xl mx-auto w-full px-4 pt-20 pb-40">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-20 pb-40">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6 gap-3">
           <div className="min-w-0 flex-1 flex items-center gap-3">
             {activeSection && (
               <button
-                onClick={() => {
-                  const url = new URL(window.location.href);
-                  url.search = "";
-                  router.replace(url.pathname);
-                }}
+                onClick={goToDashboard}
                 className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
@@ -281,7 +288,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               {SECTION_TABS.map((item) => (
                 <button
                   key={item.section}
-                  onClick={() => router.push(`?section=${item.section}`)}
+                  onClick={() => goToSection(item.section)}
                   className={`rounded-2xl border p-5 flex flex-col items-center justify-center gap-3 text-center transition-all hover:scale-[1.02] ${
                     isDark ? "bg-gray-900 border-gray-800 hover:border-gray-600" : "bg-white border-gray-200 hover:border-gray-400"
                   }`}

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
+import { API_URL } from "../../lib/api/client";
 import confetti from "canvas-confetti";
 import { ShoppingCart } from "lucide-react";
 import type { Comercio, ComercioPost } from "../../types";
@@ -43,8 +44,11 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
   const router = useRouter();
   const { isDark } = useTheme();
   const { totalItems, openCart } = useCart();
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const { getToken } = useAuth();
+
+  const [isOwnerVerified, setIsOwnerVerified] = useState(isOwner ?? false);
+  const checkedRef = useRef(false);
 
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [recommended, setRecommended] = useState(false);
@@ -81,6 +85,21 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
   useEffect(() => {
     setRecommended(!!localStorage.getItem(`rec_com_${comercio.slug}`));
   }, [comercio.slug]);
+
+  useEffect(() => {
+    if (!isLoaded || checkedRef.current) return;
+    checkedRef.current = true;
+    if (!isSignedIn) { setIsOwnerVerified(false); return; }
+    getToken().then(token => {
+      if (!token) return;
+      return fetch(`${API_URL}/api/comercios/me`, { headers: { Authorization: `Bearer ${token}` } });
+    }).then(res => {
+      if (!res || !res.ok) return;
+      return res.json();
+    }).then(mine => {
+      if (mine) setIsOwnerVerified(mine.slug === comercio.slug);
+    }).catch(() => {});
+  }, [isLoaded, isSignedIn, getToken, comercio.slug]);
 
   useEffect(() => {
     getStoreReviews(comercio.slug)
@@ -150,7 +169,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           comercio={comercio}
           theme={theme}
           rubroBadge={getRubroBadge(comercio.rubro, isDark)}
-          isOwner={isOwner}
+          isOwner={isOwnerVerified}
           recommended={recommended}
           recCount={recCount}
           onRecommend={handleRecommend}
@@ -179,7 +198,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
         <StoreCatalog
           comercio={comercio}
           theme={theme}
-          isOwner={isOwner}
+          isOwner={isOwnerVerified}
           onManage={() => router.push("/comercio/gestionar?tab=productos")}
         />
 
@@ -188,7 +207,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           posts={posts}
           loading={loadingPosts}
           theme={theme}
-          isOwner={isOwner}
+          isOwner={isOwnerVerified}
           onPublish={() => router.push("/comercio/gestionar?tab=comunidad")}
         />
 
@@ -196,7 +215,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
           offers={comercio.offers ?? []}
           whatsapp={comercio.whatsapp}
           theme={theme}
-          isOwner={isOwner}
+          isOwner={isOwnerVerified}
           comercioNombre={comercio.nombre}
           comercioLogo={comercio.logo ?? undefined}
           comercioSlug={comercio.slug}

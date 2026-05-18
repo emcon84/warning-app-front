@@ -21,9 +21,18 @@ export default function MiniMap({ lat, lng, nombre, isDark, editable, onPosition
   const markerRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    if (!containerRef.current) return;
+    let cancelled = false;
 
     import("leaflet").then((L) => {
+      if (cancelled || !containerRef.current) return;
+
+      // Guard contra double-init (Strict Mode / Fast Refresh)
+      const container = containerRef.current as any;
+      if (container._leaflet_id) {
+        container._leaflet_id = undefined;
+      }
+
       if (!document.querySelector('link[href*="leaflet"]')) {
         const link = document.createElement("link");
         link.rel = "stylesheet";
@@ -45,7 +54,7 @@ export default function MiniMap({ lat, lng, nombre, isDark, editable, onPosition
         attributionControl: false,
         dragging: true,
         scrollWheelZoom: true,
-        doubleClickZoom: !editable, // en editable, doble click no hace zoom
+        doubleClickZoom: !editable,
         touchZoom: true,
       });
 
@@ -81,7 +90,6 @@ export default function MiniMap({ lat, lng, nombre, isDark, editable, onPosition
         markerRef.current = marker;
       }
 
-      // En modo edición: click en el mapa mueve el pin
       if (editable) {
         map.on("click", (e: any) => {
           const { lat: newLat, lng: newLng } = e.latlng;
@@ -103,6 +111,7 @@ export default function MiniMap({ lat, lng, nombre, isDark, editable, onPosition
     });
 
     return () => {
+      cancelled = true;
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;

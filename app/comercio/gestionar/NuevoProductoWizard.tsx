@@ -229,7 +229,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
 
   return (
     <div className="fixed inset-0 z-[3000] flex items-end md:items-center justify-center md:bg-black/60 md:p-6">
-    <div className="bg-white dark:bg-gray-950 flex flex-col w-full h-full md:h-auto md:max-h-[90vh] md:max-w-lg md:rounded-2xl md:shadow-2xl overflow-hidden">
+    <div className="bg-white dark:bg-gray-950 flex flex-col w-full h-full md:h-[640px] md:max-h-[90vh] md:max-w-lg md:rounded-2xl md:shadow-2xl overflow-hidden">
       <div className="flex items-center justify-between px-4 pt-safe-top pt-4 pb-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
         <button
           onClick={onClose}

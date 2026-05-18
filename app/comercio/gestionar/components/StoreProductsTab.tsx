@@ -56,21 +56,23 @@ export function StoreProductsTab({
           <p className={`text-xs mt-1 ${isDark ? "text-gray-700" : "text-gray-300"}`}>Agregá productos o servicios con el boton de arriba.</p>
         </div>
       ) : (
-        productos.map((p) => (
-          <StoreProductRow
-            key={p.id}
-            producto={p}
-            slug={slug}
-            isDark={isDark}
-            cardBg={cardBg}
-            textPri={textPri}
-            textSec={textSec}
-            textMuted={textMuted}
-            onToggle={() => onToggle(p)}
-            onDelete={() => onDelete(p.id)}
-            onEdit={() => onEditClick(p)}
-          />
-        ))
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {productos.map((p) => (
+            <StoreProductRow
+              key={p.id}
+              producto={p}
+              slug={slug}
+              isDark={isDark}
+              cardBg={cardBg}
+              textPri={textPri}
+              textSec={textSec}
+              textMuted={textMuted}
+              onToggle={() => onToggle(p)}
+              onDelete={() => onDelete(p.id)}
+              onEdit={() => onEditClick(p)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

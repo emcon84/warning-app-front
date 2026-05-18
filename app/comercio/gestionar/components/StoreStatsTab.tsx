@@ -36,8 +36,8 @@ export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, tex
               { key: "product_view",   label: "Vistas de productos",  Icon: Package,       color: "text-blue-400" },
               { key: "offer_view",     label: "Vistas de ofertas",    Icon: Tag,           color: "text-amber-400" },
             ] as const).map(({ key, label, Icon, color }) => {
-              const current = analytics.thisMonth[key] ?? 0;
-              const prev = analytics.lastMonth[key] ?? 0;
+              const current = (analytics.thisMonth ?? {})[key] ?? 0;
+              const prev = (analytics.lastMonth ?? {})[key] ?? 0;
               const pct = prev === 0 ? null : Math.round(((current - prev) / prev) * 100);
               const up = pct !== null && pct >= 0;
               return (

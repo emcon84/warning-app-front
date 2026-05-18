@@ -79,7 +79,7 @@ export default function Step1Foto({
       <div className="flex gap-2">
         <button
           onClick={() => cameraRef.current?.click()}
-          className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+          className="flex-1 md:hidden py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
         >
           <Camera className="w-4 h-4" />
           Camara
