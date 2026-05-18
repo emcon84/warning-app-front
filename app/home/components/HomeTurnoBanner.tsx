@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { MapPin, Phone, Pill } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
-import type { TurnoResponse } from "../../types";
+import { useTheme } from "@/contexts/ThemeContext";
+import type { TurnoResponse } from "@/types";
 
 interface Props {
   turno: TurnoResponse | null;

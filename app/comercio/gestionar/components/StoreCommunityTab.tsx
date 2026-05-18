@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ImageIcon, Megaphone, Trash2, X } from "lucide-react";
-import ComercioPostCard from "../../../components/ComercioPostCard";
+import ComercioPostCard from "@/components/ComercioPostCard";
 import NuevoPostWizard from "../NuevoPostWizard";
-import type { ComercioPost } from "../../../types";
+import type { ComercioPost } from "@/types";
 
-import { API_URL } from "../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   comercio: { id: string; nombre: string; slug: string };

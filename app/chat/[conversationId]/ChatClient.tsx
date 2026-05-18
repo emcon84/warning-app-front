@@ -1,5 +1,5 @@
 "use client";
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -7,8 +7,8 @@ import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { Send, UserPlus } from "lucide-react";
 import Link from "next/link";
-import Navbar from "../../components/Navbar";
-import { useTheme } from "../../contexts/ThemeContext";
+import Navbar from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001";
 

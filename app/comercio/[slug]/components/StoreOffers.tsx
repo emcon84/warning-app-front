@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComercioOffer } from "../../../types";
+import type { ComercioOffer } from "@/types";
 import type { ThemeClasses } from "./types";
 import { StoreOfferCard } from "./StoreOfferCard";
 

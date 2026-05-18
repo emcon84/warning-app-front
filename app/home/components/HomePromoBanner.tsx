@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import { slideVariants } from "../../lib/constants/homeConstants";
+import { slideVariants } from "@/lib/constants/homeConstants";
 
 const SLIDE_COUNT = 3;
 

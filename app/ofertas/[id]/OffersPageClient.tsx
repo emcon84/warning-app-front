@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Plus, Pencil, Trash2, Instagram, X, Copy, Check, Download } from "lucide-react";
-import { Supermarket, Offer } from "../../types";
-import { deleteSupermarketOffer } from "../../utils/api";
-import AddOfferModal from "../../components/AddOfferModal";
-import EditOfferModal from "../../components/EditOfferModal";
-import Navbar from "../../components/Navbar";
+import { Supermarket, Offer } from "@/types";
+import { deleteSupermarketOffer } from "@/utils/api";
+import AddOfferModal from "@/components/AddOfferModal";
+import EditOfferModal from "@/components/EditOfferModal";
+import Navbar from "@/components/Navbar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 

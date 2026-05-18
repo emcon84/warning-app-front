@@ -1,7 +1,7 @@
 "use client";
 
 import { X, Check } from "lucide-react";
-import type { PlanInfo } from "../../../lib/constants/storeConstants";
+import type { PlanInfo } from "@/lib/constants/storeConstants";
 
 interface Props {
   isDark: boolean;

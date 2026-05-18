@@ -4,10 +4,10 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { X, ImageIcon, Camera, Sparkles } from "lucide-react";
-import type { Producto } from "../../../types";
-import { compressImageForAi } from "../../../lib/utils/imageUtils";
+import type { Producto } from "@/types";
+import { compressImageForAi } from "@/lib/utils/imageUtils";
 
-import { API_URL } from "../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   isDark: boolean;

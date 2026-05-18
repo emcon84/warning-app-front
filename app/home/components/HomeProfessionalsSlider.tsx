@@ -5,12 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Star, ChevronRight, ChevronLeft } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
-import { resolvePhotoUrl } from "../../lib/utils/photo";
+import { useTheme } from "@/contexts/ThemeContext";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 import {
   PRO_PROMOS, PRO_GRADIENTS, buildMixed, slideVariants,
-} from "../../lib/constants/homeConstants";
-import type { Professional } from "../../types";
+} from "@/lib/constants/homeConstants";
+import type { Professional } from "@/types";
 
 interface Props {
   professionals: Professional[];

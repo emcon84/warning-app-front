@@ -2,7 +2,7 @@
 
 import { BarChart2, Eye, MessageCircle, Package, Tag } from "lucide-react";
 import { StoreAnalyticsChart } from "./StoreAnalyticsChart";
-import type { AnalyticsData } from "../../../lib/constants/storeConstants";
+import type { AnalyticsData } from "@/lib/constants/storeConstants";
 
 interface Props {
   analytics: AnalyticsData | null;

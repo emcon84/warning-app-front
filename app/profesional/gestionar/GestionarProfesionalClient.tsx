@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "../../contexts/ThemeContext";
-import Navbar from "../../components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
+import Navbar from "@/components/Navbar";
 import {
   Camera, Trash2, ArrowLeft, Save, ToggleLeft, ToggleRight,
   ImagePlus, Loader2, CheckCircle2, ExternalLink, KeyRound, Eye, EyeOff,
 } from "lucide-react";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 const STORAGE_KEY = "professional_panel_code";
 
 interface Professional {

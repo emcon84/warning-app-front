@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { ComercioOffer } from "../../../../types";
-import Navbar from "../../../../components/Navbar";
-import { useTheme } from "../../../../contexts/ThemeContext";
+import { ComercioOffer } from "@/types";
+import Navbar from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarDays, FileText } from "lucide-react";
 
-import { API_URL } from "../../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 function photoUrl(url?: string | null) {
   if (!url) return null;

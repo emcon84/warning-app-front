@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Check, Instagram, Link } from "lucide-react";
-import { API_URL } from "../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   createdProduct: { id: string; nombre: string; precio?: string | null; foto?: string | null } | null;

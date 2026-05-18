@@ -1,5 +1,5 @@
 "use client";
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,9 +14,9 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "../../components/Navbar";
-import { useConfetti } from "../../hooks/useConfetti";
-import { useTheme } from "../../contexts/ThemeContext";
+import Navbar from "@/components/Navbar";
+import { useConfetti } from "@/hooks/useConfetti";
+import { useTheme } from "@/contexts/ThemeContext";
 import StepPuesto from "./components/StepPuesto";
 import StepDetalles from "./components/StepDetalles";
 

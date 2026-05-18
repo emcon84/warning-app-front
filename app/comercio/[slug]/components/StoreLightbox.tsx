@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   photos: string[];

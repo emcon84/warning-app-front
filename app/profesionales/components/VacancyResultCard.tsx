@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import type { Vacante } from "../../types";
+import type { Vacante } from "@/types";
 import { ProfessionalAvatar } from "./ProfessionalAvatar";
-import { resolvePhotoUrl } from "../../lib/utils/photo";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   vacante: Vacante;

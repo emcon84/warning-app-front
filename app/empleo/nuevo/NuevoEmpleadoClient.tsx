@@ -1,13 +1,13 @@
 "use client";
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 import { useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { SignInButton, useUser } from "@clerk/nextjs";
-import Navbar from "../../components/Navbar";
+import Navbar from "@/components/Navbar";
 import { CheckCircle, User, Briefcase, MapPin } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import StepPersonal from "./components/StepPersonal";
 import StepHabilidades from "./components/StepHabilidades";
 import StepContacto from "./components/StepContacto";

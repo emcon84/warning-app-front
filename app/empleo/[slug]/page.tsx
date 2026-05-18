@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Empleado } from "../../types";
+import { Empleado } from "@/types";
 import EmpleadoProfileClient from "./EmpleadoProfileClient";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
 async function getEmpleado(slug: string): Promise<Empleado | null> {

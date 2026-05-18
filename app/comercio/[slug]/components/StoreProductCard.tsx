@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ShoppingBag, ShoppingCart, MessageCircle, Check } from "lucide-react";
-import type { Producto } from "../../../types";
+import type { Producto } from "@/types";
 import type { ThemeClasses } from "./types";
-import { useCart } from "../../../contexts/CartContext";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
+import { useCart } from "@/contexts/CartContext";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface CartComercio {
   id: string;

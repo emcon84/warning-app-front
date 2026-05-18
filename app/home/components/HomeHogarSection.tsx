@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
-import { HOGAR_CATS } from "../../lib/constants/homeConstants";
+import { useTheme } from "@/contexts/ThemeContext";
+import { HOGAR_CATS } from "@/lib/constants/homeConstants";
 
 export function HomeHogarSection() {
   const { isDark } = useTheme();

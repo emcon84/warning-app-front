@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Empleado } from "../../types";
+import type { Empleado } from "@/types";
 import { ProfessionalAvatar } from "./ProfessionalAvatar";
 
 interface Props {

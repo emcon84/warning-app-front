@@ -1,6 +1,6 @@
 import { CheckCircle, XCircle, HelpCircle } from "lucide-react";
-import type { Doctor } from "../../types";
-import { OBRAS_SOCIALES } from "../../utils/doctorHelpers";
+import type { Doctor } from "@/types";
+import { OBRAS_SOCIALES } from "@/utils/doctorHelpers";
 
 interface Props {
   doctor: Doctor;

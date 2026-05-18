@@ -1,7 +1,7 @@
 import L from "leaflet";
-import type { Doctor } from "../../types";
-import { getCategoryIconSvg } from "../../utils/categoryHelpers";
-import { getDoctorIconSvg } from "../../utils/doctorHelpers";
+import type { Doctor } from "@/types";
+import { getCategoryIconSvg } from "@/utils/categoryHelpers";
+import { getDoctorIconSvg } from "@/utils/doctorHelpers";
 
 export type ReportCategory =
   | "basura" | "alumbrado" | "baches" | "pastizales" | "robo"

@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Store, ShoppingCart } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
-import { resolvePhotoUrl } from "../../lib/utils/photo";
+import { useTheme } from "@/contexts/ThemeContext";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface RecentProduct {
   id: string;

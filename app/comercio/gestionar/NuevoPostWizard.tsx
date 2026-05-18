@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Megaphone, Tag, Gift, Camera, ChevronRight } from "lucide-react";
-import { useConfetti } from "../../hooks/useConfetti";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useConfetti } from "@/hooks/useConfetti";
+import { useTheme } from "@/contexts/ThemeContext";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 const TOTAL = 3;
 

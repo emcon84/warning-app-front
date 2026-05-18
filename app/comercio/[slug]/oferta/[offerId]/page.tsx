@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import OfertaDetailClient from "./OfertaDetailClient";
 
-import { API_URL } from "../../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; offerId: string }> }) {
   const { slug, offerId } = await params;

@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { Check } from "lucide-react";
-import type { Comercio } from "../../../types";
-import { RUBROS, BARRIOS } from "../../../lib/constants/storeConstants";
+import type { Comercio } from "@/types";
+import { RUBROS, BARRIOS } from "@/lib/constants/storeConstants";
 
-import { API_URL } from "../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   comercio: Comercio;
