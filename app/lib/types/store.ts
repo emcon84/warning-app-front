@@ -50,7 +50,7 @@ export interface Comercio {
   createdAt: string;
   offers?: ComercioOffer[];
   productos?: Producto[];
-  _count?: { suscriptores: number };
+  _count?: { subscripciones: number };
 }
 
 export type PostTipo = "novedad" | "oferta" | "sorteo";
