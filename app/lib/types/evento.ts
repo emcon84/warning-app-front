@@ -16,8 +16,12 @@ export interface Evento {
   activo:      boolean;
   organizador: string;
   createdAt:   string;
-  _count:      { comentarios: number };
-  likes?:      number;
+  _count:        { comentarios: number };
+  likes?:        number;
+  tieneSorteo?:  boolean;
+  sorteoEjecutado?: boolean;
+  sorteoGanadorNum?: number | null;
+  sorteoGanadorNombre?: string | null;
 }
 
 export interface EventoComentario {

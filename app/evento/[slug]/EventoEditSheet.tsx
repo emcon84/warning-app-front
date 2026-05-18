@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import {
   X, Upload, Calendar, MapPin, Ticket, FileText, ImagePlus,
   Smile, Trash2, Loader2, Check, Music, UtensilsCrossed,
-  Trophy, Mic2, Palette, PartyPopper, ShoppingBag, GraduationCap, Heart, Tag,
+  Trophy, Mic2, Palette, PartyPopper, ShoppingBag, GraduationCap, Heart, Tag, Gift,
 } from "lucide-react";
 import type { Evento } from "@/lib/types/evento";
 import { CATEGORIAS_EVENTO } from "@/lib/types/evento";
@@ -48,6 +48,7 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
   const [fechaFin,    setFechaFin]    = useState(toDatetimeLocal(evento.fechaFin));
   const [precio,      setPrecio]      = useState(evento.precio ?? "");
   const [descripcion, setDescripcion] = useState(evento.descripcion ?? "");
+  const [tieneSorteo, setTieneSorteo] = useState((evento as any).tieneSorteo ?? false);
 
   const [bannerFile,  setBannerFile]  = useState<File | null>(null);
   const [bannerPrev,  setBannerPrev]  = useState<string | null>(evento.banner ? resolvePhotoUrl(evento.banner) : null);
@@ -121,6 +122,7 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
       if (descripcion) fd.append("descripcion", descripcion);
       if (bannerFile)  fd.append("banner",      bannerFile);
       if (logoFile)    fd.append("logo",        logoFile);
+      fd.append("tieneSorteo", tieneSorteo ? "true" : "false");
       newFotos.forEach((f, i) => fd.append(`foto${i}`, f));
 
       const res = await fetch(`${API_URL}/api/eventos/${evento.slug}`, {
@@ -244,6 +246,36 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
                 <input className={inp} placeholder="Gratis / $1500" value={precio} onChange={e => setPrecio(e.target.value)} maxLength={80} />
               </div>
             </div>
+
+            {/* Toggle sorteo */}
+            <button
+              type="button"
+              onClick={() => setTieneSorteo(v => !v)}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all ${
+                tieneSorteo
+                  ? "border-amber-400 bg-amber-500/10"
+                  : isDark ? "border-gray-700 hover:border-gray-600" : "border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                tieneSorteo ? "bg-amber-500 text-black" : isDark ? "bg-gray-800 text-gray-500" : "bg-gray-100 text-gray-400"
+              }`}>
+                <Gift className="w-5 h-5" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className={`text-sm font-bold ${tieneSorteo ? (isDark ? "text-amber-400" : "text-amber-600") : (isDark ? "text-gray-300" : "text-gray-700")}`}>
+                  {tieneSorteo ? "Sorteo activado" : "Activar sorteo"}
+                </p>
+                <p className={`text-xs mt-0.5 ${isDark ? "text-gray-500" : "text-gray-400"}`}>
+                  Los asistentes obtienen un numero unico para el sorteo en vivo
+                </p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                tieneSorteo ? "border-amber-400 bg-amber-400" : isDark ? "border-gray-600" : "border-gray-300"
+              }`}>
+                {tieneSorteo && <Check className="w-3 h-3 text-black" />}
+              </div>
+            </button>
 
             {/* Descripción con emoji */}
             <div>
