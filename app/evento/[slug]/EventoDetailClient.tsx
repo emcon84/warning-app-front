@@ -13,7 +13,7 @@ import { resolvePhotoUrl } from "@/lib/utils/photo";
 import { API_URL } from "@/lib/api/client";
 import { EventoEditSheet } from "./EventoEditSheet";
 import { EventoFotosFeed } from "./EventoFotosFeed";
-import { EventoSorteo }    from "./EventoSorteo";
+import { EventoOrganizadorPanel } from "./EventoOrganizadorPanel";
 
 function formatFechaLarga(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", {
@@ -324,13 +324,39 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
           </div>
         </div>
 
-        {/* Sorteo */}
-        <EventoSorteo
-          slug={evento.slug}
-          eventoNombre={evento.nombre}
-          isOwner={isOwner}
-          isDark={isDark}
-        />
+        {/* Panel organizador (solo visible para el dueño) */}
+        {isOwner && (
+          <EventoOrganizadorPanel
+            slug={evento.slug}
+            eventoNombre={evento.nombre}
+            isDark={isDark}
+            getToken={getToken}
+          />
+        )}
+
+        {/* Vista pública del sorteo — solo muestra si hay sorteo activo */}
+        {!isOwner && (evento as any).tieneSorteo && !(evento as any).sorteoEjecutado && (
+          <div className={`rounded-2xl border p-5 text-center ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}>
+            <div className={`w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center ${isDark ? "bg-amber-500/20" : "bg-amber-50"}`}>
+              <span className="text-3xl">🎟️</span>
+            </div>
+            <p className={`text-base font-black mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>Sorteo en el evento</p>
+            <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+              Escaneá el QR que va a estar en el evento para obtener tu número y participar en el sorteo.
+            </p>
+          </div>
+        )}
+
+        {/* Resultado público si ya se ejecutó */}
+        {!isOwner && (evento as any).sorteoEjecutado && (evento as any).sorteoGanadorNum && (
+          <div className={`rounded-2xl border p-5 text-center ${isDark ? "bg-amber-500/10 border-amber-500/30" : "bg-amber-50 border-amber-200"}`}>
+            <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? "text-amber-500" : "text-amber-600"}`}>Ganador del sorteo</p>
+            <p className="text-6xl font-black text-amber-400 tracking-widest mb-1">
+              {(evento as any).sorteoGanadorNum?.toString().padStart(3, "0")}
+            </p>
+            <p className={`text-base font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{(evento as any).sorteoGanadorNombre}</p>
+          </div>
+        )}
 
         {/* Feed social de fotos */}
         <EventoFotosFeed slug={evento.slug} isDark={isDark} />
