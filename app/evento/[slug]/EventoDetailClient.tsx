@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send, Pencil } from "lucide-react";
+import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send, Pencil, Heart, Download } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import type { Evento, EventoComentario } from "@/lib/types/evento";
@@ -27,6 +27,9 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
   const [shared, setShared] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [comentarios, setComentarios] = useState<EventoComentario[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
   const [texto, setTexto] = useState("");
@@ -39,6 +42,53 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
   const card   = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
   const textPri = isDark ? "text-white" : "text-gray-900";
   const textMut = isDark ? "text-gray-400" : "text-gray-500";
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/eventos/${evento.slug}/likes`)
+      .then(r => r.ok ? r.json() : { count: 0 })
+      .then(d => setLikes(d.count ?? 0))
+      .catch(() => {});
+  }, [evento.slug]);
+
+  async function handleLike() {
+    setLiked(true);
+    setLikes(l => l + 1);
+    try {
+      const res = await fetch(`${API_URL}/api/eventos/${evento.slug}/like`, { method: "POST" });
+      const d = await res.json();
+      setLikes(d.count ?? likes);
+      if (d.already) setLiked(true);
+    } catch {}
+  }
+
+  async function handleDownloadFlyer() {
+    setDownloading(true);
+    try {
+      const params = new URLSearchParams({
+        nombre:      evento.nombre,
+        categoria:   evento.categoria,
+        lugar:       evento.lugar ?? "",
+        fecha:       evento.fecha,
+        organizador: evento.organizador,
+        ...(evento.precio  ? { precio:  evento.precio  } : {}),
+        ...(evento.banner  ? { banner:  evento.banner  } : {}),
+        ...(evento.logo    ? { logo:    evento.logo    } : {}),
+      });
+      const url = `${window.location.origin}/share/evento?${params}`;
+      const res  = await fetch(url);
+      const blob = await res.blob();
+      const file = new File([blob], `evento-${evento.slug}.jpg`, { type: blob.type });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: evento.nombre });
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `evento-${evento.slug}.jpg`;
+        a.click();
+      }
+    } catch {}
+    finally { setDownloading(false); }
+  }
 
   useEffect(() => {
     fetch(`${API_URL}/api/eventos/${evento.slug}/comentarios`)
@@ -183,6 +233,31 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
               {evento.descripcion}
             </p>
           )}
+
+          {/* Like + Compartir flyer */}
+          <div className={`mt-4 pt-4 border-t flex items-center gap-3 ${isDark ? "border-gray-800" : "border-gray-100"}`}>
+            <button
+              onClick={handleLike}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all flex-1 justify-center ${
+                liked
+                  ? "bg-rose-500/20 border-rose-500/40 text-rose-400"
+                  : isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-rose-500/40 hover:text-rose-400" : "border-gray-200 text-gray-500 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-500"
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${liked ? "fill-current" : ""}`} />
+              {likes > 0 ? `${likes} Me gusta` : "Me gusta"}
+            </button>
+            <button
+              onClick={handleDownloadFlyer}
+              disabled={downloading}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all flex-1 justify-center ${
+                isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"
+              } disabled:opacity-60`}
+            >
+              <Download className={`w-4 h-4 ${downloading ? "animate-bounce" : ""}`} />
+              {downloading ? "Generando..." : "Compartir flyer"}
+            </button>
+          </div>
         </div>
 
         {/* Galería post-evento */}

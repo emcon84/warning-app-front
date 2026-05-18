@@ -17,6 +17,7 @@ export interface Evento {
   organizador: string;
   createdAt:   string;
   _count:      { comentarios: number };
+  likes?:      number;
 }
 
 export interface EventoComentario {
