@@ -4,18 +4,24 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  X, Upload, Calendar, MapPin, Ticket, FileText,
+  X, Upload, Calendar, MapPin, Ticket, FileText, ImagePlus, Smile,
   Music, UtensilsCrossed, Trophy, Mic2, Palette,
   PartyPopper, ShoppingBag, GraduationCap, Heart, Tag,
-  Loader2, Check, Share2
+  Loader2, Check, Share2, Trash2
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { CATEGORIAS_EVENTO } from "@/lib/types/evento";
 import { API_URL } from "@/lib/api/client";
 import { useConfetti } from "@/hooks/useConfetti";
+
+const EmojiPicker = dynamic(
+  () => import("@emoji-mart/react").then(m => m.default),
+  { ssr: false, loading: () => null }
+);
 
 const CATEGORIA_ICON: Record<string, React.ElementType> = {
   "Música":      Music,
@@ -73,6 +79,11 @@ export default function NuevoEventoPage() {
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [logoFile,      setLogoFile]      = useState<File | null>(null);
   const [logoPreview,   setLogoPreview]   = useState<string | null>(null);
+  const [galeriaFiles,  setGaleriaFiles]  = useState<File[]>([]);
+  const [galeriaPreviews, setGaleriaPreviews] = useState<string[]>([]);
+  const [showEmoji,     setShowEmoji]     = useState(false);
+  const galeriaRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [error,      setError]      = useState("");
@@ -88,6 +99,30 @@ export default function NuevoEventoPage() {
     if (!file) return;
     setFile(file);
     setPrev(URL.createObjectURL(file));
+  }
+
+  function handleGaleria(files: FileList | null) {
+    if (!files) return;
+    const nuevos = Array.from(files).slice(0, 10 - galeriaFiles.length);
+    setGaleriaFiles(prev => [...prev, ...nuevos]);
+    setGaleriaPreviews(prev => [...prev, ...nuevos.map(f => URL.createObjectURL(f))]);
+  }
+
+  function removeGaleriaPhoto(i: number) {
+    setGaleriaFiles(prev => prev.filter((_, idx) => idx !== i));
+    setGaleriaPreviews(prev => prev.filter((_, idx) => idx !== i));
+  }
+
+  function insertEmoji(emoji: any) {
+    const native = emoji.native as string;
+    const el = textareaRef.current;
+    if (!el) { setDescripcion(d => d + native); return; }
+    const start = el.selectionStart ?? descripcion.length;
+    const end   = el.selectionEnd   ?? descripcion.length;
+    const next  = descripcion.slice(0, start) + native + descripcion.slice(end);
+    setDescripcion(next);
+    setShowEmoji(false);
+    setTimeout(() => { el.focus(); el.setSelectionRange(start + native.length, start + native.length); }, 0);
   }
 
   async function handleSubmit() {
@@ -110,8 +145,9 @@ export default function NuevoEventoPage() {
       if (fechaFin)    fd.append("fechaFin",    fechaFin);
       if (precio)      fd.append("precio",      precio);
       if (descripcion) fd.append("descripcion", descripcion);
-      if (bannerFile)  fd.append("banner",      bannerFile);
-      if (logoFile)    fd.append("logo",        logoFile);
+      if (bannerFile)  fd.append("banner", bannerFile);
+      if (logoFile)    fd.append("logo",   logoFile);
+      galeriaFiles.forEach((f, i) => fd.append(`foto${i}`, f));
 
       const res = await fetch(`${API_URL}/api/eventos`, {
         method: "POST",
@@ -253,7 +289,7 @@ export default function NuevoEventoPage() {
         </div>
       );
 
-      // Paso 3 — Descripción + logo — o Listo si ya se creó
+      // Paso 3 — Descripción + emoji + galería + logo — o Listo si ya se creó
       case 3: return createdSlug ? (
         <div className="p-5 flex flex-col items-center justify-center text-center h-full gap-4 min-h-[300px]">
           <div className="w-16 h-16 rounded-2xl bg-indigo-500 flex items-center justify-center">
@@ -273,15 +309,90 @@ export default function NuevoEventoPage() {
           </button>
         </div>
       ) : (
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-5">
+
+          {/* Descripción con emoji picker */}
           <div>
-            <label className={lab(isDark)}><FileText className="inline w-3 h-3 mr-1" />Descripción</label>
-            <textarea className={`${inp(isDark)} resize-none`} rows={5}
-              placeholder="Contá de qué se trata, qué esperar, quiénes participan..."
-              value={descripcion} onChange={e => setDescripcion(e.target.value)} maxLength={1000} />
+            <div className="flex items-center justify-between mb-1">
+              <label className={lab(isDark)}><FileText className="inline w-3 h-3 mr-1" />Descripción</label>
+              <button type="button" onClick={() => setShowEmoji(v => !v)}
+                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors ${
+                  showEmoji
+                    ? "bg-amber-500/20 text-amber-400"
+                    : isDark ? "text-gray-500 hover:text-gray-300 hover:bg-gray-800" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                }`}>
+                <Smile className="w-3.5 h-3.5" /> Emoji
+              </button>
+            </div>
+
+            {showEmoji && (
+              <div className="mb-2">
+                <EmojiPicker
+                  data={async () => (await import("@emoji-mart/data")).default}
+                  onEmojiSelect={insertEmoji}
+                  theme={isDark ? "dark" : "light"}
+                  locale="es"
+                  previewPosition="none"
+                  skinTonePosition="none"
+                />
+              </div>
+            )}
+
+            <textarea
+              ref={textareaRef}
+              className={`${inp(isDark)} resize-none`}
+              rows={5}
+              placeholder="Contá de qué se trata 🎉, qué esperar, quiénes participan..."
+              value={descripcion}
+              onChange={e => setDescripcion(e.target.value)}
+              maxLength={1000}
+            />
             <p className={`text-xs mt-1 text-right ${isDark ? "text-gray-600" : "text-gray-300"}`}>{descripcion.length}/1000</p>
           </div>
 
+          {/* Galería de fotos */}
+          <div>
+            <label className={lab(isDark)}><ImagePlus className="inline w-3 h-3 mr-1" />Galería de fotos (opcional)</label>
+            <p className={`text-xs mb-2 ${isDark ? "text-gray-600" : "text-gray-400"}`}>
+              Podés agregar fotos del lugar, flyers, o fotos del evento después
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {galeriaPreviews.map((src, i) => (
+                <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
+                  <Image src={src} alt={`foto-${i}`} fill className="object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeGaleriaPhoto(i)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-red-500/80 transition-colors"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+              {galeriaFiles.length < 10 && (
+                <button
+                  type="button"
+                  onClick={() => galeriaRef.current?.click()}
+                  className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-colors ${
+                    isDark ? "border-gray-700 text-gray-600 hover:border-gray-600 hover:text-gray-500" : "border-gray-200 text-gray-300 hover:border-gray-300 hover:text-gray-400"
+                  }`}
+                >
+                  <ImagePlus className="w-5 h-5" />
+                  <span className="text-xs">Agregar</span>
+                </button>
+              )}
+            </div>
+            <input
+              ref={galeriaRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={e => handleGaleria(e.target.files)}
+            />
+          </div>
+
+          {/* Logo */}
           <div>
             <label className={lab(isDark)}>Logo del organizador (opcional)</label>
             <div className="flex items-center gap-3">

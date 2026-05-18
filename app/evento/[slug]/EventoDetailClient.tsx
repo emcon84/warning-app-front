@@ -157,7 +157,7 @@ export default function EventoDetailClient({ evento }: { evento: Evento }) {
           </div>
 
           {evento.descripcion && (
-            <p className={`mt-4 pt-4 border-t text-sm leading-relaxed ${isDark ? "border-gray-800 text-gray-300" : "border-gray-100 text-gray-600"}`}>
+            <p className={`mt-4 pt-4 border-t text-sm leading-relaxed whitespace-pre-wrap ${isDark ? "border-gray-800 text-gray-300" : "border-gray-100 text-gray-600"}`}>
               {evento.descripcion}
             </p>
           )}
