@@ -69,14 +69,15 @@ const ChartTip = ({ active, payload, label, isDark }: any) => {
 
 function insights(a: AnalyticsData): string[] {
   const out: string[] = [];
-  const views = a.thisMonth["profile_view"] ?? 0;
-  const offers = a.thisMonth["offer_view"] ?? 0;
-  if (a.conversionRate >= 10) out.push("Tu tasa de conversión es excelente — muchos visitantes te contactan directamente.");
-  else if (a.conversionRate > 0 && a.conversionRate < 5) out.push("Conversión baja — mejorá tu descripción y agregá más productos.");
+  const views  = a.thisMonth?.["profile_view"] ?? 0;
+  const offers = a.thisMonth?.["offer_view"]   ?? 0;
+  const conv   = a.conversionRate ?? 0;
+  if (conv >= 10) out.push("Tu tasa de conversión es excelente — muchos visitantes te contactan directamente.");
+  else if (conv > 0 && conv < 5) out.push("Conversión baja — mejorá tu descripción y agregá más productos.");
   const best = [...(a.dayOfWeek ?? [])].sort((x, y) => y.total - x.total)[0];
   if (best?.total > 0) { const m: Record<string,string> = {Lun:"lunes",Mar:"martes",Mié:"miércoles",Jue:"jueves",Vie:"viernes",Sáb:"sábados",Dom:"domingos"}; out.push(`Los ${m[best.day]??best.day} tenés más actividad — ideal para publicar novedades.`); }
   if (offers === 0 && views > 0) out.push("Tus ofertas tienen 0 vistas — publicá una oferta llamativa.");
-  if (a.profileScore.score < 60) out.push("Completá tu perfil para aparecer mejor en búsquedas.");
+  if ((a.profileScore?.score ?? 100) < 60) out.push("Completá tu perfil para aparecer mejor en búsquedas.");
   return out.slice(0, 3);
 }
 
@@ -206,19 +207,19 @@ export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, tex
           <p className={`text-xs font-semibold uppercase tracking-wider mb-5 ${textMuted}`}>Embudo de conversión</p>
           <div className="flex flex-col gap-4">
             {[
-              {label:"Visitas al perfil",   val:analytics.thisMonth["profile_view"]??0,   color:"#6366f1",bar:"bg-indigo-500"},
-              {label:"Vistas de productos", val:analytics.thisMonth["product_view"]??0,   color:"#3b82f6",bar:"bg-blue-500"},
-              {label:"Clicks en WhatsApp",  val:analytics.thisMonth["whatsapp_click"]??0, color:"#10b981",bar:"bg-emerald-500"},
+              {label:"Visitas al perfil",   val:(analytics.thisMonth?.["profile_view"]??0),   color:"#6366f1",bar:"bg-indigo-500"},
+              {label:"Vistas de productos", val:(analytics.thisMonth?.["product_view"]??0),   color:"#3b82f6",bar:"bg-blue-500"},
+              {label:"Clicks en WhatsApp",  val:(analytics.thisMonth?.["whatsapp_click"]??0), color:"#10b981",bar:"bg-emerald-500"},
             ].map(s=>{
-              const max=analytics.thisMonth["profile_view"]||1;
+              const max=(analytics.thisMonth?.["profile_view"])||1;
               return(<div key={s.label}><div className="flex items-center justify-between mb-1.5"><span className={`text-xs ${textMuted}`}>{s.label}</span><span className="text-sm font-black" style={{color:s.color}}>{s.val}</span></div><div className={`h-2.5 rounded-full ${isDark?"bg-gray-800":"bg-gray-100"}`}><div className={`h-full rounded-full transition-all duration-700 ${s.bar}`} style={{width:`${Math.round((s.val/max)*100)}%`}}/></div></div>);
             })}
           </div>
           <div className={`mt-5 pt-4 border-t ${isDark?"border-gray-800":"border-gray-100"} flex items-center justify-between`}>
             <span className={`text-xs ${textMuted}`}>Tasa de conversión</span>
             <div className="flex items-center gap-2">
-              <span className={`text-2xl font-black ${analytics.conversionRate>=5?"text-green-400":analytics.conversionRate>0?"text-amber-400":textMuted}`}>{analytics.conversionRate}%</span>
-              {analytics.conversionRate>=5&&<Zap className="w-4 h-4 text-green-400"/>}
+              <span className={`text-2xl font-black ${(analytics.conversionRate??0)>=5?"text-green-400":(analytics.conversionRate??0)>0?"text-amber-400":textMuted}`}>{analytics.conversionRate??0}%</span>
+              {(analytics.conversionRate??0)>=5&&<Zap className="w-4 h-4 text-green-400"/>}
             </div>
           </div>
         </div>
