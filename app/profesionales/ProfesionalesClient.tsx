@@ -21,7 +21,7 @@ import {
   VacancyResultCard,
 } from "./components";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "../lib/api/client";
 
 type Pill = "profesionales" | "comercios" | "oficios" | "empleados";
 type EmpleoTab = "cvs" | "vacantes";

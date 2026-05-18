@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { resolvePhotoUrl } from "../../../../lib/utils/photo";
+import { resolvePhotoUrl } from "../../../lib/utils/photo";
 import type { ProfessionalDetail } from "../../../../types";
 import { Stars } from "./Stars";
 
