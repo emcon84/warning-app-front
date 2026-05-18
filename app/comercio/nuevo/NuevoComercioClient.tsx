@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { Store, MapPin, Camera, Bell, ArrowLeft } from "lucide-react";
-import { useNotifications } from "../../hooks/useNotifications";
-import { useConfetti } from "../../hooks/useConfetti";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useConfetti } from "@/hooks/useConfetti";
+import { useTheme } from "@/contexts/ThemeContext";
 import { TOTAL_STEPS, STEP_VARIANTS, ICON_VARIANTS } from "./constants";
 import type { ComercioForm, AiExtra } from "./types";
 import { StepContacto } from "./components/StepContacto";
@@ -16,7 +16,7 @@ import { StepInfo } from "./components/StepInfo";
 import { StepFotos } from "./components/StepFotos";
 import { StepNotificaciones } from "./components/StepNotificaciones";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 export default function NuevoComercioClient() {
   const router = useRouter();

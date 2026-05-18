@@ -4,10 +4,10 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { Plus, X, Pencil } from "lucide-react";
-import type { Comercio } from "../../../types";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
+import type { Comercio } from "@/types";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
-import { API_URL } from "../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   comercio: Comercio;

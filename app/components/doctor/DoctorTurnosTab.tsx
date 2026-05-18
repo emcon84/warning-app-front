@@ -1,6 +1,6 @@
 import { Plus, Clock } from "lucide-react";
-import type { TurnoDisponibilidad } from "../../types";
-import { OBRAS_SOCIALES } from "../../utils/doctorHelpers";
+import type { TurnoDisponibilidad } from "@/types";
+import { OBRAS_SOCIALES } from "@/utils/doctorHelpers";
 
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 const HORARIOS = ["Mañana", "Tarde", "Todo el día"];

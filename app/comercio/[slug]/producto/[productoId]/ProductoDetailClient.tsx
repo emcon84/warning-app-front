@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Comercio, Producto } from "../../../../types";
-import Navbar from "../../../../components/Navbar";
-import { useTheme } from "../../../../contexts/ThemeContext";
+import { Comercio, Producto } from "@/types";
+import Navbar from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Share2, Copy, Check, X, Instagram, Download } from "lucide-react";
 
-import { API_URL } from "../../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 function photoUrl(url?: string | null) {
   if (!url) return null;

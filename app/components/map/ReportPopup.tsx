@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { Share2, Phone, AlertTriangle } from "lucide-react";
-import { getCategoryLabel, getCategoryIcon } from "../../utils/categoryHelpers";
-import type { Report } from "../../types";
+import { getCategoryLabel, getCategoryIcon } from "@/utils/categoryHelpers";
+import type { Report } from "@/types";
 
 const PUBLIC_SERVICE_CATEGORIES = [
   "basura", "alumbrado", "pastizales", "fugas_agua",

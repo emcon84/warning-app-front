@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import { Comercio } from "../../types";
+import { Comercio } from "@/types";
 import ComercioProfileClient from "./ComercioProfileClient";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
 /**

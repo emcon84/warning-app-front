@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MedicoClient from "./MedicoClient";
-import { Doctor } from "../../types";
+import { Doctor } from "@/types";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 async function getDoctor(id: string): Promise<Doctor | null> {
   try {

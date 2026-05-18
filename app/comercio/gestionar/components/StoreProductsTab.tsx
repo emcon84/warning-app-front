@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, ShoppingBag } from "lucide-react";
-import type { Producto } from "../../../types";
+import type { Producto } from "@/types";
 import { StoreProductRow } from "./StoreProductRow";
 
 interface Props {

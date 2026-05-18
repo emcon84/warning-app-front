@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, Tag } from "lucide-react";
-import type { ComercioOffer } from "../../../types";
+import type { ComercioOffer } from "@/types";
 import { StoreOfferRow } from "./StoreOfferRow";
 
 interface Props {

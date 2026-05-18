@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { CheckCircle, User } from "lucide-react";
-import { Empleado } from "../../types";
-import Navbar from "../../components/Navbar";
-import { useTheme } from "../../contexts/ThemeContext";
+import { Empleado } from "@/types";
+import Navbar from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 const BARRIOS = [
   "Centro",

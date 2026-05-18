@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ComercioPostCard from "../../components/ComercioPostCard";
-import { useTheme } from "../../contexts/ThemeContext";
-import type { ComercioPost } from "../../types";
+import ComercioPostCard from "@/components/ComercioPostCard";
+import { useTheme } from "@/contexts/ThemeContext";
+import type { ComercioPost } from "@/types";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 export function HomeCommunitySection() {
   const { isDark } = useTheme();

@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
-import type { Professional } from "../../types";
+import type { Professional } from "@/types";
 import { StarRating } from "./StarRating";
 import { HeartIcon } from "./HeartIcon";
 import { ProfessionalAvatar } from "./ProfessionalAvatar";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   pro: Professional;

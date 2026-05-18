@@ -10,10 +10,10 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   return res.json() as Promise<T>;
 }
 
-export function authHeader(token: string): HeadersInit {
+export function authHeader(token: string): Record<string, string> {
   return { Authorization: `Bearer ${token}` };
 }
 
-export function jsonHeader(): HeadersInit {
+export function jsonHeader(): Record<string, string> {
   return { "Content-Type": "application/json" };
 }

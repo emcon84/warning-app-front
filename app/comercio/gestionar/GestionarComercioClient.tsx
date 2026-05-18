@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { motion } from "framer-motion";
-import { useTheme } from "../../contexts/ThemeContext";
-import Navbar from "../../components/Navbar";
-import type { Comercio, ComercioOffer, Producto } from "../../types";
-import type { AnalyticsData, PlanInfo, Tab } from "../../lib/constants/storeConstants";
+import { useTheme } from "@/contexts/ThemeContext";
+import Navbar from "@/components/Navbar";
+import type { Comercio, ComercioOffer, Producto } from "@/types";
+import type { AnalyticsData, PlanInfo, Tab } from "@/lib/constants/storeConstants";
 import {
   Store, ImageIcon, Tag, ShoppingBag, QrCode, BarChart2,
   ArrowLeft, ExternalLink, Megaphone,
@@ -24,7 +24,7 @@ import { StoreCommunityTab } from "./components/StoreCommunityTab";
 import { StoreStatsTab } from "./components/StoreStatsTab";
 import { StorePlanModal } from "./components/StorePlanModal";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   comercio: Comercio & { offers?: ComercioOffer[]; productos?: Producto[] };

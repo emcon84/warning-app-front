@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Pencil, ToggleLeft, ToggleRight, Trash2 } from "lucide-react";
-import type { ComercioOffer } from "../../../types";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
+import type { ComercioOffer } from "@/types";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   offer: ComercioOffer;

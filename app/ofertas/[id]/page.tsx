@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Supermarket, Offer } from "../../types";
+import { Supermarket, Offer } from "@/types";
 import OffersPageClient from "./OffersPageClient";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 async function getSupermarket(id: string): Promise<Supermarket | null> {
   try {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { KeyRound, X, Eye, EyeOff, Check } from "lucide-react";
 import type { Professional } from "../types";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 interface Props {
   target: Professional;

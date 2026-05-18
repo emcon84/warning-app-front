@@ -1,9 +1,9 @@
 "use client";
 
 import { Users } from "lucide-react";
-import type { Comercio, ComercioPost } from "../../../types";
+import type { Comercio, ComercioPost } from "@/types";
 import type { ThemeClasses } from "./types";
-import ComercioPostCard from "../../../components/ComercioPostCard";
+import ComercioPostCard from "@/components/ComercioPostCard";
 
 interface Props {
   comercio: Comercio;

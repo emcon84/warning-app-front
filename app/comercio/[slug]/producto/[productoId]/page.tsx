@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import ProductoDetailClient from "./ProductoDetailClient";
 
-import { API_URL } from "../../../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 export async function generateMetadata({
   params,

@@ -1,5 +1,5 @@
 import { MapPin, Phone, MessageCircle, Pencil, Search, CheckCircle, XCircle, Trash2 } from "lucide-react";
-import type { Doctor } from "../../types";
+import type { Doctor } from "@/types";
 
 interface Props {
   doctor: Doctor;

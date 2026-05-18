@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
-import type { Doctor } from "../../types";
+import type { Doctor } from "@/types";
 import { createDoctorIcon, createRelocateIcon } from "./map-icons";
 
 interface DoctorClusterLayerProps {

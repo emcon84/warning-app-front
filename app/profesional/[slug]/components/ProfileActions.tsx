@@ -1,9 +1,9 @@
 "use client";
 
-import type { ProfessionalDetail } from "../../../../types";
+import type { ProfessionalDetail } from "@/types";
 
 interface Props {
-  pro: Pick<ProfessionalDetail, "id" | "nombre" | "whatsapp">;
+  pro: Pick<ProfessionalDetail, "id" | "nombre"> & { whatsapp?: string | null };
   isFav: boolean;
   favLoading: boolean;
   recommended: boolean;

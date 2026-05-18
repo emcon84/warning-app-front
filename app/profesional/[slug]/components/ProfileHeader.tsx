@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
-import type { ProfessionalDetail } from "../../../../types";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
+import type { ProfessionalDetail } from "@/types";
 import { Stars } from "./Stars";
 
 interface Props {

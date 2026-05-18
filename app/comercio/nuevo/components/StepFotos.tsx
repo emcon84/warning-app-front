@@ -11,8 +11,8 @@ interface Props {
   onMainPhotoClear: () => void;
   onGalleryClick: () => void;
   onRemoveGallery: (idx: number) => void;
-  mainPhotoRef: React.RefObject<HTMLInputElement>;
-  galleryRef: React.RefObject<HTMLInputElement>;
+  mainPhotoRef: React.RefObject<HTMLInputElement | null>;
+  galleryRef: React.RefObject<HTMLInputElement | null>;
   onMainPhotoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onGalleryChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error: string;

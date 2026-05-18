@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import type { Professional } from "../../types";
-import { CATEGORIAS_OFICIOS, normalizeText } from "../../lib/utils/professionals";
+import type { Professional } from "@/types";
+import { CATEGORIAS_OFICIOS, normalizeText } from "@/lib/utils/professionals";
 
 interface Props {
   professionals: Professional[];

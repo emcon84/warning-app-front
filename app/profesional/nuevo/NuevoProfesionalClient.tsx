@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Wrench, FileText, Bell, ArrowLeft } from "lucide-react";
-import { useNotifications } from "../../hooks/useNotifications";
-import { useConfetti } from "../../hooks/useConfetti";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useConfetti } from "@/hooks/useConfetti";
+import { useTheme } from "@/contexts/ThemeContext";
 import { TOTAL_STEPS, STEP_VARIANTS, ICON_VARIANTS } from "./constants";
 import type { ProfesionalForm, AiForm } from "./types";
 import { StepDatos } from "./components/StepDatos";
@@ -15,7 +15,7 @@ import { StepEspecialidad } from "./components/StepEspecialidad";
 import { StepPerfil } from "./components/StepPerfil";
 import { StepNotificaciones } from "./components/StepNotificaciones";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 export default function NuevoProfesionalClient() {
   const router = useRouter();

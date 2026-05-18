@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import type { Comercio } from "../../types";
+import type { Comercio } from "@/types";
 import { ProfessionalAvatar } from "./ProfessionalAvatar";
-import { resolvePhotoUrl } from "../../lib/utils/photo";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   comercio: Comercio;

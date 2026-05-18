@@ -1,7 +1,7 @@
 "use client";
 
 import { Pencil, ShoppingBag, Package } from "lucide-react";
-import type { Comercio } from "../../../types";
+import type { Comercio } from "@/types";
 import type { ThemeClasses } from "./types";
 import { StoreProductCard } from "./StoreProductCard";
 

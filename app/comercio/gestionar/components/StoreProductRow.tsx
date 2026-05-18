@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Pencil, Share2, Check, ToggleLeft, ToggleRight, Trash2, ImageOff } from "lucide-react";
-import type { Producto } from "../../../types";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
+import type { Producto } from "@/types";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   producto: Producto;

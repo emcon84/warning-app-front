@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { useConfetti } from "../../hooks/useConfetti";
-import { API_URL } from "../../lib/api/client";
+import { useConfetti } from "@/hooks/useConfetti";
+import { API_URL } from "@/lib/api/client";
 import Step1Foto from "./wizard/Step1Foto";
 import Step2Datos from "./wizard/Step2Datos";
 import Step3Listo from "./wizard/Step3Listo";

@@ -1,4 +1,4 @@
-import type { Professional } from "../../types";
+import type { Professional } from "@/types";
 
 export const PROFESION_KEYWORDS = [
   "desarroll", "contador", "abogad", "arquitect", "ingenier",

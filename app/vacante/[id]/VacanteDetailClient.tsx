@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Clock, Banknote, Briefcase, ArrowLeft, CheckCircle, Phone, MessageCircle } from "lucide-react";
-import { Vacante } from "../../types";
-import Navbar from "../../components/Navbar";
-import ShareButton from "../../components/ShareButton";
-import { useTheme } from "../../contexts/ThemeContext";
+import { Vacante } from "@/types";
+import Navbar from "@/components/Navbar";
+import ShareButton from "@/components/ShareButton";
+import { useTheme } from "@/contexts/ThemeContext";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 function getOrCreateClientToken(): string {
   if (typeof window === "undefined") return "";

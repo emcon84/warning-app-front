@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
-import type { Supermarket } from "../../types";
+import { useTheme } from "@/contexts/ThemeContext";
+import type { Supermarket } from "@/types";
 
 interface Props {
   supermarkets: Supermarket[];

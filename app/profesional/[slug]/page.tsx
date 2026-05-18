@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ProfessionalDetail } from "../../types";
+import { ProfessionalDetail } from "@/types";
 import ProfileClient from "./ProfileClient";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
 function resolveImage(foto?: string | null): string {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { SECTION_BANNERS } from "../../lib/constants/homeConstants";
+import { SECTION_BANNERS } from "@/lib/constants/homeConstants";
 
 export function HomeSectionBanners() {
   return (

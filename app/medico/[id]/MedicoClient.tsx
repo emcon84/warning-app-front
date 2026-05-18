@@ -3,9 +3,9 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Doctor } from "../../types";
-import Navbar from "../../components/Navbar";
-import { useTheme } from "../../contexts/ThemeContext";
+import { Doctor } from "@/types";
+import Navbar from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   MapPin, Phone, Stethoscope, MessageCircle,
   Navigation, CheckCircle, Loader, AlertTriangle,
@@ -14,7 +14,7 @@ import {
 
 const MiniMap = dynamic(() => import("./MiniMap"), { ssr: false });
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 const OBRAS_SOCIALES_SUGERIDAS = [
   "IAPOS", "OSDE", "Swiss Medical", "Galeno", "Medicus", "PAMI",

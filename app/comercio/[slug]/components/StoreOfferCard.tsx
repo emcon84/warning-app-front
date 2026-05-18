@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Share2, Copy, Check, Pencil } from "lucide-react";
-import type { ComercioOffer } from "../../../types";
+import type { ComercioOffer } from "@/types";
 import type { ThemeClasses } from "./types";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   offer: ComercioOffer;

@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { MessageCircle, Phone, MapPin, CheckCircle, ArrowLeft, Pencil } from "lucide-react";
-import { Empleado } from "../../types";
-import Navbar from "../../components/Navbar";
-import { useTheme } from "../../contexts/ThemeContext";
+import { Empleado } from "@/types";
+import Navbar from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 
 function getOrCreateClientToken(): string {
   if (typeof window === "undefined") return "";

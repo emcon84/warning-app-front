@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Vacante } from "../../types";
+import { Vacante } from "@/types";
 import VacanteDetailClient from "./VacanteDetailClient";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
 async function getVacante(id: string): Promise<Vacante | null> {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { ThemeClasses } from "./types";
-import { resolvePhotoUrl } from "../../../lib/utils/photo";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   photos: string[];

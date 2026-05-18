@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { ProfessionalDetail, PublicReview } from "../../types";
-import Navbar from "../../components/Navbar";
-import { useTheme } from "../../contexts/ThemeContext";
+import { ProfessionalDetail, PublicReview } from "@/types";
+import Navbar from "@/components/Navbar";
+import { useTheme } from "@/contexts/ThemeContext";
 import { fireConfetti } from "./components/Stars";
 import { LoginModal } from "./components/LoginModal";
 import { ProfileHeader } from "./components/ProfileHeader";
@@ -14,7 +14,7 @@ import { ProfileReviews } from "./components/ProfileReviews";
 import { ReviewForm } from "./components/ReviewForm";
 import { ProfileActions } from "./components/ProfileActions";
 
-import { API_URL } from "../../lib/api/client";
+import { API_URL } from "@/lib/api/client";
 const SITE_URL =
   typeof window !== "undefined"
     ? window.location.origin
@@ -165,7 +165,7 @@ export default function ProfileClient({ pro, slug }: Props) {
   async function handleRecommend() {
     if (recommended) return;
     try {
-      const res = await fetch(API + "/api/professionals/" + pro.slug + "/recommend", { method: "POST" });
+      const res = await fetch(API_URL + "/api/professionals/" + pro.slug + "/recommend", { method: "POST" });
       const data = await res.json();
       setRecommended(true);
       setRecCount(data.count ?? recCount + 1);

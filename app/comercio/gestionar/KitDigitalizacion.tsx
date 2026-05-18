@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import NextImage from "next/image";
 import { Download, QrCode } from "lucide-react";
-import type { Comercio } from "../../types";
+import type { Comercio } from "@/types";
 
 const SITE = "https://reportesreconquista.com";
 

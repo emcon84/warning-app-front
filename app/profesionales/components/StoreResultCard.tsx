@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import type { Comercio } from "../../types";
-import { resolvePhotoUrl } from "../../lib/utils/photo";
+import type { Comercio } from "@/types";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 
 interface Props {
   comercio: Comercio;

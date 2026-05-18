@@ -5,12 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import { useTheme } from "../../contexts/ThemeContext";
-import { resolvePhotoUrl } from "../../lib/utils/photo";
+import { useTheme } from "@/contexts/ThemeContext";
+import { resolvePhotoUrl } from "@/lib/utils/photo";
 import {
   COM_PROMOS, COMERCIO_BG_GRADIENTS, buildMixed, slideVariants,
-} from "../../lib/constants/homeConstants";
-import type { Comercio } from "../../types";
+} from "@/lib/constants/homeConstants";
+import type { Comercio } from "@/types";
 
 interface Props {
   comercios: Comercio[];
