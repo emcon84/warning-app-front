@@ -79,7 +79,7 @@ export const handlers = [
   http.post(`${API}/api/comercios/${DEMO_SLUG}/sumate`, () => {
     comercio = {
       ...comercio,
-      _count: { suscriptores: (comercio._count?.suscriptores ?? 0) + 1 },
+      _count: { subscripciones: (comercio._count?.subscripciones ?? 0) + 1 },
     };
     return HttpResponse.json({ ok: true });
   }),
@@ -87,7 +87,7 @@ export const handlers = [
   http.delete(`${API}/api/comercios/${DEMO_SLUG}/sumate`, () => {
     comercio = {
       ...comercio,
-      _count: { suscriptores: Math.max(0, (comercio._count?.suscriptores ?? 0) - 1) },
+      _count: { subscripciones: Math.max(0, (comercio._count?.subscripciones ?? 0) - 1) },
     };
     return HttpResponse.json({ ok: true });
   }),
