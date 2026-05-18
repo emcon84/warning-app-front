@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { resolvePhotoUrl } from "../../../lib/utils/photo";
-import type { ProfessionalDetail } from "../../../../types";
+import type { ProfessionalDetail } from "../../../types";
 import { StarPicker, SCORE_LABELS, SCORE_COLORS } from "./Stars";
 
 interface Props {
-  pro: Pick<ProfessionalDetail, "nombre" | "foto">;
+  pro: Pick<ProfessionalDetail, "nombre"> & { foto?: string | null };
   formScore: number;
   submitting: boolean;
   submitError: string;

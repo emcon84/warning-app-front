@@ -165,7 +165,7 @@ export default function ProfileClient({ pro, slug }: Props) {
   async function handleRecommend() {
     if (recommended) return;
     try {
-      const res = await fetch(API + "/api/professionals/" + pro.slug + "/recommend", { method: "POST" });
+      const res = await fetch(API_URL + "/api/professionals/" + pro.slug + "/recommend", { method: "POST" });
       const data = await res.json();
       setRecommended(true);
       setRecCount(data.count ?? recCount + 1);

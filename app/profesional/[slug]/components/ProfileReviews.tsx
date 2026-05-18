@@ -1,6 +1,6 @@
 "use client";
 
-import type { PublicReview } from "../../../../types";
+import type { PublicReview } from "../../../types";
 import { Stars } from "./Stars";
 
 interface Props {
