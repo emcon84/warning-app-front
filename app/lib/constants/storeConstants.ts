@@ -34,6 +34,13 @@ export interface AnalyticsData {
   profileScore: { score: number; items: ProfileScoreItem[] };
 }
 
+export interface AiRecommendation {
+  prioridad: "urgente" | "recomendado" | "opcional";
+  titulo: string;
+  accion: string;
+  impacto: string;
+}
+
 export interface PlanInfo {
   plan: string;
   planName: string;

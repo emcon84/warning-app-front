@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { Eye, MessageCircle, Package, Tag, TrendingUp, TrendingDown, Minus, Users, ThumbsUp, Star, CheckCircle, Circle, Zap } from "lucide-react";
-import type { AnalyticsData, ProfileScoreItem } from "@/lib/constants/storeConstants";
+import { Eye, MessageCircle, Package, Tag, TrendingUp, TrendingDown, Minus, Users, ThumbsUp, Star, CheckCircle, Circle, Zap, Sparkles, AlertTriangle, Info, Loader2 } from "lucide-react";
+import type { AnalyticsData, ProfileScoreItem, AiRecommendation } from "@/lib/constants/storeConstants";
 
 interface Props {
   analytics: AnalyticsData | null;
@@ -78,8 +78,35 @@ function insights(a: AnalyticsData): string[] {
   return out.slice(0, 3);
 }
 
+const PRIORITY_CONFIG = {
+  urgente:     { label: "Urgente",     icon: AlertTriangle, color: "text-red-400",    bg: (dark: boolean) => dark ? "bg-red-500/10 border-red-500/20"    : "bg-red-50 border-red-100"    },
+  recomendado: { label: "Recomendado", icon: Zap,           color: "text-amber-400",  bg: (dark: boolean) => dark ? "bg-amber-500/10 border-amber-500/20" : "bg-amber-50 border-amber-100" },
+  opcional:    { label: "Opcional",    icon: Info,          color: "text-blue-400",   bg: (dark: boolean) => dark ? "bg-blue-500/10 border-blue-500/20"   : "bg-blue-50 border-blue-100"   },
+} as const;
+
 export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, textPri, textMuted, comercio }: Props) {
   const [period, setPeriod] = useState<Period>("30d");
+  const [aiRecs, setAiRecs] = useState<AiRecommendation[] | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  async function fetchRecommendations() {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await fetch("/api/comercios/me/recommendations", { method: "POST" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as any).error ?? "Error al generar recomendaciones");
+      }
+      const data = await res.json() as { recomendaciones: AiRecommendation[] };
+      setAiRecs(data.recomendaciones ?? []);
+    } catch (e: any) {
+      setAiError(e.message ?? "Error inesperado");
+    } finally {
+      setAiLoading(false);
+    }
+  }
   const card  = `rounded-2xl border p-5 ${cardBg}`;
   const chartC = isDark ? "#818cf8" : "#6366f1";
   const gridC  = isDark ? "#1f2937" : "#f1f5f9";
@@ -189,6 +216,82 @@ export function StoreStatsTab({ analytics, analyticsLoading, isDark, cardBg, tex
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ── AI Recommendations ── */}
+      <div className={card}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-400"/>
+            <h2 className={`text-sm font-bold ${textPri}`}>Plan de accion con IA</h2>
+          </div>
+          {!aiRecs && (
+            <button
+              onClick={fetchRecommendations}
+              disabled={aiLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-500 text-white hover:bg-indigo-600 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Sparkles className="w-3.5 h-3.5"/>}
+              {aiLoading ? "Generando..." : "Generar plan"}
+            </button>
+          )}
+          {aiRecs && (
+            <button
+              onClick={() => { setAiRecs(null); setAiError(null); }}
+              className={`text-xs px-2 py-1 rounded-lg ${isDark ? "text-gray-400 hover:text-gray-200 hover:bg-gray-800" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"} transition-all`}
+            >
+              Regenerar
+            </button>
+          )}
+        </div>
+
+        {!aiRecs && !aiLoading && !aiError && (
+          <div className={`rounded-xl p-4 text-center ${isDark ? "bg-indigo-500/10" : "bg-indigo-50"}`}>
+            <p className={`text-xs ${isDark ? "text-indigo-300" : "text-indigo-700"}`}>
+              La IA analiza tus metricas reales y te da 4 acciones concretas para crecer.
+            </p>
+          </div>
+        )}
+
+        {aiLoading && (
+          <div className="flex flex-col items-center justify-center py-8 gap-3">
+            <Loader2 className="w-7 h-7 text-indigo-400 animate-spin"/>
+            <p className={`text-xs ${textMuted}`}>Analizando tu comercio...</p>
+          </div>
+        )}
+
+        {aiError && (
+          <div className={`rounded-xl p-3 text-xs ${isDark ? "bg-red-500/10 text-red-300" : "bg-red-50 text-red-700"}`}>
+            {aiError}
+          </div>
+        )}
+
+        {aiRecs && aiRecs.length > 0 && (
+          <div className="space-y-3">
+            {aiRecs.map((rec, i) => {
+              const cfg = PRIORITY_CONFIG[rec.prioridad as keyof typeof PRIORITY_CONFIG] ?? PRIORITY_CONFIG.opcional;
+              const PIcon = cfg.icon;
+              return (
+                <div key={i} className={`rounded-xl border p-3.5 ${cfg.bg(isDark)}`}>
+                  <div className="flex items-start gap-2.5">
+                    <PIcon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${cfg.color}`}/>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${cfg.color}`}>{cfg.label}</span>
+                      </div>
+                      <p className={`text-sm font-bold leading-tight mb-1 ${textPri}`}>{rec.titulo}</p>
+                      <p className={`text-xs leading-relaxed mb-1.5 ${textMuted}`}>{rec.accion}</p>
+                      <div className={`flex items-center gap-1 text-xs font-medium ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>
+                        <TrendingUp className="w-3 h-3"/>
+                        <span>{rec.impacto}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
