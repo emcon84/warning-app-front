@@ -2,24 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
-import { Users, BarChart2, FileText, MapPin, ArrowLeft, TrendingUp, Sun, Moon, Briefcase, MessageSquare, Star } from "lucide-react";
+import { Users, FileText, MapPin, ArrowLeft, TrendingUp, Sun, Moon, Briefcase, MessageSquare, Star } from "lucide-react";
 import Link from "next/link";
+import {
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+} from "recharts";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const SECTION_LABELS: Record<string, string> = {
-  reports: "Reportes",
-  doctors: "Médicos",
-  farmacias: "Farmacias",
-  ofertas: "Ofertas",
-};
-
-const SECTION_COLORS: Record<string, string> = {
-  reports: "bg-blue-500",
-  doctors: "bg-emerald-500",
-  farmacias: "bg-purple-500",
-  ofertas: "bg-amber-500",
-};
+const PIE_COLORS = ["#6366f1", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#06b6d4"];
 
 interface Analytics {
   uniqueVisitors: { today: number; week: number; month: number; total: number };
@@ -34,59 +26,41 @@ interface Analytics {
   reviews?: number;
 }
 
-function StatCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
+function KpiCard({ label, value, sub, icon: Icon, color }: {
+  label: string; value: number | string; sub?: string;
+  icon: React.ElementType; color: string;
+}) {
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm">
-      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{label}</p>
-      <p className="text-3xl font-bold text-gray-900 dark:text-white">{value.toLocaleString("es-AR")}</p>
-      {sub && <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</p>}
-    </div>
-  );
-}
-
-function Bar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
-  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-gray-700 dark:text-gray-300 font-medium truncate mr-2">{label}</span>
-        <span className="text-gray-500 dark:text-gray-400 shrink-0">{value.toLocaleString("es-AR")}</span>
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 flex items-center gap-4">
+      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${color}`}>
+        <Icon className="w-5 h-5 text-white" />
       </div>
-      <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${color}`}
-          style={{ width: `${pct}%` }}
-        />
+      <div>
+        <p className="text-2xl font-black text-gray-900 dark:text-white">{typeof value === "number" ? value.toLocaleString("es-AR") : value}</p>
+        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">{label}</p>
+        {sub && <p className="text-xs text-gray-400 dark:text-gray-600 mt-0.5">{sub}</p>}
       </div>
     </div>
   );
 }
 
-function MiniChart({ data }: { data: { date: string; visits: number }[] }) {
-  const max = Math.max(...data.map((d) => d.visits), 1);
+const CustomTooltip = ({ active, payload, label, isDark }: any) => {
+  if (!active || !payload?.length) return null;
   return (
-    <div className="flex items-end gap-0.5 h-16">
-      {data.map((d) => (
-        <div key={d.date} className="flex-1 flex flex-col items-center gap-0.5 group relative">
-          <div
-            className="w-full bg-blue-400 dark:bg-blue-500 rounded-sm transition-all duration-500 hover:bg-blue-500 dark:hover:bg-blue-400"
-            style={{ height: `${Math.max((d.visits / max) * 100, 4)}%` }}
-          />
-          <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-gray-500 hidden group-hover:block whitespace-nowrap bg-white dark:bg-gray-900 px-1 rounded shadow">
-            {new Date(d.date).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}: {d.visits}
-          </span>
-        </div>
+    <div className={`rounded-xl px-3 py-2 text-xs shadow-lg border ${isDark ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-gray-200 text-gray-900"}`}>
+      <p className="font-semibold mb-1">{label}</p>
+      {payload.map((p: any) => (
+        <p key={p.name} style={{ color: p.color }}>{p.value} {p.name}</p>
       ))}
     </div>
   );
-}
+};
 
 export default function StatsPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { isDark, toggleTheme } = useTheme();
-  const theme = isDark ? "dark" : "light";
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/analytics`)
@@ -96,39 +70,45 @@ export default function StatsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const maxSectionVisits = data ? Math.max(...(data.topSections ?? []).map((s) => s.visits), 1) : 1;
-  const maxCategoryCount = data ? Math.max(...(data.reportsByCategory ?? []).map((r) => r.count), 1) : 1;
-  const maxBarrioCount = data ? Math.max(...(data.topBarrios ?? []).map((b) => b.count), 1) : 1;
+  const chartColor   = isDark ? "#818cf8" : "#6366f1";
+  const gridColor    = isDark ? "#1f2937" : "#f3f4f6";
+  const axisColor    = isDark ? "#6b7280" : "#9ca3af";
+  const barColor     = isDark ? "#a78bfa" : "#7c3aed";
+  const cardBg       = "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5";
+
+  const dailyData = (data?.dailyVisits ?? []).map(d => ({
+    ...d,
+    label: new Date(d.date).toLocaleDateString("es-AR", { day: "numeric", month: "short" }),
+  }));
+
+  const categoryData = (data?.reportsByCategory ?? [])
+    .map(r => ({ name: r.category.replace(/_/g, " "), value: r.count }))
+    .sort((a, b) => b.value - a.value);
+
+  const barrioData = (data?.topBarrios ?? [])
+    .map(b => ({ name: b.barrio, value: b.count }));
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Header */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
-        <Link
-          href="/app"
-          className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
-        >
+        <Link href="/app" className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
           <h1 className="text-base font-bold text-gray-900 dark:text-white">Dashboard</h1>
           <p className="text-xs text-gray-500 dark:text-gray-400">Reportes Reconquista</p>
         </div>
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
-        >
-          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        <button onClick={toggleTheme} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors">
+          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
         {loading && (
           <div className="flex items-center justify-center h-48">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+            <div className="w-8 h-8 border-2 border-t-transparent border-indigo-500 rounded-full animate-spin" />
           </div>
         )}
-
         {error && (
           <div className="flex items-center justify-center h-48 text-gray-400 dark:text-gray-600 text-sm">
             No se pudo cargar el dashboard.
@@ -137,127 +117,93 @@ export default function StatsPage() {
 
         {data && (
           <>
-            {/* Visitantes únicos */}
-            <section>
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="w-4 h-4 text-blue-500" />
-                <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Visitantes únicos</h2>
+            {/* KPIs */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <KpiCard label="Reportes totales"  value={data.totalReports}                icon={FileText}     color="bg-indigo-500" />
+              <KpiCard label="Profesionales"     value={data.professionals?.total ?? 0}   icon={Briefcase}    color="bg-emerald-500" sub={`${data.professionals?.active ?? 0} activos`} />
+              <KpiCard label="Conversaciones"    value={data.conversations?.total ?? 0}   icon={MessageSquare} color="bg-blue-500" />
+              <KpiCard label="Reseñas"           value={data.reviews ?? 0}                icon={Star}         color="bg-amber-500" />
+            </div>
+
+            {/* Tendencia diaria */}
+            {dailyData.length > 0 && (
+              <div className={cardBg}>
+                <div className="flex items-center gap-2 mb-5">
+                  <TrendingUp className="w-4 h-4 text-indigo-500" />
+                  <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300">Reportes — últimos 30 días</h2>
+                </div>
+                <ResponsiveContainer width="100%" height={200}>
+                  <AreaChart data={dailyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="statsGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor={chartColor} stopOpacity={0.35} />
+                        <stop offset="95%" stopColor={chartColor} stopOpacity={0}    />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                    <XAxis dataKey="label" tick={{ fontSize: 10, fill: axisColor }} interval={4} />
+                    <YAxis tick={{ fontSize: 10, fill: axisColor }} allowDecimals={false} />
+                    <Tooltip content={<CustomTooltip isDark={isDark} />} />
+                    <Area type="monotone" dataKey="visits" name="reportes" stroke={chartColor} strokeWidth={2} fill="url(#statsGrad)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <StatCard label="Hoy" value={data.uniqueVisitors.today} />
-                <StatCard label="Últimos 7 días" value={data.uniqueVisitors.week} />
-                <StatCard label="Últimos 30 días" value={data.uniqueVisitors.month} />
-                <StatCard label="Total histórico" value={data.uniqueVisitors.total} />
-              </div>
-            </section>
-
-            {/* Visitas por día */}
-            {data.dailyVisits.length > 0 && (
-              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-4 h-4 text-blue-500" />
-                  <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Visitas últimos 30 días</h2>
-                </div>
-                <MiniChart data={data.dailyVisits} />
-                <div className="flex justify-between mt-1">
-                  <span className="text-[10px] text-gray-400">{new Date(data.dailyVisits[0].date).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}</span>
-                  <span className="text-[10px] text-gray-400">{new Date(data.dailyVisits[data.dailyVisits.length - 1].date).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}</span>
-                </div>
-              </section>
             )}
 
-            {/* Secciones más visitadas */}
-            {data.topSections.length > 0 && (
-              <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <BarChart2 className="w-4 h-4 text-emerald-500" />
-                  <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Secciones más visitadas</h2>
-                </div>
-                <div className="space-y-3">
-                  {data.topSections.map((s) => (
-                    <Bar
-                      key={s.section}
-                      label={SECTION_LABELS[s.section] ?? s.section}
-                      value={s.visits}
-                      max={maxSectionVisits}
-                      color={SECTION_COLORS[s.section] ?? "bg-gray-400"}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
+            {/* Categorías + Barrios */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            {/* Plataforma */}
-            {(data.professionals || data.users !== undefined || data.conversations || data.reviews !== undefined) && (
-              <section>
-                <div className="flex items-center gap-2 mb-3">
-                  <Briefcase className="w-4 h-4 text-indigo-500" />
-                  <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Plataforma</h2>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {data.professionals && (
-                    <>
-                      <StatCard label="Profesionales" value={data.professionals.total} sub={`${data.professionals.active} activos`} />
-                    </>
-                  )}
-                  {data.users !== undefined && (
-                    <StatCard label="Usuarios registrados" value={data.users} />
-                  )}
-                  {data.conversations && (
-                    <StatCard label="Conversaciones" value={data.conversations.total} sub={`${data.conversations.active} activas`} />
-                  )}
-                  {data.reviews !== undefined && (
-                    <StatCard label="Reseñas" value={data.reviews} />
-                  )}
-                </div>
-              </section>
-            )}
-
-            {/* Reportes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Por categoría */}
-              {data.reportsByCategory.length > 0 && (
-                <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
+              {/* BarChart horizontal — categorías */}
+              {categoryData.length > 0 && (
+                <div className={cardBg}>
+                  <div className="flex items-center gap-2 mb-5">
                     <FileText className="w-4 h-4 text-purple-500" />
-                    <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                      Reportes por categoría
-                      <span className="ml-2 text-gray-400 font-normal normal-case">({data.totalReports} total)</span>
-                    </h2>
+                    <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300">Por categoría</h2>
                   </div>
-                  <div className="space-y-3">
-                    {data.reportsByCategory.map((r) => (
-                      <Bar
-                        key={r.category}
-                        label={r.category.replace(/_/g, " ")}
-                        value={r.count}
-                        max={maxCategoryCount}
-                        color="bg-purple-400"
-                      />
-                    ))}
-                  </div>
-                </section>
+                  <ResponsiveContainer width="100%" height={Math.max(categoryData.length * 36, 160)}>
+                    <BarChart data={categoryData} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={gridColor} horizontal={false} />
+                      <XAxis type="number" tick={{ fontSize: 10, fill: axisColor }} allowDecimals={false} />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: axisColor }} width={100} />
+                      <Tooltip content={<CustomTooltip isDark={isDark} />} />
+                      <Bar dataKey="value" name="reportes" fill={barColor} radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               )}
 
-              {/* Por barrio */}
-              {data.topBarrios.length > 0 && (
-                <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
+              {/* PieChart — barrios */}
+              {barrioData.length > 0 && (
+                <div className={cardBg}>
+                  <div className="flex items-center gap-2 mb-5">
                     <MapPin className="w-4 h-4 text-amber-500" />
-                    <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Top barrios</h2>
+                    <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300">Top barrios</h2>
                   </div>
-                  <div className="space-y-3">
-                    {data.topBarrios.map((b) => (
-                      <Bar
-                        key={b.barrio}
-                        label={b.barrio}
-                        value={b.count}
-                        max={maxBarrioCount}
-                        color="bg-amber-400"
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={barrioData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={90}
+                        paddingAngle={3}
+                        dataKey="value"
+                        nameKey="name"
+                      >
+                        {barrioData.map((_, i) => (
+                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip isDark={isDark} />} />
+                      <Legend
+                        iconType="circle"
+                        iconSize={8}
+                        formatter={(value) => <span style={{ fontSize: 11, color: axisColor }}>{value}</span>}
                       />
-                    ))}
-                  </div>
-                </section>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               )}
             </div>
           </>
