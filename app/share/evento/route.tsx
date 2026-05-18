@@ -168,13 +168,22 @@ export async function GET(req: NextRequest) {
           {/* Borde brillante */}
           <div style={{ position:"absolute", inset:0, borderRadius:40, border:`2px solid ${rgba(dr,dg,db,0.5)}`, display:"flex" }} />
 
-          {/* Precio superpuesto en el banner */}
-          {precio && (
-            <div style={{ position:"absolute", bottom:32, right:32, display:"flex", alignItems:"center", justifyContent:"center", background:accent, borderRadius:999, padding:"18px 48px" }}>
-              <span style={{ color:"#000", fontSize:52, fontWeight:900 }}>{precio}</span>
-            </div>
-          )}
+          {/* Badge categoría en el banner */}
+          <div style={{ position:"absolute", top:28, left:28, display:"flex", alignItems:"center", gap:12, background:"rgba(0,0,0,0.55)", borderRadius:999, padding:"12px 28px", backdropFilter:"blur(8px)" }}>
+            <span style={{ fontSize:28 }}>{catIcon}</span>
+            <span style={{ color:"rgba(255,255,255,0.9)", fontSize:26, fontWeight:700, letterSpacing:1 }}>{categoria.toUpperCase()}</span>
+          </div>
         </div>
+
+        {/* ── Precio destacado ── */}
+        {precio && (
+          <div style={{ display:"flex", padding:"36px 96px 0", width:"100%", boxSizing:"border-box" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:20, background:`linear-gradient(90deg, ${accent}, ${accentLt})`, borderRadius:999, padding:"24px 64px" }}>
+              <span style={{ fontSize:36 }}>🎟</span>
+              <span style={{ color:"#000", fontSize:72, fontWeight:900, lineHeight:1 }}>{precio}</span>
+            </div>
+          </div>
+        )}
 
         {/* ── Fecha, Lugar ── */}
         <div style={{ display:"flex", flexDirection:"column", padding:"52px 96px 0", gap:28, width:"100%", boxSizing:"border-box" }}>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send, Pencil, Heart, Download } from "lucide-react";
+import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send, Pencil, Heart, Download, Bell, BellOff } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import type { Evento, EventoComentario } from "@/lib/types/evento";
@@ -12,6 +12,7 @@ import { CATEGORIA_EMOJI } from "@/lib/types/evento";
 import { resolvePhotoUrl } from "@/lib/utils/photo";
 import { API_URL } from "@/lib/api/client";
 import { EventoEditSheet } from "./EventoEditSheet";
+import { EventoFotosFeed } from "./EventoFotosFeed";
 
 function formatFechaLarga(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", {
@@ -30,6 +31,9 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [following, setFollowing] = useState(false);
+  const [followCount, setFollowCount] = useState(0);
+  const [followLoading, setFollowLoading] = useState(false);
   const [comentarios, setComentarios] = useState<EventoComentario[]>([]);
   const [loadingComments, setLoadingComments] = useState(true);
   const [texto, setTexto] = useState("");
@@ -108,6 +112,37 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
         .catch(() => {});
     });
   }, [isSignedIn, evento.slug]);
+
+  useEffect(() => {
+    const fetchFollow = async () => {
+      const token = isSignedIn ? await getToken().catch(() => null) : null;
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await fetch(`${API_URL}/api/eventos/${evento.slug}/follow`, { headers }).catch(() => null);
+      if (!res?.ok) return;
+      const d = await res.json();
+      setFollowing(d.subscribed ?? false);
+      setFollowCount(d.count ?? 0);
+    };
+    fetchFollow();
+  }, [isSignedIn, evento.slug]);
+
+  async function handleFollow() {
+    if (!isSignedIn) return;
+    setFollowLoading(true);
+    const token = await getToken().catch(() => null);
+    const method = following ? "DELETE" : "POST";
+    try {
+      const res = await fetch(`${API_URL}/api/eventos/${evento.slug}/follow`, {
+        method,
+        headers: { Authorization: `Bearer ${token ?? ""}` },
+      });
+      if (res.ok) {
+        setFollowing(!following);
+        setFollowCount(c => following ? c - 1 : c + 1);
+      }
+    } catch {}
+    finally { setFollowLoading(false); }
+  }
 
   async function handleShare() {
     const url = window.location.href;
@@ -221,9 +256,11 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
               <span>{evento.lugar}{evento.barrio ? ` · ${evento.barrio}` : ""}{evento.direccion ? ` · ${evento.direccion}` : ""}</span>
             </div>
             {evento.precio && (
-              <div className="flex items-center gap-2.5 text-sm font-semibold text-green-500">
-                <Ticket className="w-4 h-4 flex-shrink-0" />
-                <span>{evento.precio}</span>
+              <div className="flex items-center gap-2">
+                <div className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl font-black text-lg ${isDark ? "bg-green-500/15 text-green-400 border border-green-500/30" : "bg-green-50 text-green-600 border border-green-200"}`}>
+                  <Ticket className="w-5 h-5 flex-shrink-0" />
+                  {evento.precio}
+                </div>
               </div>
             )}
           </div>
@@ -233,6 +270,32 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
               {evento.descripcion}
             </p>
           )}
+
+          {/* Seguir evento */}
+          <div className={`mt-4 pt-4 border-t ${isDark ? "border-gray-800" : "border-gray-100"}`}>
+            <button
+              onClick={handleFollow}
+              disabled={followLoading || !isSignedIn}
+              className={`w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm transition-all ${
+                following
+                  ? isDark ? "bg-indigo-500/20 border border-indigo-500/40 text-indigo-300" : "bg-indigo-50 border border-indigo-200 text-indigo-600"
+                  : "bg-indigo-500 hover:bg-indigo-600 text-white"
+              } disabled:opacity-50`}
+            >
+              {following ? <BellOff className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+              {following
+                ? `Siguiendo · ${followCount} ${followCount === 1 ? "seguidor" : "seguidores"}`
+                : isSignedIn
+                  ? `Seguir evento · ${followCount > 0 ? followCount : ""}`
+                  : "Iniciá sesión para seguir"
+              }
+            </button>
+            {!following && isSignedIn && (
+              <p className={`text-xs text-center mt-1.5 ${isDark ? "text-gray-600" : "text-gray-400"}`}>
+                Recibís una notificacion por cada actualizacion
+              </p>
+            )}
+          </div>
 
           {/* Like + Compartir flyer */}
           <div className={`mt-4 pt-4 border-t flex items-center gap-3 ${isDark ? "border-gray-800" : "border-gray-100"}`}>
@@ -260,19 +323,8 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
           </div>
         </div>
 
-        {/* Galería post-evento */}
-        {evento.fotos.length > 0 && (
-          <div className={`rounded-2xl border p-4 ${card}`}>
-            <p className={`text-sm font-bold mb-3 ${textPri}`}>Fotos del evento</p>
-            <div className="grid grid-cols-3 gap-2">
-              {evento.fotos.map((f, i) => (
-                <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
-                  <Image src={resolvePhotoUrl(f)} alt={`foto-${i}`} fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Feed social de fotos */}
+        <EventoFotosFeed slug={evento.slug} isDark={isDark} />
 
         {/* Comentarios */}
         <div className={`rounded-2xl border p-5 ${card}`}>
