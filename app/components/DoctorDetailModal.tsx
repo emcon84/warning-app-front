@@ -3,13 +3,12 @@
 import { useState, useEffect } from "react";
 import { Doctor, TurnoDisponibilidad } from "../types";
 import { OBRAS_SOCIALES } from "../utils/doctorHelpers";
-import { confirmarDoctor, getDoctor, getDisponibilidad, reportarDisponibilidad, updateDoctor } from "../utils/api";
-import { X, Phone, MessageCircle, MapPin, Stethoscope, CheckCircle, XCircle, HelpCircle, Calendar, Plus, Clock, Pencil, Search, Trash2 } from "lucide-react";
-import { deleteDoctor } from "../utils/api";
+import { confirmarDoctor, getDoctor, getDisponibilidad, reportarDisponibilidad, updateDoctor, deleteDoctor } from "../utils/api";
+import { X, Phone, MessageCircle, Stethoscope } from "lucide-react";
+import { DoctorInfoTab } from "./doctor/DoctorInfoTab";
+import { DoctorTurnosTab } from "./doctor/DoctorTurnosTab";
+import { DoctorObrasTab } from "./doctor/DoctorObrasTab";
 
-const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-const HORARIOS = ["Mañana", "Tarde", "Todo el día"];
-const TIPOS_TURNO = ["Con turno previo", "Sin turno", "Por orden de llegada"];
 type Tab = "info" | "turnos" | "obras";
 
 interface DoctorDetailModalProps {
@@ -21,39 +20,35 @@ interface DoctorDetailModalProps {
   onDelete?: (doctorId: string) => void;
 }
 
+const TABS: { key: Tab; label: string }[] = [
+  { key: "info", label: "Info" },
+  { key: "turnos", label: "Turnos" },
+  { key: "obras", label: "Obras Sociales" },
+];
+
 export default function DoctorDetailModal({
-  isOpen,
-  onClose,
-  doctor: initialDoctor,
-  onDoctorUpdate,
-  onRelocate,
-  onDelete,
+  isOpen, onClose, doctor: initialDoctor, onDoctorUpdate, onRelocate, onDelete,
 }: DoctorDetailModalProps) {
   const [doctor, setDoctor] = useState<Doctor>(initialDoctor);
   const [tab, setTab] = useState<Tab>("info");
 
-  // Disponibilidad
   const [disponibilidades, setDisponibilidades] = useState<TurnoDisponibilidad[]>([]);
   const [showFormDisp, setShowFormDisp] = useState(false);
   const [savingDisp, setSavingDisp] = useState(false);
   const [formDisp, setFormDisp] = useState({ dias: [] as string[], horario: "", tipoTurno: "", obraSocial: "Todas", nota: "" });
 
-  // Info edit
   const [editingField, setEditingField] = useState<"direccion" | "telefono" | "whatsapp" | null>(null);
   const [editValue, setEditValue] = useState("");
   const [savingField, setSavingField] = useState(false);
   const [geocoding, setGeocoding] = useState(false);
   const [geocodeResult, setGeocodeResult] = useState<{ lat: number; lng: number } | null>(null);
 
-  // Obras sociales
   const [confirming, setConfirming] = useState<string | null>(null);
   const [loadingConfirm, setLoadingConfirm] = useState(false);
 
-  // Delete
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Relocate by address
   const [relocateAddress, setRelocateAddress] = useState("");
   const [relocateResult, setRelocateResult] = useState<{ lat: number; lng: number } | null>(null);
   const [relocating, setRelocating] = useState(false);
@@ -74,7 +69,6 @@ export default function DoctorDetailModal({
 
   if (!isOpen) return null;
 
-  // ─── Info handlers ───────────────────────────────────────────
   const startEdit = (field: "direccion" | "telefono" | "whatsapp") => {
     setEditingField(field);
     setEditValue(doctor[field] || "");
@@ -118,14 +112,8 @@ export default function DoctorDetailModal({
     if (!relocateAddress.trim()) return;
     setRelocateResult(null);
     setRelocateError(null);
-
-    // Intentar parsear como coordenadas primero
     const coords = parseCoords(relocateAddress);
-    if (coords) {
-      setRelocateResult(coords);
-      return;
-    }
-
+    if (coords) { setRelocateResult(coords); return; }
     setRelocating(true);
     try {
       const raw = relocateAddress.trim();
@@ -202,7 +190,6 @@ export default function DoctorDetailModal({
     }
   };
 
-  // ─── Disponibilidad handlers ──────────────────────────────────
   const toggleDia = (dia: string) =>
     setFormDisp((p) => ({ ...p, dias: p.dias.includes(dia) ? p.dias.filter((d) => d !== dia) : [...p.dias, dia] }));
 
@@ -218,7 +205,6 @@ export default function DoctorDetailModal({
     finally { setSavingDisp(false); }
   };
 
-  // ─── Obras sociales handlers ──────────────────────────────────
   const handleConfirmar = async (obraSocial: string, acepta: boolean) => {
     setLoadingConfirm(true);
     try {
@@ -231,8 +217,7 @@ export default function DoctorDetailModal({
     finally { setLoadingConfirm(false); }
   };
 
-  const getObrasSocialStatus = (os: string) => {
-    // IAPOS: dato oficial del padrón — no requiere confirmación de la comunidad
+  const getObrasSocialStatus = (os: string): "acepta" | "rechaza" | "desconocido" => {
     if (os === "IAPOS" && doctor.iapos) return "acepta";
     if (doctor.obrasSociales.includes(os)) return "acepta";
     const conf = (doctor.confirmaciones || []).filter((c) => c.obraSocial === os);
@@ -240,18 +225,17 @@ export default function DoctorDetailModal({
     return "desconocido";
   };
 
-  const formatFecha = (dateStr: string) => {
-    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
-    if (diff < 60) return `hace ${diff}m`;
-    if (diff < 1440) return `hace ${Math.floor(diff / 60)}h`;
-    return `hace ${Math.floor(diff / 1440)}d`;
+  const handleDeleteConfirmed = async () => {
+    setDeleting(true);
+    try {
+      await deleteDoctor(doctor.id);
+      onDelete!(doctor.id);
+    } catch {
+      alert("Error al eliminar.");
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
   };
-
-  const TABS: { key: Tab; label: string }[] = [
-    { key: "info", label: "Info" },
-    { key: "turnos", label: "Turnos" },
-    { key: "obras", label: "Obras Sociales" },
-  ];
 
   return (
     <div className="fixed inset-0 z-[2000] flex items-end sm:items-center justify-center">
@@ -272,7 +256,7 @@ export default function DoctorDetailModal({
           </button>
         </div>
 
-        {/* Botones llamar — solo si tiene contacto */}
+        {/* Contact buttons */}
         {(doctor.telefono || doctor.whatsapp) && (
           <div className="flex gap-2 px-4 py-2 border-b dark:border-gray-700 flex-shrink-0">
             {doctor.telefono && (
@@ -290,7 +274,7 @@ export default function DoctorDetailModal({
           </div>
         )}
 
-        {/* Tabs */}
+        {/* Tabs nav */}
         <div className="flex border-b dark:border-gray-700 flex-shrink-0">
           {TABS.map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
@@ -306,304 +290,58 @@ export default function DoctorDetailModal({
 
         {/* Tab content */}
         <div className="overflow-y-auto flex-1 p-4">
-
-          {/* ── TAB INFO ── */}
           {tab === "info" && (
-            <div className="space-y-3">
-              {(["direccion", "telefono", "whatsapp"] as const).map((field) => {
-                const icons = { direccion: MapPin, telefono: Phone, whatsapp: MessageCircle };
-                const labels = { direccion: "Dirección", telefono: "Teléfono", whatsapp: "WhatsApp" };
-                const Icon = icons[field];
-                const isEditing = editingField === field;
-
-                return (
-                  <div key={field} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
-                        <Icon className="w-3.5 h-3.5" /> {labels[field]}
-                      </label>
-                      {!isEditing && (
-                        <button onClick={() => startEdit(field)}
-                          className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1">
-                          <Pencil className="w-3 h-3" /> Editar
-                        </button>
-                      )}
-                    </div>
-
-                    {isEditing ? (
-                      <div className="space-y-2">
-                        <div className="flex gap-1.5">
-                          <input
-                            type={field === "telefono" || field === "whatsapp" ? "tel" : "text"}
-                            value={editValue}
-                            onChange={(e) => { setEditValue(e.target.value); setGeocodeResult(null); }}
-                            placeholder={field === "direccion" ? "Ej: Belgrano 1234" : field === "telefono" ? "Ej: 03482-123456" : "Ej: 3482123456"}
-                            className="flex-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-1.5 bg-white dark:bg-gray-800"
-                            autoFocus
-                          />
-                          {field === "direccion" && (
-                            <button onClick={handleGeocode} disabled={geocoding || !editValue.trim()}
-                              title="Buscar en el mapa"
-                              className="px-2.5 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600 disabled:opacity-40 flex items-center gap-1">
-                              <Search className="w-3.5 h-3.5" />
-                              {geocoding ? "..." : "Buscar"}
-                            </button>
-                          )}
-                        </div>
-                        {geocodeResult && (
-                          <p className="text-xs text-green-600 flex items-center gap-1">
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            Ubicación encontrada — se actualizará el pin al guardar
-                          </p>
-                        )}
-                        <div className="flex gap-2">
-                          <button onClick={handleSaveField} disabled={savingField}
-                            className="flex-1 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 disabled:opacity-40">
-                            {savingField ? "Guardando..." : "Guardar"}
-                          </button>
-                          <button onClick={cancelEdit}
-                            className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold">
-                            Cancelar
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-800 dark:text-gray-100">
-                        {doctor[field] || <span className="text-gray-400 dark:text-gray-500 italic text-xs">No cargado</span>}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-
-              {/* Corregir ubicación */}
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-3 space-y-2">
-                <p className="text-xs font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5" /> Corregir ubicación del pin
-                </p>
-                <p className="text-xs text-amber-600 dark:text-amber-400">
-                  Dirección <span className="font-medium">o coordenadas</span> (-29.1234, -59.6789) desde Google Maps.
-                </p>
-                <div className="flex gap-1.5">
-                  <input
-                    type="text"
-                    value={relocateAddress}
-                    onChange={(e) => { setRelocateAddress(e.target.value); setRelocateResult(null); setRelocateError(null); }}
-                    placeholder="Ej: Belgrano 1234 o -29.1523, -59.6431"
-                    className="flex-1 text-sm border border-amber-300 dark:border-amber-600 rounded-lg px-2.5 py-1.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400"
-                  />
-                  <button
-                    onClick={handleRelocateGeocode}
-                    disabled={relocating || !relocateAddress.trim()}
-                    className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600 disabled:opacity-40 flex items-center gap-1">
-                    <Search className="w-3.5 h-3.5" />
-                    {relocating ? "..." : "Buscar"}
-                  </button>
-                </div>
-                {relocateError && (
-                  <p className="text-xs text-red-500 flex items-center gap-1">
-                    <XCircle className="w-3.5 h-3.5" /> {relocateError}
-                  </p>
-                )}
-                {relocateResult && (
-                  <div className="space-y-1.5">
-                    <p className="text-xs text-green-600 flex items-center gap-1">
-                      <CheckCircle className="w-3.5 h-3.5" /> Dirección encontrada
-                    </p>
-                    <button
-                      onClick={handleSaveRelocate}
-                      disabled={savingRelocate}
-                      className="w-full py-1.5 bg-amber-600 text-white rounded-lg text-xs font-semibold hover:bg-amber-700 disabled:opacity-40">
-                      {savingRelocate ? "Guardando..." : "Mover pin a esta dirección"}
-                    </button>
-                  </div>
-                )}
-                {onRelocate && (
-                  <button onClick={() => onRelocate(doctor.id)}
-                    className="w-full text-xs text-amber-700 dark:text-amber-400 hover:underline text-center pt-0.5">
-                    O arrastrá el pin manualmente en el mapa
-                  </button>
-                )}
-              </div>
-
-              {/* Eliminar médico */}
-              {onDelete && (
-                confirmDelete ? (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-3 space-y-2">
-                    <p className="text-sm font-semibold text-red-700 text-center">¿Eliminar este médico del mapa?</p>
-                    <p className="text-xs text-red-500 text-center">Esta acción no se puede deshacer.</p>
-                    <div className="flex gap-2">
-                      <button
-                        disabled={deleting}
-                        onClick={async () => {
-                          setDeleting(true);
-                          try {
-                            await deleteDoctor(doctor.id);
-                            onDelete(doctor.id);
-                          } catch {
-                            alert("Error al eliminar.");
-                            setDeleting(false);
-                            setConfirmDelete(false);
-                          }
-                        }}
-                        className="flex-1 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold disabled:opacity-40">
-                        {deleting ? "Eliminando..." : "Sí, eliminar"}
-                      </button>
-                      <button onClick={() => setConfirmDelete(false)}
-                        className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold">
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button onClick={() => setConfirmDelete(true)}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 border border-red-200 text-red-500 rounded-xl text-sm font-medium hover:bg-red-50">
-                    <Trash2 className="w-4 h-4" />
-                    Eliminar este médico
-                  </button>
-                )
-              )}
-            </div>
+            <DoctorInfoTab
+              doctor={doctor}
+              editingField={editingField}
+              editValue={editValue}
+              savingField={savingField}
+              geocoding={geocoding}
+              geocodeResult={geocodeResult}
+              confirmDelete={confirmDelete}
+              deleting={deleting}
+              relocateAddress={relocateAddress}
+              relocateResult={relocateResult}
+              relocating={relocating}
+              savingRelocate={savingRelocate}
+              relocateError={relocateError}
+              onRelocate={onRelocate}
+              onDelete={onDelete}
+              onStartEdit={startEdit}
+              onCancelEdit={cancelEdit}
+              onEditValueChange={(v) => { setEditValue(v); setGeocodeResult(null); }}
+              onGeocode={handleGeocode}
+              onSaveField={handleSaveField}
+              onRelocateAddressChange={(v) => { setRelocateAddress(v); setRelocateResult(null); setRelocateError(null); }}
+              onRelocateGeocode={handleRelocateGeocode}
+              onSaveRelocate={handleSaveRelocate}
+              onConfirmDelete={() => setConfirmDelete(true)}
+              onCancelDelete={() => setConfirmDelete(false)}
+              onDeleteConfirmed={handleDeleteConfirmed}
+            />
           )}
-
-          {/* ── TAB TURNOS ── */}
           {tab === "turnos" && (
-            <div className="space-y-3">
-              {!showFormDisp ? (
-                <button onClick={() => setShowFormDisp(true)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 border border-green-300 text-green-600 rounded-xl text-sm font-semibold hover:bg-green-50">
-                  <Plus className="w-4 h-4" /> Reportar disponibilidad
-                </button>
-              ) : (
-                <div className="bg-green-50 dark:bg-gray-800 border border-green-200 dark:border-green-900 rounded-xl p-3 space-y-3">
-                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">¿Qué días atiende?</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {DIAS.map((dia) => (
-                      <button key={dia} onClick={() => toggleDia(dia)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                          formDisp.dias.includes(dia) ? "bg-green-600 text-white" : "bg-white text-gray-600 border border-gray-300"
-                        }`}>{dia}</button>
-                    ))}
-                  </div>
-
-                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Horario</p>
-                  <div className="flex gap-1.5">
-                    {HORARIOS.map((h) => (
-                      <button key={h} onClick={() => setFormDisp((p) => ({ ...p, horario: h }))}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                          formDisp.horario === h ? "bg-green-600 text-white" : "bg-white text-gray-600 border border-gray-300"
-                        }`}>{h}</button>
-                    ))}
-                  </div>
-
-                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">¿Cómo se atiende?</p>
-                  <div className="flex flex-col gap-1.5">
-                    {TIPOS_TURNO.map((t) => (
-                      <button key={t} onClick={() => setFormDisp((p) => ({ ...p, tipoTurno: t }))}
-                        className={`py-2 rounded-lg text-xs font-medium transition-colors ${
-                          formDisp.tipoTurno === t ? "bg-green-600 text-white" : "bg-white text-gray-600 border border-gray-300"
-                        }`}>{t}</button>
-                    ))}
-                  </div>
-
-                  <select value={formDisp.obraSocial}
-                    onChange={(e) => setFormDisp((p) => ({ ...p, obraSocial: e.target.value }))}
-                    className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-2 bg-white dark:bg-gray-700">
-                    <option value="Todas">Todas las obras sociales</option>
-                    {OBRAS_SOCIALES.map((os) => <option key={os} value={os}>{os}</option>)}
-                  </select>
-
-                  <input type="text" placeholder="Nota opcional..."
-                    value={formDisp.nota}
-                    onChange={(e) => setFormDisp((p) => ({ ...p, nota: e.target.value }))}
-                    className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-2.5 py-2 bg-white dark:bg-gray-700" />
-
-                  <div className="flex gap-2">
-                    <button onClick={handleSubmitDisp}
-                      disabled={savingDisp || !formDisp.dias.length || !formDisp.horario || !formDisp.tipoTurno}
-                      className="flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold disabled:opacity-40">
-                      {savingDisp ? "Guardando..." : "Confirmar"}
-                    </button>
-                    <button onClick={() => setShowFormDisp(false)}
-                      className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold">
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {disponibilidades.length === 0 ? (
-                <p className="text-sm text-gray-400 italic text-center py-4">Nadie reportó disponibilidad aún. ¡Sé el primero!</p>
-              ) : (
-                <div className="space-y-2">
-                  {disponibilidades.map((d) => (
-                    <div key={d.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 border border-gray-100 dark:border-gray-700">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{d.dias.join(", ")}</p>
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{d.horario}</span>
-                            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{d.tipoTurno}</span>
-                            {d.obraSocial !== "Todas" && <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{d.obraSocial}</span>}
-                          </div>
-                          {d.nota && <p className="text-xs text-gray-500 mt-1 italic">"{d.nota}"</p>}
-                        </div>
-                        <span className="text-[10px] text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2">{formatFecha(d.createdAt)}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <DoctorTurnosTab
+              disponibilidades={disponibilidades}
+              showFormDisp={showFormDisp}
+              savingDisp={savingDisp}
+              formDisp={formDisp}
+              onShowForm={() => setShowFormDisp(true)}
+              onHideForm={() => setShowFormDisp(false)}
+              onToggleDia={toggleDia}
+              onFormDispChange={(key, value) => setFormDisp((p) => ({ ...p, [key]: value }))}
+              onSubmitDisp={handleSubmitDisp}
+            />
           )}
-
-          {/* ── TAB OBRAS SOCIALES ── */}
           {tab === "obras" && (
-            <div className="space-y-2">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Confirmado por la comunidad. Ayudá actualizando la info.</p>
-              {OBRAS_SOCIALES.map((os) => {
-                const status = getObrasSocialStatus(os);
-                return (
-                  <div key={os} className={`flex items-center justify-between rounded-xl p-3 ${
-                    status === "acepta" ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" :
-                    status === "rechaza" ? "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800" :
-                    "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-                  }`}>
-                    <div className="flex items-center gap-2">
-                      {status === "acepta" && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
-                      {status === "rechaza" && <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />}
-                      {status === "desconocido" && <HelpCircle className="w-4 h-4 text-gray-400 flex-shrink-0" />}
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{os}</p>
-                          {os === "IAPOS" && doctor.iapos && (
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded-full font-medium">Padrón oficial</span>
-                          )}
-                        </div>
-                        <p className={`text-xs ${status === "acepta" ? "text-green-600 dark:text-green-400" : status === "rechaza" ? "text-red-500 dark:text-red-400" : "text-gray-400"}`}>
-                          {status === "acepta" ? "Acepta" : status === "rechaza" ? "No acepta" : "Sin información"}
-                        </p>
-                      </div>
-                    </div>
-                    {confirming === os ? (
-                      <div className="flex gap-1">
-                        <button disabled={loadingConfirm} onClick={() => handleConfirmar(os, true)}
-                          className="px-2.5 py-1 bg-green-600 text-white text-xs rounded-lg font-semibold disabled:opacity-50">Sí</button>
-                        <button disabled={loadingConfirm} onClick={() => handleConfirmar(os, false)}
-                          className="px-2.5 py-1 bg-red-600 text-white text-xs rounded-lg font-semibold disabled:opacity-50">No</button>
-                        <button disabled={loadingConfirm} onClick={() => setConfirming(null)}
-                          className="px-2 py-1 bg-gray-300 text-gray-700 text-xs rounded-lg font-semibold">✕</button>
-                      </div>
-                    ) : (
-                      <button onClick={() => setConfirming(os)}
-                        className="text-xs text-blue-500 hover:underline">
-                        ¿Sigue así?
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <DoctorObrasTab
+              doctor={doctor}
+              confirming={confirming}
+              loadingConfirm={loadingConfirm}
+              onConfirmar={handleConfirmar}
+              onSetConfirming={setConfirming}
+              getStatus={getObrasSocialStatus}
+            />
           )}
         </div>
       </div>

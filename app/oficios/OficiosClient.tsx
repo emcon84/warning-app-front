@@ -1,5 +1,6 @@
 "use client";
 
+import { API_URL } from "../lib/api/client";
 import { useState, useMemo, useEffect, useRef, useCallback, Fragment } from "react";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -171,7 +172,6 @@ export default function OficiosClient({ professionals, initialCategoria, initial
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   function photoUrl(url?: string | null) {
     if (!url) return null;
     return url.startsWith("/uploads/") ? `${API_URL}${url}` : url;

@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { API_URL } from "./lib/api/client";
 
 const BASE_URL = "https://reportesreconquista.com";
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API = API_URL;
 
 interface SlugItem {
   slug: string;

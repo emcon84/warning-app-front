@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Megaphone, Tag, Gift, Camera, ChevronRight } from "lucide-react";
 import { useConfetti } from "../../hooks/useConfetti";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 const TOTAL = 3;
 
@@ -71,7 +72,7 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
         if (precioDespues) fd.append("precioDespues", precioDespues);
       }
       if (tipo === "sorteo" && fechaSorteo) fd.append("fechaSorteo", fechaSorteo);
-      const res = await fetch(`${API}/api/comercios/${comercio.slug}/posts`, {
+      const res = await fetch(`${API_URL}/api/comercios/${comercio.slug}/posts`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
@@ -103,7 +104,8 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
   }
 
   return (
-    <div className="fixed inset-0 z-[3000] bg-white dark:bg-gray-950 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[3000] flex items-end md:items-center justify-center md:bg-black/60 md:p-6">
+    <div className="bg-white dark:bg-gray-950 flex flex-col w-full h-full md:h-[640px] md:max-h-[90vh] md:max-w-lg md:rounded-2xl md:shadow-2xl overflow-hidden">
       <div className="flex items-center justify-between px-4 pt-safe-top pt-4 pb-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
         <button
           onClick={onClose}
@@ -277,8 +279,8 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
                 )}
 
                 {fotoPreview ? (
-                  <div className="relative">
-                    <img src={fotoPreview} className="w-full h-48 object-cover rounded-2xl" alt="preview" />
+                  <div className="relative w-full h-48">
+                    <Image src={fotoPreview} alt="preview" fill className="object-cover rounded-2xl" unoptimized />
                     <button
                       onClick={() => { setFoto(null); setFotoPreview(null); }}
                       className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white"
@@ -403,6 +405,7 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
           </>
         )}
       </div>
+    </div>
     </div>
   );
 }

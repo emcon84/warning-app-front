@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import ComerciosClient from "./ComerciosClient";
 import { Comercio } from "../types";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 export const metadata: Metadata = {
   title: "Comercios en Reconquista",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 async function getComerciosData(): Promise<Comercio[]> {
   try {
-    const res = await fetch(`${API}/api/comercios`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API_URL}/api/comercios`, { next: { revalidate: 300 } });
     if (!res.ok) return [];
     return res.json();
   } catch { return []; }

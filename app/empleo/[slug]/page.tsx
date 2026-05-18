@@ -3,12 +3,12 @@ import { notFound } from "next/navigation";
 import { Empleado } from "../../types";
 import EmpleadoProfileClient from "./EmpleadoProfileClient";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://reportesreconquista.com";
 
 async function getEmpleado(slug: string): Promise<Empleado | null> {
   try {
-    const res = await fetch(`${API}/api/empleados/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/empleados/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { Megaphone, Tag, Gift, Clock, Heart, Share2, MessageCircle } from "lucide-react";
 import type { ComercioPost } from "../types";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 function photoUrl(url?: string | null): string | null {
   if (!url) return null;
-  return url.startsWith("/uploads/") ? `${API}${url}` : url;
+  return url.startsWith("/uploads/") ? `${url}` : url;
 }
 
 function timeAgo(date: string): string {
@@ -80,7 +80,7 @@ export default function ComercioPostCard({ post, variant = "feed", isDark, comer
     setLikeCount(c => wasLiked ? Math.max(0, c - 1) : c + 1);
     if (wasLiked) localStorage.removeItem(storageKey);
     else localStorage.setItem(storageKey, "1");
-    fetch(`${API}/api/posts/${post.id}/like`, {
+    fetch(`${API_URL}/api/posts/${post.id}/like`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ unlike: wasLiked }),

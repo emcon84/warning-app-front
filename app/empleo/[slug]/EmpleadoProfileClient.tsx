@@ -9,7 +9,7 @@ import { Empleado } from "../../types";
 import Navbar from "../../components/Navbar";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 function getOrCreateClientToken(): string {
   if (typeof window === "undefined") return "";
@@ -45,7 +45,7 @@ function ContactModal({ empleado, isDark, onClose, onSent }: ContactModalProps) 
     setError(null);
     try {
       const clientToken = getOrCreateClientToken();
-      const res = await fetch(`${API}/api/empleados/${empleado.slug}/conversaciones`, {
+      const res = await fetch(`${API_URL}/api/empleados/${empleado.slug}/conversaciones`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clientToken, clientName: nombre.trim() || undefined, mensaje: mensaje.trim() }),
@@ -133,7 +133,7 @@ export default function EmpleadoProfileClient({ empleado, slug }: { empleado: Em
     getToken().then(async (token) => {
       if (!token) return;
       try {
-        const res = await fetch(`${API}/api/empleados/me`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(`${API_URL}/api/empleados/me`, { headers: { Authorization: `Bearer ${token}` } });
         if (res.ok) {
           const data = await res.json();
           setIsOwner(data.slug === slug);

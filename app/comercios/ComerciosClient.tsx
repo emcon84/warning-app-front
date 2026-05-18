@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 interface RecentProducto {
   id: string;
@@ -183,11 +183,6 @@ export default function ComerciosClient({ comercios }: Props) {
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-  function photoUrl(url?: string | null) {
-    if (!url) return null;
-    return url.startsWith("/uploads/") ? `${API_URL}${url}` : url;
-  }
 
   return (
     <div className={`min-h-screen overflow-x-hidden ${bg} ${textPrimary}`}>
@@ -230,7 +225,7 @@ export default function ComerciosClient({ comercios }: Props) {
             <div className="md:hidden overflow-hidden -mx-4 py-2">
               <div className="marquee-comercios flex gap-4 px-4 pb-1" style={{ width: "max-content" }}>
                 {[...featured, ...featured].map((comercio, idx) => {
-                  const photo = photoUrl(comercio.logo || comercio.foto);
+                  const photo = resolvePhoto(comercio.logo || comercio.foto);
                   return (
                     <Link
                       key={`${comercio.id}-${idx}`}
@@ -278,7 +273,7 @@ export default function ComerciosClient({ comercios }: Props) {
             {/* Desktop: grid estático */}
             <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-6 gap-4 py-2">
               {featured.map((comercio) => {
-                const photo = photoUrl(comercio.logo || comercio.foto);
+                const photo = resolvePhoto(comercio.logo || comercio.foto);
                 return (
                   <Link
                     key={comercio.id}
@@ -439,7 +434,7 @@ export default function ComerciosClient({ comercios }: Props) {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {visible.map((comercio, index) => {
-              const photo = photoUrl(comercio.logo || comercio.foto);
+              const photo = resolvePhoto(comercio.logo || comercio.foto);
               return (
                 <motion.div
                   key={comercio.id}

@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import MedicoClient from "./MedicoClient";
 import { Doctor } from "../../types";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 async function getDoctor(id: string): Promise<Doctor | null> {
   try {
-    const res = await fetch(`${API}/api/doctors/${id}`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API_URL}/api/doctors/${id}`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
     return res.json();
   } catch {

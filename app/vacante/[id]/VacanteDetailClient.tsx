@@ -9,7 +9,7 @@ import Navbar from "../../components/Navbar";
 import ShareButton from "../../components/ShareButton";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../lib/api/client";
 
 function getOrCreateClientToken(): string {
   if (typeof window === "undefined") return "";
@@ -44,7 +44,7 @@ function PostularModal({ vacante, isDark, onClose, onSent }: PostularModalProps)
     setError(null);
     try {
       const clientToken = getOrCreateClientToken();
-      const res = await fetch(`${API}/api/vacantes/${vacante.id}/conversaciones`, {
+      const res = await fetch(`${API_URL}/api/vacantes/${vacante.id}/conversaciones`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clientToken, clientName: nombre.trim() || undefined, mensaje: mensaje.trim() }),

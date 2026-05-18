@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Professional } from "../types";
 import ProfesionalesClient from "./ProfesionalesClient";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 const SITE_URL = "https://reportesreconquista.com";
 
 export const metadata: Metadata = {
@@ -64,7 +64,7 @@ const jsonLd = {
 
 async function getProfessionals(): Promise<Professional[]> {
   try {
-    const res = await fetch(`${API}/api/professionals`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/professionals`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

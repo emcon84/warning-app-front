@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import OfertaDetailClient from "./OfertaDetailClient";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../../../../lib/api/client";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; offerId: string }> }) {
   const { slug, offerId } = await params;
   try {
-    const res = await fetch(`${API}/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
     if (!res.ok) return {};
     const data = await res.json();
     return {
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       openGraph: {
         title: `${data.titulo} — ${data.comercio.nombre}`,
         description: data.descripcion ?? "",
-        images: data.foto ? [`${API}${data.foto}`] : [],
+        images: data.foto ? [`${data.foto}`] : [],
       },
     };
   } catch {
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function OfertaPage({ params }: { params: Promise<{ slug: string; offerId: string }> }) {
   const { slug, offerId } = await params;
-  const res = await fetch(`${API}/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
+  const res = await fetch(`${API_URL}/api/comercios/${slug}/offers/${offerId}`, { cache: "no-store" });
   if (!res.ok) notFound();
   const data = await res.json();
   return <OfertaDetailClient offer={data} comercio={data.comercio} />;

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { API_URL } from "../lib/api/client";
 
 function getClientToken(): string | null {
   if (typeof window === "undefined") return null;
