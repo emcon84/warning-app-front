@@ -284,29 +284,44 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
             {/* Premio del sorteo */}
             {tieneSorteo && (
               <div className={`rounded-2xl border p-4 space-y-3 ${isDark ? "border-amber-500/30 bg-amber-500/5" : "border-amber-200 bg-amber-50/50"}`}>
-                <p className={`text-xs font-bold ${isDark ? "text-amber-400" : "text-amber-700"}`}>¿Qué se sortea?</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {["🍺 Consumición libre", "🎟️ Entrada gratis", "🎁 Premio sorpresa", "🍾 Botella"].map(opt => (
-                    <button
-                      key={opt} type="button"
-                      onClick={() => setSorteoPremio(opt)}
-                      className={`text-xs font-semibold px-3 py-2 rounded-xl border transition-all text-left ${
-                        sorteoPremio === opt
-                          ? "border-amber-400 bg-amber-500/20 text-amber-400"
-                          : isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-white"
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <p className={`text-xs font-bold ${isDark ? "text-amber-400" : "text-amber-700"}`}>¿Qué se sortea?</p>
+                  {!evento.borrador && (
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-gray-700 text-gray-400" : "bg-gray-200 text-gray-500"}`}>
+                      🔒 Bloqueado al publicar
+                    </span>
+                  )}
                 </div>
-                <input
-                  className={inp}
-                  value={sorteoPremio}
-                  onChange={e => setSorteoPremio(e.target.value)}
-                  placeholder="O escribí lo que querés sortear..."
-                  maxLength={120}
-                />
+                {evento.borrador ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      {["🍺 Consumición libre", "🎟️ Entrada gratis", "🎁 Premio sorpresa", "🍾 Botella"].map(opt => (
+                        <button
+                          key={opt} type="button"
+                          onClick={() => setSorteoPremio(opt)}
+                          className={`text-xs font-semibold px-3 py-2 rounded-xl border transition-all text-left ${
+                            sorteoPremio === opt
+                              ? "border-amber-400 bg-amber-500/20 text-amber-400"
+                              : isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-white"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                    <input
+                      className={inp}
+                      value={sorteoPremio}
+                      onChange={e => setSorteoPremio(e.target.value)}
+                      placeholder="O escribí lo que querés sortear..."
+                      maxLength={120}
+                    />
+                  </>
+                ) : (
+                  <div className={`px-3 py-2.5 rounded-xl text-sm font-semibold ${isDark ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"}`}>
+                    {sorteoPremio || "Sin premio definido"}
+                  </div>
+                )}
               </div>
             )}
 
