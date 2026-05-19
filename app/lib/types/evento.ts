@@ -22,6 +22,7 @@ export interface Evento {
   sorteoEjecutado?:    boolean;
   sorteoGanadorNum?:   number | null;
   sorteoGanadorNombre?: string | null;
+  sorteoPremio?:       string | null;
   borrador?:           boolean;
   countdownTexto?:     string | null;
 }

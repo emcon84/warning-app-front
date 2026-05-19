@@ -49,6 +49,7 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
   const [precio,      setPrecio]      = useState(evento.precio ?? "");
   const [descripcion,    setDescripcion]    = useState(evento.descripcion ?? "");
   const [tieneSorteo,    setTieneSorteo]    = useState((evento as any).tieneSorteo ?? false);
+  const [sorteoPremio,   setSorteoPremio]   = useState(evento.sorteoPremio ?? "");
   const [countdownTexto, setCountdownTexto] = useState(evento.countdownTexto ?? "");
 
   const [bannerFile,  setBannerFile]  = useState<File | null>(null);
@@ -123,7 +124,8 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
       if (descripcion) fd.append("descripcion", descripcion);
       if (bannerFile)  fd.append("banner",      bannerFile);
       if (logoFile)    fd.append("logo",        logoFile);
-      fd.append("tieneSorteo",    tieneSorteo ? "true" : "false");
+      fd.append("tieneSorteo",  tieneSorteo ? "true" : "false");
+      fd.append("sorteoPremio",  sorteoPremio.trim());
       fd.append("countdownTexto", countdownTexto.trim());
       newFotos.forEach((f, i) => fd.append(`foto${i}`, f));
 
@@ -278,6 +280,35 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
                 {tieneSorteo && <Check className="w-3 h-3 text-black" />}
               </div>
             </button>
+
+            {/* Premio del sorteo */}
+            {tieneSorteo && (
+              <div className={`rounded-2xl border p-4 space-y-3 ${isDark ? "border-amber-500/30 bg-amber-500/5" : "border-amber-200 bg-amber-50/50"}`}>
+                <p className={`text-xs font-bold ${isDark ? "text-amber-400" : "text-amber-700"}`}>¿Qué se sortea?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {["🍺 Consumición libre", "🎟️ Entrada gratis", "🎁 Premio sorpresa", "🍾 Botella"].map(opt => (
+                    <button
+                      key={opt} type="button"
+                      onClick={() => setSorteoPremio(opt)}
+                      className={`text-xs font-semibold px-3 py-2 rounded-xl border transition-all text-left ${
+                        sorteoPremio === opt
+                          ? "border-amber-400 bg-amber-500/20 text-amber-400"
+                          : isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-600 hover:bg-white"
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  className={inp}
+                  value={sorteoPremio}
+                  onChange={e => setSorteoPremio(e.target.value)}
+                  placeholder="O escribí lo que querés sortear..."
+                  maxLength={120}
+                />
+              </div>
+            )}
 
             {/* Countdown texto personalizado */}
             <div>

@@ -391,6 +391,11 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
               <span className="text-3xl">🎟️</span>
             </div>
             <p className={`text-base font-black mb-1 ${isDark ? "text-white" : "text-gray-900"}`}>Sorteo en el evento</p>
+            {(evento as any).sorteoPremio && (
+              <p className={`text-sm font-bold mb-2 ${isDark ? "text-amber-400" : "text-amber-600"}`}>
+                🎁 {(evento as any).sorteoPremio}
+              </p>
+            )}
             <p className={`text-sm ${isDark ? "text-gray-400" : "text-gray-500"}`}>
               Escaneá el QR que va a estar en el evento para obtener tu número y participar en el sorteo.
             </p>
@@ -401,6 +406,9 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
         {!isOwner && (evento as any).sorteoEjecutado && (evento as any).sorteoGanadorNum && (
           <div className={`rounded-2xl border p-5 text-center ${isDark ? "bg-amber-500/10 border-amber-500/30" : "bg-amber-50 border-amber-200"}`}>
             <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? "text-amber-500" : "text-amber-600"}`}>Ganador del sorteo</p>
+            {(evento as any).sorteoPremio && (
+              <p className={`text-sm font-bold mb-3 ${isDark ? "text-amber-300" : "text-amber-700"}`}>🎁 {(evento as any).sorteoPremio}</p>
+            )}
             <p className="text-6xl font-black text-amber-400 tracking-widest mb-1">
               {(evento as any).sorteoGanadorNum?.toString().padStart(3, "0")}
             </p>
