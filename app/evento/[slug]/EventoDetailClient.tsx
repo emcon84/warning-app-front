@@ -252,7 +252,7 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
         )}
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 pt-6 pb-24 space-y-4">
 
         {/* Info principal */}
         <div className={`rounded-2xl border p-5 ${card}`}>
