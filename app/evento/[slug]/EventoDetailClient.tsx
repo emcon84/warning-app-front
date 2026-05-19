@@ -347,8 +347,8 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
                 isDark ? "border-gray-700 text-gray-400 hover:bg-gray-800" : "border-gray-200 text-gray-500 hover:bg-gray-50"
               } disabled:opacity-60`}
             >
-              <Download className={`w-4 h-4 ${downloading ? "animate-bounce" : ""}`} />
-              {downloading ? "Generando..." : "Compartir flyer"}
+              <Download className={`w-4 h-4 flex-shrink-0 ${downloading ? "animate-bounce" : ""}`} />
+              <span className="whitespace-nowrap">{downloading ? "Generando..." : "Compartir flyer"}</span>
             </button>
           </div>
         </div>

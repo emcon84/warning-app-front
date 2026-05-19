@@ -348,7 +348,7 @@ export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, getToken }:
           <div className={`flex gap-1 p-1 rounded-xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
             {tabs.map(([t, icon, label]) => (
               <button key={t} onClick={() => setTab(t)} className={`${tabBase} ${tab === t ? tabActive : tabInactive}`}>
-                {icon}{label}
+                {icon}<span className="hidden sm:inline">{label}</span>
               </button>
             ))}
           </div>
