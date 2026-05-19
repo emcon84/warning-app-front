@@ -47,8 +47,9 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
   const [fecha,       setFecha]       = useState(toDatetimeLocal(evento.fecha));
   const [fechaFin,    setFechaFin]    = useState(toDatetimeLocal(evento.fechaFin));
   const [precio,      setPrecio]      = useState(evento.precio ?? "");
-  const [descripcion, setDescripcion] = useState(evento.descripcion ?? "");
-  const [tieneSorteo, setTieneSorteo] = useState((evento as any).tieneSorteo ?? false);
+  const [descripcion,    setDescripcion]    = useState(evento.descripcion ?? "");
+  const [tieneSorteo,    setTieneSorteo]    = useState((evento as any).tieneSorteo ?? false);
+  const [countdownTexto, setCountdownTexto] = useState(evento.countdownTexto ?? "");
 
   const [bannerFile,  setBannerFile]  = useState<File | null>(null);
   const [bannerPrev,  setBannerPrev]  = useState<string | null>(evento.banner ? resolvePhotoUrl(evento.banner) : null);
@@ -122,7 +123,8 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
       if (descripcion) fd.append("descripcion", descripcion);
       if (bannerFile)  fd.append("banner",      bannerFile);
       if (logoFile)    fd.append("logo",        logoFile);
-      fd.append("tieneSorteo", tieneSorteo ? "true" : "false");
+      fd.append("tieneSorteo",    tieneSorteo ? "true" : "false");
+      fd.append("countdownTexto", countdownTexto.trim());
       newFotos.forEach((f, i) => fd.append(`foto${i}`, f));
 
       const res = await fetch(`${API_URL}/api/eventos/${evento.slug}`, {
@@ -276,6 +278,21 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
                 {tieneSorteo && <Check className="w-3 h-3 text-black" />}
               </div>
             </button>
+
+            {/* Countdown texto personalizado */}
+            <div>
+              <label className={lab}>Texto del contador regresivo (opcional)</label>
+              <input
+                className={inp}
+                value={countdownTexto}
+                onChange={e => setCountdownTexto(e.target.value)}
+                placeholder='Por defecto: "Ya falta poco!"'
+                maxLength={100}
+              />
+              <p className={`text-xs mt-1 ${isDark ? "text-gray-600" : "text-gray-400"}`}>
+                Aparece sobre el banner la última semana antes del evento
+              </p>
+            </div>
 
             {/* Descripción con emoji */}
             <div>

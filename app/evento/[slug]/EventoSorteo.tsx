@@ -171,7 +171,7 @@ export function EventoSorteo({ slug, eventoNombre, isOwner, isDark }: Props) {
     load();
   }, [slug, isSignedIn]);
 
-  async function handleParticipar() {
+  async function handleParticiparYCompartir() {
     if (!isSignedIn || joining) return;
     setJoining(true);
     try {
@@ -183,7 +183,16 @@ export function EventoSorteo({ slug, eventoNombre, isOwner, isDark }: Props) {
       });
       if (!res.ok) return;
       const d = await res.json();
-      setStatus(prev => prev ? { ...prev, miNumero: d.numero, totalParticipantes: prev.totalParticipantes + (d.yaParticipaba ? 0 : 1) } : prev);
+      const numero = d.numero as number;
+      setStatus(prev => prev ? { ...prev, miNumero: numero, totalParticipantes: prev.totalParticipantes + (d.yaParticipaba ? 0 : 1) } : prev);
+
+      // Inmediatamente abre el share con el número
+      const url   = `${window.location.origin}/evento/${slug}`;
+      const texto = `Participé en el sorteo de "${eventoNombre}" con el número *${padNum(numero)}*! Compartí este link para participar vos también: ${url}`;
+      try {
+        if (navigator.share) await navigator.share({ text: texto, url });
+        else await navigator.clipboard.writeText(texto);
+      } catch { await navigator.clipboard.writeText(texto).catch(() => {}); }
     } catch {}
     finally { setJoining(false); }
   }
@@ -260,7 +269,7 @@ export function EventoSorteo({ slug, eventoNombre, isOwner, isDark }: Props) {
           <div className="space-y-2">
             {!status.miNumero && isSignedIn && (
               <button
-                onClick={handleParticipar}
+                onClick={handleParticiparYCompartir}
                 disabled={joining}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm transition-colors disabled:opacity-60"
               >

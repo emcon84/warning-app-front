@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send, Pencil, Heart, Download, Bell, BellOff } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Calendar, MapPin, Ticket, ArrowLeft, Share2, Check, MessageCircle, Send, Pencil, Heart, Download, Bell, BellOff, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import type { Evento, EventoComentario } from "@/lib/types/evento";
@@ -14,6 +15,8 @@ import { API_URL } from "@/lib/api/client";
 import { EventoEditSheet } from "./EventoEditSheet";
 import { EventoFotosFeed } from "./EventoFotosFeed";
 import { EventoOrganizadorPanel } from "./EventoOrganizadorPanel";
+import { EventoBarraMenu } from "./EventoBarraMenu";
+import { EventoCountdown } from "./EventoCountdown";
 
 function formatFechaLarga(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", {
@@ -25,10 +28,12 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
   const { isDark } = useTheme();
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
+  const searchParams = useSearchParams();
   const [evento, setEvento] = useState(inicial);
   const [shared, setShared] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
+  const [showEdit, setShowEdit] = useState(searchParams.get("editar") === "1");
   const [isOwner, setIsOwner] = useState(false);
+  const [togglingEstado, setTogglingEstado] = useState(false);
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -145,6 +150,18 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
     finally { setFollowLoading(false); }
   }
 
+  async function handleToggleEstado() {
+    setTogglingEstado(true);
+    const token = await getToken().catch(() => null);
+    const res = await fetch(`${API_URL}/api/eventos/${evento.slug}/estado`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
+      body: JSON.stringify({ borrador: !evento.borrador }),
+    }).catch(() => null);
+    if (res?.ok) setEvento(prev => ({ ...prev, borrador: !prev.borrador }));
+    setTogglingEstado(false);
+  }
+
   async function handleShare() {
     const url = window.location.href;
     try {
@@ -213,11 +230,23 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
           </div>
         </div>
 
-        {/* Countdown badge */}
-        {diasRestantes >= 0 && (
+        {/* Countdown overlay (última semana) */}
+        <EventoCountdown fecha={evento.fecha} texto={evento.countdownTexto} />
+
+        {/* Countdown badge (más de 7 días) */}
+        {diasRestantes >= 0 && diasRestantes > 7 && (
           <div className="absolute bottom-4 right-4">
             <span className={`text-sm font-bold px-3 py-1.5 rounded-full text-white ${diasRestantes === 0 ? "bg-red-500" : diasRestantes <= 3 ? "bg-amber-500" : "bg-indigo-500"}`}>
               {diasRestantes === 0 ? "Hoy" : diasRestantes === 1 ? "Mañana" : `En ${diasRestantes} días`}
+            </span>
+          </div>
+        )}
+
+        {/* Badge borrador (solo para el owner) */}
+        {isOwner && evento.borrador && (
+          <div className="absolute bottom-4 left-4">
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/90 text-white backdrop-blur-sm">
+              Borrador — no visible al público
             </span>
           </div>
         )}
@@ -324,6 +353,27 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
           </div>
         </div>
 
+        {/* Publicar / Despublicar — solo para el owner */}
+        {isOwner && (
+          <button
+            onClick={handleToggleEstado}
+            disabled={togglingEstado}
+            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm transition-colors disabled:opacity-60 ${
+              evento.borrador
+                ? "bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+                : isDark ? "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700" : "bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            {togglingEstado
+              ? <Loader2 className="w-4 h-4 animate-spin" />
+              : evento.borrador
+                ? <Eye className="w-4 h-4" />
+                : <EyeOff className="w-4 h-4" />
+            }
+            {evento.borrador ? "Publicar evento" : "Despublicar (volver a borrador)"}
+          </button>
+        )}
+
         {/* Panel organizador (solo visible para el dueño) */}
         {isOwner && (
           <EventoOrganizadorPanel
@@ -357,6 +407,9 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
             <p className={`text-base font-bold ${isDark ? "text-white" : "text-gray-900"}`}>{(evento as any).sorteoGanadorNombre}</p>
           </div>
         )}
+
+        {/* Menu de la barra */}
+        <EventoBarraMenu slug={evento.slug} isDark={isDark} />
 
         {/* Feed social de fotos */}
         <EventoFotosFeed slug={evento.slug} isDark={isDark} />

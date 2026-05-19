@@ -18,10 +18,12 @@ export interface Evento {
   createdAt:   string;
   _count:        { comentarios: number };
   likes?:        number;
-  tieneSorteo?:  boolean;
-  sorteoEjecutado?: boolean;
-  sorteoGanadorNum?: number | null;
+  tieneSorteo?:        boolean;
+  sorteoEjecutado?:    boolean;
+  sorteoGanadorNum?:   number | null;
   sorteoGanadorNombre?: string | null;
+  borrador?:           boolean;
+  countdownTexto?:     string | null;
 }
 
 export interface EventoComentario {

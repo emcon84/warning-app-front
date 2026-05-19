@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Settings, Sun, Moon, LayoutDashboard } from "lucide-react";
+import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Settings, Sun, Moon, LayoutDashboard, CalendarDays } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
@@ -244,6 +244,11 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
                       href="/profesional/gestionar"
                     />
                   )}
+                  <UserButton.Link
+                    label="Mis eventos"
+                    labelIcon={<CalendarDays className="w-4 h-4" />}
+                    href="/mis-eventos"
+                  />
                   <UserButton.Link label="Mi perfil" labelIcon={<User className="w-4 h-4" />} href="/mi-perfil" />
                   <UserButton.Link label="Configuración" labelIcon={<Settings className="w-4 h-4" />} href="/settings" />
                 </UserButton.MenuItems>
