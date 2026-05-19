@@ -25,6 +25,7 @@ interface SorteoStatus {
   sorteoEjecutado:     boolean;
   sorteoGanadorNum:    number | null;
   sorteoGanadorNombre: string | null;
+  sorteoPremio:        string | null;
   totalParticipantes:  number;
   miNumero:            number | null;
 }
@@ -577,6 +578,15 @@ export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, getToken }:
               </div>
             ) : (
               <>
+                {status.sorteoPremio && (
+                  <div className={`rounded-xl p-3 flex items-center gap-2 ${isDark ? "bg-amber-500/10 border border-amber-500/20" : "bg-amber-50 border border-amber-200"}`}>
+                    <span className="text-xl">🎁</span>
+                    <div>
+                      <p className={`text-xs font-semibold uppercase tracking-wider ${isDark ? "text-amber-500" : "text-amber-700"}`}>Se sortea</p>
+                      <p className={`text-sm font-bold ${isDark ? "text-amber-300" : "text-amber-800"}`}>{status.sorteoPremio}</p>
+                    </div>
+                  </div>
+                )}
                 <div className={`rounded-xl p-4 text-center ${isDark ? "bg-gray-800" : "bg-gray-50"}`}>
                   <p className="text-3xl font-black text-indigo-400 mb-1">{status.totalParticipantes}</p>
                   <p className={`text-xs ${textMut}`}>asistentes en el sorteo</p>
