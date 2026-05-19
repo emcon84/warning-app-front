@@ -252,7 +252,7 @@ export function EventoEditSheet({ evento, getToken, isDark, onClose, onSaved }: 
             {/* Toggle sorteo */}
             <button
               type="button"
-              onClick={() => setTieneSorteo(v => !v)}
+              onClick={() => setTieneSorteo((v: boolean) => !v)}
               className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all ${
                 tieneSorteo
                   ? "border-amber-400 bg-amber-500/10"
