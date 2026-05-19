@@ -493,7 +493,7 @@ export default function NuevoEventoPage() {
       <Navbar />
 
       {/* Wizard card — full screen mobile, centered card desktop */}
-      <div className="fixed inset-0 md:flex md:items-center md:justify-center md:bg-black/60 md:p-6 z-10">
+      <div className="fixed inset-x-0 top-0 bottom-16 md:inset-0 md:flex md:items-center md:justify-center md:bg-black/60 md:p-6 z-10">
         <div className={`flex flex-col w-full h-full md:h-[640px] md:max-h-[90vh] md:max-w-lg md:rounded-2xl md:shadow-2xl overflow-hidden ${isDark ? "bg-gray-950" : "bg-white"}`}>
 
           {/* Header */}
