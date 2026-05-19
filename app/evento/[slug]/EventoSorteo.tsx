@@ -66,7 +66,7 @@ function SlotMachineModal({
         speed = 220;
       } else {
         if (intervalRef.current) clearInterval(intervalRef.current);
-        setDisplay(padNum(ganador.numero));
+        setDisplay(padNum(ganador!.numero));
         setPhase("done");
         setTimeout(() => fire(), 300);
         return;
