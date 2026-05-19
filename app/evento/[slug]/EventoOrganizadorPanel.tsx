@@ -214,8 +214,7 @@ export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, borrador, g
       headers: { Authorization: `Bearer ${token ?? ""}` },
     }).catch(() => null);
     if (res?.ok) {
-      setStatus(prev => prev ? { ...prev, sorteoEjecutado: false, sorteoGanadorNum: null, sorteoGanadorNombre: null, totalParticipantes: 0 } : prev);
-      setParticipantes([]);
+      setStatus(prev => prev ? { ...prev, sorteoEjecutado: false, sorteoGanadorNum: null, sorteoGanadorNombre: null } : prev);
       setGanador(null);
     }
     setResetting(false);
@@ -637,7 +636,7 @@ export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, borrador, g
                 className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-colors border disabled:opacity-50 ${isDark ? "border-gray-700 text-gray-500 hover:bg-gray-800 hover:text-red-400 hover:border-red-500/30" : "border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200"}`}
               >
                 {resetting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "↺"}
-                {resetting ? "Reseteando..." : "Resetear sorteo (borrar participantes y resultado)"}
+                {resetting ? "Reseteando..." : "Resetear resultado (mantiene los participantes)"}
               </button>
             )}
           </div>
