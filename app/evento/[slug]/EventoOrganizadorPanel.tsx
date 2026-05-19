@@ -44,6 +44,7 @@ interface Props {
   slug:         string;
   eventoNombre: string;
   isDark:       boolean;
+  borrador:     boolean;
   getToken:     () => Promise<string | null>;
 }
 
@@ -121,13 +122,14 @@ function SlotMachine({ total, ganador, onClose, isDark }: {
 }
 
 // ── Main Panel ────────────────────────────────────────────────────────────────
-export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, getToken }: Props) {
+export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, borrador, getToken }: Props) {
   const [tab,           setTab]           = useState<Tab>("barra");
   const [status,        setStatus]        = useState<SorteoStatus | null>(null);
   const [participantes, setParticipantes] = useState<Participante[]>([]);
   const [loadingP,      setLoadingP]      = useState(false);
   const [running,       setRunning]       = useState(false);
   const [showSlot,      setShowSlot]      = useState(false);
+  const [resetting,     setResetting]     = useState(false);
   const [ganador,       setGanador]       = useState<{ numero: number; nombre: string } | null>(null);
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -202,6 +204,22 @@ export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, getToken }:
       setLoadingP(false);
     })();
   }, [tab, slug]);
+
+  async function handleReset() {
+    if (resetting) return;
+    setResetting(true);
+    const token = await getToken().catch(() => null);
+    const res = await fetch(`${API_URL}/api/eventos/${slug}/sorteo/reset`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token ?? ""}` },
+    }).catch(() => null);
+    if (res?.ok) {
+      setStatus(prev => prev ? { ...prev, sorteoEjecutado: false, sorteoGanadorNum: null, sorteoGanadorNombre: null, totalParticipantes: 0 } : prev);
+      setParticipantes([]);
+      setGanador(null);
+    }
+    setResetting(false);
+  }
 
   async function handleEjecutar() {
     if (running) return;
@@ -609,6 +627,18 @@ export function EventoOrganizadorPanel({ slug, eventoNombre, isDark, getToken }:
                   </p>
                 )}
               </>
+            )}
+
+            {/* Reset — solo en borrador */}
+            {borrador && (
+              <button
+                onClick={handleReset}
+                disabled={resetting}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold transition-colors border disabled:opacity-50 ${isDark ? "border-gray-700 text-gray-500 hover:bg-gray-800 hover:text-red-400 hover:border-red-500/30" : "border-gray-200 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200"}`}
+              >
+                {resetting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "↺"}
+                {resetting ? "Reseteando..." : "Resetear sorteo (borrar participantes y resultado)"}
+              </button>
             )}
           </div>
         )}
