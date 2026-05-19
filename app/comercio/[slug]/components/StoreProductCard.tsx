@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ShoppingBag, ShoppingCart, MessageCircle, Check } from "lucide-react";
+import { ShoppingBag, ShoppingCart, MessageCircle, Check, Share2 } from "lucide-react";
 import type { Producto } from "@/types";
 import type { ThemeClasses } from "./types";
 import { useCart } from "@/contexts/CartContext";
@@ -31,6 +31,19 @@ export function StoreProductCard({ producto, whatsapp, comercioNombre, comercioS
   const { isDark, textPrimary, textSec, textMuted, cardBg } = theme;
   const { addItem, clearCart } = useCart();
   const [adding, setAdding] = useState<"idle" | "added" | "confirm" | "no_stock">("idle");
+  const [shared, setShared] = useState(false);
+
+  async function handleShare(e: React.MouseEvent) {
+    e.preventDefault();
+    const url = `${window.location.origin}/comercio/${comercioSlug}/producto/${producto.id}`;
+    const text = `Mirá: *${producto.nombre}*${producto.precio ? ` · ${producto.precio}` : ""} en ${comercioNombre}`;
+    try {
+      if (navigator.share) { await navigator.share({ title: producto.nombre, text, url }); }
+      else { await navigator.clipboard.writeText(url); }
+    } catch { await navigator.clipboard.writeText(url).catch(() => {}); }
+    setShared(true);
+    setTimeout(() => setShared(false), 2000);
+  }
 
   const fotoResolved = producto.foto
     ? resolvePhotoUrl(producto.foto)
@@ -74,12 +87,28 @@ export function StoreProductCard({ producto, whatsapp, comercioNombre, comercioS
   return (
     <div className={`rounded-2xl border overflow-hidden flex flex-col ${cardBg}`}>
       {fotoResolved ? (
-        <div className="relative w-full h-36 flex-shrink-0">
+        <div className="relative w-full h-44 flex-shrink-0">
           <Image src={fotoResolved} alt={producto.nombre} fill className="object-cover" />
+          <button
+            onClick={handleShare}
+            className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+              shared ? "bg-green-500 text-white" : "bg-black/40 text-white hover:bg-black/60"
+            }`}
+          >
+            {shared ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+          </button>
         </div>
       ) : (
-        <div className={`w-full h-28 flex items-center justify-center flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+        <div className={`relative w-full h-36 flex items-center justify-center flex-shrink-0 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
           <ShoppingBag className={`w-8 h-8 ${textMuted}`} />
+          <button
+            onClick={handleShare}
+            className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+              shared ? "bg-green-500 text-white" : isDark ? "bg-gray-700 text-gray-400 hover:bg-gray-600" : "bg-gray-200 text-gray-500 hover:bg-gray-300"
+            }`}
+          >
+            {shared ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+          </button>
         </div>
       )}
       <div className="p-3 flex flex-col gap-1 flex-1">

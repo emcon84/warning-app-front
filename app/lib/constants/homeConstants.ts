@@ -1,6 +1,6 @@
 import {
   Wrench, Store, ShoppingCart, Zap, Flame, Droplets,
-  HardHat, Settings2, Stethoscope, Pill, Map, Trees,
+  HardHat, Settings2, Stethoscope, Pill, Map, Trees, CalendarDays,
 } from "lucide-react";
 
 export const SECTION_BANNERS = [
@@ -43,6 +43,14 @@ export const SECTION_BANNERS = [
     Icon: Pill,
     gradient: "from-green-500 to-emerald-600",
     glow: "shadow-green-500/30",
+  },
+  {
+    label: "Eventos",
+    sub: "Shows, ferias y actividades",
+    href: "/eventos",
+    Icon: CalendarDays,
+    gradient: "from-purple-500 to-indigo-600",
+    glow: "shadow-purple-500/30",
   },
   {
     label: "Mapa",

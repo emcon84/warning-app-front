@@ -14,15 +14,18 @@ import { HomeProfessionalsSlider } from "./components/HomeProfessionalsSlider";
 import { HomeHogarSection } from "./components/HomeHogarSection";
 import { HomeStoresSlider } from "./components/HomeStoresSlider";
 import { HomeSupermarketsSection } from "./components/HomeSupermarketsSection";
+import { HomeEventsSection } from "./components/HomeEventsSection";
+import type { Evento } from "@/lib/types/evento";
 
 interface Props {
   professionals: Professional[];
   comercios: Comercio[];
   turno: TurnoResponse | null;
   supermarkets: Supermarket[];
+  eventos: Evento[];
 }
 
-export default function HomeClient({ professionals, comercios, turno, supermarkets }: Props) {
+export default function HomeClient({ professionals, comercios, turno, supermarkets, eventos }: Props) {
   const { user } = useUser();
   const { isDark } = useTheme();
 
@@ -38,6 +41,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-32">
         <HomeSectionBanners />
+        <HomeEventsSection eventos={eventos} />
         <HomePromoBanner />
         <HomeCommunitySection />
         <HomeRecentProducts />
