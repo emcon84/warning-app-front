@@ -20,6 +20,24 @@ interface Props {
   isDark: boolean;
 }
 
+function detectEmoji(nombre: string): string | null {
+  const n = nombre.toLowerCase();
+  if (/cerveza|birra|beer|chopp|lager|stout/.test(n))             return "🍺";
+  if (/fernet|aperol|campari|bitter/.test(n))                     return "🥃";
+  if (/gin|vodka|whisky|whiskey|ron|tequila|vino|espumante|champag|prosecco/.test(n)) return "🥂";
+  if (/agua|gaseosa|jugo|coca|pepsi|sprite|seven|fanta|limonada|bebida|refresco/.test(n)) return "🥤";
+  if (/choripan|chori/.test(n))                                   return "🌭";
+  if (/sandwich|sangwich|pancho|lomito/.test(n))                  return "🥪";
+  if (/hamburguesa|burger|burguer/.test(n))                       return "🍔";
+  if (/pizza/.test(n))                                            return "🍕";
+  if (/empanada/.test(n))                                         return "🥟";
+  if (/papa|fritas/.test(n))                                      return "🍟";
+  if (/helado/.test(n))                                           return "🍦";
+  if (/cafe|coffee|capuccino|cortado/.test(n))                    return "☕";
+  if (/combo|menu|paquete/.test(n))                               return "🍽️";
+  return null;
+}
+
 export function EventoBarraMenu({ slug, isDark }: Props) {
   const [productos, setProductos] = useState<BarraProduct[]>([]);
   const [mpAlias,   setMpAlias]   = useState<string | null>(null);
@@ -66,7 +84,7 @@ export function EventoBarraMenu({ slug, isDark }: Props) {
               !p.disponible ? "opacity-50" : ""
             } ${i === 0 ? "" : isDark ? "border-gray-800" : "border-gray-100"}`}
           >
-            {/* Foto */}
+            {/* Foto o emoji detectado */}
             {p.foto ? (
               <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
                 <Image
@@ -77,11 +95,11 @@ export function EventoBarraMenu({ slug, isDark }: Props) {
                   className="object-cover w-full h-full"
                 />
               </div>
-            ) : (
-              <div className={`w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
-                🍺
+            ) : detectEmoji(p.nombre) ? (
+              <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
+                {detectEmoji(p.nombre)}
               </div>
-            )}
+            ) : null}
 
             {/* Info */}
             <div className="flex-1 min-w-0">
