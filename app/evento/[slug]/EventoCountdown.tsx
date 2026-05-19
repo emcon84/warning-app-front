@@ -38,7 +38,7 @@ export function EventoCountdown({ fecha, texto }: Props) {
   const label = texto?.trim() || "Ya falta poco!";
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-[2px] pointer-events-none">
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-[2px] pointer-events-none pt-20 pb-8">
       <p className="text-white/90 text-sm font-bold uppercase tracking-widest mb-4 drop-shadow">
         {label}
       </p>
