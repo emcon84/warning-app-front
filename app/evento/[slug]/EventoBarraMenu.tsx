@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { UtensilsCrossed, Loader2, ExternalLink } from "lucide-react";
+import { UtensilsCrossed, ExternalLink } from "lucide-react";
 import { API_URL } from "@/lib/api/client";
 import { resolvePhotoUrl } from "@/lib/utils/photo";
 
@@ -41,62 +41,80 @@ export function EventoBarraMenu({ slug, isDark }: Props) {
   if (productos.length === 0) return null;
 
   const card    = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const divider = isDark ? "border-gray-800" : "border-gray-100";
   const textPri = isDark ? "text-white" : "text-gray-900";
   const textMut = isDark ? "text-gray-400" : "text-gray-500";
 
   return (
-    <div className={`rounded-2xl border ${card}`}>
-      <div className={`px-5 pt-5 pb-3 border-b ${isDark ? "border-gray-800" : "border-gray-100"} flex items-center gap-2`}>
+    <div className={`rounded-2xl border overflow-hidden ${card}`}>
+
+      {/* Header */}
+      <div className={`px-5 pt-4 pb-3 border-b ${divider} flex items-center gap-2`}>
         <UtensilsCrossed className="w-4 h-4 text-indigo-400" />
         <h2 className={`text-sm font-bold ${textPri}`}>Menú de la barra</h2>
+        <span className={`ml-auto text-xs font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"}`}>
+          {productos.length} {productos.length === 1 ? "producto" : "productos"}
+        </span>
       </div>
 
-      <div className="p-4 space-y-2">
-        {productos.map(p => (
+      {/* Products */}
+      <div className="divide-y divide-gray-800/50">
+        {productos.map((p, i) => (
           <div
             key={p.id}
-            className={`flex items-center gap-3 p-3 rounded-xl ${
-              p.disponible
-                ? isDark ? "bg-gray-800" : "bg-gray-50"
-                : isDark ? "bg-gray-800/40 opacity-60" : "bg-gray-50/60 opacity-60"
-            }`}
+            className={`flex items-center gap-4 px-4 py-3.5 transition-opacity ${
+              !p.disponible ? "opacity-50" : ""
+            } ${i === 0 ? "" : isDark ? "border-gray-800" : "border-gray-100"}`}
           >
+            {/* Foto */}
             {p.foto ? (
-              <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
                 <Image
                   src={resolvePhotoUrl(p.foto)}
                   alt={p.nombre}
-                  width={56}
-                  height={56}
+                  width={48}
+                  height={48}
                   className="object-cover w-full h-full"
                 />
               </div>
             ) : (
-              <div className={`w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-2xl ${isDark ? "bg-gray-700" : "bg-gray-200"}`}>
+              <div className={`w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
                 🍺
               </div>
             )}
 
+            {/* Info */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className={`text-sm font-bold ${textPri}`}>{p.nombre}</p>
+              <div className="flex items-center gap-2">
+                <p className={`text-sm font-bold truncate ${textPri}`}>{p.nombre}</p>
                 {!p.disponible && (
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-gray-700 text-gray-400" : "bg-gray-200 text-gray-500"}`}>
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-md flex-shrink-0 ${isDark ? "bg-gray-700 text-gray-500" : "bg-gray-200 text-gray-400"}`}>
                     Agotado
                   </span>
                 )}
               </div>
               {p.descripcion && (
-                <p className={`text-xs mt-0.5 line-clamp-1 ${textMut}`}>{p.descripcion}</p>
+                <p className={`text-xs mt-0.5 truncate ${textMut}`}>{p.descripcion}</p>
               )}
-              <p className={`text-sm font-black mt-0.5 ${isDark ? "text-green-400" : "text-green-600"}`}>{p.precio}</p>
+            </div>
+
+            {/* Precio */}
+            <div className={`flex-shrink-0 text-right`}>
+              <span className={`text-lg font-black tabular-nums ${
+                p.disponible
+                  ? isDark ? "text-green-400" : "text-green-600"
+                  : textMut
+              }`}>
+                {p.precio}
+              </span>
             </div>
           </div>
         ))}
       </div>
 
+      {/* MP Button */}
       {mpAlias && (
-        <div className={`px-4 pb-4`}>
+        <div className={`p-4 border-t ${divider}`}>
           <a
             href={`https://link.mercadopago.com.ar/${mpAlias}`}
             target="_blank"
