@@ -213,7 +213,7 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
         {/* Nav actions */}
-        <div className="absolute top-16 left-4 right-4 flex items-center justify-between">
+        <div className="absolute top-16 left-4 right-4 flex items-center justify-between z-10">
           <Link href="/eventos" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 text-white text-sm backdrop-blur-sm hover:bg-black/60 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Eventos
           </Link>
