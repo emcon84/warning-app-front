@@ -380,6 +380,7 @@ export default function EventoDetailClient({ evento: inicial }: { evento: Evento
             slug={evento.slug}
             eventoNombre={evento.nombre}
             isDark={isDark}
+            borrador={evento.borrador ?? false}
             getToken={getToken}
           />
         )}
