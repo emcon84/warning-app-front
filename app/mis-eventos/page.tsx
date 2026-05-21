@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  CalendarDays, MapPin, Plus, Eye, EyeOff, Pencil, Loader2, CalendarClock,
+  CalendarDays, MapPin, Plus, Eye, EyeOff, Pencil, Loader2, CalendarClock, Trash2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -30,6 +30,7 @@ export default function MisEventosPage() {
   const [eventos,   setEventos]   = useState<Evento[]>([]);
   const [loading,   setLoading]   = useState(true);
   const [toggling,  setToggling]  = useState<string | null>(null);
+  const [deleting,  setDeleting]  = useState<string | null>(null);
 
   const bg      = isDark ? "bg-gray-950" : "bg-gray-50";
   const card    = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
@@ -66,6 +67,18 @@ export default function MisEventosPage() {
       ));
     }
     setToggling(null);
+  }
+
+  async function handleDelete(evento: Evento) {
+    if (!confirm(`¿Eliminar "${evento.nombre}"? Esta acción no se puede deshacer.`)) return;
+    setDeleting(evento.id);
+    const token = await getToken().catch(() => null);
+    const res = await fetch(`${API_URL}/api/eventos/${evento.slug}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token ?? ""}` },
+    }).catch(() => null);
+    if (res?.ok) setEventos(prev => prev.filter(e => e.id !== evento.id));
+    setDeleting(null);
   }
 
   const publicados = eventos.filter(e => !e.borrador);
@@ -123,7 +136,9 @@ export default function MisEventosPage() {
                     textPri={textPri}
                     textMut={textMut}
                     toggling={toggling}
+                    deleting={deleting}
                     onToggle={handleToggleEstado}
+                    onDelete={handleDelete}
                   />
                 ))}
               </section>
@@ -144,7 +159,9 @@ export default function MisEventosPage() {
                     textPri={textPri}
                     textMut={textMut}
                     toggling={toggling}
+                    deleting={deleting}
                     onToggle={handleToggleEstado}
+                    onDelete={handleDelete}
                   />
                 ))}
               </section>
@@ -157,7 +174,7 @@ export default function MisEventosPage() {
 }
 
 function EventoCard({
-  evento, isDark, card, textPri, textMut, toggling, onToggle,
+  evento, isDark, card, textPri, textMut, toggling, deleting, onToggle, onDelete,
 }: {
   evento: Evento;
   isDark: boolean;
@@ -165,11 +182,14 @@ function EventoCard({
   textPri: string;
   textMut: string;
   toggling: string | null;
+  deleting: string | null;
   onToggle: (e: Evento) => void;
+  onDelete: (e: Evento) => void;
 }) {
   const banner = evento.banner ? resolvePhotoUrl(evento.banner) : null;
   const isBorrador = evento.borrador ?? true;
   const isToggling = toggling === evento.id;
+  const isDeleting = deleting === evento.id;
 
   return (
     <div className={`rounded-2xl border overflow-hidden ${card}`}>
@@ -240,6 +260,18 @@ function EventoCard({
               : <><EyeOff className="w-3.5 h-3.5" /> Despublicar</>
           }
         </button>
+        {isBorrador && (
+          <>
+            <div className={`w-px ${isDark ? "bg-gray-800" : "bg-gray-100"}`} />
+            <button
+              onClick={() => onDelete(evento)}
+              disabled={isDeleting}
+              className={`flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-colors disabled:opacity-50 ${isDark ? "text-red-500/70 hover:bg-red-500/10 hover:text-red-400" : "text-red-400 hover:bg-red-50 hover:text-red-500"}`}
+            >
+              {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
