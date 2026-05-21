@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  CalendarDays, MapPin, Plus, Eye, EyeOff, Pencil, Loader2, CalendarClock, Trash2,
+  CalendarDays, MapPin, Plus, Eye, EyeOff, Pencil,
+  Loader2, CalendarClock, Trash2, AlertTriangle,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -27,10 +28,11 @@ export default function MisEventosPage() {
   const { getToken } = useAuth();
   const router = useRouter();
 
-  const [eventos,   setEventos]   = useState<Evento[]>([]);
-  const [loading,   setLoading]   = useState(true);
-  const [toggling,  setToggling]  = useState<string | null>(null);
-  const [deleting,  setDeleting]  = useState<string | null>(null);
+  const [eventos,       setEventos]       = useState<Evento[]>([]);
+  const [loading,       setLoading]       = useState(true);
+  const [toggling,      setToggling]      = useState<string | null>(null);
+  const [deleting,      setDeleting]      = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Evento | null>(null);
 
   const bg      = isDark ? "bg-gray-950" : "bg-gray-50";
   const card    = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
@@ -53,7 +55,7 @@ export default function MisEventosPage() {
     loadEventos();
   }, [isLoaded, isSignedIn, loadEventos, router]);
 
-  async function handleToggleEstado(evento: Evento) {
+  async function handleToggle(evento: Evento) {
     setToggling(evento.id);
     const token = await getToken().catch(() => null);
     const res = await fetch(`${API_URL}/api/eventos/${evento.slug}/estado`, {
@@ -61,24 +63,21 @@ export default function MisEventosPage() {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token ?? ""}` },
       body: JSON.stringify({ borrador: !evento.borrador }),
     }).catch(() => null);
-    if (res?.ok) {
-      setEventos(prev => prev.map(e =>
-        e.id === evento.id ? { ...e, borrador: !e.borrador } : e
-      ));
-    }
+    if (res?.ok) setEventos(prev => prev.map(e => e.id === evento.id ? { ...e, borrador: !e.borrador } : e));
     setToggling(null);
   }
 
-  async function handleDelete(evento: Evento) {
-    if (!confirm(`¿Eliminar "${evento.nombre}"? Esta acción no se puede deshacer.`)) return;
-    setDeleting(evento.id);
+  async function confirmDelete() {
+    if (!pendingDelete) return;
+    setDeleting(pendingDelete.id);
     const token = await getToken().catch(() => null);
-    const res = await fetch(`${API_URL}/api/eventos/${evento.slug}`, {
+    const res = await fetch(`${API_URL}/api/eventos/${pendingDelete.slug}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token ?? ""}` },
     }).catch(() => null);
-    if (res?.ok) setEventos(prev => prev.filter(e => e.id !== evento.id));
+    if (res?.ok) setEventos(prev => prev.filter(e => e.id !== pendingDelete.id));
     setDeleting(null);
+    setPendingDelete(null);
   }
 
   const publicados = eventos.filter(e => !e.borrador);
@@ -121,14 +120,11 @@ export default function MisEventosPage() {
           </div>
         ) : (
           <>
-            {/* Borradores */}
             {borradores.length > 0 && (
               <section className="space-y-3">
-                <p className={`text-xs font-bold uppercase tracking-wider ${textMut}`}>
-                  Borradores ({borradores.length})
-                </p>
+                <p className={`text-xs font-bold uppercase tracking-wider ${textMut}`}>Borradores ({borradores.length})</p>
                 {borradores.map(e => (
-                  <EventoCard
+                  <EventCard
                     key={e.id}
                     evento={e}
                     isDark={isDark}
@@ -137,21 +133,18 @@ export default function MisEventosPage() {
                     textMut={textMut}
                     toggling={toggling}
                     deleting={deleting}
-                    onToggle={handleToggleEstado}
-                    onDelete={handleDelete}
+                    onToggle={handleToggle}
+                    onRequestDelete={setPendingDelete}
                   />
                 ))}
               </section>
             )}
 
-            {/* Publicados */}
             {publicados.length > 0 && (
               <section className="space-y-3">
-                <p className={`text-xs font-bold uppercase tracking-wider ${textMut}`}>
-                  Publicados ({publicados.length})
-                </p>
+                <p className={`text-xs font-bold uppercase tracking-wider ${textMut}`}>Publicados ({publicados.length})</p>
                 {publicados.map(e => (
-                  <EventoCard
+                  <EventCard
                     key={e.id}
                     evento={e}
                     isDark={isDark}
@@ -160,8 +153,8 @@ export default function MisEventosPage() {
                     textMut={textMut}
                     toggling={toggling}
                     deleting={deleting}
-                    onToggle={handleToggleEstado}
-                    onDelete={handleDelete}
+                    onToggle={handleToggle}
+                    onRequestDelete={setPendingDelete}
                   />
                 ))}
               </section>
@@ -169,32 +162,65 @@ export default function MisEventosPage() {
           </>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      {pendingDelete && (
+        <div className="fixed inset-0 z-[3000] flex items-end sm:items-center justify-center bg-black/60 px-4 pb-6 sm:pb-0">
+          <div className={`w-full max-w-sm rounded-3xl p-6 space-y-4 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-white"} shadow-2xl`}>
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${isDark ? "bg-red-500/15" : "bg-red-50"}`}>
+                <AlertTriangle className="w-7 h-7 text-red-500" />
+              </div>
+              <div>
+                <p className={`text-base font-black ${textPri}`}>¿Eliminar este evento?</p>
+                <p className={`text-sm mt-1 font-semibold ${isDark ? "text-indigo-300" : "text-indigo-600"}`}>{pendingDelete.nombre}</p>
+                <p className={`text-xs mt-2 ${textMut}`}>Esta acción no se puede deshacer.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPendingDelete(null)}
+                className={`flex-1 py-3 rounded-2xl text-sm font-bold transition-colors ${isDark ? "bg-gray-800 text-gray-300 hover:bg-gray-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={!!deleting}
+                className="flex-1 py-3 rounded-2xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function EventoCard({
-  evento, isDark, card, textPri, textMut, toggling, deleting, onToggle, onDelete,
+function EventCard({
+  evento, isDark, card, textPri, textMut, toggling, deleting, onToggle, onRequestDelete,
 }: {
-  evento: Evento;
-  isDark: boolean;
-  card: string;
-  textPri: string;
-  textMut: string;
-  toggling: string | null;
-  deleting: string | null;
-  onToggle: (e: Evento) => void;
-  onDelete: (e: Evento) => void;
+  evento:          Evento;
+  isDark:          boolean;
+  card:            string;
+  textPri:         string;
+  textMut:         string;
+  toggling:        string | null;
+  deleting:        string | null;
+  onToggle:        (e: Evento) => void;
+  onRequestDelete: (e: Evento) => void;
 }) {
-  const banner = evento.banner ? resolvePhotoUrl(evento.banner) : null;
-  const isBorrador = evento.borrador ?? true;
+  const banner     = evento.banner ? resolvePhotoUrl(evento.banner) : null;
+  const isDraft    = evento.borrador ?? true;
   const isToggling = toggling === evento.id;
   const isDeleting = deleting === evento.id;
 
   return (
     <div className={`rounded-2xl border overflow-hidden ${card}`}>
       <div className="flex gap-3 p-4">
-        {/* Thumbnail */}
         <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
           {banner ? (
             <Image src={banner} alt={evento.nombre} width={64} height={64} className="object-cover w-full h-full" />
@@ -205,16 +231,15 @@ function EventoCard({
           )}
         </div>
 
-        {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-2 flex-wrap">
             <h3 className={`text-sm font-bold flex-1 min-w-0 truncate ${textPri}`}>{evento.nombre}</h3>
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
-              isBorrador
+              isDraft
                 ? isDark ? "bg-amber-500/20 text-amber-400" : "bg-amber-50 text-amber-600"
                 : isDark ? "bg-green-500/20 text-green-400" : "bg-green-50 text-green-600"
             }`}>
-              {isBorrador ? "Borrador" : "Publicado"}
+              {isDraft ? "Borrador" : "Publicado"}
             </span>
           </div>
           <div className={`flex items-center gap-1.5 text-xs mt-1 ${textMut}`}>
@@ -228,7 +253,6 @@ function EventoCard({
         </div>
       </div>
 
-      {/* Actions */}
       <div className={`flex border-t ${isDark ? "border-gray-800" : "border-gray-100"}`}>
         <Link
           href={`/evento/${evento.slug}`}
@@ -248,25 +272,25 @@ function EventoCard({
           onClick={() => onToggle(evento)}
           disabled={isToggling}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold transition-colors disabled:opacity-50 ${
-            isBorrador
+            isDraft
               ? "text-indigo-400 hover:bg-indigo-500/10"
               : isDark ? "text-gray-400 hover:bg-gray-800" : "text-gray-500 hover:bg-gray-50"
           }`}
         >
           {isToggling
             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            : isBorrador
+            : isDraft
               ? <><Eye className="w-3.5 h-3.5" /> Publicar</>
               : <><EyeOff className="w-3.5 h-3.5" /> Despublicar</>
           }
         </button>
-        {isBorrador && (
+        {isDraft && (
           <>
             <div className={`w-px ${isDark ? "bg-gray-800" : "bg-gray-100"}`} />
             <button
-              onClick={() => onDelete(evento)}
+              onClick={() => onRequestDelete(evento)}
               disabled={isDeleting}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-colors disabled:opacity-50 ${isDark ? "text-red-500/70 hover:bg-red-500/10 hover:text-red-400" : "text-red-400 hover:bg-red-50 hover:text-red-500"}`}
+              className={`px-3.5 flex items-center justify-center transition-colors disabled:opacity-50 ${isDark ? "text-red-500/60 hover:bg-red-500/10 hover:text-red-400" : "text-red-400 hover:bg-red-50 hover:text-red-500"}`}
             >
               {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
             </button>
