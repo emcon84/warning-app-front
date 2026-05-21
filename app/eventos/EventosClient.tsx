@@ -108,9 +108,9 @@ export default function EventosClient({ eventosIniciales }: { eventosIniciales: 
           </div>
           <Link
             href="/evento/nuevo"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors whitespace-nowrap flex-shrink-0"
           >
-            <Plus className="w-4 h-4" /> Publicar evento
+            <Plus className="w-4 h-4 flex-shrink-0" /> Crear evento
           </Link>
         </div>
 
