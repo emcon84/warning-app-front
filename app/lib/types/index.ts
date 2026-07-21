@@ -6,3 +6,4 @@ export * from "./employee";
 export * from "./vacancy";
 export * from "./store";
 export * from "./supermarket";
+export * from "./reconquistanews";

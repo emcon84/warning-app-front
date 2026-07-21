@@ -12,6 +12,7 @@ import { HomeRecentProducts } from "./components/HomeRecentProducts";
 import { HomeTurnoBanner } from "./components/HomeTurnoBanner";
 import { HomeProfessionalsSlider } from "./components/HomeProfessionalsSlider";
 import { HomeHogarSection } from "./components/HomeHogarSection";
+import { NewsCarousel } from "../components/NewsCarousel";
 import { HomeStoresSlider } from "./components/HomeStoresSlider";
 import { HomeSupermarketsSection } from "./components/HomeSupermarketsSection";
 import { HomeEventsSection } from "./components/HomeEventsSection";
@@ -41,6 +42,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-32">
         <HomeSectionBanners />
+        <NewsCarousel />
         <HomeEventsSection eventos={eventos} />
         <HomePromoBanner />
         <HomeCommunitySection />

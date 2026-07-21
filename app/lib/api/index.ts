@@ -12,3 +12,4 @@ export * from "./admin";
 export * from "./favorites";
 export * from "./conversations";
 export * from "./ai";
+export * from "./reconquistanews";

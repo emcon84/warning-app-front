@@ -23,6 +23,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   experimental: {
     staleTimes: {
       dynamic: 0,
@@ -38,6 +39,26 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "pub-8320ee04bdb94df59332be35269b2a51.r2.dev",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.reconquistahoy.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "reconquistahoy.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.reconquista.com.ar",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "reconquista.com.ar",
         pathname: "/**",
       },
     ],
