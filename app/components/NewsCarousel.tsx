@@ -173,12 +173,12 @@ export function NewsCarousel() {
         </div>
       </div>
 
-      <div className="flex gap-1 mb-3">
+      <div className="flex gap-1 mb-3 overflow-x-auto flex-nowrap scrollbar-hide -mx-1 px-1">
         {PORTALS.map((p, i) => (
           <button
             key={p.key}
             onClick={() => setTab(i)}
-            className={`text-sm font-semibold px-3 py-1.5 rounded-lg transition-all ${
+            className={`text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg transition-all flex-shrink-0 ${
               i === tab
                 ? isDark
                   ? "bg-red-900/40 text-red-300"
