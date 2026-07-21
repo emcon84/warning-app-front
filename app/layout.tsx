@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Reportes RQ",
+    title: "Reportes Reconquista",
   },
   formatDetection: {
     telephone: false,

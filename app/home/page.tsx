@@ -5,7 +5,7 @@ import { Professional, Comercio, Supermarket, TurnoResponse } from "../types";
 import { API_URL } from "../lib/api/client";
 
 export const metadata: Metadata = {
-  title: "Inicio | Reportes Reconquista",
+  title: "Inicio",
   description: "Encontrá profesionales, comercios, farmacias de turno y más en Reconquista, Santa Fe.",
 };
 

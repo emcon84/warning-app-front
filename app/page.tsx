@@ -8,7 +8,7 @@ import LandingThemeToggle from "./components/LandingThemeToggle";
 import HeroCarousel from "./components/HeroCarousel";
 
 export const metadata: Metadata = {
-  title: "Reportes Reconquista | App ciudadana para Reconquista, Santa Fe",
+  title: "App ciudadana para Reconquista, Santa Fe",
   description:
     "La app ciudadana de Reconquista, Santa Fe. Reporta situaciones en la via publica, encontra medicos IAPOS/PAMI, farmacias de turno, profesionales, comercios y ofertas de supermercados.",
   keywords: [
