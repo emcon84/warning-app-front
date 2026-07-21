@@ -7,10 +7,8 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useReconquistaNews } from "../hooks/useReconquistaNews";
 
 const PORTALS = [
-  { key: "reconquistahoy", label: "Reconquista Hoy" },
   { key: "reconquistaar", label: "Reconquista.com.ar" },
   { key: "reconquistanoticias", label: "Reconquista Noticias" },
-  { key: "vialibre", label: "Vía Libre" },
 ] as const;
 
 const MAX_ARTICLES = 15;
