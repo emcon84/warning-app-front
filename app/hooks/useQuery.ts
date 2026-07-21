@@ -11,7 +11,8 @@ export interface QueryResult<T> {
 
 export function useQuery<T>(
   fetcher: () => Promise<T>,
-  deps: unknown[] = []
+  deps: unknown[] = [],
+  refetchInterval?: number
 ): QueryResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,12 +31,20 @@ export function useQuery<T>(
     } finally {
       setLoading(false);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     execute();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps]);
+
+  useEffect(() => {
+    if (!refetchInterval) return;
+    const t = setInterval(() => {
+      fetcherRef.current().then(setData).catch(() => {});
+    }, refetchInterval);
+    return () => clearInterval(t);
+  }, [refetchInterval]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { data, loading, error, refetch: execute };
 }
