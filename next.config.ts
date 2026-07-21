@@ -61,6 +61,26 @@ const nextConfig: NextConfig = {
         hostname: "reconquista.com.ar",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.vialibre.ar",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "blogger.googleusercontent.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "bp.blogspot.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
+      },
     ],
   },
   async redirects() {
