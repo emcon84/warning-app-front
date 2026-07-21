@@ -29,7 +29,7 @@ export function HomePromoBanner() {
           else if (d < -50) setSlide(p => (p - 1 + SLIDE_COUNT) % SLIDE_COUNT);
         }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
 
           {/* Slide 1: Pedidos por WhatsApp */}
           {slide === 0 && (
