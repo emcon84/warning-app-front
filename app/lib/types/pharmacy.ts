@@ -3,6 +3,7 @@ export interface Farmacia {
   nombre: string;
   direccion: string;
   telefono: string | null;
+  googleMapsUrl?: string;
   lat: number;
   lng: number;
   activo: boolean;

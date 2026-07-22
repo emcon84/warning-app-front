@@ -41,27 +41,40 @@ export function HomeTurnoBanner({ turno }: Props) {
           </span>
         </div>
         <div className="flex flex-col md:flex-row md:flex-wrap gap-2">
-          {turno.farmacias.slice(0, 3).map((farmacia) => (
-            <div
-              key={farmacia.id}
-              className={`rounded-xl p-3 border md:flex-1 md:min-w-[280px] ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
-            >
-              <p className={`text-sm font-semibold ${textPrimary}`}>{farmacia.nombre}</p>
-              <div className={`flex items-center gap-1 mt-0.5 ${textMuted}`}>
-                <MapPin className="w-3 h-3 flex-shrink-0" />
-                <span className="text-xs">{farmacia.direccion}</span>
+          {turno.farmacias.slice(0, 3).map((farmacia) => {
+            const mapsUrl = farmacia.googleMapsUrl || `https://www.google.com/maps?q=${farmacia.lat},${farmacia.lng}`;
+            return (
+              <div
+                key={farmacia.id}
+                onClick={() => window.open(mapsUrl, "_blank", "noopener,noreferrer")}
+                role="link"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    window.open(mapsUrl, "_blank", "noopener,noreferrer");
+                  }
+                }}
+                className={`rounded-xl p-3 border md:flex-1 md:min-w-[280px] hover:shadow-md hover:border-green-400 transition-all cursor-pointer ${isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"}`}
+              >
+                <p className={`text-sm font-semibold ${textPrimary}`}>{farmacia.nombre}</p>
+                <div className={`flex items-center gap-1 mt-0.5 ${textMuted}`}>
+                  <MapPin className="w-3 h-3 flex-shrink-0" />
+                  <span className="text-xs">{farmacia.direccion}</span>
+                </div>
+                {farmacia.telefono && (
+                  <a
+                    href={`tel:${farmacia.telefono}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-1 mt-1.5 text-xs text-green-600 font-medium"
+                  >
+                    <Phone className="w-3 h-3" />
+                    {farmacia.telefono}
+                  </a>
+                )}
               </div>
-              {farmacia.telefono && (
-                <a
-                  href={`tel:${farmacia.telefono}`}
-                  className="inline-flex items-center gap-1 mt-1.5 text-xs text-green-600 font-medium"
-                >
-                  <Phone className="w-3 h-3" />
-                  {farmacia.telefono}
-                </a>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </motion.div>
