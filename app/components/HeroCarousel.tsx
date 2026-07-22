@@ -49,7 +49,7 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     id: "home",
-    badge: "Super-app local",
+    badge: "App ciudadana",
     badgeCls: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
     headline: "Todo Reconquista,",
     headlineSuffix: "en un solo lugar",

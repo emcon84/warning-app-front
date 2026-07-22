@@ -12,12 +12,12 @@ export function HomeSectionBanners() {
       transition={{ duration: 0.3, delay: 0.1, ease: "easeOut" }}
       className="mb-6 -mx-4 px-4 md:mx-0 md:px-0"
     >
-      <div className="flex gap-3 overflow-x-auto scrollbar-hide md:overflow-visible md:grid md:grid-cols-6 pb-1">
+      <div className="flex gap-3 overflow-x-auto scrollbar-hide md:overflow-visible md:grid md:grid-cols-7 pb-1">
         {SECTION_BANNERS.map(({ label, sub, href, Icon, gradient, glow }) => (
           <Link
             key={label}
             href={href}
-            className={`flex-shrink-0 w-40 h-[108px] rounded-2xl bg-gradient-to-br ${gradient} shadow-lg ${glow} flex flex-col p-4 transition-transform active:scale-[0.97] hover:scale-[1.02] md:w-auto md:flex-1`}
+            className={`flex-shrink-0 w-[136px] h-[108px] rounded-2xl bg-gradient-to-br ${gradient} shadow-lg ${glow} flex flex-col p-3 transition-transform active:scale-[0.97] hover:scale-[1.02] md:w-auto md:min-w-0 md:p-4`}
           >
             <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
               <Icon className="w-5 h-5 text-white" />
