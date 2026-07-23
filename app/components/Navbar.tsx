@@ -1,8 +1,8 @@
 "use client";
 
-import type { ComponentType } from "react";
-import { Home, Stethoscope, Megaphone, Pill, ShoppingCart, Wrench, Store, Briefcase, User, Settings, Sun, Moon, LayoutDashboard, CalendarDays } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+import { Search, X, User, Settings, Sun, Moon, LayoutDashboard, CalendarDays } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { SearchDropdown } from "./SearchDropdown";
 import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
@@ -19,14 +19,14 @@ interface NavbarProps {
   sidebarDisabled?: boolean;
 }
 
-type MapViewItem = Exclude<MapView, "profesionales">;
-
-const VIEW_CONFIG: Record<MapViewItem, { label: string; Icon: ComponentType<{ className?: string }> }> = {
-  doctors:   { label: "Médicos",   Icon: Stethoscope },
-  reports:   { label: "Reportes",  Icon: Megaphone },
-  farmacias: { label: "Farmacias", Icon: Pill },
-  ofertas:   { label: "Ofertas",   Icon: ShoppingCart },
-};
+const CATEGORY_LINKS = [
+  { label: "Home",      href: "/home" },
+  { label: "Oficios",   href: "/oficios" },
+  { label: "Comercios", href: "/comercios" },
+  { label: "Médicos",   href: "/medicos" },
+  { label: "Farmacias", href: "/app?view=farmacias" },
+  { label: "Reportes",  href: "/app" },
+] as const;
 
 interface UnreadConversation {
   id: string;
@@ -50,6 +50,7 @@ function formatTime(dateStr: string): string {
 export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChange, sidebarDisabled }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
   const { isDark, toggleTheme } = useTheme();
@@ -61,8 +62,12 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
   const [hasProfessionalProfile, setHasProfessionalProfile] = useState(false);
   const [hasPanelCode, setHasPanelCode] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [query, setQuery] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
 
-  // Check localStorage for anonymous professional panel code (no Clerk needed)
   useEffect(() => {
     setHasPanelCode(!!localStorage.getItem("professional_panel_code"));
   }, []);
@@ -110,6 +115,34 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (mobileSearchRef.current && !mobileSearchRef.current.contains(e.target as Node)) {
+        setMobileSearchOpen(false);
+      }
+    }
+    if (mobileSearchOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [mobileSearchOpen]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMobileSearchOpen(false);
+    }
+    if (mobileSearchOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [mobileSearchOpen]);
+
+  useEffect(() => {
+    if (mobileSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [mobileSearchOpen]);
+
   async function fetchUnreadConversations() {
     const token = await getToken();
     if (!token) return;
@@ -120,11 +153,8 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
       });
       if (!res.ok) return;
       const data = await res.json();
-
-      // El endpoint devuelve { items, hasMore, nextCursor }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const items: any[] = Array.isArray(data) ? data : (data.items ?? []);
-
       const unread: UnreadConversation[] = items
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .filter((conv: any) => (conv._unreadCount ?? 0) > 0)
@@ -140,7 +170,6 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
             lastMessageTime: lastMsg?.createdAt ?? "",
           };
         });
-
       setUnreadConversations(unread);
     } finally {
       setLoadingConversations(false);
@@ -150,9 +179,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
   function handleBellClick() {
     const next = !dropdownOpen;
     setDropdownOpen(next);
-    if (next) {
-      fetchUnreadConversations();
-    }
+    if (next) fetchUnreadConversations();
   }
 
   function handleConversationClick(id: string) {
@@ -160,81 +187,103 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     setDropdownOpen(false);
   }
 
-  const navBg      = isDark ? "bg-gray-900"  : "bg-white";
-  const navText    = isDark ? "text-white"   : "text-gray-900";
-  const hoverBg    = isDark ? "hover:bg-gray-800" : "hover:bg-gray-100";
-  const iconColor  = isDark ? "text-gray-300" : "text-gray-600";
-  const pillInact  = isDark ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200";
-  const dropBg     = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
-  const dropBorder = isDark ? "border-gray-800" : "border-gray-200";
-  const dropHover  = isDark ? "hover:bg-gray-800" : "hover:bg-gray-50";
-  const textSec    = isDark ? "text-gray-400" : "text-gray-500";
-  const textMut    = isDark ? "text-gray-600" : "text-gray-400";
-  const shadow     = isDark ? "shadow-lg" : "shadow-sm border-b border-gray-200";
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const q = query.trim();
+    setMobileSearchOpen(false);
+    setShowDropdown(false);
+    if (q) {
+      router.push(`/buscar?q=${encodeURIComponent(q)}`);
+    } else {
+      router.push("/buscar");
+    }
+  }
+
+  function isActive(href: string): boolean {
+    if (href === "/home") return pathname === "/home";
+    if (href === "/oficios") return pathname.startsWith("/oficios") || pathname.startsWith("/profesional");
+    if (href === "/comercios") return pathname.startsWith("/comercios") || pathname.startsWith("/comercio");
+    if (href === "/medicos") return pathname.startsWith("/medicos");
+    if (href === "/app?view=farmacias") return pathname === "/app" && searchParams.get("view") === "farmacias";
+    if (href === "/app") return pathname === "/app" && (!searchParams.get("view") || searchParams.get("view") === "reports");
+    return false;
+  }
+
+  const navBg    = isDark ? "bg-gray-900" : "bg-white";
+  const navText  = isDark ? "text-white" : "text-gray-900";
+  const hoverBg  = isDark ? "hover:bg-gray-800" : "hover:bg-gray-100";
+  const dropBg   = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const dropHover = isDark ? "hover:bg-gray-800" : "hover:bg-gray-50";
+  const textSec  = isDark ? "text-gray-400" : "text-gray-500";
+  const textMut  = isDark ? "text-gray-600" : "text-gray-400";
+  const shadow   = isDark ? "shadow-lg" : "shadow-sm border-b border-gray-200";
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[1002] ${navBg} ${navText} ${shadow}`}>
-      <div className="max-w-5xl mx-auto w-full flex items-center gap-2 px-4 py-2">
+      <div className="w-full">
 
-        {/* Hamburguesa — solo si hay sidebar y no está deshabilitado */}
-        {onMenuClick && !sidebarDisabled && (
-          <button
-            onClick={onMenuClick}
-            data-tour="sidebar-toggle"
-            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${hoverBg}`}
-            aria-label="Toggle menu"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        )}
+        {/* ROW 1 */}
+        <div className="flex items-center gap-2 px-4 py-2 max-w-5xl mx-auto w-full">
 
-        {/* Logo */}
-        <img
-          src="/icon.svg"
-          className="w-7 h-7 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-          alt="Reportes RQ"
-          onClick={() => router.push("/home")}
-        />
+          <img
+            src="/icon.svg"
+            className="w-7 h-7 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+            alt="Reportes RQ"
+            onClick={() => router.push("/home")}
+          />
 
-        {/* Spacer mobile — empuja auth a la derecha cuando las pills están ocultas */}
-        <div className="flex-1 md:hidden" />
+          {/* Desktop search */}
+          <div className="hidden md:flex flex-1 items-center max-w-2xl mx-auto">
+            <div className="relative w-full">
+            <form onSubmit={handleSearchSubmit} className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setShowDropdown(true); }}
+                placeholder="Buscar plomero, electricista, médico..."
+                className={`w-full rounded-full pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  isDark
+                    ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+                    : "bg-gray-100 border-gray-200 text-gray-900 placeholder-gray-400"
+                } border`}
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${textSec} hover:opacity-70 transition-opacity`}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </form>
+            <SearchDropdown
+              query={query}
+              isDark={isDark}
+              visible={showDropdown && query.length >= 2}
+              onClose={() => setShowDropdown(false)}
+              onClear={() => { setQuery(""); setShowDropdown(false); }}
+            />
+            </div>
+          </div>
 
-        {/* Pills de vista — ocultas en mobile, se muestran en el bottom nav. Ocultas en desktop cuando sidebarDisabled */}
-        <div className={`hidden ${sidebarDisabled ? "" : "md:flex"} flex-1 items-center justify-center gap-1 overflow-x-auto`} data-tour="view-pills">
-          {(
-            [
-              { key: "home",      label: "Home",      Icon: Home,         href: "/home",               active: pathname === "/home",                                                            mapKey: null },
-              { key: "oficios",   label: "Oficios",   Icon: Wrench,       href: "/oficios",            active: pathname.startsWith("/oficios") || pathname.startsWith("/profesional"),           mapKey: null },
-              { key: "comercios", label: "Comercios", Icon: Store,        href: "/comercios",           active: pathname.startsWith("/comercios") || pathname.startsWith("/comercio"),           mapKey: null },
-              { key: "ofertas",   label: "Ofertas",   Icon: ShoppingCart, href: "/ofertas",             active: pathname.startsWith("/ofertas"),                                                 mapKey: null },
-              { key: "empleos",   label: "Empleos",   Icon: Briefcase,    href: "/empleos",             active: pathname.startsWith("/empleos") || pathname.startsWith("/empleo") || pathname.startsWith("/vacante"), mapKey: null },
-              { key: "medicos",   label: "Médicos",   Icon: Stethoscope,  href: "/medicos",             active: pathname.startsWith("/medicos") || (pathname === "/app" && mapView === "doctors"), mapKey: null },
-              { key: "farmacias", label: "Farmacias", Icon: Pill,         href: "/app?view=farmacias",  active: pathname === "/app" && mapView === "farmacias",                                   mapKey: "farmacias" as MapViewItem | null },
-              { key: "reportes",  label: "Reportes",  Icon: Megaphone,    href: "/app",                 active: pathname === "/app" && mapView === "reports",                                    mapKey: "reports" as MapViewItem | null },
-            ] as { key: string; label: string; Icon: ComponentType<{ className?: string }>; href: string; active: boolean; mapKey: MapViewItem | null }[]
-          ).map(({ key, label, Icon, href, active, mapKey }) => (
+          {/* Mobile spacer + search icon */}
+          <div className="flex-1 md:hidden" />
+          <div className="md:hidden">
             <button
-              key={key}
-              onClick={() => {
-                if (mapKey && onMapViewChange && pathname === "/app") onMapViewChange(mapKey);
-                else router.push(href);
-              }}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
-                active ? "bg-green-500 text-white" : pillInact
-              }`}
+              onClick={() => setMobileSearchOpen(true)}
+              className={`p-2 rounded-lg transition-colors ${hoverBg}`}
+              aria-label="Buscar"
             >
-              <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-              <span className="hidden sm:inline">{label}</span>
+              <Search className="w-5 h-5" />
             </button>
-          ))}
-        </div>
+          </div>
 
-        {/* Auth */}
-        <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
-          {isSignedIn ? (
-            <>
+          {/* Auth + Theme */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {isSignedIn ? (
               <UserButton>
                 <UserButton.MenuItems>
                   {hasProfessionalProfile && (
@@ -253,34 +302,105 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
                   <UserButton.Link label="Configuración" labelIcon={<Settings className="w-4 h-4" />} href="/settings" />
                 </UserButton.MenuItems>
               </UserButton>
-            </>
-          ) : (
-            <>
-              {hasPanelCode && (
+            ) : (
+              <>
+                {hasPanelCode && (
+                  <button
+                    onClick={() => router.push("/profesional/gestionar")}
+                    className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-700 hover:bg-gray-50"}`}
+                  >
+                    Mi panel
+                  </button>
+                )}
                 <button
-                  onClick={() => router.push("/profesional/gestionar")}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${isDark ? "border-gray-700 text-gray-300 hover:bg-gray-800" : "border-gray-200 text-gray-700 hover:bg-gray-50"}`}
+                  onClick={() => openSignIn()}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-200" : "bg-gray-900 text-white hover:bg-gray-700"}`}
                 >
-                  Mi panel
+                  Entrar
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={toggleTheme}
+              aria-label="Alternar tema"
+              className={`p-2 rounded-full ${textSec} ${hoverBg} transition-colors`}
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile search overlay */}
+        <div
+          ref={mobileSearchRef}
+          className={`md:hidden transition-all duration-300 ease-in-out ${
+            mobileSearchOpen ? "max-h-[90vh] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+          }`}
+        >
+          <div className="px-4 pb-3">
+            <div className="relative">
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setShowDropdown(true); }}
+                placeholder="Buscar plomero, electricista, médico..."
+                className={`w-full rounded-full pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  isDark
+                    ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+                    : "bg-gray-100 border-gray-200 text-gray-900 placeholder-gray-400"
+                } border`}
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${textSec} hover:opacity-70 transition-opacity`}
+                >
+                  <X className="w-4 h-4" />
                 </button>
               )}
-              <button
-                onClick={() => openSignIn()}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-200" : "bg-gray-900 text-white hover:bg-gray-700"}`}
-              >
-                Entrar
-              </button>
-            </>
-          )}
+            </form>
+            <SearchDropdown
+              query={query}
+              isDark={isDark}
+              visible={showDropdown && query.length >= 2 && mobileSearchOpen}
+              onClose={() => setShowDropdown(false)}
+              onClear={() => { setQuery(""); setShowDropdown(false); }}
+            />
+            </div>
+          </div>
+        </div>
 
-          {/* Toggle de tema — siempre visible */}
-          <button
-            onClick={toggleTheme}
-            aria-label="Alternar tema"
-            className={`p-2 rounded-full ${textSec} ${hoverBg} transition-colors`}
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+        {/* ROW 2 */}
+        <div className={`border-t ${navBg} ${isDark ? "border-gray-800" : "border-gray-200"}`}>
+          <div className="max-w-5xl mx-auto w-full px-4">
+            <div className="flex items-center gap-0 overflow-x-auto [&::-webkit-scrollbar]:hidden py-2 text-sm">
+              {CATEGORY_LINKS.map((link, i) => {
+                const active = isActive(link.href);
+                return (
+                  <span key={link.label} className="flex items-center gap-0 whitespace-nowrap">
+                    {i > 0 && (
+                      <span className={`mx-1 select-none ${isDark ? "text-gray-600" : "text-gray-300"}`}>·</span>
+                    )}
+                    <button
+                      onClick={() => router.push(link.href)}
+                      className={`px-2 py-1 transition-colors whitespace-nowrap flex-shrink-0 ${
+                        active
+                          ? "text-green-500 font-semibold border-b-2 border-green-500"
+                          : `${isDark ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"}`
+                      }`}
+                    >
+                      {link.label}
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
       </div>

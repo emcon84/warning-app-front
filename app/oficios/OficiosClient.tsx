@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Professional } from "../types";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
-import { Wrench, GraduationCap, MapPin, Star, Search, X, ChevronRight, Plus } from "lucide-react";
+import { Wrench, GraduationCap, MapPin, Star, ChevronRight, Plus } from "lucide-react";
 
 const TAGS_OFICIO = [
   "plomero", "electricista", "albañil", "pintor", "gasista", "jardinero",
@@ -181,24 +181,7 @@ export default function OficiosClient({ professionals, initialCategoria, initial
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar />
 
-      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
-
-        {/* Buscador */}
-        <div className="relative mb-5 mt-2 md:max-w-2xl md:mx-auto">
-          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={tab === "oficio" ? "Buscar plomero, electricista..." : "Buscar abogado, contador..."}
-            className={`w-full pl-11 pr-11 py-3 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 ${inputCls}`}
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className={`absolute right-4 top-1/2 -translate-y-1/2 ${textMuted}`}>
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-28 pb-32">
 
         {/* Sub-tabs */}
         <div className={`flex p-1 rounded-2xl mb-5 mt-2 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-gray-100"}`}>

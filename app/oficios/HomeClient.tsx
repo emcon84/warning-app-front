@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import {
-  Search, X, MapPin, Star, Phone, Wrench, Store, ShoppingCart,
+  MapPin, Star, Phone, Wrench, Store, ShoppingCart,
   Zap, Flame, Droplets, HardHat, Settings2, ChevronRight,
   Stethoscope, Pill, Map, Trees,
 } from "lucide-react";
@@ -55,10 +53,8 @@ const PRO_GRADIENTS = [
 ] as const;
 
 export default function HomeClient({ professionals, comercios, turno, supermarkets }: Props) {
-  const router = useRouter();
   const { user } = useUser();
   const { isDark } = useTheme();
-  const [query, setQuery] = useState("");
 
   const bg          = isDark ? "bg-gray-950"  : "bg-gray-50";
   const textPrimary = isDark ? "text-white"   : "text-gray-900";
@@ -74,18 +70,11 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
     (c) => c.activo && (c.isPremium || c.isFounder)
   );
 
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (query.trim()) {
-      router.push(`/profesionales?q=${encodeURIComponent(query.trim())}`);
-    }
-  }
-
   return (
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar sidebarDisabled />
 
-      <div className="max-w-xl mx-auto px-4 pt-20 pb-32">
+      <div className="max-w-xl mx-auto px-4 pt-28 pb-32">
 
         {/* ── 1. Header con saludo ─────────────────────────────────────── */}
         <motion.div
@@ -102,39 +91,7 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
           <p className={`text-sm mt-1 ${textSec}`}>¿Qué necesitás hoy?</p>
         </motion.div>
 
-        {/* ── 2. Buscador prominente ────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.05, ease: "easeOut" }}
-          className="mb-6"
-        >
-          <form onSubmit={handleSearch} className="relative">
-            <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${textMuted}`} />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar plomero, electricista, médico..."
-              className={`w-full pl-11 pr-11 py-3.5 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                isDark
-                  ? "bg-gray-900 border-gray-700 text-white placeholder-gray-600"
-                  : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm"
-              }`}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                className={`absolute right-4 top-1/2 -translate-y-1/2 ${textMuted} hover:text-gray-400 transition-colors`}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </form>
-        </motion.div>
-
-        {/* ── 3. Accesos rápidos ────────────────────────────────────────── */}
+        {/* ── 2. Accesos rápidos ────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

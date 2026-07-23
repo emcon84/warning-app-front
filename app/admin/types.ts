@@ -45,7 +45,7 @@ export interface Comercio {
   createdAt: string;
 }
 
-export type Tab = "professionals" | "reports" | "reviews" | "comercios" | "outreach";
+export type Tab = "professionals" | "reports" | "reviews" | "comercios" | "outreach" | "slides";
 export type ShareFormat = "story" | "feed";
 
 export interface ShareTarget {
@@ -53,4 +53,21 @@ export interface ShareTarget {
   shareUrl: string;
   profileUrl: string;
   label: string;
+}
+
+export interface HeroSlideItem {
+  id: string;
+  slideType: "professional" | "comercio" | "promo";
+  refId: string | null;
+  title: string;
+  subtitle: string | null;
+  ctaText: string | null;
+  ctaUrl: string | null;
+  imageUrl: string | null;
+  imagePosition: string;
+  isPinned: boolean;
+  sortOrder: number;
+  startsAt: string | null;
+  endsAt: string | null;
+  createdAt: string;
 }

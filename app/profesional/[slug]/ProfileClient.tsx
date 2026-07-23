@@ -8,11 +8,10 @@ import Navbar from "@/components/Navbar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { fireConfetti } from "./components/Stars";
 import { LoginModal } from "./components/LoginModal";
-import { ProfileHeader } from "./components/ProfileHeader";
+import { ProfileSidebar } from "./components/ProfileSidebar";
 import { ProfilePhotos } from "./components/ProfilePhotos";
 import { ProfileReviews } from "./components/ProfileReviews";
 import { ReviewForm } from "./components/ReviewForm";
-import { ProfileActions } from "./components/ProfileActions";
 
 import { API_URL } from "@/lib/api/client";
 const SITE_URL =
@@ -49,15 +48,16 @@ export default function ProfileClient({ pro, slug }: Props) {
 
   const profileUrl = `${SITE_URL}/profesional/${pro.slug}`;
 
-  const bg         = isDark ? "bg-gray-950"                                 : "bg-gray-50";
-  const textPrimary = isDark ? "text-white"                                  : "text-gray-900";
-  const textSec    = isDark ? "text-gray-400"                               : "text-gray-500";
-  const textMuted  = isDark ? "text-gray-500"                               : "text-gray-400";
-  const cardBg     = isDark ? "bg-gray-900 border-gray-800"                 : "bg-white border-gray-200";
-  const tagBg      = isDark ? "bg-gray-800 border-gray-700 text-gray-300"   : "bg-gray-100 border-gray-200 text-gray-600";
-  const bottomBar  = isDark ? `${bg} border-gray-900`                       : "bg-white border-gray-200";
+  // ── Theme variables ────────────────────────────────────────────
+  const bg         = isDark ? "bg-gray-950" : "bg-gray-50";
+  const textPrimary = isDark ? "text-white" : "text-gray-900";
+  const textSec    = isDark ? "text-gray-400" : "text-gray-500";
+  const textMuted  = isDark ? "text-gray-500" : "text-gray-400";
+  const cardBg     = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const tagBg      = isDark ? "bg-gray-800 border-gray-700 text-gray-300" : "bg-gray-100 border-gray-200 text-gray-600";
   const secBtn     = isDark ? "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700" : "bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200";
 
+  // ── Effects ────────────────────────────────────────────────────
   useEffect(() => {
     if (!isSignedIn) return;
     getToken().then((token) => {
@@ -84,6 +84,7 @@ export default function ProfileClient({ pro, slug }: Props) {
       setRecommended(!!localStorage.getItem("rec_pro_" + pro.slug));
   }, [pro.slug]);
 
+  // ── Handlers ───────────────────────────────────────────────────
   async function toggleFav() {
     if (!isSignedIn) { setLoginModalContext("fav"); setShowLoginModal(true); return; }
     setFavLoading(true);
@@ -173,8 +174,9 @@ export default function ProfileClient({ pro, slug }: Props) {
     } catch {}
   }
 
+  // ── Render ─────────────────────────────────────────────────────
   return (
-    <div className={`h-screen ${bg} ${textPrimary} flex flex-col overflow-hidden transition-colors`}>
+    <div className={`min-h-screen ${bg} ${textPrimary} transition-colors`}>
       <Navbar totalReports={0} onMenuClick={() => {}} sidebarDisabled mapView="profesionales" />
 
       {showLoginModal && (
@@ -187,79 +189,86 @@ export default function ProfileClient({ pro, slug }: Props) {
         />
       )}
 
-      <div className="flex flex-col flex-1 overflow-hidden max-w-xl md:max-w-3xl mx-auto w-full pb-16">
-        <ProfileHeader
+      {showForm && (
+        <ReviewForm
           pro={pro}
+          formScore={formScore}
+          submitting={submitting}
+          submitError={submitError}
           isDark={isDark}
-          textPrimary={textPrimary}
-          textSec={textSec}
-          textMuted={textMuted}
-          tagBg={tagBg}
-          onBack={() => router.back()}
+          onScoreChange={(score) => {
+            setFormScore(score);
+            setTimeout(() => submitReview(score), 420);
+          }}
+          onCancel={() => { setShowForm(false); setSubmitError(""); setFormScore(0); }}
         />
+      )}
 
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
-          {pro.descripcion && (
-            <div className={`mb-4 p-4 rounded-2xl border ${cardBg}`}>
-              <p className={`text-sm leading-relaxed ${isDark ? "text-gray-300" : "text-gray-700"}`}>{pro.descripcion}</p>
-            </div>
-          )}
-
-          <ProfilePhotos fotos={pro.fotos ?? []} isDark={isDark} textSec={textSec} />
-
-          <ProfileReviews
-            reviews={reviews}
-            loading={loadingReviews}
-            submitSuccess={submitSuccess}
-            reportedIds={reportedIds}
-            isSignedIn={!!isSignedIn}
-            showForm={showForm}
+      {/* Two-column layout */}
+      <div className="max-w-6xl mx-auto px-4 pt-28 pb-16">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-10 mt-16">
+          {/* ── SIDEBAR ────────────────────────────────────────── */}
+          <ProfileSidebar
+            pro={pro}
+            isFav={isFav}
+            favLoading={favLoading}
+            recommended={recommended}
+            recCount={recCount}
+            copied={copied}
             isDark={isDark}
-            textSec={textSec}
-            textMuted={textMuted}
             cardBg={cardBg}
             tagBg={tagBg}
-            onShowForm={() => setShowForm(true)}
-            onRequestLogin={() => { setLoginModalContext("review"); setShowLoginModal(true); }}
-            onReport={handleReport}
-          />
-        </div>
-
-        {showForm && (
-          <ReviewForm
-            pro={pro}
-            formScore={formScore}
-            submitting={submitting}
-            submitError={submitError}
-            isDark={isDark}
-            onScoreChange={(score) => {
-              setFormScore(score);
-              setTimeout(() => submitReview(score), 420);
+            textPrimary={textPrimary}
+            textSec={textSec}
+            textMuted={textMuted}
+            secBtn={secBtn}
+            onWhatsapp={() => {
+              const msg = `Hola ${pro.nombre}, te contacto desde Reportes Reconquista. `;
+              window.open(`https://wa.me/${pro.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
             }}
-            onCancel={() => { setShowForm(false); setSubmitError(""); setFormScore(0); }}
+            onChat={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
+            onRecommend={handleRecommend}
+            onShare={handleShare}
+            onToggleFav={toggleFav}
+            onCopy={handleCopy}
           />
-        )}
 
-        <ProfileActions
-          pro={pro}
-          isFav={isFav}
-          favLoading={favLoading}
-          recommended={recommended}
-          recCount={recCount}
-          copied={copied}
-          isDark={isDark}
-          bottomBar={bottomBar}
-          secBtn={secBtn}
-          onWhatsapp={() => {
-            const msg = `Hola ${pro.nombre}, te contacto desde Reportes Reconquista. `;
-            window.open(`https://wa.me/${pro.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
-          }}
-          onChat={() => router.push(`/chat/nuevo?professionalId=${pro.id}`)}
-          onRecommend={handleRecommend}
-          onShare={handleShare}
-          onToggleFav={toggleFav}
-          onCopy={handleCopy}
-        />
+          {/* ── MAIN CONTENT ───────────────────────────────────── */}
+          <main className="flex-1 min-w-0 space-y-6 mt-6 md:mt-0">
+            {/* Description */}
+            {pro.descripcion && (
+              <div className={`p-5 md:p-6 rounded-2xl border ${cardBg}`}>
+                <h2 className={`text-sm font-semibold uppercase tracking-wider mb-3 ${textSec}`}>
+                  Sobre mí
+                </h2>
+                <p className={`leading-relaxed whitespace-pre-line ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                  {pro.descripcion}
+                </p>
+              </div>
+            )}
+
+            {/* Photos */}
+            <ProfilePhotos fotos={pro.fotos ?? []} isDark={isDark} textSec={textSec} />
+
+            {/* Reviews */}
+            <ProfileReviews
+              reviews={reviews}
+              loading={loadingReviews}
+              submitSuccess={submitSuccess}
+              reportedIds={reportedIds}
+              isSignedIn={!!isSignedIn}
+              showForm={showForm}
+              isDark={isDark}
+              textSec={textSec}
+              textMuted={textMuted}
+              cardBg={cardBg}
+              tagBg={tagBg}
+              onShowForm={() => setShowForm(true)}
+              onRequestLogin={() => { setLoginModalContext("review"); setShowLoginModal(true); }}
+              onReport={handleReport}
+            />
+          </main>
+        </div>
       </div>
     </div>
   );

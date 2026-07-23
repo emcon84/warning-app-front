@@ -410,7 +410,7 @@ function HomeContent() {
         <div className="flex-1 relative w-full h-full" data-tour="map-container">
           {/* Instrucción contextual — solo al relocalizar */}
           {relocatingDoctorId && (
-            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
+            <div className="absolute top-24 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
               <MapPin className="w-3.5 h-3.5" />
               Arrastrá el pin amarillo a la posición correcta
               <button onClick={() => setRelocatingDoctorId(null)} className="ml-1 hover:text-amber-100">✕</button>
@@ -418,7 +418,7 @@ function HomeContent() {
           )}
 
           {relocatingFarmaciaId && (
-            <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
+            <div className="absolute top-24 left-1/2 transform -translate-x-1/2 z-[999] bg-amber-500 text-white px-3 py-1.5 rounded-full shadow-lg text-xs flex items-center gap-2 font-semibold">
               <MapPin className="w-3.5 h-3.5" />
               Arrastrá el pin de la farmacia a la posición correcta
               <button onClick={() => setRelocatingFarmaciaId(null)} className="ml-1 hover:text-amber-100">✕</button>
@@ -435,7 +435,7 @@ function HomeContent() {
 
           {/* Card farmacia de turno — colapsable en mobile */}
           {mapView === "farmacias" && turno && (
-            <div className="absolute top-3 left-3 right-3 z-[999] max-w-sm mx-auto">
+            <div className="absolute top-24 left-3 right-3 z-[999] max-w-sm mx-auto">
               {/* Pill colapsado (siempre visible) */}
               <button
                 onClick={() => setTurnoExpanded(v => !v)}
@@ -490,7 +490,7 @@ function HomeContent() {
             <button
               data-tour="filter-btn"
               onClick={() => setShowFilterSheet(true)}
-              className={`absolute top-3 right-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
+              className={`absolute top-24 right-3 z-[999] flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md transition-colors ${
                 selectedSpecialties.length > 0
                   ? "bg-green-500 text-white"
                   : "bg-white text-gray-700 border border-gray-300"
