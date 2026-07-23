@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { KeyRound, X, Eye, EyeOff, Check } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 import type { Professional } from "../types";
 
 import { API_URL } from "@/lib/api/client";
@@ -13,6 +14,12 @@ interface Props {
 }
 
 export function PinModal({ target, getToken, onClose }: Props) {
+  const { isDark } = useTheme();
+  const bgCard = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const bgInput = isDark ? "bg-gray-800 border-gray-700 text-white placeholder-gray-600" : "bg-white border-gray-200 text-gray-900 placeholder-gray-400";
+  const textPrimary = isDark ? "text-white" : "text-gray-900";
+  const textMuted = isDark ? "text-gray-500" : "text-gray-400";
+  const btnClose = isDark ? "hover:bg-gray-800 text-gray-400" : "hover:bg-gray-100 text-gray-500";
   const [pinValue, setPinValue] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [showPinVal, setShowPinVal] = useState(false);
@@ -48,23 +55,23 @@ export function PinModal({ target, getToken, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6"
+        className={`border rounded-2xl shadow-2xl w-full max-w-sm p-6 ${bgCard}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
+            <h3 className={`text-base font-bold ${textPrimary} flex items-center gap-2`}>
               <KeyRound className="w-4 h-4 text-amber-400" />
               Asignar PIN
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">{target.nombre} {target.apellido}</p>
+            <p className={`text-xs ${textMuted} mt-0.5`}>{target.nombre} {target.apellido}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400">
+          <button onClick={onClose} className={`p-1.5 rounded-full ${btnClose}`}>
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <p className="text-xs text-gray-500 mb-4">
+        <p className={`text-xs ${textMuted} mb-4`}>
           Asigná un PIN de 4 dígitos. El profesional lo va a usar junto a su WhatsApp para acceder a su panel.
         </p>
 
@@ -77,12 +84,12 @@ export function PinModal({ target, getToken, onClose }: Props) {
               type={showPinVal ? "text" : "password"}
               inputMode="numeric"
               maxLength={4}
-              className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-amber-500 pr-12"
+              className={`w-full px-4 py-3 rounded-xl ${bgInput} text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-amber-500 pr-12`}
             />
             <button
               type="button"
               onClick={() => setShowPinVal(v => !v)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+              className={`absolute right-4 top-1/2 -translate-y-1/2 ${textMuted}`}
             >
               {showPinVal ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -94,7 +101,7 @@ export function PinModal({ target, getToken, onClose }: Props) {
             type={showPinVal ? "text" : "password"}
             inputMode="numeric"
             maxLength={4}
-            className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-amber-500"
+            className={`w-full px-4 py-3 rounded-xl ${bgInput} text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:border-amber-500`}
           />
           {pinValue.length === 4 && pinConfirm.length === 4 && (
             <p className={`text-xs text-center ${pinValue === pinConfirm ? "text-green-400" : "text-red-400"}`}>

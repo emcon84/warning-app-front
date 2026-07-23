@@ -10,6 +10,7 @@ import { resolvePhotoUrl } from "@/lib/utils/photo";
 import {
   COM_PROMOS, COMERCIO_BG_GRADIENTS, buildMixed, slideVariants,
 } from "@/lib/constants/homeConstants";
+import { getRubroPhotoUrl } from "@/lib/constants/rubroPhotos";
 import type { Comercio } from "@/types";
 
 interface Props {
@@ -83,6 +84,7 @@ export function HomeStoresSlider({ comercios }: Props) {
             const comercio = item.data;
             const logoRaw = comercio.logo || comercio.foto;
             const logoSrc = logoRaw ? resolvePhotoUrl(logoRaw) : null;
+            const rubroPhoto = getRubroPhotoUrl(comercio.rubro);
             const bgGrad = COMERCIO_BG_GRADIENTS[slide % COMERCIO_BG_GRADIENTS.length];
             return (
               <motion.div
@@ -96,7 +98,13 @@ export function HomeStoresSlider({ comercios }: Props) {
                 className="absolute inset-0"
               >
                 <Link href={`/comercio/${comercio.slug}`} className="block h-full">
-                  <div className={`h-full bg-gradient-to-br ${bgGrad} flex relative overflow-hidden`}>
+                  <div className={`h-full flex relative overflow-hidden ${rubroPhoto ? "" : `bg-gradient-to-br ${bgGrad}`}`}>
+                    {rubroPhoto && (
+                      <>
+                        <Image src={rubroPhoto} alt="" fill className="object-cover object-right" unoptimized />
+                        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-black/10" />
+                      </>
+                    )}
                     <div className="absolute -right-12 -top-12 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
                     <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-white/5 pointer-events-none" />
                     <div className="w-2/5 flex items-center justify-center p-5">

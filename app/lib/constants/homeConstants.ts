@@ -1,66 +1,4 @@
-import {
-  Wrench, Store, ShoppingCart, Zap, Flame, Droplets,
-  HardHat, Settings2, Stethoscope, Pill, Map, Trees, CalendarDays,
-} from "lucide-react";
-
-export const SECTION_BANNERS = [
-  {
-    label: "Oficios",
-    sub: "Plomeros, electricistas y más",
-    href: "/oficios",
-    Icon: Wrench,
-    gradient: "from-blue-600 to-indigo-700",
-    glow: "shadow-blue-500/30",
-  },
-  {
-    label: "Comercios",
-    sub: "Catálogos y ofertas locales",
-    href: "/comercios",
-    Icon: Store,
-    gradient: "from-amber-500 to-orange-600",
-    glow: "shadow-amber-500/30",
-  },
-  {
-    label: "Médicos",
-    sub: "IAPOS, PAMI y más",
-    href: "/medicos",
-    Icon: Stethoscope,
-    gradient: "from-cyan-500 to-blue-600",
-    glow: "shadow-cyan-500/30",
-  },
-  {
-    label: "Ofertas",
-    sub: "Supermercados de Reconquista",
-    href: "/ofertas",
-    Icon: ShoppingCart,
-    gradient: "from-yellow-400 to-orange-500",
-    glow: "shadow-yellow-500/30",
-  },
-  {
-    label: "Farmacias",
-    sub: "Turno de hoy",
-    href: "/app?view=farmacias",
-    Icon: Pill,
-    gradient: "from-green-500 to-emerald-600",
-    glow: "shadow-green-500/30",
-  },
-  {
-    label: "Eventos",
-    sub: "Shows, ferias y actividades",
-    href: "/eventos",
-    Icon: CalendarDays,
-    gradient: "from-purple-500 to-indigo-600",
-    glow: "shadow-purple-500/30",
-  },
-  {
-    label: "Mapa",
-    sub: "Reportes en tiempo real",
-    href: "/app",
-    Icon: Map,
-    gradient: "from-slate-500 to-gray-700",
-    glow: "shadow-slate-500/30",
-  },
-] as const;
+import { Zap, Flame, Droplets, HardHat, Trees, Settings2 } from "lucide-react";
 
 export const HOGAR_CATS = [
   { label: "Gasistas",      Icon: Flame,     image: "/banners/gasistas.webp",  tag: "gasista"      },
@@ -71,6 +9,7 @@ export const HOGAR_CATS = [
   { label: "Mecánicos",     Icon: Settings2, image: "/banners/mecanicos.webp", tag: "mecánico"     },
 ] as const;
 
+// ── Gradient palettes — still used by HomeStoresSlider & HomeProfessionalsSlider ──
 export const PRO_GRADIENTS = [
   "from-blue-500 to-blue-700",
   "from-purple-500 to-purple-700",
@@ -88,9 +27,9 @@ export const COMERCIO_BG_GRADIENTS = [
 ] as const;
 
 export const slideVariants = {
-  enter: () => ({ scale: 0.92, opacity: 0, filter: "blur(4px)" }),
-  center: { scale: 1, opacity: 1, filter: "blur(0px)" },
-  exit: () => ({ scale: 1.06, opacity: 0, filter: "blur(2px)" }),
+  enter: (dir: number = 1) => ({ x: dir > 0 ? 360 : -360, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number = 1) => ({ x: dir > 0 ? -360 : 360, opacity: 0 }),
 };
 
 export interface PromoSlide {
@@ -159,6 +98,33 @@ export const COM_PROMOS: PromoSlide[] = [
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=400&fit=crop&q=80",
     gradient: "from-violet-950/98 via-violet-950/85 to-violet-900/50",
     accent: "bg-purple-400 text-white",
+  },
+];
+
+export const HERO_PROMOS: PromoSlide[] = [
+  {
+    type: "promo",
+    id: "hero-marketplace",
+    tag: "TU CIUDAD EN UN SOLO LUGAR",
+    title: "Encontrá todo en Reconquista",
+    subtitle: "Profesionales, comercios, ofertas y servicios cerca tuyo.",
+    cta: "Explorar",
+    href: "/comercios",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=600&fit=crop&q=80",
+    gradient: "from-emerald-950/98 via-emerald-950/85 to-emerald-900/50",
+    accent: "bg-white text-gray-900",
+  },
+  {
+    type: "promo",
+    id: "hero-reportes",
+    tag: "REPORTES EN VIVO",
+    title: "Sumate a la red de alertas",
+    subtitle: "Recibí notificaciones de robos, accidentes y eventos en tiempo real en tu zona.",
+    cta: "Ver reportes",
+    href: "/app",
+    image: "https://images.unsplash.com/photo-1453873531674-2151bcd01707?w=1200&h=600&fit=crop&q=80",
+    gradient: "from-rose-950/98 via-rose-950/85 to-rose-900/50",
+    accent: "bg-rose-400 text-white",
   },
 ];
 

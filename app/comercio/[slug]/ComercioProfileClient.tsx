@@ -15,7 +15,7 @@ import { useCart } from "@/contexts/CartContext";
 import Navbar from "@/components/Navbar";
 import { StoreLightbox } from "./components/StoreLightbox";
 import { StoreHero } from "./components/StoreHero";
-import { StoreInfoCard } from "./components/StoreInfoCard";
+import { StoreSidebar } from "./components/StoreSidebar";
 import { StoreReviewsSection } from "./components/StoreReviewsSection";
 import { StoreGallery } from "./components/StoreGallery";
 import { StoreCatalog } from "./components/StoreCatalog";
@@ -65,16 +65,16 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
 
   const gallery = comercio.fotos?.length ? comercio.fotos : (comercio.foto ? [comercio.foto] : []);
 
-  const theme = {
-    isDark,
-    bg:          isDark ? "bg-gray-950"                               : "bg-gray-50",
-    textPrimary: isDark ? "text-white"                                : "text-gray-900",
-    textSec:     isDark ? "text-gray-400"                             : "text-gray-500",
-    textMuted:   isDark ? "text-gray-500"                             : "text-gray-400",
-    cardBg:      isDark ? "bg-gray-900 border-gray-800"               : "bg-white border-gray-200",
-    tagBg:       isDark ? "bg-gray-800 border-gray-700 text-gray-300" : "bg-gray-100 border-gray-200 text-gray-600",
-  };
+  // ── Theme ───────────────────────────────────────────────────────
+  const bg         = isDark ? "bg-gray-950"                               : "bg-gray-50";
+  const cardBg     = isDark ? "bg-gray-900 border-gray-800"               : "bg-white border-gray-200";
+  const tagBg      = isDark ? "bg-gray-800 border-gray-700 text-gray-300" : "bg-gray-100 border-gray-200 text-gray-600";
+  const textSec    = isDark ? "text-gray-400"                             : "text-gray-500";
+  const textMuted  = isDark ? "text-gray-500"                             : "text-gray-400";
+  const rubroBadge = getRubroBadge(comercio.rubro, isDark);
+  const heroGradient = getRubroGradient(comercio.rubro);
 
+  // ── Effects ─────────────────────────────────────────────────────
   useEffect(() => {
     const key = `viewed_comercio_${comercio.slug}`;
     if (sessionStorage.getItem(key)) return;
@@ -116,6 +116,7 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
       .finally(() => setLoadingPosts(false));
   }, [comercio.slug]);
 
+  // ── Handlers ────────────────────────────────────────────────────
   async function handleRecommend() {
     if (recommended) return;
     const data = await recommendStore(comercio.slug).catch(() => null);
@@ -144,8 +145,9 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
     }
   }
 
+  // ── Render ──────────────────────────────────────────────────────
   return (
-    <div className={`min-h-screen ${theme.bg} ${theme.textPrimary} flex flex-col`}>
+    <div className={`min-h-screen ${bg} text-inherit transition-colors`}>
       <Navbar sidebarDisabled />
 
       {lightboxIdx !== null && (
@@ -158,75 +160,96 @@ export default function ComercioProfileClient({ comercio, isOwner }: Props) {
         />
       )}
 
-      <div className="flex-1 max-w-xl md:max-w-3xl mx-auto w-full pb-40">
-        <StoreHero
-          comercio={comercio}
-          heroGradient={getRubroGradient(comercio.rubro)}
-          onBack={() => router.push("/comercios")}
-        />
+      {/* Hero — full width, no back button */}
+      <StoreHero
+        comercio={comercio}
+        heroGradient={heroGradient}
+      />
 
-        <StoreInfoCard
-          comercio={comercio}
-          theme={theme}
-          rubroBadge={getRubroBadge(comercio.rubro, isDark)}
-          isOwner={isOwnerVerified}
-          recommended={recommended}
-          recCount={recCount}
-          onRecommend={handleRecommend}
-          onManage={() => router.push("/comercio/gestionar")}
-        />
-
-        <StoreReviewsSection
-          comercio={comercio}
-          theme={theme}
-          reviews={reviews}
-          loading={loadingReviews}
-          reviewSuccess={reviewSuccess}
-          isSignedIn={isSignedIn}
-          onOpenForm={() => setShowReviewForm(true)}
-          onSignIn={() => router.push("/sign-in")}
-        />
-
-        {gallery.length > 0 && (
-          <StoreGallery
-            photos={gallery}
-            theme={theme}
-            onPhotoClick={setLightboxIdx}
+      {/* Two-column layout */}
+      <div className="max-w-6xl mx-auto px-4 pb-16">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-10 -mt-8">
+          {/* ── SIDEBAR ───────────────────────────────────────── */}
+          <StoreSidebar
+            comercio={comercio}
+            isDark={isDark}
+            cardBg={cardBg}
+            tagBg={tagBg}
+            rubroBadge={rubroBadge}
+            isOwner={isOwnerVerified}
+            recommended={recommended}
+            recCount={recCount}
+            onRecommend={handleRecommend}
+            onManage={() => router.push("/comercio/gestionar")}
           />
-        )}
 
-        <StoreCatalog
-          comercio={comercio}
-          theme={theme}
-          isOwner={isOwnerVerified}
-          onManage={() => router.push("/comercio/gestionar?tab=productos")}
-        />
+          {/* ── MAIN CONTENT ──────────────────────────────────── */}
+          <main className="flex-1 min-w-0 space-y-6 pt-4 md:mt-0 relative z-10">
+            {/* Description */}
+            {comercio.descripcion && (
+              <div className={`p-5 md:p-6 rounded-2xl border ${cardBg}`}>
+                <h2 className={`text-sm font-semibold uppercase tracking-wider mb-3 ${textSec}`}>
+                  Sobre el comercio
+                </h2>
+                <p className={`leading-relaxed whitespace-pre-line ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                  {comercio.descripcion}
+                </p>
+              </div>
+            )}
 
-        <StoreCommunity
-          comercio={comercio}
-          posts={posts}
-          loading={loadingPosts}
-          theme={theme}
-          isOwner={isOwnerVerified}
-          onPublish={() => router.push("/comercio/gestionar?tab=comunidad")}
-        />
+            <StoreReviewsSection
+              comercio={comercio}
+              theme={{ isDark, bg, textPrimary: isDark ? "text-white" : "text-gray-900", textSec, textMuted, cardBg, tagBg }}
+              reviews={reviews}
+              loading={loadingReviews}
+              reviewSuccess={reviewSuccess}
+              isSignedIn={isSignedIn}
+              onOpenForm={() => setShowReviewForm(true)}
+              onSignIn={() => router.push("/sign-in")}
+            />
 
-        <StoreOffers
-          offers={comercio.offers ?? []}
-          whatsapp={comercio.whatsapp}
-          theme={theme}
-          isOwner={isOwnerVerified}
-          comercioNombre={comercio.nombre}
-          comercioLogo={comercio.logo ?? undefined}
-          comercioSlug={comercio.slug}
-          onEdit={() => router.push("/comercio/gestionar?tab=ofertas")}
-        />
+            {gallery.length > 0 && (
+              <StoreGallery
+                photos={gallery}
+                theme={{ isDark, bg, textPrimary: isDark ? "text-white" : "text-gray-900", textSec, textMuted, cardBg, tagBg }}
+                onPhotoClick={setLightboxIdx}
+              />
+            )}
+
+            <StoreCatalog
+              comercio={comercio}
+              theme={{ isDark, bg, textPrimary: isDark ? "text-white" : "text-gray-900", textSec, textMuted, cardBg, tagBg }}
+              isOwner={isOwnerVerified}
+              onManage={() => router.push("/comercio/gestionar?tab=productos")}
+            />
+
+            <StoreCommunity
+              comercio={comercio}
+              posts={posts}
+              loading={loadingPosts}
+              theme={{ isDark, bg, textPrimary: isDark ? "text-white" : "text-gray-900", textSec, textMuted, cardBg, tagBg }}
+              isOwner={isOwnerVerified}
+              onPublish={() => router.push("/comercio/gestionar?tab=comunidad")}
+            />
+
+            <StoreOffers
+              offers={comercio.offers ?? []}
+              whatsapp={comercio.whatsapp}
+              theme={{ isDark, bg, textPrimary: isDark ? "text-white" : "text-gray-900", textSec, textMuted, cardBg, tagBg }}
+              isOwner={isOwnerVerified}
+              comercioNombre={comercio.nombre}
+              comercioLogo={comercio.logo ?? undefined}
+              comercioSlug={comercio.slug}
+              onEdit={() => router.push("/comercio/gestionar?tab=ofertas")}
+            />
+          </main>
+        </div>
       </div>
 
       {showReviewForm && (
         <StoreReviewSheet
           comercio={comercio}
-          theme={theme}
+          theme={{ isDark, bg, textPrimary: isDark ? "text-white" : "text-gray-900", textSec, textMuted, cardBg, tagBg }}
           submitting={submittingReview}
           error={reviewError}
           score={reviewScore}

@@ -37,13 +37,7 @@ const PILL_CONFIG: { key: Pill; label: string }[] = [
   { key: "empleados", label: "Empleos" },
 ];
 
-const PLACEHOLDERS: Record<Pill, string | ((tab: EmpleoTab) => string)> = {
-  profesionales: "Buscar plomero, electricista, albañil...",
-  comercios: "Buscar comercio, rubro, barrio...",
-  oficios: "Buscar oficio o barrio...",
-  empleados: (tab) =>
-    tab === "cvs" ? "Buscar CV por nombre, habilidad..." : "Buscar vacante por puesto, empresa...",
-};
+
 
 export default function ProfesionalesClient({ professionals }: Props) {
   const { isDark } = useTheme();
@@ -54,7 +48,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
   const [comercios, setComercios] = useState<Comercio[]>([]);
   const [empleados, setEmpleados] = useState<Empleado[]>([]);
   const [vacantes, setVacantes] = useState<Vacante[]>([]);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const { isSignedIn } = useUser();
   const { getToken } = useAuth();
 
@@ -172,10 +166,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
     empleados: { color: isDark ? "text-emerald-400" : "text-emerald-700", activeBg: isDark ? "bg-emerald-900/60" : "bg-emerald-100", activeBorder: isDark ? "border-emerald-700" : "border-emerald-400" },
   };
 
-  const placeholder =
-    typeof PLACEHOLDERS[activePill] === "function"
-      ? (PLACEHOLDERS[activePill] as (tab: EmpleoTab) => string)(empleoTab)
-      : (PLACEHOLDERS[activePill] as string);
+
 
   return (
     <div className={`min-h-screen pb-40 md:pb-0 ${bg} transition-colors duration-300 flex flex-col`}>
@@ -184,7 +175,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
       <div className="flex-1 flex flex-col">
         <div
           className="w-full transition-all duration-500 ease-in-out"
-          style={{ paddingTop: showResults ? "4rem" : "calc(50vh - 210px)" }}
+          style={{ paddingTop: showResults ? "7rem" : "calc(50vh - 210px)" }}
         >
           <div className="max-w-2xl mx-auto px-4">
             {/* Title */}
@@ -252,32 +243,6 @@ export default function ProfesionalesClient({ professionals }: Props) {
                 ))}
               </div>
             )}
-
-            {/* Search input */}
-            <div className="relative mb-8">
-              <svg className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${isDark ? "text-gray-500" : "text-gray-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={placeholder}
-                style={{ color: isDark ? "#f9fafb" : "#111827", backgroundColor: isDark ? "#111827" : "#ffffff" }}
-                className={`w-full pl-12 pr-10 py-4 rounded-2xl border text-sm focus:outline-none transition-colors placeholder:text-gray-400 ${inputBg}`}
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className={`absolute right-4 top-1/2 -translate-y-1/2 ${isDark ? "text-gray-500 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"}`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
 
             {/* Search results */}
             <div
@@ -349,7 +314,7 @@ export default function ProfesionalesClient({ professionals }: Props) {
                   {activePill === "oficios" && (
                     <>
                       <SectionHeader label="Explorar oficios" linkHref="/profesional/nuevo" linkLabel="Registrarme" linkColor={isDark ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"} labelColor={labelColor} />
-                      <JobCategoryGrid professionals={oficioProfiles} dark={isDark} onSelect={(o) => setQuery(o)} />
+                      <JobCategoryGrid professionals={oficioProfiles} dark={isDark} onSelect={() => {}} />
                     </>
                   )}
 

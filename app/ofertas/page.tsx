@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+export const dynamic = "force-dynamic";
 import { Supermarket } from "../types";
 import OfertasPageClient from "./OfertasPageClient";
 

@@ -1,11 +1,9 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useTheme } from "../contexts/ThemeContext";
 import Navbar from "../components/Navbar";
 import type { Professional, Comercio, TurnoResponse, Supermarket } from "../types";
-import { HomeHero } from "./components/HomeHero";
-import { HomeSectionBanners } from "./components/HomeSectionBanners";
+import { HeroSlider } from "./components/HeroSlider";
 import { HomePromoBanner } from "./components/HomePromoBanner";
 import { HomeCommunitySection } from "./components/HomeCommunitySection";
 import { HomeRecentProducts } from "./components/HomeRecentProducts";
@@ -18,19 +16,30 @@ import { HomeSupermarketsSection } from "./components/HomeSupermarketsSection";
 import { HomeEventsSection } from "./components/HomeEventsSection";
 import type { Evento } from "@/lib/types/evento";
 
+interface HeroSlideData {
+  id: string;
+  slideType: "professional" | "comercio" | "promo";
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  ctaText: string | null;
+  ctaUrl: string | null;
+  imageUrl: string | null;
+  imagePosition: string;
+}
+
 interface Props {
   professionals: Professional[];
   comercios: Comercio[];
   turno: TurnoResponse | null;
   supermarkets: Supermarket[];
   eventos: Evento[];
+  heroSlides: HeroSlideData[];
 }
 
-export default function HomeClient({ professionals, comercios, turno, supermarkets, eventos }: Props) {
-  const { user } = useUser();
+export default function HomeClient({ professionals, comercios, turno, supermarkets, eventos, heroSlides }: Props) {
   const { isDark } = useTheme();
 
-  const greeting = user?.firstName ? `¡Hola, ${user.firstName}!` : "¡Hola, Bienvenido!";
   const bg = isDark ? "bg-gray-950" : "bg-gray-50";
   const textPrimary = isDark ? "text-white" : "text-gray-900";
 
@@ -38,19 +47,18 @@ export default function HomeClient({ professionals, comercios, turno, supermarke
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar sidebarDisabled />
 
-      <HomeHero greeting={greeting} />
+      <HeroSlider slides={heroSlides} />
 
       <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-6 pb-32">
-        <HomeSectionBanners />
         <NewsCarousel />
-        <HomeEventsSection eventos={eventos} />
-        <HomePromoBanner />
-        <HomeCommunitySection />
-        <HomeRecentProducts />
-        <HomeTurnoBanner turno={turno} />
         <HomeProfessionalsSlider professionals={professionals} />
-        <HomeHogarSection />
+        <HomeCommunitySection />
         <HomeStoresSlider comercios={comercios} />
+        <HomePromoBanner />
+        <HomeRecentProducts />
+        <HomeEventsSection eventos={eventos} />
+        <HomeTurnoBanner turno={turno} />
+        <HomeHogarSection />
         <HomeSupermarketsSection supermarkets={supermarkets} />
       </div>
     </div>

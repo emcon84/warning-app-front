@@ -5,6 +5,7 @@ import { useUser, useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import { resolvePhotoUrl } from "../lib/utils/photo";
+import { useTheme } from "../contexts/ThemeContext";
 import type { Professional, Report, Review, Comercio, Tab, ShareTarget } from "./types";
 import { ShareModal } from "./components/ShareModal";
 import { PinModal } from "./components/PinModal";
@@ -13,11 +14,12 @@ import { AdminReportsTab } from "./components/AdminReportsTab";
 import { AdminComerciosTab } from "./components/AdminComerciosTab";
 import { AdminReviewsTab } from "./components/AdminReviewsTab";
 import { AdminOutreachTab } from "./components/AdminOutreachTab";
+import { AdminSlidesTab } from "./components/AdminSlidesTab";
 
 import { API_URL } from "../lib/api/client";
 const ADMIN_CLERK_IDS = (process.env.NEXT_PUBLIC_ADMIN_CLERK_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
 
-const TAB_ORDER: Tab[] = ["professionals", "comercios", "reports", "reviews", "outreach"];
+const TAB_ORDER: Tab[] = ["professionals", "comercios", "reports", "reviews", "outreach", "slides"];
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
@@ -35,6 +37,14 @@ export default function AdminPage() {
   const [pinTarget, setPinTarget] = useState<Professional | null>(null);
 
   const isAdmin = isLoaded && user && ADMIN_CLERK_IDS.includes(user.id);
+  const { isDark } = useTheme();
+  const theme = isDark ? "dark" : "light";
+  const bgPage = isDark ? "bg-gray-950" : "bg-gray-50";
+  const textPrimary = isDark ? "text-white" : "text-gray-900";
+  const textMuted = isDark ? "text-gray-500" : "text-gray-400";
+  const cardBg = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
+  const tabActive = isDark ? "bg-white text-gray-950" : "bg-gray-900 text-white";
+  const tabInactive = isDark ? "bg-gray-900 border-gray-800 text-gray-400 hover:text-white" : "bg-gray-100 border-gray-200 text-gray-500 hover:text-gray-900";
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -159,12 +169,13 @@ export default function AdminPage() {
     reviews: `Reseñas (${reviews.length})`,
     comercios: `Comercios (${comercios.length})`,
     outreach: "Mensajes",
+    slides: "Slides Hero",
   };
 
   if (!isLoaded || !user) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-gray-700 border-t-white rounded-full animate-spin" />
+      <div className={`min-h-screen ${bgPage} flex items-center justify-center`}>
+        <div className={`w-6 h-6 border-2 rounded-full animate-spin ${isDark ? "border-gray-700 border-t-white" : "border-gray-300 border-t-gray-900"}`} />
       </div>
     );
   }
@@ -172,13 +183,13 @@ export default function AdminPage() {
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className={`min-h-screen ${bgPage} ${textPrimary}`}>
       <Navbar mapView="profesionales" />
 
       <div className="max-w-3xl mx-auto px-4 pt-20 pb-40">
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-white">Panel de administración</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Moderación de contenido</p>
+          <h1 className={`text-xl font-bold ${textPrimary}`}>Panel de administración</h1>
+          <p className={`text-sm ${textMuted} mt-0.5`}>Moderación de contenido</p>
         </div>
 
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
@@ -187,7 +198,7 @@ export default function AdminPage() {
               key={t}
               onClick={() => setTab(t)}
               className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
-                tab === t ? "bg-white text-gray-950" : "bg-gray-900 border border-gray-800 text-gray-400 hover:text-white"
+                tab === t ? tabActive : tabInactive
               }`}
             >
               {tabLabels[t]}
@@ -198,7 +209,7 @@ export default function AdminPage() {
         {loading ? (
           <div className="flex flex-col gap-3">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-16 rounded-2xl bg-gray-900 border border-gray-800 animate-pulse" />
+              <div key={i} className={`h-16 rounded-2xl ${cardBg} animate-pulse`} />
             ))}
           </div>
         ) : tab === "professionals" ? (
@@ -222,6 +233,8 @@ export default function AdminPage() {
           />
         ) : tab === "outreach" ? (
           <AdminOutreachTab />
+        ) : tab === "slides" ? (
+          <AdminSlidesTab />
         ) : (
           <AdminReviewsTab reviews={reviews} deletingId={deletingId} onDelete={deleteReview} />
         )}

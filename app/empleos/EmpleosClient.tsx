@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Empleado, Vacante } from "../types";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
-import { UserCheck, Briefcase, MapPin, Search, X, ChevronRight, Plus, Tag, Clock } from "lucide-react";
+import { UserCheck, Briefcase, MapPin, ChevronRight, Plus, Tag, Clock } from "lucide-react";
 
 interface Props { empleados: Empleado[]; vacantes: Vacante[] }
 
@@ -90,7 +90,7 @@ export default function EmpleosClient({ empleados, vacantes }: Props) {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar />
 
-      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-28 pb-32">
 
         {/* Sub-tabs */}
         <div className={`flex p-1 rounded-2xl mb-5 mt-2 ${isDark ? "bg-gray-900 border border-gray-800" : "bg-gray-100"}`}>
@@ -118,23 +118,6 @@ export default function EmpleosClient({ empleados, vacantes }: Props) {
           <p className={`text-sm ${textMuted}`}>
             {filtered.length} {tab === "vacantes" ? "empleos disponibles" : "perfiles buscando trabajo"}
           </p>
-        </div>
-
-        {/* Buscador */}
-        <div className="relative mb-5 md:max-w-2xl md:mx-auto">
-          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={tab === "vacantes" ? "Buscar puesto, empresa, habilidad..." : "Buscar nombre, habilidad, barrio..."}
-            className={`w-full pl-9 pr-9 py-2.5 rounded-xl border text-sm focus:outline-none ${inputCls}`}
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className={`absolute right-3 top-1/2 -translate-y-1/2 ${textMuted}`}>
-              <X className="w-4 h-4" />
-            </button>
-          )}
         </div>
 
         {/* Lista */}

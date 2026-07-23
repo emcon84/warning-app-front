@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Doctor } from "../types";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../contexts/ThemeContext";
-import { Stethoscope, MapPin, Phone, ChevronRight, Search, X } from "lucide-react";
+import { Stethoscope, MapPin, Phone, ChevronRight, X } from "lucide-react";
 
 interface Props {
   doctors: Doctor[];
@@ -102,7 +102,7 @@ export default function MedicosClient({ doctors }: Props) {
     <div className={`min-h-screen ${bg} ${textPrimary}`}>
       <Navbar mapView="doctors" />
 
-      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-20 pb-32">
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 md:px-8 pt-28 pb-32">
 
         {/* Header */}
         <div className="mb-5">
@@ -110,26 +110,6 @@ export default function MedicosClient({ doctors }: Props) {
           <p className={`text-sm mt-1 ${textMuted}`}>
             {filtered.length} {filtered.length === 1 ? "profesional" : "profesionales"} en Reconquista
           </p>
-        </div>
-
-        {/* Buscador */}
-        <div className="relative mb-4 md:max-w-2xl md:mx-auto">
-          <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${textMuted}`} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nombre, especialidad o barrio..."
-            className={`w-full pl-11 pr-11 py-3 rounded-full border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors ${inputCls}`}
-          />
-          {search && (
-            <button
-              onClick={() => setSearch("")}
-              className={`absolute right-3 top-1/2 -translate-y-1/2 ${textMuted} hover:${textPrimary}`}
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
         </div>
 
         {/* Filtros en fila */}
