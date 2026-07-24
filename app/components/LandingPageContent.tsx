@@ -172,6 +172,29 @@ const FEATURES_SCROLL = [
   },
 ];
 
+const FAQ: FAQItem[] = [
+  {
+    q: "¿Dónde encontrar plomeros en Reconquista?",
+    a: "En la sección Oficios encontrás plomeros, electricistas, albañiles y más profesionales con perfil, zona y contacto directo por chat.",
+  },
+  {
+    q: "¿Cuál farmacia está de turno hoy en Reconquista?",
+    a: "En la sección Farmacias ves la farmacia de turno de hoy en Reconquista con dirección y teléfono. Se actualiza diariamente.",
+  },
+  {
+    q: "¿Cómo reportar un problema en la vía pública?",
+    a: "Abrí la app, tocá el mapa en el punto del problema, elegí el tipo (bache, inundación, alumbrado…) y el reporte queda visible para vecinos y el municipio.",
+  },
+  {
+    q: "¿Cómo encontrar médicos IAPOS en Reconquista?",
+    a: "En la sección Médicos podés filtrar por IAPOS, PAMI u otras obras sociales. Encontrás especialidad, dirección y ubicación en el mapa.",
+  },
+  {
+    q: "¿Cómo registro mi comercio en la app?",
+    a: "En la sección Comercios tocás 'Registrar mi comercio', completás los datos en unos pasos y tu vidriera digital queda visible para toda la ciudad.",
+  },
+];
+
 // ─── Animation presets ────────────────────────────────────────
 
 const easeOut = [0.25, 0.1, 0.25, 1] as const;
