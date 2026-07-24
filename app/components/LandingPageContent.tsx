@@ -93,7 +93,6 @@ const FEATURES: Feature[] = [
     sectionId: "feature-oficios",
   },
   {
-    icon: ShoppingCart,
     title: "Médicos IAPOS y PAMI",
     description:
       "Encontrá médicos, especialistas y centros de salud con información de obras sociales y ubicación en el mapa.",
