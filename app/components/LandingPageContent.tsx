@@ -622,11 +622,17 @@ export default function LandingPageContent() {
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
               >
                 <PhoneFrame glow="#3b82f6">
-                  <img
-                    src="/screenshots/home-mobile.png"
-                    alt="Home - Reportes Reconquista Mobile"
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    poster="/screenshots/home-mobile.png"
                     className="absolute inset-0 w-full h-full object-cover object-top"
-                  />
+                  >
+                    <source src="/videos/home-scroll.webm" type="video/webm" />
+                    <source src="/videos/home-scroll.mp4" type="video/mp4" />
+                  </video>
                 </PhoneFrame>
               </motion.div>
             </motion.div>
@@ -639,11 +645,17 @@ export default function LandingPageContent() {
               className="shrink-0 scale-[0.7] origin-top -mb-[120px] lg:hidden"
             >
               <PhoneFrame glow="#3b82f6">
-                <img
-                  src="/screenshots/home-mobile.png"
-                  alt="Home - Reportes Reconquista"
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  poster="/screenshots/home-mobile.png"
                   className="absolute inset-0 w-full h-full object-cover object-top"
-                />
+                >
+                  <source src="/videos/home-scroll.webm" type="video/webm" />
+                  <source src="/videos/home-scroll.mp4" type="video/mp4" />
+                </video>
               </PhoneFrame>
             </motion.div>
           </div>
