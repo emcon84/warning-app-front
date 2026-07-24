@@ -7,6 +7,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useReconquistaNews } from "../hooks/useReconquistaNews";
 
 const PORTALS = [
+  { key: "reconquistahoy", label: "Reconquista HOY" },
   { key: "reconquistaar", label: "Reconquista.com.ar" },
   { key: "reconquistanoticias", label: "Reconquista Noticias" },
 ] as const;
