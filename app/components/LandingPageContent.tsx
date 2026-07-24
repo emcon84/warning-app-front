@@ -247,6 +247,24 @@ const cardVariants = {
 
 // ─── Sub-components ────────────────────────────────────────────
 
+function LaptopFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative shrink-0 mx-auto" style={{ width: 420, height: 270 }}>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none bg-blue-500" />
+      {/* Lid */}
+      <div className="relative w-full h-[236px] rounded-t-xl border-[3px] border-b-0 border-gray-700 bg-gray-950 overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-gray-600 z-20" />
+        <div className="absolute inset-0 overflow-hidden">{children}</div>
+        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/5 to-transparent pointer-events-none z-10" />
+      </div>
+      {/* Base/keyboard */}
+      <div className="relative w-full h-[34px] bg-gray-800 rounded-b-lg border-[3px] border-t-0 border-gray-700 shadow-[0_8px_16px_rgba(0,0,0,0.4)]">
+        <div className="absolute top-1 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-gray-600 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
 function PhoneFrame({
   children,
   glow,
@@ -576,28 +594,39 @@ export default function LandingPageContent() {
               </motion.div>
             </div>
 
-            {/* Phone mockup desktop */}
+            {/* Mockups desktop */}
             <motion.div
               initial={{ opacity: 0, y: 60, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.8, ease: easeOut, delay: 0.3 }}
-              className="shrink-0 hidden lg:block"
+              className="shrink-0 hidden lg:flex items-end gap-2"
             >
+              {/* Laptop */}
               <motion.div
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+                className="mb-4"
+              >
+                <LaptopFrame>
+                  <img
+                    src="/screenshots/home-desktop.png"
+                    alt="Home - Reportes Reconquista Desktop"
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                  />
+                </LaptopFrame>
+              </motion.div>
+
+              {/* Phone */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
               >
                 <PhoneFrame glow="#3b82f6">
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    poster="/screenshots/screen-home.png"
+                  <img
+                    src="/screenshots/home-mobile.png"
+                    alt="Home - Reportes Reconquista Mobile"
                     className="absolute inset-0 w-full h-full object-cover object-top"
-                  >
-                    <source src="/videos/home-scroll.webm" type="video/webm" />
-                  </video>
+                  />
                 </PhoneFrame>
               </motion.div>
             </motion.div>
@@ -610,16 +639,11 @@ export default function LandingPageContent() {
               className="shrink-0 scale-[0.7] origin-top -mb-[120px] lg:hidden"
             >
               <PhoneFrame glow="#3b82f6">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  poster="/screenshots/screen-home.png"
+                <img
+                  src="/screenshots/home-mobile.png"
+                  alt="Home - Reportes Reconquista"
                   className="absolute inset-0 w-full h-full object-cover object-top"
-                >
-                  <source src="/videos/home-scroll.webm" type="video/webm" />
-                </video>
+                />
               </PhoneFrame>
             </motion.div>
           </div>
