@@ -12,7 +12,7 @@ const PORTALS = [
   { key: "reconquistanoticias", label: "Reconquista Noticias" },
 ] as const;
 
-const MAX_ARTICLES = 15;
+const MAX_ARTICLES = 25;
 
 function PortalCarousel({ portal }: { portal: string }) {
   const { isDark } = useTheme();
