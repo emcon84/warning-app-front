@@ -94,21 +94,13 @@ const FEATURES: Feature[] = [
   },
   {
     icon: ShoppingCart,
-    title: "Ofertas de supermercados",
+    title: "Médicos IAPOS y PAMI",
     description:
-      "Las mejores ofertas y promociones de los supermercados de Reconquista actualizadas por la comunidad.",
-    color: "text-yellow-600 dark:text-yellow-400",
-    bg: "bg-yellow-500/10 border-yellow-500/20",
-    sectionId: "feature-ofertas",
-  },
-  {
-    icon: Calendar,
-    title: "Eventos y agenda",
-    description:
-      "Eventos culturales, ferias, deportes y actividades en Reconquista. Creá tu evento y compartilo con la comunidad.",
+      "Encontrá médicos, especialistas y centros de salud con información de obras sociales y ubicación en el mapa.",
+    icon: Stethoscope,
     color: "text-rose-600 dark:text-rose-400",
-    bg: "bg-rose-500/10 border-rose-500/20",
-    sectionId: "feature-eventos",
+    bg: "bg-rose-500/5 border-rose-500/10",
+    sectionId: "feature-medicos",
   },
 ];
 
@@ -177,41 +169,7 @@ const FEATURES_SCROLL = [
     cta: "Ver ofertas",
     href: "/ofertas",
     ctaColor: "bg-yellow-600 hover:bg-yellow-500 text-white",
-    screenshot: "/screenshots/ofertas-mobile.png",
-  },
-  {
-    id: "feature-eventos",
-    badge: "Eventos y Agenda",
-    badgeColor: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30",
-    title: "Agenda cultural y deportiva",
-    description: "Eventos, ferias, encuentros deportivos y actividades culturales en Reconquista.",
-    cta: "Ver eventos",
-    href: "/eventos",
-    ctaColor: "bg-rose-600 hover:bg-rose-500 text-white",
-    screenshot: "/screenshots/eventos-mobile.png",
-  },
-] as const;
-
-const FAQ: FAQItem[] = [
-  {
-    q: "¿Dónde encontrar plomeros en Reconquista?",
-    a: "En la sección Oficios encontrás plomeros, electricistas, albañiles y más profesionales con perfil, zona y contacto directo por chat.",
-  },
-  {
-    q: "¿Cuál farmacia está de turno hoy en Reconquista?",
-    a: "En la sección Farmacias ves la farmacia de turno de hoy en Reconquista con dirección y teléfono. Se actualiza diariamente.",
-  },
-  {
-    q: "¿Cómo reportar un problema en la vía pública?",
-    a: "Abrí la app, tocá el mapa en el punto del problema, elegí el tipo (bache, inundación, alumbrado…) y el reporte queda visible para vecinos y el municipio.",
-  },
-  {
-    q: "¿Cómo encontrar médicos IAPOS en Reconquista?",
-    a: "En la sección Médicos podés filtrar por IAPOS, PAMI u otras obras sociales. Encontrás especialidad, dirección y ubicación en el mapa.",
-  },
-  {
-    q: "¿Cómo registro mi comercio en la app?",
-    a: "En la sección Comercios tocás 'Registrar mi comercio', completás los datos en unos pasos y tu vidriera digital queda visible para toda la ciudad.",
+    screenshot: "/screenshots/medicos-mobile.png",
   },
 ];
 
@@ -545,7 +503,7 @@ export default function LandingPageContent() {
                 transition={{ duration: 0.6, ease: easeOut, delay: 0.25 }}
                 className="text-base sm:text-lg text-gray-500 dark:text-gray-400 leading-relaxed mt-5 max-w-lg mx-auto lg:mx-0"
               >
-                Oficios, comercios, médicos, farmacias de turno, ofertas y
+                Oficios, comercios, médicos, farmacias de turno y
                 reportes ciudadanos. Todo lo que necesitás, en una sola app
                 gratuita.
               </motion.p>
