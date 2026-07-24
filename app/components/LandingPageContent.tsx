@@ -577,11 +577,17 @@ export default function LandingPageContent() {
                 className="mb-4"
               >
                 <LaptopFrame>
-                  <img
-                    src="/screenshots/home-desktop.png"
-                    alt="Home - Reportes Reconquista Desktop"
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    poster="/screenshots/home-desktop.png"
                     className="absolute inset-0 w-full h-full object-cover object-top"
-                  />
+                  >
+                    <source src="/videos/home-scroll-desktop.webm" type="video/webm" />
+                    <source src="/videos/home-scroll-desktop.mp4" type="video/mp4" />
+                  </video>
                 </LaptopFrame>
               </motion.div>
 
@@ -599,8 +605,8 @@ export default function LandingPageContent() {
                     poster="/screenshots/home-mobile.png"
                     className="absolute inset-0 w-full h-full object-cover object-top"
                   >
-                    <source src="/videos/home-scroll.webm" type="video/webm" />
-                    <source src="/videos/home-scroll.mp4" type="video/mp4" />
+                    <source src="/videos/home-scroll-mobile.webm" type="video/webm" />
+                    <source src="/videos/home-scroll-mobile.mp4" type="video/mp4" />
                   </video>
                 </PhoneFrame>
               </motion.div>
@@ -622,8 +628,8 @@ export default function LandingPageContent() {
                   poster="/screenshots/home-mobile.png"
                   className="absolute inset-0 w-full h-full object-cover object-top"
                 >
-                  <source src="/videos/home-scroll.webm" type="video/webm" />
-                  <source src="/videos/home-scroll.mp4" type="video/mp4" />
+                  <source src="/videos/home-scroll-mobile.webm" type="video/webm" />
+                  <source src="/videos/home-scroll-mobile.mp4" type="video/mp4" />
                 </video>
               </PhoneFrame>
             </motion.div>
