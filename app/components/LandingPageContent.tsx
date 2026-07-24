@@ -159,17 +159,6 @@ const FEATURES_SCROLL = [
     ctaColor: "bg-purple-600 hover:bg-purple-500 text-white",
     screenshot: "/screenshots/oficios-mobile.png",
   },
-  {
-    id: "feature-ofertas",
-    badge: "Ofertas de Supermercados",
-    badgeColor: "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 border-yellow-500/30",
-    title: "Las mejores ofertas locales",
-    description: "Promociones de supermercados actualizadas por la comunidad. Precios y productos al instante.",
-    cta: "Ver ofertas",
-    href: "/ofertas",
-    ctaColor: "bg-yellow-600 hover:bg-yellow-500 text-white",
-    screenshot: "/screenshots/medicos-mobile.png",
-  },
 ];
 
 const FAQ: FAQItem[] = [
