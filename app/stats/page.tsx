@@ -33,6 +33,7 @@ interface Analytics {
   conversations?: { total: number; active: number };
   reviews?: number;
   devices?: { mobile: number; desktop: number; totalViews: number };
+  dailyReports?: { date: string; reports: number }[];
 }
 
 function useCountUp(target: number, duration = 800) {
@@ -230,6 +231,35 @@ export default function StatsPage() {
                     <YAxis tick={{ fontSize: 10, fill: axisC }} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip isDark={isDark} />} />
                     <Area type="monotone" dataKey="reportes" stroke={chartC} strokeWidth={2.5} fill="url(#grad1)" dot={{ fill: chartC, r: 3 }} activeDot={{ r: 5 }} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className={`flex items-center justify-center h-48 text-sm ${isDark ? "text-gray-600" : "text-gray-400"}`}>
+                  Sin visitas en los últimos {days} días
+                </div>
+              )}
+            </div>
+
+            {/* ── Reports chart ── */}
+            <div className={`${card} mt-4`}>
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-purple-400" />
+                  <h2 className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>Reportes por día</h2>
+                </div>
+              </div>
+              {(data?.dailyReports ?? []).length > 0 ? (
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={(data?.dailyReports ?? []).filter(d => d.date >= cutoff).map(d => ({
+                    label: new Date(d.date + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "short" }),
+                    reportes: d.reports,
+                  }))} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                    <defs><linearGradient id="gradReports" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.3} /><stop offset="100%" stopColor="#8b5cf6" stopOpacity={0} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
+                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip contentStyle={{ background: isDark ? "#1f2937" : "#fff", border: "none", borderRadius: 12, fontSize: 12 }} />
+                    <Area type="monotone" dataKey="reportes" stroke="#8b5cf6" strokeWidth={2.5} fill="url(#gradReports)" dot={{ fill: "#8b5cf6", r: 3 }} activeDot={{ r: 5 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
