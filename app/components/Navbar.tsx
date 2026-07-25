@@ -24,6 +24,7 @@ const CATEGORY_LINKS = [
   { label: "Oficios",   href: "/oficios" },
   { label: "Comercios", href: "/comercios" },
   { label: "Médicos",   href: "/medicos" },
+  { label: "Patio Limpio", href: "/patio-limpio" },
   { label: "Farmacias", href: "/app?view=farmacias" },
   { label: "Reportes",  href: "/app" },
 ] as const;
@@ -204,6 +205,7 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
     if (href === "/oficios") return pathname.startsWith("/oficios") || pathname.startsWith("/profesional");
     if (href === "/comercios") return pathname.startsWith("/comercios") || pathname.startsWith("/comercio");
     if (href === "/medicos") return pathname.startsWith("/medicos");
+    if (href === "/patio-limpio") return pathname.startsWith("/patio-limpio");
     if (href === "/app?view=farmacias") return pathname === "/app" && searchParams.get("view") === "farmacias";
     if (href === "/app") return pathname === "/app" && (!searchParams.get("view") || searchParams.get("view") === "reports");
     return false;

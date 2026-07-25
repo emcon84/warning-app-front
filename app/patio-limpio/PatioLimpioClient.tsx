@@ -94,7 +94,7 @@ export default function PatioLimpioClient() {
     <div className={`min-h-screen ${bg} ${textPri}`}>
       <Navbar sidebarDisabled />
 
-      <div className="max-w-xl mx-auto px-4 pt-24 pb-16">
+      <div className="max-w-xl md:max-w-5xl mx-auto px-4 pt-24 pb-16">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-semibold mb-3" style={{ backgroundColor: isDark ? "#16653433" : "#f0fdf4", borderColor: isDark ? "#166534" : "#bbf7d0", color: isDark ? "#4ade80" : "#166534" }}>
@@ -120,7 +120,7 @@ export default function PatioLimpioClient() {
         </div>
 
         {/* Zonas */}
-        <div className="space-y-3">
+        <div className="grid md:grid-cols-2 gap-3">
           {data.zones.map((z) => (
             <div key={z.zone} className={`rounded-2xl border ${cardBg} overflow-hidden`}>
               <button
