@@ -32,6 +32,7 @@ interface Analytics {
   professionals?: { total: number; active: number };
   conversations?: { total: number; active: number };
   reviews?: number;
+  devices?: { mobile: number; desktop: number; totalViews: number };
 }
 
 function useCountUp(target: number, duration = 800) {
@@ -182,11 +183,14 @@ export default function StatsPage() {
         {data && (
           <>
             {/* ── KPIs ── */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               <KpiCard label="Reportes"       value={data.totalReports}              icon={FileText}      gradient="bg-gradient-to-br from-indigo-500 to-indigo-700" />
               <KpiCard label="Profesionales"  value={data.professionals?.total ?? 0} icon={Users}         gradient="bg-gradient-to-br from-emerald-500 to-emerald-700" sub={`${data.professionals?.active ?? 0} activos`} />
               <KpiCard label="Conversaciones" value={data.conversations?.total ?? 0} icon={MessageSquare} gradient="bg-gradient-to-br from-blue-500 to-blue-700" />
               <KpiCard label="Reseñas"        value={data.reviews ?? 0}              icon={Star}          gradient="bg-gradient-to-br from-amber-500 to-amber-600" />
+              {data.devices && (
+                <KpiCard label="Visitas home" value={data.devices.totalViews} icon={TrendingUp} gradient="bg-gradient-to-br from-pink-500 to-pink-700" sub={`📱 ${data.devices.mobile}% · 💻 ${data.devices.desktop}%`} />
+              )}
             </div>
 
             {/* ── Tendencia + Period selector ── */}
@@ -194,7 +198,7 @@ export default function StatsPage() {
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-indigo-400" />
-                  <h2 className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>Reportes por día</h2>
+                  <h2 className={`text-sm font-bold ${isDark ? "text-white" : "text-gray-800"}`}>Visitas al home por día</h2>
                 </div>
                 <div className={`flex rounded-xl border p-0.5 text-xs font-semibold ${isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-100"}`}>
                   {(["7d","30d"] as Period[]).map(p => (
