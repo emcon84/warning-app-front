@@ -73,23 +73,23 @@ export default function PatioLimpioClient() {
 
     if (foundZone) {
       const msg = [
-        `🧹 *Patio Limpio - ${data.mes} ${data.year}*`,
+        `Patio Limpio - ${data.mes} ${data.year}`,
         ``,
-        `📍 *${search.trim()}* está en la *Zona ${foundZone.zone}*`,
+        `${search.trim()} está en la Zona ${foundZone.zone}`,
         ``,
-        `🗑️ Sacar los residuos: *${foundZone.sacarFechas}*`,
-        `🚛 La recolección se realiza el *${foundZone.recoleccionDesde}*`,
+        `Sacar los residuos: ${foundZone.sacarFechas}`,
+        `La recolección se realiza el ${foundZone.recoleccionDesde}`,
         ``,
-        `⚠️ Solamente sábado y domingo. Si sacás otro día, podés recibir una multa.`,
+        `Solamente sábado y domingo. Si sacás otro día, podés recibir una multa.`,
         ``,
         `Más info: ${shareUrl}`,
       ];
       window.open(`https://wa.me/?text=${encodeURIComponent(msg.join("\n"))}`, "_blank");
     } else {
       const msg = [
-        `🧹 *Patio Limpio - ${data.mes} ${data.year}*`,
+        `Patio Limpio - ${data.mes} ${data.year}`,
         ``,
-        ...data.zones.map((z) => `📍 *Zona ${z.zone}*: sacar ${z.sacarFechas} — recolecta ${z.recoleccionDesde}`),
+        ...data.zones.map((z) => `Zona ${z.zone}: sacar ${z.sacarFechas} — recolecta ${z.recoleccionDesde}`),
         ``,
         `Más info: ${shareUrl}`,
       ];
@@ -165,18 +165,18 @@ export default function PatioLimpioClient() {
               {foundZone ? (
                 <div>
                   <p className={`text-sm font-bold ${isDark ? "text-green-400" : "text-green-800"}`}>
-                    📍 {search.trim()} está en la <span className="underline">Zona {foundZone.zone}</span>
+                    {search.trim()} está en la <span className="underline">Zona {foundZone.zone}</span>
                   </p>
                   <div className="mt-3 space-y-1.5 text-sm">
                     <p className={isDark ? "text-gray-300" : "text-gray-700"}>
-                      🗑️ <strong>Sacar los residuos:</strong> {foundZone.sacarFechas}
+                      <strong>Sacar los residuos:</strong> {foundZone.sacarFechas}
                     </p>
                     <p className={isDark ? "text-gray-300" : "text-gray-700"}>
-                      🚛 <strong>La recolección se realiza el:</strong> {foundZone.recoleccionDesde}
+                      <strong>La recolección se realiza el:</strong> {foundZone.recoleccionDesde}
                     </p>
                   </div>
                   <p className={`mt-2 text-xs ${isDark ? "text-amber-400" : "text-amber-700"}`}>
-                    ⚠️ Sacá los residuos solo el sábado y domingo de tu zona. Si los sacás otro día, podés recibir una multa.
+                    Sacá los residuos solo el sábado y domingo de tu zona. Si los sacás otro día, podés recibir una multa.
                   </p>
                 </div>
               ) : (
