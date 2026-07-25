@@ -1,7 +1,7 @@
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
+import PatioLimpioClient from "./PatioLimpioClient";
 
-const PatioLimpioClient = dynamic(() => import("./PatioLimpioClient"), { ssr: false });
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Patio Limpio - Cronograma de Recolección | Reconquista",
