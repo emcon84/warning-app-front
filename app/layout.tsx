@@ -5,6 +5,7 @@ import NotificationPrompt from "./components/NotificationPrompt";
 import ApiStatusBanner from "./components/ApiStatusBanner";
 import MobileBottomNav from "./components/MobileBottomNav";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PWARedirect from "./components/PWARedirect";
 import PageViewTracker from "./components/PageViewTracker";
 import PostLoginWizard from "./components/PostLoginWizard";
 import SplashScreen from "./components/SplashScreen";
