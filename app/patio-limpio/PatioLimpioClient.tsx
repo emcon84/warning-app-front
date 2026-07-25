@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import { Trash2, Calendar, Search, Share2, ExternalLink, MapPin } from "lucide-react";
@@ -26,10 +27,11 @@ const BANNER_URL = "https://reconquista.gob.ar/wp-content/uploads/2026/07/Patio-
 
 export default function PatioLimpioClient() {
   const { isDark } = useTheme();
+  const searchParams = useSearchParams();
   const [data, setData] = useState<PatioLimpioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("barrio") ?? "");
 
   const bg = isDark ? "bg-gray-950" : "bg-gray-50";
   const cardBg = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
