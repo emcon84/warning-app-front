@@ -131,7 +131,7 @@ export function StoreCatalog({ comercio, theme, isOwner, onManage }: Props) {
           <p className={`text-sm ${textMuted}`}>No hay {filtro === "producto" ? "productos" : "servicios"} cargados.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div             className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {activos.map((p) => (
             <StoreProductCard
               key={p.id}
