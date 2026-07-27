@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import { resolvePhotoUrl } from "../lib/utils/photo";
 import { useTheme } from "../contexts/ThemeContext";
+import { revalidatePublicComercios } from "../actions";
 import type { Professional, Report, Review, Comercio, Tab, ShareTarget } from "./types";
 import { ShareModal } from "./components/ShareModal";
 import { PinModal } from "./components/PinModal";
@@ -114,10 +115,16 @@ export default function AdminPage() {
   async function deleteComerco(id: string) {
     if (!confirm("¿Seguro que querés eliminar este comercio? Se van a borrar también sus ofertas y vacantes.")) return;
     setDeletingId(id);
-    const token = await getToken();
-    const res = await fetch(`${API_URL}/api/admin/comercios/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-    if (res.ok) setComercios(prev => prev.filter(c => c.id !== id));
-    setDeletingId(null);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_URL}/api/admin/comercios/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        setComercios(prev => prev.filter(c => c.id !== id));
+        revalidatePublicComercios();
+      }
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   async function togglePremium(com: Comercio) {
