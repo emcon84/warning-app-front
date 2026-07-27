@@ -84,7 +84,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       if (res.ok) setPlanInfo(await res.json());
       setPlanLoading(false);
     }
-    fetchPlan();
+    fetchPlan().catch(() => setPlanLoading(false));
   }, [getToken]);
 
   useEffect(() => {
@@ -204,7 +204,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         />
       )}
 
-      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-20 pb-40">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 pt-24 pb-40">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6 gap-3">
