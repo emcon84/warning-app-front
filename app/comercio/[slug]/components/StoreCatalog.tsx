@@ -131,8 +131,9 @@ export function StoreCatalog({ comercio, theme, isOwner, onManage }: Props) {
           <p className={`text-sm ${textMuted}`}>No hay {filtro === "producto" ? "productos" : "servicios"} cargados.</p>
         </div>
       ) : (
-        <div             className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="flex md:grid md:grid-cols-2 gap-3 overflow-x-auto snap-x snap-mandatory md:snap-none md:overflow-visible pb-2">
           {activos.map((p) => (
+            <div key={p.id} className="snap-start flex-shrink-0 w-[80vw] md:w-auto">
             <StoreProductCard
               key={p.id}
               producto={p}
@@ -142,6 +143,7 @@ export function StoreCatalog({ comercio, theme, isOwner, onManage }: Props) {
               cartComercio={cartComercio}
               theme={theme}
             />
+            </div>
           ))}
         </div>
       )}

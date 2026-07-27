@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Newspaper, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
@@ -22,14 +22,20 @@ function PortalCarousel({ portal }: { portal: string }) {
   const [slide, setSlide] = useState(0);
   const [paused, setPaused] = useState(false);
   const itemWidth = 268;
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setSlide(p => (p + 1) % (articles?.length || 1));
+    }, 5000);
+  }, [articles?.length]);
 
   useEffect(() => {
     if (!articles || articles.length === 0 || paused) return;
-    const t = setInterval(() => {
-      setSlide(p => (p + 1) % articles.length);
-    }, 5000);
-    return () => clearInterval(t);
-  }, [articles, paused, articles?.length]);
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [articles, paused, resetTimer]);
 
   useEffect(() => {
     if (!scrollRef.current) return;
@@ -119,7 +125,7 @@ function PortalCarousel({ portal }: { portal: string }) {
         </div>
 
         <button
-          onClick={() => setSlide(p => (p - 1 + articles.length) % articles.length)}
+          onClick={() => { setSlide(p => (p - 1 + articles.length) % articles.length); resetTimer(); }}
           className={`absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity ${
             isDark ? "bg-black/60 text-white hover:bg-black/80" : "bg-white/80 text-gray-900 hover:bg-white shadow-md"
           }`}
@@ -127,7 +133,7 @@ function PortalCarousel({ portal }: { portal: string }) {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <button
-          onClick={() => setSlide(p => (p + 1) % articles.length)}
+          onClick={() => { setSlide(p => (p + 1) % articles.length); resetTimer(); }}
           className={`absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity ${
             isDark ? "bg-black/60 text-white hover:bg-black/80" : "bg-white/80 text-gray-900 hover:bg-white shadow-md"
           }`}
@@ -140,7 +146,7 @@ function PortalCarousel({ portal }: { portal: string }) {
         {articles.slice(0, 8).map((_, i) => (
           <button
             key={i}
-            onClick={() => setSlide(i)}
+            onClick={() => { setSlide(i); resetTimer(); }}
             className={`w-1.5 h-1.5 rounded-full transition-all ${
               i === slide
                 ? isDark ? "bg-red-400 w-4" : "bg-red-500 w-4"
