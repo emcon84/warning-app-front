@@ -44,7 +44,7 @@ export function StoreSidebar({
     <aside className="w-full md:w-80 flex-shrink-0">
       <div className="md:sticky md:top-24 space-y-5">
         {/* Logo */}
-        <div className={`rounded-2xl overflow-hidden border-2 ${cardBg} shadow-lg`}>
+        <div className={`rounded-2xl overflow-hidden border-2 ${cardBg} shadow-lg w-44 md:w-full`}>
           <div className="aspect-square relative">
             {(comercio.logo || comercio.foto) ? (
               <Image
