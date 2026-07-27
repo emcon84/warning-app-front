@@ -254,7 +254,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             <div className="flex-1">
               <p className="text-xs font-bold text-indigo-400">Plan Premium</p>
               <p className={`text-xs ${textMuted}`}>
-                  {(planInfo?.limits?.totalProducts != null ? `${planInfo?.usage?.productos ?? 0}/${planInfo.limits.totalProducts} productos · ${planInfo.limits.dailyAi ?? 0}/día IA` : "Plan Premium")}
+                  {planInfo && planInfo.limits ? `${planInfo?.usage?.productos ?? 0}/${planInfo.limits.totalProducts} productos · ${planInfo.limits.dailyAi ?? 0}/día IA` : "Plan Premium"}
                 </p>
               </div>
               <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-indigo-500 text-indigo-400 hover:bg-indigo-500/20 transition-colors flex-shrink-0">
@@ -268,7 +268,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 <div className="flex-1">
                   <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
                   <p className={`text-xs ${textMuted}`}>
-                    {(planInfo?.limits?.totalProducts != null ? `${planInfo?.usage?.productos ?? 0}/${planInfo.limits.totalProducts} productos` : "Gratuito")}
+                    {planInfo && planInfo.limits ? `${planInfo?.usage?.productos ?? 0}/${planInfo.limits.totalProducts} productos` : "Gratuito"}
                   </p>
               </div>
               <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0">
