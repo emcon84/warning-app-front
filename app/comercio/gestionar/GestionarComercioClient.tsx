@@ -275,7 +275,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
                 Upgrade
               </button>
             </div>
-            {planInfo?.canUpgrade && (planInfo?.usage?.productos ?? 0) >= ((planInfo?.limits?.totalProducts ?? 50)) - 3 && (
+            {planInfo?.canUpgrade && (
               <p className="text-xs text-amber-500">¡Casi alcanzás el límite! Considerá pasar a Premium.</p>
             )}
           </div>
