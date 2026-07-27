@@ -254,28 +254,28 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
             <div className="flex-1">
               <p className="text-xs font-bold text-indigo-400">Plan Premium</p>
               <p className={`text-xs ${textMuted}`}>
-                {planInfo?.usage?.productos ?? 0}/{planInfo?.limits?.totalProducts ?? 100} productos · {planInfo?.limits?.dailyAi ?? 0}/día IA
-              </p>
-            </div>
-            <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-indigo-500 text-indigo-400 hover:bg-indigo-500/20 transition-colors flex-shrink-0">
-              Ver planes
-            </button>
-          </div>
-        ) : (
-          <div className={`mb-6 flex flex-col gap-2 px-4 py-3 rounded-2xl border ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"}`}>
-            <div className="flex items-center gap-3">
-              <span className={`text-lg ${textMuted}`}>○</span>
-              <div className="flex-1">
-                <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
-                <p className={`text-xs ${textMuted}`}>
-                  {planInfo?.usage?.productos ?? 0}/{planInfo?.limits?.totalProducts ?? 50} productos
+                  {(planInfo?.limits?.totalProducts != null ? `${planInfo?.usage?.productos ?? 0}/${planInfo.limits.totalProducts} productos · ${planInfo.limits.dailyAi ?? 0}/día IA` : "Plan Premium")}
                 </p>
+              </div>
+              <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-indigo-500 text-indigo-400 hover:bg-indigo-500/20 transition-colors flex-shrink-0">
+                Ver planes
+              </button>
+            </div>
+          ) : (
+            <div className={`mb-6 flex flex-col gap-2 px-4 py-3 rounded-2xl border ${isDark ? "border-gray-700 bg-gray-800/50" : "border-gray-200 bg-gray-50"}`}>
+              <div className="flex items-center gap-3">
+                <span className={`text-lg ${textMuted}`}>○</span>
+                <div className="flex-1">
+                  <p className={`text-xs font-bold ${textPri}`}>Plan Gratuito</p>
+                  <p className={`text-xs ${textMuted}`}>
+                    {(planInfo?.limits?.totalProducts != null ? `${planInfo?.usage?.productos ?? 0}/${planInfo.limits.totalProducts} productos` : "Gratuito")}
+                  </p>
               </div>
               <button onClick={() => setShowPlanModal(true)} className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-500 text-white hover:bg-indigo-600 transition-colors flex-shrink-0">
                 Upgrade
               </button>
             </div>
-            {planInfo?.canUpgrade && (planInfo?.usage?.productos ?? 0) >= ((planInfo?.limits?.totalProducts as number) ?? 50) - 3 && (
+            {planInfo?.canUpgrade && (planInfo?.usage?.productos ?? 0) >= ((planInfo?.limits?.totalProducts ?? 50)) - 3 && (
               <p className="text-xs text-amber-500">¡Casi alcanzás el límite! Considerá pasar a Premium.</p>
             )}
           </div>
