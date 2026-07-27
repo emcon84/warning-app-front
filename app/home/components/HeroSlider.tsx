@@ -31,7 +31,6 @@ export function HeroSlider({ slides }: HeroSliderProps) {
   const { isDark } = useTheme();
   const [slide, setSlide] = useState(0);
   const [dir, setDir] = useState(1);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const swipeX = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -52,7 +51,6 @@ export function HeroSlider({ slides }: HeroSliderProps) {
   const paginate = (newDir: number) => {
     setDir(newDir);
     setSlide((p) => (p + newDir + slides.length) % slides.length);
-    setImageLoaded(false);
     resetTimer();
   };
 
@@ -132,9 +130,8 @@ export function HeroSlider({ slides }: HeroSliderProps) {
                       src={resolvePhotoUrl(current.imageUrl)}
                       alt=""
                       fill
-                      className={`object-cover transition-opacity duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+                      className="object-cover"
                       style={{ objectPosition: current.imagePosition || "center" }}
-                      onLoad={() => setImageLoaded(true)}
                       unoptimized
                     />
                       <div className="absolute inset-0 bg-gradient-to-r from-gray-950/95 via-gray-950/70 to-gray-950/50" />
@@ -230,7 +227,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
         {slides.map((_, i) => (
           <button
             key={i}
-            onClick={() => { setDir(i > slide ? 1 : -1); setSlide(i); setImageLoaded(false); resetTimer(); }}
+            onClick={() => { setDir(i > slide ? 1 : -1); setSlide(i); resetTimer(); }}
             className={`rounded-full transition-all duration-300 ${
               i === slide ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/40 hover:bg-white/60"
             }`}
