@@ -73,6 +73,17 @@ export default function AdminPage() {
     }
   }
 
+  async function loadComercios() {
+    try {
+      const token = await getToken();
+      const headers = { Authorization: `Bearer ${token}` };
+      const res = await fetch(`${API_URL}/api/admin/comercios`, { headers });
+      if (res.ok) setComercios(await res.json());
+    } catch {
+      /* no-op on network error */
+    }
+  }
+
   async function deleteProfessional(id: string) {
     if (!confirm("¿Seguro que querés eliminar este profesional? Se van a borrar también sus conversaciones y reseñas.")) return;
     setDeletingId(id);
