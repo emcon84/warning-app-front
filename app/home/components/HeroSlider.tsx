@@ -54,6 +54,17 @@ export function HeroSlider({ slides }: HeroSliderProps) {
     resetTimer();
   };
 
+  // Preload next slide's image
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const nextIdx = (slide + 1) % slides.length;
+    const nextUrl = slides[nextIdx]?.imageUrl;
+    if (nextUrl) {
+      const img = new window.Image();
+      img.src = resolvePhotoUrl(nextUrl);
+    }
+  }, [slide, slides]);
+
   if (slides.length === 0) {
     return (
       <section className="relative w-full min-h-[280px] md:min-h-[400px] bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900 flex items-center justify-center overflow-hidden">

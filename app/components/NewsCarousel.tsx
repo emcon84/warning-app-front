@@ -23,6 +23,7 @@ function PortalCarousel({ portal }: { portal: string }) {
   const [paused, setPaused] = useState(false);
   const itemWidth = 268;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const swipeX = useRef(0);
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -78,6 +79,8 @@ function PortalCarousel({ portal }: { portal: string }) {
         <div
           ref={scrollRef}
           className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+          onTouchStart={() => setPaused(true)}
+          onTouchEnd={() => { setPaused(false); resetTimer(); }}
         >
           {articles.map((article, i) => (
             <a
