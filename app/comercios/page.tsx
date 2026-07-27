@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 async function getComerciosData(): Promise<Comercio[]> {
   try {
-    const res = await fetch(`${API_URL}/api/comercios`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API_URL}/api/comercios`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch { return []; }

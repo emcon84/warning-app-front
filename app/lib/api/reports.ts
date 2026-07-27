@@ -16,37 +16,22 @@ export async function getReport(id: string): Promise<Report> {
 }
 
 export async function createReport(data: CreateReportData): Promise<Report> {
-  if (data.photos && data.photos.length > 0) {
-    const fd = new FormData();
-    fd.append("lat", data.lat.toString());
-    fd.append("lng", data.lng.toString());
-    fd.append("category", data.category);
-    fd.append("description", data.description);
-    fd.append("barrio", data.barrio);
-    fd.append("direccion", data.direccion);
-    if (data.fecha) fd.append("fecha", data.fecha);
-    if (data.isUrgent !== undefined) fd.append("isUrgent", data.isUrgent.toString());
-    data.photos.forEach((photo, i) => fd.append(`photo${i}`, photo));
-    return apiFetch<Report>("/api/reports", { method: "POST", body: fd });
-  }
+  const fd = new FormData();
+  fd.append("lat", data.lat.toString());
+  fd.append("lng", data.lng.toString());
+  fd.append("category", data.category);
+  fd.append("description", data.description);
+  fd.append("barrio", data.barrio);
+  fd.append("direccion", data.direccion);
+  if (data.fecha) fd.append("fecha", data.fecha);
+  if (data.isUrgent !== undefined) fd.append("isUrgent", data.isUrgent.toString());
   if (data.photo instanceof File) {
-    const fd = new FormData();
-    fd.append("lat", data.lat.toString());
-    fd.append("lng", data.lng.toString());
-    fd.append("category", data.category);
-    fd.append("description", data.description);
-    fd.append("barrio", data.barrio);
-    fd.append("direccion", data.direccion);
-    if (data.fecha) fd.append("fecha", data.fecha);
-    if (data.isUrgent !== undefined) fd.append("isUrgent", data.isUrgent.toString());
     fd.append("photo", data.photo);
-    return apiFetch<Report>("/api/reports", { method: "POST", body: fd });
   }
-  return apiFetch<Report>("/api/reports", {
-    method: "POST",
-    headers: jsonHeader(),
-    body: JSON.stringify(data),
-  });
+  if (data.photos && data.photos.length > 0) {
+    data.photos.forEach((photo, i) => fd.append(`photo${i}`, photo));
+  }
+  return apiFetch<Report>("/api/reports", { method: "POST", body: fd });
 }
 
 export async function updateReport(id: string, data: Partial<CreateReportData>): Promise<Report> {

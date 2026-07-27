@@ -149,7 +149,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
   }
 
   const SECTION_TABS: { id: Tab; section: string; icon: React.ReactNode; title: string; badge: string }[] = [
-    { id: "datos",    section: "datos",    icon: <Store className="w-6 h-6" />,      title: "Dados",          badge: "" },
+    { id: "datos",    section: "datos",    icon: <Store className="w-6 h-6" />,      title: "Datos",          badge: "" },
     { id: "fotos",    section: "fotos",    icon: <ImageIcon className="w-6 h-6" />,  title: "Fotos",          badge: `${comercio.fotos?.length ?? 0} fotos` },
     { id: "productos", section: "productos", icon: <ShoppingBag className="w-6 h-6" />,title: "Catálogo",       badge: `${productos.length} items` },
     { id: "ofertas",  section: "ofertas",  icon: <Tag className="w-6 h-6" />,        title: "Ofertas",        badge: `${offers.length} ofertas` },
