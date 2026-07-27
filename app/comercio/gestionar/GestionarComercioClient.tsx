@@ -388,10 +388,10 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         )}
       </div>
 
-      {showPlanModal && planInfo && (
+      {showPlanModal && (
         <StorePlanModal
           isDark={isDark}
-          currentPlan={planInfo.plan}
+          currentPlan={planInfo?.plan ?? "free"}
           planInfo={planInfo}
           onClose={() => setShowPlanModal(false)}
         />
