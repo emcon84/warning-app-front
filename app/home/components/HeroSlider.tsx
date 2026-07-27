@@ -176,10 +176,9 @@ export function HeroSlider({ slides }: HeroSliderProps) {
                     src={resolvePhotoUrl(current.imageUrl)}
                     alt=""
                     fill
-                    className={`object-cover transition-opacity duration-500 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-                    style={{ objectPosition: current.imagePosition || "center" }}
-                    onLoad={() => setImageLoaded(true)}
-                    unoptimized
+                     className="object-cover"
+                     style={{ objectPosition: current.imagePosition || "center" }}
+                     unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-gray-950/95 via-gray-950/70 to-gray-950/50" />
                 </>
