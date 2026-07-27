@@ -41,6 +41,7 @@ export interface Comercio {
   activo: boolean;
   isPremium?: boolean;
   isFounder?: boolean;
+  plan?: string;
   recommendations?: number;
   ratingAvg?: number;
   ratingCount?: number;

@@ -229,6 +229,15 @@ export default function AdminPage() {
             onDelete={deleteComerco}
             onTogglePremium={togglePremium}
             onToggleFounder={toggleFounder}
+            onSetPlan={async (com, plan) => {
+              const token = await getToken();
+              await fetch(`${API_URL}/api/admin/comercios/${com.id}`, {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ plan }),
+              });
+              loadComercios();
+            }}
             onShare={openShareComercio}
           />
         ) : tab === "outreach" ? (

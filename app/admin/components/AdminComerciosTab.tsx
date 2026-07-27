@@ -11,10 +11,11 @@ interface Props {
   onDelete: (id: string) => void;
   onTogglePremium: (com: Comercio) => void;
   onToggleFounder: (com: Comercio) => void;
+  onSetPlan: (com: Comercio, plan: string) => void;
   onShare: (com: Comercio) => void;
 }
 
-export function AdminComerciosTab({ comercios, deletingId, onDelete, onTogglePremium, onToggleFounder, onShare }: Props) {
+export function AdminComerciosTab({ comercios, deletingId, onDelete, onTogglePremium, onToggleFounder, onSetPlan, onShare }: Props) {
   const { isDark } = useTheme();
   const bgCard = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
   const bgBtn = isDark ? "bg-gray-800 text-gray-400 border-gray-700 hover:text-white hover:bg-gray-700" : "bg-white text-gray-600 border-gray-300 hover:text-gray-900 hover:bg-gray-50";
@@ -60,26 +61,21 @@ export function AdminComerciosTab({ comercios, deletingId, onDelete, onTogglePre
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={() => onToggleFounder(com)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border ${
-                com.isFounder
+            <select
+              value={com.plan ?? "free"}
+              onChange={(e) => onSetPlan(com, e.target.value)}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-medium border focus:outline-none ${
+                com.plan === "master"
                   ? `${btnAmber}`
-                  : bgBtn
+                  : com.plan === "premium"
+                    ? `${btnIndigo}`
+                    : bgBtn
               }`}
             >
-              {com.isFounder ? "★ Founder" : "Founder"}
-            </button>
-            <button
-              onClick={() => onTogglePremium(com)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border ${
-                com.isPremium
-                  ? `${btnIndigo}`
-                  : bgBtn
-              }`}
-            >
-              {com.isPremium ? "✦ Premium" : "Premium"}
-            </button>
+              <option value="free">Gratis</option>
+              <option value="premium">Premium</option>
+              <option value="master">Master</option>
+            </select>
             <button
               onClick={() => onShare(com)}
               className={`px-3 py-1.5 rounded-xl border ${btnGreen} text-xs font-medium transition-colors flex items-center gap-1.5`}

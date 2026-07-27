@@ -237,7 +237,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
         {/* Plan banner */}
         {planLoading ? (
           <div className={`mb-6 h-20 rounded-2xl animate-pulse ${isDark ? "bg-gray-800" : "bg-gray-100"}`} />
-        ) : planInfo?.plan === "master" ? (
+        ) : (planInfo?.plan || comercio.plan) === "master" ? (
           <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border border-amber-500/30 bg-amber-500/10">
             <span className="text-amber-400 text-lg">★</span>
             <div className="flex-1">
@@ -248,7 +248,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
               Ver planes
             </button>
           </div>
-        ) : planInfo?.plan === "premium" ? (
+        ) : (planInfo?.plan || comercio.plan) === "premium" ? (
           <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-2xl border border-indigo-500/30 bg-indigo-500/10">
             <span className="text-indigo-400 text-lg">✦</span>
             <div className="flex-1">
@@ -391,7 +391,7 @@ export default function GestionarComercioClient({ comercio: initial }: Props) {
       {showPlanModal && (
         <StorePlanModal
           isDark={isDark}
-          currentPlan={planInfo?.plan ?? "free"}
+          currentPlan={planInfo?.plan ?? comercio.plan ?? "free"}
           planInfo={planInfo}
           onClose={() => setShowPlanModal(false)}
         />
