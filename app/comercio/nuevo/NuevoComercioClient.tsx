@@ -86,12 +86,17 @@ export default function NuevoComercioClient() {
     setAiLoading(true);
     try {
       const token = await getToken();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
       const res = await fetch(`${API_URL}/api/ai/generate-description`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers,
         body: JSON.stringify({ rubro: form.rubro, nombre: form.nombre, barrio: form.barrio, zona: aiExtra.zona || undefined }),
       });
-      if (!res.ok) throw new Error("Error generando descripcion");
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error((d as { error?: string }).error ?? "Error generando descripcion");
+      }
       const data = await res.json();
       setForm((f) => ({ ...f, descripcion: data.descripcion }));
       setAiOpen(false);

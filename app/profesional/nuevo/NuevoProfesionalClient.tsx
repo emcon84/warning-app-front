@@ -86,12 +86,16 @@ export default function NuevoProfesionalClient() {
         headers,
         body: JSON.stringify({ oficios: form.oficios, nombre: form.nombre, anios: aiForm.anios || undefined, zona: aiForm.zona || undefined }),
       });
-      if (!res.ok) throw new Error("Error generando descripcion");
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error((d as { error?: string }).error ?? "Error generando descripcion");
+      }
       const data = await res.json();
       setForm((f) => ({ ...f, descripcion: data.descripcion }));
       setAiOpen(false);
-    } catch { /* silently fail — user can write manually */ }
-    finally { setAiLoading(false); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "No se pudo generar la descripcion.");
+    } finally { setAiLoading(false); }
   }
 
   function toggleOficio(oficio: string) {
