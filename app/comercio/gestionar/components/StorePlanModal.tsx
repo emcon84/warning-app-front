@@ -33,7 +33,7 @@ export function StorePlanModal({ isDark, currentPlan, planInfo, onClose }: Props
     {
       id: "premium",
       name: "Premium",
-      price: "U$5/mes",
+      price: "$5.000/mes",
       features: [
         "Hasta 100 productos",
         "20 fotos con IA por día",
@@ -46,7 +46,7 @@ export function StorePlanModal({ isDark, currentPlan, planInfo, onClose }: Props
     {
       id: "master",
       name: "Master",
-      price: "U$10/mes",
+      price: "$10.000/mes",
       features: [
         "Productos ilimitados",
         "IA ilimitada",
