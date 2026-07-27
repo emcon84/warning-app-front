@@ -59,7 +59,7 @@ export function StorePlanModal({ isDark, currentPlan, planInfo, onClose }: Props
   ];
 
   function getUsageText() {
-    if (!planInfo) return "";
+    if (!planInfo || !planInfo.limits) return "";
     const { usage, limits } = planInfo;
     if (typeof limits.totalProducts === "number") {
       return `${usage.productos}/${limits.totalProducts} productos`;
