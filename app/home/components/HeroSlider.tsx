@@ -37,7 +37,9 @@ export function HeroSlider({ slides }: HeroSliderProps) {
     if (timerRef.current) clearInterval(timerRef.current);
     if (slides.length <= 1) return;
     timerRef.current = setInterval(() => {
-      goTo((slide + 1) % slides.length);
+      setTransitioning(true);
+      setSlide(p => (p + 1) % slides.length);
+      setTimeout(() => setTransitioning(false), 500);
     }, 6000);
   };
 
