@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import GestionarComercioClient from "./GestionarComercioClient";
 
 import { API_URL } from "@/lib/api/client";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Mi comercio" };
 
 export default async function GestionarComercioPage() {
