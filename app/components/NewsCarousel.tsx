@@ -19,32 +19,11 @@ function PortalCarousel({ portal }: { portal: string }) {
   const { data: rawArticles, loading } = useReconquistaNews(portal);
   const articles = (rawArticles ?? []).slice(0, MAX_ARTICLES);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [slide, setSlide] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const itemWidth = 268;
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const swipeX = useRef(0);
 
-  const resetTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setSlide(p => (p + 1) % (articles?.length || 1));
-    }, 5000);
-  }, [articles?.length]);
-
-  useEffect(() => {
-    if (!articles || articles.length === 0 || paused) return;
-    resetTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [articles, paused, resetTimer]);
-
-  useEffect(() => {
+  const scrollBy = (dir: number) => {
     if (!scrollRef.current) return;
-    scrollRef.current.scrollTo({
-      left: slide * itemWidth,
-      behavior: "smooth",
-    });
-  }, [slide]);
+    scrollRef.current.scrollBy({ left: dir * 280, behavior: "smooth" });
+  };
 
   if (loading) {
     return (
@@ -71,16 +50,11 @@ function PortalCarousel({ portal }: { portal: string }) {
   if (!articles || articles.length === 0) return null;
 
   return (
-    <section
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
+    <section>
       <div className="relative group/scroll">
         <div
           ref={scrollRef}
           className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory scroll-smooth"
-          onTouchStart={() => setPaused(true)}
-          onTouchEnd={() => { setPaused(false); resetTimer(); }}
         >
           {articles.map((article, i) => (
             <a
@@ -127,36 +101,20 @@ function PortalCarousel({ portal }: { portal: string }) {
           ))}
         </div>
 
-        <button
-          onClick={() => { setSlide(p => (p - 1 + articles.length) % articles.length); resetTimer(); }}
+        <button onClick={() => scrollBy(-1)}
           className={`absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity ${
             isDark ? "bg-black/60 text-white hover:bg-black/80" : "bg-white/80 text-gray-900 hover:bg-white shadow-md"
           }`}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <button
-          onClick={() => { setSlide(p => (p + 1) % articles.length); resetTimer(); }}
+        <button onClick={() => scrollBy(1)}
           className={`absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover/scroll:opacity-100 transition-opacity ${
             isDark ? "bg-black/60 text-white hover:bg-black/80" : "bg-white/80 text-gray-900 hover:bg-white shadow-md"
           }`}
         >
           <ChevronRight className="w-5 h-5" />
         </button>
-      </div>
-
-      <div className="flex justify-center gap-1.5 mt-3">
-        {articles.slice(0, 8).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setSlide(i); resetTimer(); }}
-            className={`w-1.5 h-1.5 rounded-full transition-all ${
-              i === slide
-                ? isDark ? "bg-red-400 w-4" : "bg-red-500 w-4"
-                : isDark ? "bg-gray-700" : "bg-gray-300"
-            }`}
-          />
-        ))}
       </div>
     </section>
   );
