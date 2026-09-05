@@ -17,7 +17,7 @@ interface Props {
     logo?: string | null;
     whatsapp: string;
   };
-  getToken: () => Promise<string | null>;
+  getHeaders: () => Record<string, string>;
   onComplete: (producto: { id: string; nombre: string; precio?: string | null; foto?: string | null }) => void;
   onClose: () => void;
 }
@@ -30,7 +30,7 @@ const variants = {
   exit: (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
 };
 
-export default function NuevoProductoWizard({ comercio, getToken, onComplete, onClose }: Props) {
+export default function NuevoProductoWizard({ comercio, getHeaders, onComplete, onClose }: Props) {
   const [step, setStep] = useState(1);
   const [dir, setDir] = useState(1);
   const { fire } = useConfetti();
@@ -80,12 +80,11 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
   async function runAutocompletar(file: File) {
     setAutocompleting(true);
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("photo", file);
       const res = await fetch(`${API_URL}/api/comercios/me/productos/autocompletar`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) return;
@@ -106,13 +105,12 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
     setGeneratingImg(true);
     setImgGenError(null);
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("photo", photoFile);
       if (aiGenNombre || nombre) fd.append("nombre", aiGenNombre || nombre);
       const res = await fetch(`${API_URL}/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) throw new Error("error");
@@ -130,7 +128,6 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("nombre", nombre.trim());
       fd.append("tipo", tipo);
@@ -142,7 +139,7 @@ export default function NuevoProductoWizard({ comercio, getToken, onComplete, on
 
       const res = await fetch(`${API_URL}/api/comercios/me/productos`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) throw new Error("error");

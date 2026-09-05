@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { useAuth } from "@clerk/nextjs";
 import { X, ImageIcon } from "lucide-react";
 import type { ComercioOffer } from "@/types";
 import { resolvePhotoUrl } from "@/lib/utils/photo";
@@ -11,13 +10,13 @@ import { API_URL } from "@/lib/api/client";
 
 interface Props {
   isDark: boolean;
+  getHeaders: () => Record<string, string>;
   onClose: () => void;
   onSaved: (offer: ComercioOffer) => void;
   editing?: ComercioOffer;
 }
 
-export function StoreOfferModal({ isDark, onClose, onSaved, editing }: Props) {
-  const { getToken } = useAuth();
+export function StoreOfferModal({ isDark, getHeaders, onClose, onSaved, editing }: Props) {
   const [titulo, setTitulo] = useState(editing?.titulo ?? "");
   const [descripcion, setDescripcion] = useState(editing?.descripcion ?? "");
   const [terminos, setTerminos] = useState(editing?.terminos ?? "");
@@ -45,7 +44,6 @@ export function StoreOfferModal({ isDark, onClose, onSaved, editing }: Props) {
     setLoading(true);
     setError("");
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("titulo", titulo.trim());
       if (descripcion.trim()) fd.append("descripcion", descripcion.trim());
@@ -60,7 +58,7 @@ export function StoreOfferModal({ isDark, onClose, onSaved, editing }: Props) {
         : `/api/comercios/me/offers`;
       const res = await fetch(url, {
         method: editing ? "PATCH" : "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) {

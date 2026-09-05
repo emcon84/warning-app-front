@@ -20,14 +20,13 @@ import { API_URL } from "@/lib/api/client";
 
 export default function NuevoComercioClient() {
   const router = useRouter();
-  const { getToken, isSignedIn, isLoaded } = useAuth();
+  const { getToken } = useAuth();
   const { permission, isSupported, requestPermission } = useNotifications();
   const { fire: fireConfetti } = useConfetti();
   const { isDark } = useTheme();
 
   const pageBg   = isDark ? "bg-gray-950"    : "bg-gray-50";
   const headerBg = isDark ? "bg-gray-950/90" : "bg-gray-50/90";
-  const cardBg   = isDark ? "bg-gray-900"    : "bg-white";
   const border   = isDark ? "border-gray-800" : "border-gray-200";
   const textPri  = isDark ? "text-white"     : "text-gray-900";
   const textSec  = isDark ? "text-gray-400"  : "text-gray-500";
@@ -48,8 +47,10 @@ export default function NuevoComercioClient() {
   const [form, setForm] = useState<ComercioForm>({
     nombre: "", rubro: "", barrio: "Reconquista (toda la ciudad)",
     whatsapp: "", telefono: "", direccion: "", horario: "", descripcion: "",
+    pin: "", pinConfirm: "",
   });
   const [whatsappRaw, setWhatsappRaw] = useState("");
+  const [showPin, setShowPin] = useState(false);
 
   const [aiOpen, setAiOpen] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -138,12 +139,15 @@ export default function NuevoComercioClient() {
       if (form.direccion) fd.append("direccion", form.direccion);
       if (form.horario) fd.append("horario", form.horario);
       if (form.descripcion) fd.append("descripcion", form.descripcion);
+      if (form.pin) fd.append("pin", form.pin);
       if (mainPhoto) fd.append("photo", mainPhoto);
       gallery.forEach((f, i) => fd.append(`photo${i}`, f));
 
+      const authHeaders: Record<string, string> = {};
+      if (token) authHeaders["Authorization"] = `Bearer ${token}`;
       const res = await fetch(`${API_URL}/api/comercios`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeaders,
         body: fd,
       });
 
@@ -155,6 +159,7 @@ export default function NuevoComercioClient() {
 
       const comercio = await res.json();
       setCreatedSlug(comercio.slug);
+      if (comercio.id) localStorage.setItem("store_panel_code", comercio.id);
       fireConfetti();
       goNext();
     } catch (e: unknown) {
@@ -169,37 +174,7 @@ export default function NuevoComercioClient() {
     [router, createdSlug],
   );
 
-  if (isLoaded && !isSignedIn) {
-    return (
-      <div className={`min-h-screen ${pageBg} ${textPri} flex flex-col items-center justify-center px-6`}>
-        <div className={`w-full max-w-sm rounded-2xl border ${border} ${cardBg} p-8 flex flex-col items-center text-center gap-5`}>
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
-            🏪
-          </div>
-          <div>
-            <h2 className={`text-lg font-bold mb-2 ${textPri}`}>Necesitás una cuenta</h2>
-            <p className={`text-sm leading-relaxed ${textSec}`}>
-              Para registrar tu comercio tenés que iniciar sesión primero. Es gratis y tarda menos de un minuto.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 w-full">
-            <button
-              onClick={() => router.push(`/sign-in?redirect_url=/comercio/nuevo`)}
-              className={`w-full py-3 rounded-2xl font-semibold text-sm transition-colors ${isDark ? "bg-white text-gray-900 hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-gray-800"}`}
-            >
-              Iniciar sesión
-            </button>
-            <button
-              onClick={() => router.back()}
-              className={`w-full py-3 rounded-2xl text-sm font-medium ${textSec} transition-colors`}
-            >
-              Volver
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const pinValid = /^\d{4}$/.test(form.pin) && form.pin === form.pinConfirm;
 
   const steps = [
     {
@@ -211,10 +186,11 @@ export default function NuevoComercioClient() {
         <StepContacto
           form={form} setForm={setForm}
           whatsappRaw={whatsappRaw} onWhatsappChange={handleWhatsappChange}
-          inputCls={inputCls} textSec={textSec} textMut={textMut}
+          showPin={showPin} setShowPin={setShowPin}
+          inputCls={inputCls} isDark={isDark} textSec={textSec} textMut={textMut}
         />
       ),
-      canContinue: !!(form.nombre.trim() && form.whatsapp.length >= 11),
+      canContinue: !!(form.nombre.trim() && form.whatsapp.length >= 11 && pinValid),
       onContinue: goNext,
     },
     {

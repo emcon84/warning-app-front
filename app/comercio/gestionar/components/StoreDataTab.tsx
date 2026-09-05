@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
 import { Check } from "lucide-react";
 import type { Comercio } from "@/types";
 import { RUBROS, BARRIOS } from "@/lib/constants/storeConstants";
@@ -11,11 +10,11 @@ import { API_URL } from "@/lib/api/client";
 interface Props {
   comercio: Comercio;
   isDark: boolean;
+  getHeaders: () => Record<string, string>;
   onComercioUpdate: (updated: Partial<Comercio>) => void;
 }
 
-export function StoreDataTab({ comercio, isDark, onComercioUpdate }: Props) {
-  const { getToken } = useAuth();
+export function StoreDataTab({ comercio, isDark, getHeaders, onComercioUpdate }: Props) {
   const [form, setForm] = useState({
     nombre: comercio.nombre ?? "",
     rubro: comercio.rubro ?? "",
@@ -47,7 +46,6 @@ export function StoreDataTab({ comercio, isDark, onComercioUpdate }: Props) {
     setSaving(true);
     setError("");
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("nombre", form.nombre.trim());
       fd.append("rubro", form.rubro);
@@ -63,7 +61,7 @@ export function StoreDataTab({ comercio, isDark, onComercioUpdate }: Props) {
 
       const res = await fetch(`${API_URL}/api/comercios/me`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) {

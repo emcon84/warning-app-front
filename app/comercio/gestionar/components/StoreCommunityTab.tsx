@@ -12,10 +12,10 @@ import { API_URL } from "@/lib/api/client";
 interface Props {
   comercio: { id: string; nombre: string; slug: string };
   isDark: boolean;
-  getToken: () => Promise<string | null>;
+  getHeaders: () => Record<string, string>;
 }
 
-export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
+export function StoreCommunityTab({ comercio, isDark, getHeaders }: Props) {
   const [posts, setPosts] = useState<ComercioPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -48,7 +48,6 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
     setSaving(true);
     setPostError(null);
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("tipo", postTipo);
       fd.append("contenido", postContenido.trim());
@@ -60,7 +59,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
       if (postTipo === "sorteo" && postFechaSorteo) fd.append("fechaSorteo", postFechaSorteo);
       const res = await fetch(`${API_URL}/api/comercios/${comercio.slug}/posts`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) throw new Error("error");
@@ -81,10 +80,9 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
   }
 
   async function handleDeletePost(postId: string) {
-    const token = await getToken();
     await fetch(`${API_URL}/api/comercios/${comercio.slug}/posts/${postId}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: getHeaders(),
     });
     setPosts((prev) => prev.filter((p) => p.id !== postId));
   }
@@ -237,7 +235,7 @@ export function StoreCommunityTab({ comercio, isDark, getToken }: Props) {
       {showWizard && (
         <NuevoPostWizard
           comercio={{ id: comercio.id, nombre: comercio.nombre, slug: comercio.slug }}
-          getToken={getToken}
+          getHeaders={getHeaders}
           onComplete={(post) => {
             setPosts((prev) => [post as ComercioPost, ...prev]);
             setShowWizard(false);

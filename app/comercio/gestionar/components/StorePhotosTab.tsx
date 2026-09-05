@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { useAuth } from "@clerk/nextjs";
 import { Plus, X, Pencil } from "lucide-react";
 import type { Comercio } from "@/types";
 import { resolvePhotoUrl } from "@/lib/utils/photo";
@@ -12,11 +11,11 @@ import { API_URL } from "@/lib/api/client";
 interface Props {
   comercio: Comercio;
   isDark: boolean;
+  getHeaders: () => Record<string, string>;
   onComercioUpdate: (updated: Partial<Comercio>) => void;
 }
 
-export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
-  const { getToken } = useAuth();
+export function StorePhotosTab({ comercio, isDark, getHeaders, onComercioUpdate }: Props) {
   const [newLogoFile, setNewLogoFile] = useState<File | null>(null);
   const [newLogoPreview, setNewLogoPreview] = useState<string | null>(null);
   const [newMainFile, setNewMainFile] = useState<File | null>(null);
@@ -41,7 +40,6 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
     setSaving(true);
     setError("");
     try {
-      const token = await getToken();
       const fd = new FormData();
       if (newLogoFile) fd.append("logo", newLogoFile);
       if (newMainFile) fd.append("photo", newMainFile);
@@ -49,7 +47,7 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
 
       const res = await fetch(`${API_URL}/api/comercios/me`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) {
@@ -73,10 +71,9 @@ export function StorePhotosTab({ comercio, isDark, onComercioUpdate }: Props) {
 
   async function handleDeleteFoto(url: string) {
     try {
-      const token = await getToken();
       await fetch(`${API_URL}/api/comercios/me/fotos`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { ...getHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
       });
       onComercioUpdate({ fotos: existingFotos.filter((f) => f !== url) });

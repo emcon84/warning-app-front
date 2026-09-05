@@ -7,6 +7,8 @@ export interface ComercioForm {
   direccion: string;
   horario: string;
   descripcion: string;
+  pin: string;
+  pinConfirm: string;
 }
 
 export interface AiExtra {

@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { useAuth } from "@clerk/nextjs";
 import { X, ImageIcon, Camera, Sparkles } from "lucide-react";
 import type { Producto } from "@/types";
 import { compressImageForAi } from "@/lib/utils/imageUtils";
@@ -11,13 +10,13 @@ import { API_URL } from "@/lib/api/client";
 
 interface Props {
   isDark: boolean;
+  getHeaders: () => Record<string, string>;
   onClose: () => void;
   onSaved: (p: Producto) => void;
   editing?: Producto;
 }
 
-export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) {
-  const { getToken } = useAuth();
+export function StoreProductModal({ isDark, getHeaders, onClose, onSaved, editing }: Props) {
   const [nombre, setNombre] = useState(editing?.nombre ?? "");
   const [tipo, setTipo] = useState<"producto" | "servicio">(editing?.tipo ?? "producto");
   const [descripcion, setDescripcion] = useState(editing?.descripcion ?? "");
@@ -57,12 +56,11 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
     try {
       const preparedFile = await compressImageForAi(file);
       setSelectedPhoto(preparedFile);
-      const token = await getToken();
       const fd = new FormData();
       fd.append("photo", preparedFile);
       const res = await fetch(`${API_URL}/api/comercios/me/productos/autocompletar`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       const data = (await res.json()) as {
@@ -117,7 +115,6 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
     setGeneratingImg(true);
     setImgGenError("");
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("photo", photoFileVal);
       fd.append("nombre", nombreVal.trim());
@@ -125,7 +122,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
       fd.append("tipo", tipoVal);
       const res = await fetch(`${API_URL}/api/comercios/me/productos/generar-imagen`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       const text = await res.text();
@@ -156,7 +153,6 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
     setLoading(true);
     setError("");
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("nombre", nombre.trim());
       fd.append("tipo", tipo);
@@ -172,7 +168,7 @@ export function StoreProductModal({ isDark, onClose, onSaved, editing }: Props) 
         : `/api/comercios/me/productos`;
       const res = await fetch(url, {
         method: editing ? "PATCH" : "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) {

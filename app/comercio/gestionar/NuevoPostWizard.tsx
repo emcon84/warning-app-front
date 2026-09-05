@@ -17,7 +17,7 @@ interface Props {
     nombre: string;
     slug: string;
   };
-  getToken: () => Promise<string | null>;
+  getHeaders: () => Record<string, string>;
   onComplete: (post: { id: string; tipo: string; contenido: string }) => void;
   onClose: () => void;
 }
@@ -28,7 +28,7 @@ const variants = {
   exit: (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
 };
 
-export default function NuevoPostWizard({ comercio, getToken, onComplete, onClose }: Props) {
+export default function NuevoPostWizard({ comercio, getHeaders, onComplete, onClose }: Props) {
   const { isDark } = useTheme();
   const [step, setStep] = useState(1);
   const [dir, setDir] = useState(1);
@@ -62,7 +62,6 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const token = await getToken();
       const fd = new FormData();
       fd.append("tipo", tipo);
       fd.append("contenido", contenido.trim());
@@ -74,7 +73,7 @@ export default function NuevoPostWizard({ comercio, getToken, onComplete, onClos
       if (tipo === "sorteo" && fechaSorteo) fd.append("fechaSorteo", fechaSorteo);
       const res = await fetch(`${API_URL}/api/comercios/${comercio.slug}/posts`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: getHeaders(),
         body: fd,
       });
       if (!res.ok) throw new Error("error");
