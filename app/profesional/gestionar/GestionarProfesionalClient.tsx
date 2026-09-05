@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useTheme } from "@/contexts/ThemeContext";
 import Navbar from "@/components/Navbar";
 import {
@@ -32,15 +33,14 @@ function photoUrl(url?: string | null) {
   return url.startsWith("/uploads/") ? `${url}` : url;
 }
 
-function proHeaders(code: string): HeadersInit {
-  return { "X-Professional-Code": code };
-}
-
 export default function GestionarProfesionalClient() {
   const router = useRouter();
   const { isDark } = useTheme();
+  const { isLoaded, user } = useUser();
+  const { getToken } = useAuth();
 
   const [code, setCode] = useState<string | null>(null);
+  const [clerkToken, setClerkToken] = useState<string | null>(null);
   const [waInput, setWaInput] = useState("");
   const [pinInput, setPinInput] = useState("");
   const [showPin, setShowPin] = useState(false);
@@ -74,15 +74,48 @@ export default function GestionarProfesionalClient() {
     ? "bg-gray-800 border-gray-700 text-white placeholder-gray-600 focus:border-blue-500"
     : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500";
 
-  // On mount: check localStorage for saved code
+  // Build auth headers: Clerk token when signed in, X-Professional-Code otherwise.
+  function buildHeaders(): Record<string, string> {
+    if (code) return { "X-Professional-Code": code };
+    if (clerkToken) return { Authorization: `Bearer ${clerkToken}` };
+    return {};
+  }
+
+  // On mount: if signed in with Clerk, try to load the linked profile directly.
+  // Otherwise fall back to the WhatsApp+PIN flow (localStorage code).
   useEffect(() => {
+    if (!isLoaded) return;
+    if (user) {
+      let cancelled = false;
+      (async () => {
+        try {
+          const token = await getToken();
+          if (cancelled) return;
+          setClerkToken(token);
+          const res = await fetch(`${API_URL}/api/professionals/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data: Professional = await res.json();
+            if (cancelled) return;
+            setPro(data);
+            setDescripcion(data.descripcion ?? "");
+            setWhatsapp(data.whatsapp ?? "");
+            setBarrio(data.barrio ?? "");
+          }
+        } finally {
+          if (!cancelled) setLoading(false);
+        }
+      })();
+      return () => { cancelled = true; };
+    }
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       setCode(saved);
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [isLoaded, user, getToken]);
 
   // When code is set, load the profile
   useEffect(() => {
@@ -94,7 +127,7 @@ export default function GestionarProfesionalClient() {
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/professionals/me`, {
-        headers: proHeaders(accessCode),
+        headers: { "X-Professional-Code": accessCode },
       });
       if (!res.ok) {
         localStorage.removeItem(STORAGE_KEY);
@@ -144,7 +177,7 @@ export default function GestionarProfesionalClient() {
     try {
       const res = await fetch(`${API_URL}/api/professionals/me`, {
         method: "PUT",
-        headers: { ...proHeaders(code), "Content-Type": "application/json" },
+        headers: { ...buildHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({
           nombre: pro.nombre, apellido: pro.apellido, tipo: pro.tipo,
           oficios: pro.oficios, descripcion: descripcion || null,
@@ -169,7 +202,7 @@ export default function GestionarProfesionalClient() {
     try {
       const res = await fetch(`${API_URL}/api/professionals/me`, {
         method: "PUT",
-        headers: { ...proHeaders(code), "Content-Type": "application/json" },
+        headers: { ...buildHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({
           nombre: pro.nombre, apellido: pro.apellido, tipo: pro.tipo,
           oficios: pro.oficios, descripcion: pro.descripcion, barrio: pro.barrio,
@@ -189,7 +222,7 @@ export default function GestionarProfesionalClient() {
       const fd = new FormData();
       fd.append("photo", file);
       const res = await fetch(`${API_URL}/api/professionals/me/photo`, {
-        method: "POST", headers: proHeaders(code), body: fd,
+        method: "POST", headers: buildHeaders(), body: fd,
       });
       if (res.ok) {
         const { foto } = await res.json();
@@ -207,7 +240,7 @@ export default function GestionarProfesionalClient() {
       const fd = new FormData();
       fd.append("photo", file);
       const res = await fetch(`${API_URL}/api/professionals/me/fotos`, {
-        method: "POST", headers: proHeaders(code), body: fd,
+        method: "POST", headers: buildHeaders(), body: fd,
       });
       if (res.ok) {
         const { fotos } = await res.json();
@@ -224,7 +257,7 @@ export default function GestionarProfesionalClient() {
     try {
       const res = await fetch(`${API_URL}/api/professionals/me/fotos`, {
         method: "DELETE",
-        headers: { ...proHeaders(code), "Content-Type": "application/json" },
+        headers: { ...buildHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({ fotoUrl }),
       });
       if (res.ok) {
@@ -246,7 +279,7 @@ export default function GestionarProfesionalClient() {
   }
 
   // ─── Auth form ──────────────────────────────────────────────────────────────
-  if (!code || !pro) {
+  if (!pro) {
     return (
       <div className={`min-h-screen ${bg} ${textPri}`}>
         <Navbar sidebarDisabled />
