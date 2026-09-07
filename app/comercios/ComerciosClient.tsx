@@ -514,7 +514,7 @@ export default function ComerciosClient({ comercios }: Props) {
         {/* FAB: registrar comercio */}
         <button
           onClick={() => router.push("/comercio/nuevo")}
-          className="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg flex items-center justify-center hover:bg-blue-500 transition-colors z-30"
+          className="fixed bottom-40 md:bottom-24 right-4 w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg flex items-center justify-center hover:bg-blue-500 transition-colors z-30"
           title="Registrar mi comercio"
         >
           <Plus className="w-6 h-6" />

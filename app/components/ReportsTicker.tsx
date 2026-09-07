@@ -32,6 +32,10 @@ export default function ReportsTicker({
 }: ReportsTickerProps) {
   const router = useRouter();
   const pathname = usePathname();
+  // En el mapa (/app) la barrita sube para no tapar emergencia/mic; en el resto baja al fondo
+  const tickerPos = pathname.startsWith("/app")
+    ? "bottom-48"
+    : "bottom-20";
   const [reports, setReports] = useState<Report[]>(reportsProp || []);
   const [index, setIndex] = useState(0);
   const [animState, setAnimState] = useState<AnimState>("hidden");
@@ -46,7 +50,6 @@ export default function ReportsTicker({
 
   useEffect(() => {
     if (reportsProp) return; // viene del padre, no auto-fetch
-    if (pathname.startsWith("/app")) return; // en el mapa ya hay botones de emergencia
     fetchReports.current();
     const interval = setInterval(fetchReports.current, POLL_MS);
     const onVisible = () => {
@@ -60,7 +63,7 @@ export default function ReportsTicker({
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("reports:updated", onUpdated);
     };
-  }, [reportsProp, pathname]);
+  }, [reportsProp]);
 
   const now = Date.now();
   const isRecent = (date: Date | string) => {
@@ -112,9 +115,6 @@ export default function ReportsTicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recent.length]);
 
-  // Ocultar en la página del mapa: ya hay botones de emergencia (911/101) y mic
-  if (pathname.startsWith("/app")) return null;
-
   const handleClick = () => {
     if (recent.length === 0) {
       router.push("/app?view=reports");
@@ -140,10 +140,10 @@ export default function ReportsTicker({
   // Sin reportes recientes: barra promocional que invita a la sección
   if (recent.length === 0) {
     return (
-      <div className="fixed bottom-44 left-0 right-0 z-[900] flex justify-center px-4">
+      <div className={`fixed ${tickerPos} md:bottom-auto md:top-16 left-0 right-0 z-[900] flex justify-center px-4`}>
         <button
           onClick={handleClick}
-          className="w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white transition-all duration-[420ms] ease-in-out"
+          className="w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 text-white transition-all duration-[420ms] ease-in-out"
         >
           <span className="shrink-0 w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
             <Megaphone className="w-5 h-5" />
@@ -183,7 +183,7 @@ export default function ReportsTicker({
   };
 
   return (
-    <div className="fixed bottom-44 left-0 right-0 z-[900] flex justify-center px-4">
+    <div className={`fixed ${tickerPos} md:bottom-auto md:top-16 left-0 right-0 z-[900] flex justify-center px-4`}>
       <button
         onClick={handleClick}
         onTouchStart={(e) => {
@@ -191,28 +191,28 @@ export default function ReportsTicker({
           e.preventDefault();
         }}
         onTouchEnd={handleTouch}
-        className={`w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-xl cursor-pointer bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60 transition-all duration-[420ms] ease-in-out ${translate}`}
+        className={`w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl cursor-pointer bg-emerald-50/95 dark:bg-emerald-900/80 backdrop-blur-md border border-emerald-300/60 dark:border-emerald-700/60 transition-all duration-[420ms] ease-in-out ${translate}`}
         style={{ willChange: "transform, opacity" }}
       >
         {Icon && (
-          <span className="shrink-0 w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-            <Icon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+          <span className="shrink-0 w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-800 flex items-center justify-center">
+            <Icon className="w-5 h-5 text-emerald-700 dark:text-emerald-300" />
           </span>
         )}
         <div className="flex-1 min-w-0 text-left">
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide leading-none mb-0.5">
+          <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide leading-none mb-0.5">
             {label}
           </p>
-          <p className="text-sm font-medium text-gray-900 dark:text-white truncate leading-snug">
+          <p className="text-sm font-medium text-emerald-950 dark:text-white truncate leading-snug">
             {report.description}
           </p>
           {location && (
-            <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 truncate mt-0.5">
               {location}
             </p>
           )}
         </div>
-        <span className="shrink-0 text-[10px] text-gray-300 dark:text-gray-600 font-medium">
+        <span className="shrink-0 text-[10px] text-emerald-300 dark:text-emerald-600 font-medium">
           {index + 1}/{recent.length}
         </span>
       </button>
