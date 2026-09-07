@@ -116,6 +116,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       form.append("audio", audioBlob, "audio.webm");
       form.append("lat", String(position.lat));
       form.append("lng", String(position.lng));
+      form.append("quick", "true"); // reporte rápido, sin categorizar
 
       try {
         const res = await fetch(`${API_URL}/api/voice/report`, {
@@ -129,7 +130,7 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
           return;
         }
         setState("success");
-        showFeedback(`Reporte creado: "${data.report?.descripcion || "listo"}"`, true);
+        showFeedback(`Reporte rápido creado: "${data.report?.descripcion || "listo"}"`, true);
         onReportCreated(data.report);
       } catch {
         setState("error");

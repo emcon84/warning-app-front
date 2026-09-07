@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import ReportModal from "../components/ReportModal";
@@ -15,7 +15,6 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import FloatingBottomNav from "../components/FloatingBottomNav";
 import VoiceReportButton from "../components/VoiceReportButton";
-import ReportsTicker from "../components/ReportsTicker";
 import { getReports, createReport, deleteReport, getDoctors, updateDoctor, getFarmacias, getFarmaciasTurno } from "../utils/api";
 import { MapPin, AlertTriangle, Stethoscope, Pill, Sun, Moon, WifiOff } from "lucide-react";
 import WelcomeTutorial from "../components/WelcomeTutorial";
@@ -62,6 +61,7 @@ function HomeContent() {
   const mapView = (["doctors", "reports", "farmacias", "ofertas"].includes(searchParams.get("view") ?? "")
     ? searchParams.get("view")
     : "reports") as MapView;
+  const reportIdFromQuery = searchParams.get("report");
 
   function setMapView(view: MapView) {
     router.replace(`/app?view=${view}`, { scroll: false });
@@ -90,6 +90,19 @@ function HomeContent() {
     loadDoctors();
     loadFarmacias();
   }, []);
+
+  // Abrir un reporte puntual desde el ticker global (?report=<id>)
+  const openedReportRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!reportIdFromQuery || reports.length === 0) return;
+    if (openedReportRef.current === reportIdFromQuery) return;
+    const r = reports.find((rep) => rep.id === reportIdFromQuery);
+    if (r) {
+      openedReportRef.current = reportIdFromQuery;
+      setSelectedReport(r);
+      setIsDetailModalOpen(true);
+    }
+  }, [reportIdFromQuery, reports]);
 
   const loadDoctors = async () => {
     try {
@@ -249,6 +262,7 @@ function HomeContent() {
 
         // Actualizar la lista local
         setReports([...reports, newReport]);
+        window.dispatchEvent(new Event("reports:updated"));
         // Enviar notificación push
         if (permission === "granted") {
           const categoryLabel = getCategoryLabel(newReport.category);
@@ -661,18 +675,13 @@ function HomeContent() {
       {/* Vista de ofertas de supermercados */}
       <OfertasView isVisible={mapView === "ofertas"} />
 
-      {/* Ticker de reportes recientes */}
-      {mapView === "reports" && (
-        <ReportsTicker
-          reports={reports}
-          onReportClick={(r) => setSelectedReport(r)}
-        />
-      )}
-
       {/* Botón crear reporte por voz — solo en vista reportes */}
       {mapView === "reports" && (
         <VoiceReportButton
-          onReportCreated={(report) => setReports((prev) => [...prev, report])}
+          onReportCreated={(report) => {
+            setReports((prev) => [...prev, report]);
+            window.dispatchEvent(new Event("reports:updated"));
+          }}
         />
       )}
 
