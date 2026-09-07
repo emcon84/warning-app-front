@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Megaphone } from "lucide-react";
 import { getCategoryIcon, getCategoryLabel } from "../utils/categoryHelpers";
 import { Report, ReportCategory } from "../types";
@@ -31,6 +31,7 @@ export default function ReportsTicker({
   onReportClick,
 }: ReportsTickerProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [reports, setReports] = useState<Report[]>(reportsProp || []);
   const [index, setIndex] = useState(0);
   const [animState, setAnimState] = useState<AnimState>("hidden");
@@ -45,6 +46,7 @@ export default function ReportsTicker({
 
   useEffect(() => {
     if (reportsProp) return; // viene del padre, no auto-fetch
+    if (pathname.startsWith("/app")) return; // en el mapa ya hay botones de emergencia
     fetchReports.current();
     const interval = setInterval(fetchReports.current, POLL_MS);
     const onVisible = () => {
@@ -58,7 +60,7 @@ export default function ReportsTicker({
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("reports:updated", onUpdated);
     };
-  }, [reportsProp]);
+  }, [reportsProp, pathname]);
 
   const now = Date.now();
   const isRecent = (date: Date | string) => {
@@ -109,6 +111,9 @@ export default function ReportsTicker({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recent.length]);
+
+  // Ocultar en la página del mapa: ya hay botones de emergencia (911/101) y mic
+  if (pathname.startsWith("/app")) return null;
 
   const handleClick = () => {
     if (recent.length === 0) {
