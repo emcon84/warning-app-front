@@ -141,16 +141,22 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
     mr.start(250); // chunk cada 250ms
     mediaRecorderRef.current = mr;
     setState("listening");
-    showFeedback(`Grabando... tocá para enviar (máx ${MAX_RECORDING_SEC}s)`);
+    showFeedback(`Grabando... soltá para enviar (máx ${MAX_RECORDING_SEC}s)`);
 
     // Auto-stop después de MAX_RECORDING_SEC segundos
     autoStopRef.current = setTimeout(stopAndSend, MAX_RECORDING_SEC * 1000);
   };
 
-  const handleTap = () => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (state === "idle" || state === "error") {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture?.(e.pointerId);
       startRecording();
-    } else if (state === "listening") {
+    }
+  };
+
+  const handlePointerUp = () => {
+    if (state === "listening") {
       stopAndSend();
     }
   };
@@ -175,11 +181,14 @@ export default function VoiceReportButton({ onReportCreated }: VoiceReportButton
       )}
 
       <button
-        onClick={handleTap}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onContextMenu={(e) => e.preventDefault()}
         disabled={isProcessing}
-        title={isListening ? "Tocá para enviar" : "Reportar por voz"}
+        title={isListening ? "Soltá para enviar" : "Mantené apretado para grabar"}
         className={`
-          w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all select-none
+          w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all select-none touch-none
           ${isListening  ? "bg-red-500 scale-110 ring-4 ring-red-300" : ""}
           ${isProcessing ? "bg-blue-500 cursor-not-allowed" : ""}
           ${isSuccess    ? "bg-green-500" : ""}
