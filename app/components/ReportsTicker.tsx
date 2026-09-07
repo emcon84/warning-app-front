@@ -140,7 +140,7 @@ export default function ReportsTicker({
   // Sin reportes recientes: barra promocional que invita a la sección
   if (recent.length === 0) {
     return (
-      <div className={`fixed ${tickerPos} md:bottom-auto md:top-16 left-0 right-0 z-[900] flex justify-center px-4`}>
+      <div className={`fixed ${tickerPos} md:bottom-auto md:top-24 left-0 right-0 z-[900] flex justify-center px-4`}>
         <button
           onClick={handleClick}
           className="w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 text-white transition-all duration-[420ms] ease-in-out"
@@ -183,7 +183,7 @@ export default function ReportsTicker({
   };
 
   return (
-    <div className={`fixed ${tickerPos} md:bottom-auto md:top-16 left-0 right-0 z-[900] flex justify-center px-4`}>
+    <div className={`fixed ${tickerPos} md:bottom-auto md:top-24 left-0 right-0 z-[900] flex justify-center px-4`}>
       <button
         onClick={handleClick}
         onTouchStart={(e) => {
