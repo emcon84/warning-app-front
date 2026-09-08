@@ -125,16 +125,25 @@ export default function ReportsTicker({
   };
 
   // ── DESKTOP: subnav integrada al navbar (empuja el contenido) ──
-  const latest = recent[0];
-  const NavIcon = latest ? getCategoryIcon(latest.category as ReportCategory) : Megaphone;
-  const navLabel = latest ? getCategoryLabel(latest.category as ReportCategory) : PROMO.label;
-  const navDesc = latest ? latest.description : PROMO.description;
+  // Rota por los reportes (mismo índice que la tarjeta mobile)
+  const current = recent.length > 0 ? recent[index] : undefined;
+  const NavIcon = current ? getCategoryIcon(current.category as ReportCategory) : Megaphone;
+  const navLabel = current ? getCategoryLabel(current.category as ReportCategory) : PROMO.label;
+  const navDesc = current ? current.description : PROMO.description;
+
+  // Fade para el ciclo (si no hay reportes, la promo queda siempre visible)
+  const stripOpacity =
+    recent.length === 0
+      ? "opacity-100"
+      : animState === "visible"
+      ? "opacity-100"
+      : "opacity-0";
 
   const navStrip = (
     <div className="hidden md:block w-full bg-emerald-600 text-white">
       <button
         onClick={handleClick}
-        className="w-full max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-2 text-xs"
+        className={`w-full max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-2 text-xs transition-opacity duration-[420ms] ease-in-out ${stripOpacity}`}
       >
         <NavIcon className="w-4 h-4 shrink-0" />
         <span className="font-bold shrink-0 uppercase tracking-wide">{navLabel}</span>
