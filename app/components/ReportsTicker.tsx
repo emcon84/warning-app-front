@@ -134,7 +134,7 @@ export default function ReportsTicker({
     <div className="hidden md:block w-full bg-emerald-600 text-white">
       <button
         onClick={handleClick}
-        className="w-full max-w-5xl mx-auto px-4 py-1.5 flex items-center gap-2 text-xs"
+        className="w-full max-w-5xl mx-auto px-4 py-2.5 flex items-center gap-2 text-xs"
       >
         <NavIcon className="w-4 h-4 shrink-0" />
         <span className="font-bold shrink-0 uppercase tracking-wide">{navLabel}</span>
