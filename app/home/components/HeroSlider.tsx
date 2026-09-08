@@ -92,7 +92,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
 
   return (
     <section
-      className="relative w-full min-h-[280px] md:min-h-[400px] overflow-hidden touch-pan-y pt-24"
+      className="relative w-full min-h-[280px] md:min-h-[400px] overflow-hidden touch-pan-y pt-24 md:pt-[124px]"
       onPointerDown={(e) => { swipeX.current = e.clientX; }}
       onPointerUp={(e) => {
         const d = swipeX.current - e.clientX;

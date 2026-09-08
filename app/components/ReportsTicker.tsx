@@ -32,10 +32,6 @@ export default function ReportsTicker({
 }: ReportsTickerProps) {
   const router = useRouter();
   const pathname = usePathname();
-  // En el mapa (/app) la barrita sube para no tapar emergencia/mic; en el resto baja al fondo
-  const tickerPos = pathname.startsWith("/app")
-    ? "bottom-48"
-    : "bottom-20";
   const [reports, setReports] = useState<Report[]>(reportsProp || []);
   const [index, setIndex] = useState(0);
   const [animState, setAnimState] = useState<AnimState>("hidden");
@@ -128,6 +124,29 @@ export default function ReportsTicker({
     }
   };
 
+  // ── DESKTOP: subnav integrada al navbar (empuja el contenido) ──
+  const latest = recent[0];
+  const NavIcon = latest ? getCategoryIcon(latest.category as ReportCategory) : Megaphone;
+  const navLabel = latest ? getCategoryLabel(latest.category as ReportCategory) : PROMO.label;
+  const navDesc = latest ? latest.description : PROMO.description;
+
+  const navStrip = (
+    <div className="hidden md:block w-full bg-emerald-600 text-white">
+      <button
+        onClick={handleClick}
+        className="w-full max-w-5xl mx-auto px-4 py-1.5 flex items-center gap-2 text-xs"
+      >
+        <NavIcon className="w-4 h-4 shrink-0" />
+        <span className="font-bold shrink-0 uppercase tracking-wide">{navLabel}</span>
+        <span className="truncate flex-1">{navDesc}</span>
+        <span className="shrink-0 font-semibold opacity-80">Ver más</span>
+      </button>
+    </div>
+  );
+
+  // ── MOBILE: tarjeta flotante (en el mapa sube para no tapar emergencia/mic) ──
+  const tickerPos = pathname.startsWith("/app") ? "bottom-48" : "bottom-20";
+
   const translate =
     animState === "entering"
       ? "translate-x-full opacity-0"
@@ -137,10 +156,11 @@ export default function ReportsTicker({
       ? "-translate-x-full opacity-0"
       : "translate-x-full opacity-0";
 
-  // Sin reportes recientes: barra promocional que invita a la sección
+  let floatingCard: React.ReactNode = null;
+
   if (recent.length === 0) {
-    return (
-      <div className={`fixed ${tickerPos} md:bottom-auto md:top-24 left-0 right-0 z-[900] flex justify-center px-4`}>
+    floatingCard = (
+      <div className={`md:hidden fixed ${tickerPos} left-0 right-0 z-[900] flex justify-center px-4`}>
         <button
           onClick={handleClick}
           className="w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl cursor-pointer bg-gradient-to-r from-green-600 to-emerald-600 text-white transition-all duration-[420ms] ease-in-out"
@@ -162,60 +182,67 @@ export default function ReportsTicker({
         </button>
       </div>
     );
+  } else {
+    const report = recent[index];
+    if (report) {
+      const Icon = getCategoryIcon(report.category as ReportCategory);
+      const label = getCategoryLabel(report.category as ReportCategory);
+      const location =
+        report.direccion && report.direccion !== "Sin especificar"
+          ? report.direccion
+          : report.barrio && report.barrio !== "Sin especificar"
+          ? report.barrio
+          : null;
+
+      const handleTouch = (e: React.TouchEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        handleClick();
+      };
+
+      floatingCard = (
+        <div className={`md:hidden fixed ${tickerPos} left-0 right-0 z-[900] flex justify-center px-4`}>
+          <button
+            onClick={handleClick}
+            onTouchStart={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+            onTouchEnd={handleTouch}
+            className={`w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl cursor-pointer bg-emerald-50/95 dark:bg-emerald-900/80 backdrop-blur-md border border-emerald-300/60 dark:border-emerald-700/60 transition-all duration-[420ms] ease-in-out ${translate}`}
+            style={{ willChange: "transform, opacity" }}
+          >
+            {Icon && (
+              <span className="shrink-0 w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-800 flex items-center justify-center">
+                <Icon className="w-5 h-5 text-emerald-700 dark:text-emerald-300" />
+              </span>
+            )}
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide leading-none mb-0.5">
+                {label}
+              </p>
+              <p className="text-sm font-medium text-emerald-950 dark:text-white truncate leading-snug">
+                {report.description}
+              </p>
+              {location && (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 truncate mt-0.5">
+                  {location}
+                </p>
+              )}
+            </div>
+            <span className="shrink-0 text-[10px] text-emerald-300 dark:text-emerald-600 font-medium">
+              {index + 1}/{recent.length}
+            </span>
+          </button>
+        </div>
+      );
+    }
   }
 
-  const report = recent[index];
-  if (!report) return null;
-
-  const Icon = getCategoryIcon(report.category as ReportCategory);
-  const label = getCategoryLabel(report.category as ReportCategory);
-  const location =
-    report.direccion && report.direccion !== "Sin especificar"
-      ? report.direccion
-      : report.barrio && report.barrio !== "Sin especificar"
-      ? report.barrio
-      : null;
-
-  const handleTouch = (e: React.TouchEvent) => {
-    e.stopPropagation();
-    e.preventDefault(); // evita que Leaflet capture el touch
-    handleClick();
-  };
-
   return (
-    <div className={`fixed ${tickerPos} md:bottom-auto md:top-24 left-0 right-0 z-[900] flex justify-center px-4`}>
-      <button
-        onClick={handleClick}
-        onTouchStart={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onTouchEnd={handleTouch}
-        className={`w-full max-w-sm flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl cursor-pointer bg-emerald-50/95 dark:bg-emerald-900/80 backdrop-blur-md border border-emerald-300/60 dark:border-emerald-700/60 transition-all duration-[420ms] ease-in-out ${translate}`}
-        style={{ willChange: "transform, opacity" }}
-      >
-        {Icon && (
-          <span className="shrink-0 w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-800 flex items-center justify-center">
-            <Icon className="w-5 h-5 text-emerald-700 dark:text-emerald-300" />
-          </span>
-        )}
-        <div className="flex-1 min-w-0 text-left">
-          <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide leading-none mb-0.5">
-            {label}
-          </p>
-          <p className="text-sm font-medium text-emerald-950 dark:text-white truncate leading-snug">
-            {report.description}
-          </p>
-          {location && (
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 truncate mt-0.5">
-              {location}
-            </p>
-          )}
-        </div>
-        <span className="shrink-0 text-[10px] text-emerald-300 dark:text-emerald-600 font-medium">
-          {index + 1}/{recent.length}
-        </span>
-      </button>
-    </div>
+    <>
+      {navStrip}
+      {floatingCard}
+    </>
   );
 }

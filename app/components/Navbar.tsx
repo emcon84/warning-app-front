@@ -3,6 +3,7 @@
 import { Search, X, User, Settings, Sun, Moon, LayoutDashboard, CalendarDays } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { SearchDropdown } from "./SearchDropdown";
+import ReportsTicker from "./ReportsTicker";
 import { UserButton, useUser, useAuth, useClerk } from "@clerk/nextjs";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
@@ -404,6 +405,9 @@ export default function Navbar({ onMenuClick, mapView = "reports", onMapViewChan
             </div>
           </div>
         </div>
+
+        {/* ROW 3 — ticker comunitario (solo desktop) */}
+        <ReportsTicker />
 
       </div>
     </nav>

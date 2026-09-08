@@ -14,7 +14,6 @@ import { ViewTransitions } from "next-view-transitions";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
 import CartDrawer from "./components/CartDrawer";
-import ReportsTicker from "./components/ReportsTicker";
 import { dark } from "@clerk/themes";
 import { esES } from "@clerk/localizations";
 
@@ -127,7 +126,6 @@ export default function RootLayout({
                 {children}
                 <CartDrawer />
                 <PostLoginWizard />
-                <ReportsTicker />
                 <MobileBottomNav />
                 <NotificationPrompt />
                 <PWAInstallPrompt />
