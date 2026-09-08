@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Instagram } from "lucide-react";
+import { Instagram, KeyRound } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import type { Comercio } from "../types";
 
@@ -12,10 +12,11 @@ interface Props {
   onTogglePremium: (com: Comercio) => void;
   onToggleFounder: (com: Comercio) => void;
   onSetPlan: (com: Comercio, plan: string) => void;
+  onSetPin: (com: Comercio) => void;
   onShare: (com: Comercio) => void;
 }
 
-export function AdminComerciosTab({ comercios, deletingId, onDelete, onTogglePremium, onToggleFounder, onSetPlan, onShare }: Props) {
+export function AdminComerciosTab({ comercios, deletingId, onDelete, onTogglePremium, onToggleFounder, onSetPlan, onSetPin, onShare }: Props) {
   const { isDark } = useTheme();
   const bgCard = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
   const bgBtn = isDark ? "bg-gray-800 text-gray-400 border-gray-700 hover:text-white hover:bg-gray-700" : "bg-white text-gray-600 border-gray-300 hover:text-gray-900 hover:bg-gray-50";
@@ -76,6 +77,14 @@ export function AdminComerciosTab({ comercios, deletingId, onDelete, onTogglePre
               <option value="premium">Premium</option>
               <option value="master">Master</option>
             </select>
+            <button
+              onClick={() => onSetPin(com)}
+              className={`px-3 py-1.5 rounded-xl border ${btnAmber} text-xs font-medium transition-colors flex items-center gap-1.5`}
+              title="Asignar / resetear PIN"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              PIN
+            </button>
             <button
               onClick={() => onShare(com)}
               className={`px-3 py-1.5 rounded-xl border ${btnGreen} text-xs font-medium transition-colors flex items-center gap-1.5`}

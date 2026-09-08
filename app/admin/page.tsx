@@ -35,7 +35,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [shareTarget, setShareTarget] = useState<ShareTarget | null>(null);
-  const [pinTarget, setPinTarget] = useState<Professional | null>(null);
+  const [pinTarget, setPinTarget] = useState<{ id: string; label: string; endpoint: string } | null>(null);
 
   const isAdmin = isLoaded && user && ADMIN_CLERK_IDS.includes(user.id);
   const { isDark } = useTheme();
@@ -236,7 +236,7 @@ export default function AdminPage() {
             deletingId={deletingId}
             onDelete={deleteProfessional}
             onShare={openShareProfesional}
-            onSetPin={setPinTarget}
+            onSetPin={(pro) => setPinTarget({ id: pro.id, label: `${pro.nombre} ${pro.apellido}`, endpoint: `/api/admin/professionals/${pro.id}/pin` })}
           />
         ) : tab === "reports" ? (
           <AdminReportsTab reports={reports} deletingId={deletingId} onDelete={deleteReport} />
@@ -257,6 +257,7 @@ export default function AdminPage() {
               loadComercios();
             }}
             onShare={openShareComercio}
+            onSetPin={(com) => setPinTarget({ id: com.id, label: com.nombre, endpoint: `/api/admin/comercios/${com.id}/pin` })}
           />
         ) : tab === "outreach" ? (
           <AdminOutreachTab />
@@ -268,7 +269,7 @@ export default function AdminPage() {
       </div>
 
       {shareTarget && <ShareModal target={shareTarget} onClose={() => setShareTarget(null)} />}
-      {pinTarget && <PinModal target={pinTarget} getToken={getToken} onClose={() => setPinTarget(null)} />}
+      {pinTarget && <PinModal targetId={pinTarget.id} label={pinTarget.label} endpoint={pinTarget.endpoint} getToken={getToken} onClose={() => setPinTarget(null)} />}
     </div>
   );
 }

@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { KeyRound, X, Eye, EyeOff, Check } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import type { Professional } from "../types";
 
 import { API_URL } from "@/lib/api/client";
 
 interface Props {
-  target: Professional;
+  targetId: string;
+  label: string;
+  endpoint: string; // ruta completa, ej: /api/admin/comercios/:id/pin (con id ya inyectado)
   getToken: () => Promise<string | null>;
   onClose: () => void;
 }
 
-export function PinModal({ target, getToken, onClose }: Props) {
+export function PinModal({ targetId, label, endpoint, getToken, onClose }: Props) {
   const { isDark } = useTheme();
   const bgCard = isDark ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200";
   const bgInput = isDark ? "bg-gray-800 border-gray-700 text-white placeholder-gray-600" : "bg-white border-gray-200 text-gray-900 placeholder-gray-400";
@@ -31,7 +32,7 @@ export function PinModal({ target, getToken, onClose }: Props) {
     setSavingPin(true);
     try {
       const token = await getToken();
-      const res = await fetch(`${API_URL}/api/admin/professionals/${target.id}/pin`, {
+      const res = await fetch(`${API_URL}${endpoint}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ pin: pinValue }),
@@ -64,7 +65,7 @@ export function PinModal({ target, getToken, onClose }: Props) {
               <KeyRound className="w-4 h-4 text-amber-400" />
               Asignar PIN
             </h3>
-            <p className={`text-xs ${textMuted} mt-0.5`}>{target.nombre} {target.apellido}</p>
+            <p className={`text-xs ${textMuted} mt-0.5`}>{label}</p>
           </div>
           <button onClick={onClose} className={`p-1.5 rounded-full ${btnClose}`}>
             <X className="w-5 h-5" />
@@ -72,7 +73,7 @@ export function PinModal({ target, getToken, onClose }: Props) {
         </div>
 
         <p className={`text-xs ${textMuted} mb-4`}>
-          Asigná un PIN de 4 dígitos. El profesional lo va a usar junto a su WhatsApp para acceder a su panel.
+          Asigná un PIN de 4 dígitos. Lo va a usar junto a su WhatsApp para acceder a su panel.
         </p>
 
         <div className="flex flex-col gap-3">
